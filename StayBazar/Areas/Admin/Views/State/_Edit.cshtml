@@ -1,0 +1,52 @@
+﻿@model StayBazar.Areas.Admin.Models.StateModel
+@{
+                /**/
+
+                Layout = null;
+}
+@using (Html.BeginForm("Edit", "State"))
+{
+
+    <div class="page-title-container style3">
+        <div class="row">
+            <div class="col-md-6">
+                <h2 style="color:white"><a href="/Admin/Country" title="Back to Country List">Country</a>[@BLayer.Country.Get(Model.CountryId).Name] / States</h2>
+            </div>
+            @*<div class="h3">*@</div></div><br />
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.Name)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Name)
+                    </div>
+                    @*</div>
+                        <div class="incontainer">*@
+                    <div class="col-md-6">
+                        @Html.LabelFor(m => m.GSTStateCode)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.GSTStateCode, new { @tabindex = "1", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.GSTStateCode)
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="row col-lg-offset-11">
+                    <div class="btn-toolbar">
+                        <div class="btn-group">
+                            <input type="submit" id="btnSave" value="Save" class="btn btn-success" tabindex="5" />
+                            <a href="~/Admin/State/Index/@Model.CountryId" id="btnReset" class="btn btn-danger" tabindex="6">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            @Html.HiddenFor(m => m.CountryId)
+            @Html.HiddenFor(m => m.StateId)
+            <script type="text/javascript">
+                $(function () {
+                    $("#Name").focus();
+                });
+            </script>
+            }

@@ -1,0 +1,262 @@
+﻿@model StayBazar.Models.BookingModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Booking Details Review";
+    bool showPanels = (Model.Items.Count > 0);
+    long propertyId = BLayer.Bookings.GetPropertyId(Model.BookingId);
+    string ordrno = BLayer.Bookings.GetRefNoById(Model.BookingId);
+    bool showExtensionText = false;
+    if (ordrno != null && ordrno != "")
+    {
+        List<long> ids = BLayer.Bookings.GetBookingsByOrder(ordrno);
+        showExtensionText = (ids.Count > 1);
+    }
+    bool auth = false;
+    CLayer.Role.Roles roleType = CLayer.Role.Roles.Customer;
+    string titleName = "";
+    auth = User.Identity.IsAuthenticated;
+    if (auth)
+    {
+        string userId = User.Identity.GetUserId();
+        long id = 0;
+        if (long.TryParse(userId, out id))
+        {
+            if (id > 0)
+            {
+                roleType = BLayer.User.GetRole(id);
+                if (roleType == CLayer.Role.Roles.Agent || roleType == CLayer.Role.Roles.Corporate)
+                {
+                    titleName = BLayer.B2B.GetBusinessName(id);
+                }
+                else
+                {
+                    if (roleType == CLayer.Role.Roles.CorporateUser)
+                    {
+                        long cid = BLayer.B2B.GetCorporateIdOfUser(id);
+                        titleName = BLayer.B2B.GetBusinessName(cid);
+                    }
+                }
+            }
+        }
+    }
+    string UserIds = User.Identity.GetUserId();
+    CLayer.Role.Roles UsertypeId = BLayer.User.GetRole(Convert.ToInt32(UserIds));
+}
+@using Microsoft.AspNet.Identity
+<div class="container bdy_min_height">
+    <div class="row margin10px ">
+        <div class="col-md-12" id="BookingDetails">
+            <div class="row margin-top-10">
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    @if (auth && (roleType == CLayer.Role.Roles.Agent || roleType == CLayer.Role.Roles.CorporateUser || roleType == CLayer.Role.Roles.Corporate))
+                    {
+                        if (roleType == CLayer.Role.Roles.Agent)
+                        {
+                            <text><h2>Travel Agent Booking - @titleName</h2></text>
+                        }
+                        else
+                        {  <text><h2>Corporate Booking  - @titleName</h2></text> }
+                        @*<h4>@titleName</h4>*@
+                    }
+                    else
+                    {
+                        <text><h2>@ViewBag.Title</h2></text>
+                    }
+                </div>
+                <div class="col-md-4 col-md-offset-2 margin-top-10 rightalign">
+                    @if (showPanels)
+                    {
+                        long Gatewaytype = BLayer.Bookings.Getgatewaytype(Model.BookingId);
+
+                        if (Gatewaytype == (int)CLayer.ObjectStatus.Gateway.EBS)
+                        {
+                            <a id="booking_proceed" onclick="proceed(@Model.BookingId)" href="#" class="btn btn-success">Proceed to Payment</a>
+                        }
+                        else if (Gatewaytype == (int)CLayer.ObjectStatus.Gateway.PayPal)
+                        {
+                            <form name="psub" id="psub" style="display:inline" action="@Url.Action("ByPaypal","Payment")">
+                                <input type="hidden" checked name="IsPartial" value="1" />
+                                <a href="#" id="paypalsub" class="btn"><img src="https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif" align="left" style="margin-right:7px;" /></a>
+                                <input type="hidden" value="@Model.BookingDetails.OrderNo" name="refId" id="refId" />
+                            </form>
+
+                        }
+
+                        using (Html.BeginForm("Cancel", "Booking", FormMethod.Post, new { style = "display:inline; padding-left: 15px; " }))
+                        {
+                            @Html.ValidationSummary(true)
+                            @Html.AntiForgeryToken()
+                            @*<input type="button" class="btn btn-info" value="Cancellation Policy" onclick="callPolicy(@propertyId)" />*@
+
+                            <input type="submit" class="btn btn-danger" value="Cancel" />
+                        }
+
+
+                        @*long UserId = BLayer.Bookings.GetBookedByUserId(Model.BookingId);
+                            CLayer.User dat = BLayer.User.GetCountrUser(UserId);
+                            string ct = dat.Country;
+                            if (ct == "India")
+                            {
+                                <a id="booking_proceed" onclick="proceed(@Model.BookingId)" href="#" class="btn btn-success">Proceed to Payment</a>
+
+                            }*@
+                        //bool IsPartialPay= Model.partialpayment;
+
+                        @*else
+                            {
+
+                                <form name="psub" id="psub" style="display:inline" action="@Url.Action("ByPaypal","Payment")">
+                                    <input type="hidden" checked name="IsPartial" value="1" />
+                                    <a href="#" id="paypalsub" class="btn"><img src="https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif" align="left" style="margin-right:7px;" /></a>
+                                    <input type="hidden" value="@Model.BookingDetails.OrderNo" name="refId" id="refId" />
+                                </form>
+                            }*@
+
+
+
+
+                    }
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-md-12">
+                    @*Partialpayment*@
+                    @if (UsertypeId != CLayer.Role.Roles.Agent)
+                    {
+                        //decimal Partialamountperc = 0;
+                        //if (UsertypeId == CLayer.Role.Roles.Customer)
+                        //{
+                        //    Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2CpartialamountPerc(propertyId));
+                        //}
+                        //if (UsertypeId == CLayer.Role.Roles.Administrator || UsertypeId == CLayer.Role.Roles.Corporate || UsertypeId == CLayer.Role.Roles.Affiliate || UsertypeId == CLayer.Role.Roles.Supplier || UsertypeId == CLayer.Role.Roles.CorporateUser)
+                        //{
+                        //    Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2BpartialamountPerc(propertyId));
+                        //}
+
+                        CLayer.Booking PartialBdt = BLayer.Bookings.GetPartialBookDetailsbyBookId(Model.BookingId);
+                        if (PartialBdt.PartialPaymentPercentage != 0)
+                        {
+                            decimal Totalamount = Math.Round(BLayer.Bookings.GetTotal(Model.BookingId));
+                            decimal Partialamount = Math.Round(((PartialBdt.PartialPaymentPercentage) * (Totalamount)) / 100);
+                            decimal remainingamount = Math.Round(Totalamount - Partialamount);
+
+                            <div class="row">
+                                <div class="alert alert-info">
+                                    <h4>Payment Details</h4>
+                                    You have already paid the amount &nbsp; <span class="fa cxprice fa-rupee"><span class="cxcurele">@Partialamount</span><span>.00</span></span>
+                                    <span class="bold">
+                                        Please click on "Proceed to Payment" to pay the remaining amount :&nbsp; <span class="fa cxprice fa-rupee bold">@remainingamount<span>.00</span></span>
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+            </div>
+            <div class="row">
+                @Html.Partial("_List", Model.Items)
+            </div>
+
+
+
+
+            <div class="row">
+                @if (showPanels)
+                {
+                    @Html.Partial("_Details", Model)
+                }
+            </div>
+        </div>
+
+    </div>
+    @if (showExtensionText)
+    { <text><div class="row"><div class="col-md-4" style="color:#a50c0c">Stay extension preview</div> </div></text> }
+    <div class="modal fade" id="chooseForBooking" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h3 class="modal-title" id="myModalLabel">Choose Address</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12" id="ForBookingDataView">
+                            @Html.Partial("_ForBookingList", Model.Forbookings)
+                        </div>
+                    </div>
+                    @*<div id="loadingreview"><img src="~/Content/ajax11-loader.gif" /></div>*@
+                </div>
+                <div class="modal-footer">
+                    <a href="~/BookingUser/Index/" id="btnReset" class="btn btn-default" tabindex="6">Add Guest</a>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    @*<button type="button" id="btnAddnew" onclick="Addnew()" class="btn btn-primary">Add New</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@Html.Partial("~/Views/Cancellation/_Policy.cshtml")
+<script type="text/javascript">
+
+    var cancelpopup = false;
+    function proceed(BId) {
+        var IsPartialPay = true;
+        cancelpopup = true;
+        // window.location = "Url.Action("Index","Payment")";
+        window.location = "/Payment/Index?IsPartialPay=" + IsPartialPay + "&BookId=" + BId;
+    }
+
+    $(function () {
+        $('#BookingDetails').show();
+        $('#policytooltip').popover({ trigger: "hover" });
+    });
+
+    //Popup display
+    function PopupForUser(ForBookingUserId, BookingItemId) {
+        //alert("ForBookingUserId=" + ForBookingUserId + "BookingItemId=" + BookingItemId)
+        $("#chooseForBooking").modal('show');
+        var url = '@Url.Action("ForBookingDisplay", "Booking")';
+        $.post(url, { ForBookingUserId: ForBookingUserId, BookingItemId: BookingItemId }, function (data) {
+            $("#ForBookingDataView").html(data);
+        })
+    }
+    function FinishChooseforUser(UserId) {
+        //alert("id=" + ForBookingUserId);
+        var id = UserId;
+        $('#Name').html($("#name_" + id).html());
+        $('#Address').html($("#Address_" + id).html());
+        $('#Email').html($("#Email_" + id).html());
+        $('#Mob').html($("#Mob_" + id).html());
+        $('#StateName').html($("#State_" + id).html());
+        $('#City').html($("#City_" + id).html());
+        $('#Country').html($("#Country_" + id).html());
+        $('#ZipCode').html($("#ZipCode_" + id).html());
+        var url = '@Url.Action("UpdateBookingforUser", "Booking")';
+        $.post(url, { UserId: UserId });
+    }
+
+
+    function FinishChoose(ForBookingUserId) {
+        //alert("id=" + ForBookingUserId);
+        var id = ForBookingUserId;
+        $('#Name').html($("#name_" + id).html());
+        $('#Address').html($("#Address_" + id).html());
+        $('#Email').html($("#Email_" + id).html());
+        $('#Mob').html($("#Mob_" + id).html());
+        $('#StateName').html($("#State_" + id).html());
+        $('#City').html($("#City_" + id).html());
+        $('#Country').html($("#Country_" + id).html());
+        $('#ZipCode').html($("#ZipCode_" + id).html());
+        var url = '@Url.Action("UpdateBooking", "Booking")';
+        $.post(url, { ForBookingUserId: ForBookingUserId });
+    }
+    $(function () {
+        $("#paypalsub").click(function () { $("#psub").submit(); });
+    });
+</script>

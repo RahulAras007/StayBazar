@@ -1,0 +1,76 @@
+﻿@model StayBazar.Areas.Admin.Models.AccommodationPicturesModel
+@using System.Configuration;
+@try
+{
+    using (Html.BeginForm("AccommodationPictureSave", "Property", FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadac" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(m => m.FileId)
+        @Html.HiddenFor(m => m.AccommodationId)
+        @Html.HiddenFor(m => m.PropertyId)
+        @Html.HiddenFor(m => m.FileName)
+        <div class="row">
+            <div class="col-md-12 fileupload">
+                <span>Add picture</span>
+                <input type="file" id="PictureAc" name="AccommodationPhoto" tabindex="1" />
+                <input type="submit" id="btnSaveac" value="Save" class="btn btn-success" disabled tabindex="2" />
+            </div>
+        </div>
+    }
+    <div class="row property-gallery inner">
+        @foreach (CLayer.AccommodationFiles rm in Model.AccommodationPictures)
+        {
+            if (System.IO.File.Exists(Server.MapPath("~/Files/Property/Accommodation/" + rm.AccommodationId + "/" + rm.FileName)))
+            {
+                string src = "/Files/Property/Accommodation/" + @rm.AccommodationId + "/" + @rm.FileName;
+                <div class="col-xs-12 col-md-12">
+                    <div class="thumbnail border-radius0">
+                        <div class="hover-outer">
+                            <div class="hover-inner">
+                                <div class="hover">
+                                    <a href="/Admin/Property/AccommodationPictureDelete/@rm.FileId" title="Delete" alt="Delete"
+                                       class="glyphicon glyphicon-trash" onclick="return confirm('Are you sure you want to delete this image?')"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <img src="@src" alt="no image">
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#PictureAc").focus();
+            $("#PictureAc").change(function () {
+                if ($("#PictureAc").val() != "") {
+                    $("#btnSaveac").removeAttr("disabled");
+                }
+            });
+        });
+
+
+        //filesize configeration 
+        @*@using System.Configuration;*@
+         @{
+             int fi= Convert.ToInt32(ConfigurationManager.AppSettings.Get("FileUploadSizeInMB"));
+        long by = fi * 1024 * 1024;
+        }
+
+        $('#PictureAc').bind('change', function (){                   
+            var filesizeget = this.files[0].size;
+            //alert(filesizeget + "bytes");
+            if (filesizeget > @by) {
+                alert("Please Upload below @(fi)MB file size");
+            $('#PictureAc').val("");
+            return false;
+            }
+        });
+    </script>
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+    Response.Redirect("~/ErrorPage");
+}

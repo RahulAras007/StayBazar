@@ -1,0 +1,184 @@
+﻿@model StayBazar.Areas.Admin.Models.SuppierInvoiceModel
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+}
+
+
+<style>
+    #ui-datepicker-div {
+        z-index: 99 !important;
+    }
+</style>
+
+
+
+
+@Html.HiddenFor(m => m.isFromList)
+@if (Model.SupplierInvList != null)
+{
+    using (Html.BeginForm("Pager", "SupplierInvoiceReport", FormMethod.Post, new { @id = "frmPagerSIR" }))
+    {
+        <input type="hidden" id="currentPage" name="currentPage" value="@Model.currentPage" />
+        <input type="hidden" id="Limit" name="Limit" value="@Model.Limit" />
+        <input type="hidden" id="TotalRows" name="TotalRows" value="@Model.TotalRows" />
+        <input type="hidden" id="FromDate1" name="FromDate1" value="@Model.FromDate" />
+        <input type="hidden" id="ToDate1" name="ToDate1" value="@Model.ToDate" />
+    }
+    gp.RowsInAPage = Model.Limit;
+
+
+    <div class="col-md-12">
+        @if (Model.SupplierInvList != null && Model.SupplierInvList.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)Model.TotalRows, Model.currentPage))
+        }
+    </div>
+    <div class="col-md-12">
+        <table class="table table-hover table-condensed table-responsive table-striped table-custom table-bordered">
+            <thead>
+                <tr>
+                    <th>Supplier Name</th>
+                    <th>Property Name</th>
+                    <th>City</th>
+                    <th>Invoice Number</th>
+                    <th>Invoice Date</th>
+                    <th>Service Tax Reg No</th>
+                    <th>Base Amount</th>
+                    <th>LuxuryTax</th>
+                    <th>Service Tax</th>
+                    <th>Total Invoice Value</th>
+                    <th>Entry Date</th>
+                    <th>Confirmation No</th>
+                    <th>Created Date</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.SupplierInvList.Count() > 0)
+                {
+                    long InvID = 0, rowspan = 0;
+                    var ls = from c in Model.SupplierInvList
+                             group c by new
+                             {
+                                 c.SupplierInvoiceID,
+                                 c.PropertyId,
+                                 c.Property_Name,
+                                 c.SupplierId,
+                                 c.SupplierName,
+                                 c.City,
+                                 c.InvoiceNumber,
+                                 c.InvoiceDate,
+                                 c.ServiceTaxRegNumber,
+                                 c.PAN_Number,
+                                 c.BaseAmount,
+                                 c.LuxuryTax,
+                                 c.ServiceTax,
+                                 c.TotalInvoiceValue,
+                                 c.EntryDate
+                             } into gs
+                             select new
+                             {
+                                 gs.Key.SupplierInvoiceID,
+                                 gs.Key.PropertyId,
+                                 gs.Key.Property_Name,
+                                 gs.Key.SupplierId,
+                                 gs.Key.SupplierName,
+                                 gs.Key.City,
+                                 gs.Key.InvoiceNumber,
+                                 gs.Key.InvoiceDate,
+                                 gs.Key.ServiceTaxRegNumber,
+                                 gs.Key.PAN_Number,
+                                 gs.Key.BaseAmount,
+                                 gs.Key.LuxuryTax,
+                                 gs.Key.ServiceTax,
+                                 gs.Key.TotalInvoiceValue,
+                                 gs.Key.EntryDate
+                             };
+                    foreach (var item in ls)
+                    {
+                        rowspan = Model.SupplierInvList.Where(b => b.SupplierInvoiceID == item.SupplierInvoiceID).Count() + 1;
+                        InvID = item.SupplierInvoiceID;
+                        <tr>
+                            <td rowspan="@rowspan">@item.SupplierName </td>
+                            <td rowspan="@rowspan">@item.Property_Name</td>
+                            <td rowspan="@rowspan">@item.City</td>
+                            <td rowspan="@rowspan">@item.InvoiceNumber</td>
+                            <td rowspan="@rowspan">
+                                @if (item.InvoiceDate != null && item.InvoiceDate != DateTime.MinValue)
+                                {
+                                    @Convert.ToDateTime(item.InvoiceDate).ToShortDateString()
+                                }
+                            </td>
+                            <td rowspan="@rowspan">@item.ServiceTaxRegNumber</td>
+                            <td rowspan="@rowspan" align="right">@item.BaseAmount</td>
+                            <td rowspan="@rowspan" align="right">@item.LuxuryTax</td>
+                            <td rowspan="@rowspan" align="right">@item.ServiceTax</td>
+                            <td rowspan="@rowspan" align="right">@item.TotalInvoiceValue</td>
+                            <td rowspan="@rowspan">
+                                @if (item.EntryDate != null && item.EntryDate != DateTime.MinValue)
+                                {
+                                    @Convert.ToDateTime(item.EntryDate).ToShortDateString()
+                                }
+                            </td>
+                            @{
+                                var subls = Model.SupplierInvList.Where(b => b.SupplierInvoiceID == item.SupplierInvoiceID).ToList();
+                                foreach (var itm in subls)
+                                {
+                                <tr>
+                                    <td>@itm.BookingRefNumber</td>
+                                    <td>
+                                        @if (itm.BookinCreatedDT != null && itm.BookinCreatedDT != DateTime.MinValue)
+                                        {
+                                            @Convert.ToDateTime(itm.BookinCreatedDT).ToShortDateString()
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (itm.CheckIn_date != null && itm.CheckIn_date != DateTime.MinValue)
+                                        {
+                                            @Convert.ToDateTime(itm.CheckIn_date).ToShortDateString()
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (itm.CheckOut_date != null && itm.CheckOut_date != DateTime.MinValue)
+                                        {
+                                            @Convert.ToDateTime(itm.CheckOut_date).ToShortDateString()
+                                        }
+                                    </td>
+                                </tr>
+                                }
+                                if (subls == null || subls.Count <= 0)
+                                {
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                }
+                            }
+
+                            </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+
+
+    <script type="text/javascript">
+    function showPager(num) {
+        $("#currentPage").val(num);
+        $('#FromDate1').val($('#FromDate').val());
+        $('#ToDate1').val($('#ToDate').val());
+        var url = '@Url.Action("Pager", "SupplierInvoiceReport", new { area = "Admin" })';
+        $.get(url, $("#frmPagerSIR").serialize(), function (data) {
+            $("#DivSuppInvList_Report").html(data);
+        });
+    }
+    </script>
+
+
+}

@@ -1,0 +1,218 @@
+﻿@model StayBazar.Areas.Admin.Models.TaxModel
+@{
+    ViewBag.Title =""+ Model.Title;
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+}
+@using (Html.BeginForm("Edit", "Tax", new { area = "Admin"}))
+{
+    <div class="col-md-12">        
+        <h2><a href="~/Admin/TaxTitle/Index" title="Back to Tax List" >Tax</a>/@BLayer.TaxTitle.Get(Model.TaxTitleId).Title </h2>
+</div>   
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="incontainer">      
+        <div class="row">
+            <div class="col-md-4">
+                @Html.HiddenFor(m => m.TaxTitleId)
+                @Html.HiddenFor(m => m.Title)
+                @Html.HiddenFor(m => m.UpdatedBy)
+                @Html.HiddenFor(m => m.TaxId)
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CountryId)
+                    @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "7", @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.StateId)
+                    @Html.DropDownListFor(m => m.StateId, Model.StateList, new { @tabindex = "8", @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CityId)                   
+                    @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "9", @class = "form-control" })
+                    <div id="other_city" style="display:none;">
+                        @*@Html.TextBoxFor(m => m.CityId, new { @class = "form-control" })
+                        <input type="hidden" value="@Model.City" id="hdnCity" />*@
+                        <br /> City not available
+                    </div>
+                </div>
+                <div class="btn-toolbar ">
+                    <div class="btn-group">
+                        <input type="submit" id="btnSave" onclick="javascript:return valid()"    value="Save" class="btn btn-default" tabindex="5" />
+                        <a href="~/Admin/Tax/Index/@Model.TaxTitleId" id="btnReset" class="btn btn-danger" tabindex="6">Cancel</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Rate)%
+                    @Html.TextBoxFor(m => m.Rate, new { @tabindex = "2", @class = "form-control input-sm" })
+                    @Html.ValidationMessageFor(m => m.Rate)
+                </div>
+               
+                    <div class="form-group" id="priceid">
+                        @Html.LabelFor(m => m.PriceUpto)
+                        @Html.TextBoxFor(m => m.PriceUpto, new { @tabindex = "6", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.PriceUpto)
+                    </div>
+                    <div class="form-group">
+                        <b>Unlimited:</b> @Html.CheckBoxFor(m => m.Unlimited, new { @tabindex = "10" })
+                    </div>
+                
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Notes)
+                        @Html.TextAreaFor(m => m.Notes, new { @tabindex = "7", @class = "form-control input-sm" })
+                    </div>
+
+                </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.StartDate) @Html.TextBoxFor(m => m.StartDate, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm" }) @Html.ValidationMessageFor(m => m.StartDate)
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.EndDate) @Html.TextBoxFor(m => m.EndDate, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm" }) @Html.ValidationMessageFor(m => m.EndDate)
+                </div>
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.OnTotalAmount, new { @tabindex = "10" })
+                    @Html.LabelFor(m => m.OnTotalAmount)
+                </div>
+                <div class="form-group">
+                    <b>Apply tax on  :</b>               
+                         @Html.RadioButtonFor(m => m.OnDate, (int)StayBazar.Areas.Admin.Models.TaxModel.OnDateE.Booking)<b>Booking Date</b>
+                        @Html.RadioButtonFor(m => m.OnDate, (int)StayBazar.Areas.Admin.Models.TaxModel.OnDateE.Checkin)<b>Checkin Date</b>                  
+                </div>
+                <div class="form-group">
+                    <b> Status:</b>
+                    @Html.RadioButtonFor(m => m.Status, (int)CLayer.ObjectStatus.StatusType.Active)<b>Active</b>
+                    @Html.RadioButtonFor(m => m.Status, (int)CLayer.ObjectStatus.StatusType.Disabled)<b>Disable</b>
+                </div>
+
+                
+            </div>                       
+                   
+                </div>
+            </div>
+    
+                       
+    <script type="text/javascript"> 
+             
+        function valid() {
+            if ($('#CountryId').val() == 0 || $('#StateId').val() == 0 || $('#CityId').val() == 0) {
+                alert("Select country,state,city");
+                return false;
+            }
+            else {
+
+                return true;
+            }
+           
+        }
+
+        $(function () {
+           
+            $('#CountryId').change(function () 
+            {
+                $('#CityId').val("");
+                //$("#CityId").hide();
+               // $("#other_city").show();
+                $.get("/Tax/GetState?id=" + $('#CountryId').val(), 
+                    function (data) {
+                        if (data != "")
+                            $('#StateId').empty().append(data);
+                        else
+                            $('#StateId').empty().append('<option selected="selected" value="0">None</option>');
+                    });
+
+              //  Loadcity();
+            });
+
+            $('#StateId').change(function () {             
+                $("#CityId").show();
+                $("#City").val("");
+                $("#other_city").hide();
+                $.get("/Tax/GetCity?id=" + $('#StateId').val(),
+                    function (data) {
+                    if (data != "") {
+                        $('#CityId').empty().append(data);
+                        if ($("select#CityId option").length == 1) {
+                            $("#CityId").hide();
+                            $("#City").val("");
+                            $("#other_city").show();
+                        }
+                    }
+                    else {
+                        $('#CityId').empty().append('<option selected="selected" value="0">None</option>');
+                    }
+               // Loadcity();
+                });
+            });
+            $('#CityId').change(function () {
+                if ($(this).val() == 0) {
+                    $(this).hide();
+                    $("#City").val($("#hdnCity").val());
+                    $("#other_city").show();
+                    $("#close_other_city").show();
+                }
+            });
+            $('#close_other_city').click(function () {
+                $("#CityId").show();
+                $("#City").val("");
+                $("#other_city").hide();
+                $("#close_other_city").hide();
+            });      
+        });
+
+
+        $(function () {
+
+            $('#StartDate').datepicker({
+                dateFormat: "dd/mm/yy"
+            });
+            $('#EndDate').datepicker({
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+                beforeShow: function () {
+                    $(this).datepicker('option', 'minDate', $('#StartDate').val());
+                    if ($('#StartDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+
+            var check = $('#Unlimited').prop('checked');
+            if (check == true) {
+                $("#priceid").val(0);
+                $("#priceid").hide();
+            }
+            else {
+                $("#priceid").val(0);
+                $("#priceid").show();
+            }
+        });
+      
+
+            $('#Unlimited').click(function () {               
+                //$("#priceid").val(0);
+                //$("#priceid").hide();   
+                var check = $('#Unlimited').prop('checked');
+                if (check == true) {
+                    $("#priceid").val(0);
+                    $("#priceid").hide();
+                }
+                else {
+                    $("#priceid").val(0);
+                    $("#priceid").show();
+                }
+            });
+            
+
+            function Loadcity() {
+                $.get("/Tax/GetCity?id=" + $('#State').val(), function (data) {
+                    if (data != "") {
+                        $('#CityId').html(data);
+                    }
+                    else {
+                        $('#CityId').html('<option selected="selected" value="0">None</option>');
+                    }
+                });
+            }
+    </script>
+}

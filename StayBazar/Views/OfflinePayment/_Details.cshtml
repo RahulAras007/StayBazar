@@ -1,0 +1,172 @@
+﻿@model StayBazar.Models.OfflinePaymentModel
+@using System.Configuration;
+@using CaptchaMvc.HtmlHelpers
+@{
+    Layout = null;
+
+}
+<div class="col-md-10">
+    <div class="form-group">
+        @Html.LabelFor(m => m.Name, new { style = "padding-left:0px;" }) <span style="color:red"> * </span>
+        @Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control input-sm", style = "font-size:16px;" })
+        @Html.ValidationMessageFor(m => m.Name)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Mobile, new { style = "padding-left:0px;" }) <span style="color:red"> *</span>
+        @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "10", @class = "form-control", @MaxLength = "15", @onkeypress = "return isINNumbers(event)", style = "font-size:16px;" })
+        @Html.ValidationMessageFor(m => m.Mobile)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.ReferenceNumber, new { style = "padding-left:0px;" })
+        @Html.TextBoxFor(m => m.ReferenceNumber, new { @tabindex = "2", @class = "form-control input-sm", style = "font-size:16px;" })
+        @Html.ValidationMessageFor(m => m.ReferenceNumber)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Amount, new { style = "padding-left:0px;" }) <span style="color:red"> *</span>
+        @Html.TextBoxFor(m => m.Amount, new { @tabindex = "3", @class = "form-control input-sm", style = "font-size:16px;"})
+        @Html.ValidationMessageFor(m => m.Amount)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Message, new { style = "padding-left:0px;" })
+        @Html.TextAreaFor(m => m.Message, new { @tabindex = "5", @class = "form-control input-sm", style = "font-size:16px;height:100px;" })
+        @Html.ValidationMessageFor(m => m.Message)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Address, new { style = "padding-left:0px;" }) <span style="color:red"> *</span>
+        @Html.TextAreaFor(m => m.Address, new { @tabindex = "6", @class = "form-control", style = "font-size:16px;height:80px;" })
+        @Html.ValidationMessageFor(m => m.Address)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.CountryId, new { style = "padding-left:0px;" }) <span style="color:red"> *</span>
+        @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "7", @class = "form-control", style = "font-size:16px;" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.State, new { style = "padding-left:0px;" }) <span style="color:red"> *</span>
+        @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "8", @class = "form-control", style = "font-size:16px;" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.City, new { style = "padding-left:0px;" }) <span style="color:red"> *</span>
+        <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+        @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "9", @class = "form-control",style="font-size:16px;" })
+        <div id="other_city" style="display:none;">
+            @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+            <input type="hidden" value="@Model.City" id="hdnCity" />
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ZipCode, new { style = "padding-left:0px;" })@*<span style="color:red">*</span>*@
+        @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "10", @class = "form-control", @MaxLength = "12", @onkeypress = "return isINNumbers(event)", style = "font-size:16px;" })
+        @Html.ValidationMessageFor(m => m.ZipCode)
+    </div>
+    <br />
+    <br />
+    <div class="form-group" style="text-align:center">
+        <div class="submitctr center">
+            <input type="button" id="btnSave" onclick="ProceedPayment()" value="Submit Payment" class="btn btn-danger" tabindex="23" style="width:260px;height:50px;font-size:18px;font-family:'Times New Roman';border-radius: 122px;"/>
+        </div>
+    </div>
+    <br />
+    <div class="btn-toolbar margin-bot-10">
+        
+    </div>
+
+
+</div>
+ @*CLayer.Country Country = BLayer.Country.Get(data.CountryId);*@
+<script type="text/javascript">
+    function ProceedPayment(){
+        var Country = document.getElementById("CountryId");
+        var Countryname = CountryId.options[Country.selectedIndex].text;
+
+        if (Countryname != "India") {       
+            if ($("#OfflinePaymentForm").valid()) {
+
+                $("#choosePayOption").modal('show');
+            }
+        }
+        else {           
+            $("#OfflinePaymentForm").submit();
+        }
+    }
+
+
+    $(function () {
+        if ($('#CityId').val() == -1) {
+            $("#CityId").hide();
+            $("#other_city").show();
+            if ($("select#CityId option").length > 1) {
+                $("#close_other_city").show();
+            }
+        }
+        $('#CountryId').change(function () {
+
+
+
+
+            $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                if (data != "")
+                    $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                else
+                    $('#State').empty().append('<option selected="selected" value="0">Not available...</option>');
+                cityLoad();
+            });
+        });
+        $('#State').change(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                if (data != "") {
+                    $('#CityId').empty().append(data);
+                    if ($("select#CityId option").length == 1) {
+                        $("#CityId").hide();
+                        $("#City").val("");
+                        $("#other_city").show();
+                    }
+                }
+                else {
+                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        });
+
+        $('#CityId').change(function () {
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#City").val($("#hdnCity").val());
+                $("#other_city").show();
+                $("#close_other_city").show();
+            }
+        });
+        $('#close_other_city').click(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+        });
+    });
+    function Loadcity() {
+        $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+            if (data != "") {
+                $('#CityId').html(data).append('<option selected="selected" value="0">Select</option>');;
+            }
+            else {
+                $('#CityId').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    function LoadState() {
+        $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+            if (data != "") {
+                $('#State').empty().append(data);
+            }
+            else {
+                $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+</script>

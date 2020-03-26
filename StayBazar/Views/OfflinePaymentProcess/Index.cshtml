@@ -1,0 +1,80 @@
+﻿@model StayBazar.Models.OfflinePaymentProcessModel
+@{
+    ViewBag.chatbox = "0";
+    long OffPayId = 0;
+    if (ViewBag.OfflinePaymentId != null)
+    {
+         OffPayId = ViewBag.OfflinePaymentId;
+    }
+}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <h2>Please make your payment</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="panel panel-default">
+                <div class="panel-body paybox">
+                    <form id="paytoaccount" method="post" action="https://secure.ebs.in/pg/ma/sale/pay/">
+                        <div>
+                            @*<p>Please choose how you are going to pay the amount</p>
+                                <select id="selPayType" name="selPayType" class="btnele">
+                                    <option value="@((int) CLayer.ObjectStatus.PaymentType.CreditCard)">Credit Card</option>
+                                    <option value="@((int) CLayer.ObjectStatus.PaymentType.DebitCard)">Debit card</option>
+                                    <option value="@((int) CLayer.ObjectStatus.PaymentType.NetBanking)">NetBanking</option>
+                                </select>*@
+                            <p>Please wait.. Forwarding to the Payment Gateway.</p>
+                        </div>
+                        <div class="height10px"></div>
+                        @*<div>
+                                <input type="button" id="btnsave" value="Pay" class="btn btn-success btnele" />
+                            </div>*@
+                        <div class="hidden">
+                            @Html.HiddenFor(m => m.account_id)
+                            @Html.HiddenFor(m => m.reference_no)
+                            @Html.HiddenFor(m => m.mode)
+                            @Html.HiddenFor(m => m.return_url)
+                            @Html.HiddenFor(m => m.amount)
+                            @Html.HiddenFor(m => m.description)
+
+                            @Html.HiddenFor(m => m.name)
+                            @Html.HiddenFor(m => m.address)
+                            @Html.HiddenFor(m => m.city)
+                            @Html.HiddenFor(m => m.state)
+                            @Html.HiddenFor(m => m.country)
+                            @Html.HiddenFor(m => m.phone)
+                            @Html.HiddenFor(m => m.email)
+                            @Html.HiddenFor(m => m.postal_code)
+
+                            @Html.HiddenFor(m => m.ship_name)
+                            @Html.HiddenFor(m => m.ship_address)
+                            @Html.HiddenFor(m => m.ship_city)
+                            @Html.HiddenFor(m => m.ship_state)
+                            @Html.HiddenFor(m => m.ship_country)
+                            @Html.HiddenFor(m => m.ship_postal_code)
+                            @Html.HiddenFor(m => m.ship_phone)
+
+                            @Html.HiddenFor(m => m.secure_hash)
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        @*$("#btnsave").click(function () {
+            $("#btnsave").hide();
+            $.post("@Url.Action("SetCheckout","Payment")", { payType: $("#selPayType").val() }, function () {
+                $("#paytoaccount").submit();
+            });
+        });*@
+
+        $.post("@Url.Action("SetCheckout", "OfflinePaymentProcess")?OffId=" + @OffPayId, function () {
+            $("#paytoaccount").submit();
+        });
+    });
+</script>

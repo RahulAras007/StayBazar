@@ -1,0 +1,132 @@
+﻿@model IEnumerable<CLayer.GDSBookingStatusReport>
+    @{
+        Layout = null;
+        StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+        gp.JavascriptFuncName = "showPager";
+        gp.ColumnsInPager = 2;
+        gp.RowsInAPage = 2;
+        long i = 1;
+        string type = "";
+        string mtype = "";
+        decimal buycost=0, salevalue=0,cbv=0,gcbv=0,stbv=0,gstbv=0,gnsupplierpayment=0, grossmargin=0,supplierpayment=0, commissionpayable=0, netmargin=0, gbuycost=0, gsalevalue=0, ggrossmargin=0, gcommissionpayable=0, gnetmargin=0,grandtotal=0;
+        long nonights, noaccs, gnonights, gnoaccs;
+        nonights = noaccs = gnonights = gnoaccs = 0;
+    }
+    <div class="">
+        <div class="topmargin10">
+            @{
+                if (ViewBag.Filter != null) {
+                    StayBazar.Areas.Admin.Models.GDSBookingStatusReportModel filterform = (StayBazar.Areas.Admin.Models.GDSBookingStatusReportModel)ViewBag.Filter;
+                    using (Html.BeginForm("Pager", "GDSBookingStatusReport", FormMethod.Post, new { @id = "frmPagersa" }))
+                    {
+            <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+            <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+            <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+            <input type="hidden" id="FromDate" name="FromDate" value="@filterform.FromDate" />
+            <input type="hidden" id="ToDate" name="ToDate" value="@filterform.ToDate" />
+            <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+
+            if (Model != null && Model.Count() > 0)
+            {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+            }
+            }
+            long netmarpercent = 0;
+            }
+            <div class="" style="background:white;">
+                <div style="text-align:left"><h4>GDS Booking Status Report </h4></div>
+                <table cellpadding="5" border="1" class="table table-bordered table-hover table-striped">
+                    <thead style="background-color:whitesmoke">
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Booking Date</th>
+                            <th>Booking Id</th>
+                            <th>Order Number</th>
+                            <th>Customer Name</th>
+                            <th>Property Name</th>
+                            <th>Property Address</th>
+                            <th>City</th>
+                        <th>Accommodation Type</th>
+                        <th>Guest name </th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>No of rooms</th>
+                         <th>CGST</th>
+                         <th>IGST</th>
+                         <th>SGST</th>
+
+                        <th>Tax Amount</th>
+                        <th>Total Amount</th>
+                        <th>Booking Status</th>
+                        <th>Invoice Number</th> 
+
+                        <th>Invoice Date</th> 
+                         <th>Invoice Status</th> 
+                        <th>Hotel Confirmation Number</th> 
+                    
+
+                        </tr><!-- 26 cols-->
+                    </thead>
+                    <tbody>
+                        @foreach (CLayer.GDSBookingStatusReport reportList in Model)
+                        {
+                            DateTime checkin = reportList.checkin ;
+                            DateTime checkout = reportList.checkout;
+                            TimeSpan ts = checkout - checkin;
+                            int differenceInDays = ts.Days;
+                            var cusname = reportList.FirstName + ((reportList.LastName == null) ? "" : reportList.LastName);
+
+                        <tr>
+                            <td align="center">@i</td>
+                            <td align="center">@reportList.BookingDate.ToShortDateString()</td>
+                            <td>@reportList.BookingId</td>
+                            <td>@reportList.orderno</td>
+                            <td >@cusname</td>
+                            <td>@reportList.PropertyTitle</td>
+                            <td>@reportList.PropertyAddress</td>
+                            <td>@reportList.City</td>
+                            <td>@reportList.AccommodationType</td>
+                            <td></td>
+                            <td>@reportList.checkin.ToString("dd/MM/yyyy")</td>
+                            <td>@reportList.checkout.ToString("dd/MM/yyyy")</td>
+                            <td>@reportList.noofaccommodations</td>
+                            <td>@reportList.TotalCGSTTaxAmount</td>
+                            <td>@reportList.TotalSGSTTaxAmount</td>
+                            <td>@reportList.TotalIGSTTaxAmount</td>
+
+                            <td>@reportList.TotalTax</td>
+                            <td>@reportList.TotalAmount</td>
+                            <td>@reportList.BookingStatus</td>
+                            <td>@reportList.invoicenumber</td>
+                            <td>@reportList.invoicedate.ToString("dd/MM/yyy")</td>
+                            <td>@reportList.InvoiceStatus</td>
+                            <td>@reportList.HotelConfirmNumber</td>
+
+
+                        </tr>
+                            i = i + 1;
+
+                           
+                        }
+
+
+                       
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function showPager(num) {
+            // alert('here is it ' + num);
+            $("#currentPage").val(num);
+            var url = '@Url.Action("Pager", "GDSBookingStatusReport", new { area = "Admin" })';
+            $.post(url, $("#frmPagersa").serialize(), function (data) {
+                $("#GrossMarrginList").html(data);
+            });
+        }
+    </script>

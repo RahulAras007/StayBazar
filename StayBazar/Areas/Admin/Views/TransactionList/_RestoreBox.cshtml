@@ -1,0 +1,43 @@
+﻿@model StayBazar.Areas.Admin.Models.TranRestoreModel
+@{
+    Layout = null;
+}
+@if (Model.Failed || Model.ShowMsg) { 
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        @if (Model.Failed)
+        { <div class="alert alert-danger">@Model.Message</div>  }
+        else
+        { 
+        if (Model.ShowMsg)
+        { <div class="alert alert-info">@Model.Message</div>  }
+        }
+    </div>
+</div>
+}else{
+    <div class="row">
+    <div class="col-md-12">
+        Booking is still available. Please enter Payment gateway transaction details.
+    </div>
+</div>
+    using (Html.BeginForm("Restore", "TransactionList", new { Area = "Admin" }, FormMethod.Post, new { onsubmit = "return false;", id = "restoreform" }))
+    {
+        <div class="row topmargin5">
+            <div class="col-md-3">Transaction ID</div><div class="col-md-2">@Html.TextBoxFor(m => m.TransactionId)@Html.HiddenFor(m => m.BookingId)</div>
+        </div>
+    <div class="row topmargin5">
+        <div class="col-md-3">Payment ID</div><div class="col-md-2">@Html.TextBoxFor(m => m.PaymentId)</div>
+    </div>
+    <div class="row topmargin5">
+        <div class="col-md-3">Payment Code</div><div class="col-md-2">@Html.TextBoxFor(m => m.PaymentCode)</div>
+    </div>
+    <div class="row topmargin5">
+        <div class="col-md-3">Amount</div><div class="col-md-2">@Html.TextBoxFor(m => m.Amount)</div>
+    </div>
+    <div class="row topmargin5">
+        <div class="col-md-8"></div><div class="col-md-2"><input type="button" onclick="restoreBooking()" class="btn btn-default" value="Confirm Restore" /></div>
+    </div>
+    }
+
+
+}

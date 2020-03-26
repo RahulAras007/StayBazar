@@ -1,0 +1,22 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+@{
+    ViewBag.Title = "Error";
+    try { 
+    string err = "Action: " + Model.ActionName + " Controller: " + Model.ControllerName + " Exception: " + Model.Exception.Message + " Stack Trace: " + Model.Exception.StackTrace;
+    StayBazar.Common.LogHandler.HandleError(new Exception(err));
+    }catch(Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        
+    }
+}
+<div class="container bdy_min_height">
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="redtext">Technical Issue</h3>
+            <p class="text-danger">A technical issue occured while processing the request. We have noted it and will be solving it as soon as possible.</p>
+        </div>
+    </div>
+</div>
+
+

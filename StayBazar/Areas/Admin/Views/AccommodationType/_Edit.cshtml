@@ -1,0 +1,88 @@
+﻿@model StayBazar.Areas.Admin.Models.AccommodationTypeModel
+@{
+    Layout = null;
+    List<CLayer.StayCategoryAccommodationType> types = BLayer.AccommodationType.GetAllPropertyType(Model.AccommodationTypeId);
+
+}
+@using (Html.BeginForm("Edit", "AccommodationType"))
+{
+    @*<h2>Accommodation Type</h2>*@
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-2">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        @*<div class="incontainer">*@
+        @*<div class="form-group">*@
+        <div class="col-md-4">
+            @Html.DisplayNameFor(m => m.Title)
+            @Html.TextBoxFor(m => m.Title, new { @tabindex = "1", @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.Title)
+        </div>
+        @*<div class="container">*@
+
+        @*<div class="row">*@
+        <div class="col-md-3">Choose Property Types<br />
+        @{
+            string idname = "";
+            string chosen = "";
+
+            foreach (CLayer.StayCategoryAccommodationType item in types)
+            {
+                idname = "p" + item.StayCategoryId.ToString();
+            @*<div class="col-md-3">*@
+                <input type="checkbox" id="@idname" class="propertychk"
+                       @{ if (item.IsUsed) { <text> checked="checked" disabled="disabled" </text>  } else { if (item.Selected) { if (chosen != "") { chosen = chosen + ","; } chosen = chosen + item.StayCategoryId; <text> checked="checked" </text>  } } } />
+
+
+                @(item.Title + "  ")
+
+
+                }
+                Model.StayTypesAssigned = chosen;
+                }
+            </div>
+        @*</div>*@
+        <div class="col-md-3">
+            <div class="btn-toolbar">
+                <div class="btn-group">
+                    <input type="submit" id="btnSave" value="Save" class="btn btn-default" tabindex="3" />
+                    <a href="~/Admin/AccommodationType" id="btnReset" class="btn btn-danger" tabindex="4">Cancel</a>
+                </div>
+            </div>
+        </div>
+        @*</div>*@
+    </div>
+</div>
+                               <br />
+                               <br />
+            @Html.HiddenFor(m => m.AccommodationTypeId)
+            @Html.HiddenFor(m => m.StayTypesAssigned)
+            <script type="text/javascript">
+                $(function () {
+                    $("#Title").focus();
+                    $(".propertychk").click(function () {
+                        var nm = $(this).prop("id");
+                        var addp = $(this).prop("checked");
+
+                        var id = nm.substring(1);
+                        var ids = $("#StayTypesAssigned").val();
+                        var spl = ids.split(",");
+                        var targ = "";
+                        for (i = 0; i < spl.length; i++) {
+                            if (spl[i] == id) continue;
+                            if (targ != "") targ = targ + ",";
+                            targ = targ + spl[i];
+                        }
+                        if (addp) {
+                            if (targ != "") targ = targ + ",";
+                            targ = targ + id;
+                        }
+                        $("#StayTypesAssigned").val(targ);
+                    });
+                });
+
+            </script>
+            }

@@ -1,0 +1,80 @@
+﻿@model IEnumerable<CLayer.ReportForFailedTransactions>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long j = 0;
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1"/>
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="CollectionReport">
+        <ss:Table>          
+            <ss:Row ss:StyleID="1">
+               <ss:Cell><ss:Data ss:Type="String">Sr. No</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property City</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Accomodation Type</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Check-In Date</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Check-Out Date</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Guest Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Guest Mobile No</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Booking Category</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Rate type</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Total booking Amount</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Stay Bazar Commission</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Current Status</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Booking Date & Time</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Issue</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Resolution Time</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Resolution</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Assigned to Customer Service (Y/N)</ss:Data></ss:Cell>
+               <ss:Cell><ss:Data ss:Type="String">Customer Service Person Assigned</ss:Data></ss:Cell>
+            </ss:Row>
+                @foreach (CLayer.ReportForFailedTransactions reportList in Model)
+{    j = j + 1;
+    <ss:Row>
+        <ss:Cell><ss:Data ss:Type="String">@j</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierName</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyCity</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.AccomodationType</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.Checkindate.ToShortDateString() </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.CheckoutDate.ToShortDateString()</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.CustomerName</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.CustomerMobile</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.BookingCategory</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.Ratetype </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.TotalbookingAmount</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.StayBazarCommission</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">
+                @{DateTime getdate = reportList.BookingDateTime;
+                DateTime currentdate = DateTime.Now;
+                }
+                @if (getdate.ToShortDateString() == currentdate.ToShortDateString())
+                {
+                    @getdate.ToShortDateString();
+                }
+                else
+                {
+                    @getdate.ToShortDateString();
+                }
+            </ss:Data>
+        </ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+    </ss:Row>
+                }
+       </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

@@ -1,0 +1,33 @@
+﻿
+@{
+    
+    long bookingid = ViewBag.BookingId;
+    StayBazar.Models.LoginViewModel lv = new StayBazar.Models.LoginViewModel();
+    lv.BookingId = bookingid;
+    StayBazar.Models.GuestModel gm = new StayBazar.Models.GuestModel();
+    gm.BookingId = bookingid;
+}
+<div class="container bdy_min_height">
+    <div class="row">
+        <div class="col-md-5 col-md-offset-1 lgnbx1">
+            <h4>Login and continue</h4>
+            @Html.Partial("~/Views/Continue/_PLogin.cshtml", lv)
+        </div>
+        <div class="col-md-5 lgnbx2">
+            <h4>Continue as Guest</h4>
+            @Html.Partial("~/Views/Continue/_PGuest.cshtml", gm)
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        @if(ViewBag.GuestError)
+        {
+            <text>$("#Email").focus();</text>
+        }
+        else
+        { <text>$("#UserName").focus();</text> }
+    });
+</script>
+
+

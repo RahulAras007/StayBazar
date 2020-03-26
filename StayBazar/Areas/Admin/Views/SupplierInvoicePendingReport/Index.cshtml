@@ -1,0 +1,33 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    //Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+    ViewBag.Title = "Supplier Invoice Pending Report";
+}
+
+
+
+
+@*<h2>@ViewBag.Title</h2>*@
+<div class="page-title-container style3">
+
+
+    <div class="row">
+        <div class="col-md-4">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        @*<div class="row">*@
+            <div class="col-md-8">
+                @Html.Partial("~/Areas/Admin/Views/SupplierInvoicePendingReport/_Filter.cshtml", Model)
+            </div>
+        </div>
+    </div>
+        <hr />
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="DivSuppInvPendingList_Report" class="row">
+                        @Html.Partial("~/Areas/Admin/Views/SupplierInvoicePendingReport/_ReportList.cshtml", Model)
+                    </div>
+                </div>
+            </div>
+        </div>

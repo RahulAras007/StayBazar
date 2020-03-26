@@ -1,0 +1,210 @@
+﻿@model IEnumerable<CLayer.MargintrackingReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 1;
+    //string type = "";
+    //string mtype = "";
+    //decimal buycost=0, salevalue=0,cbv=0,gcbv=0,stbv=0,gstbv=0,gnsupplierpayment=0, grossmargin=0,supplierpayment=0, commissionpayable=0, netmargin=0, gbuycost=0, gsalevalue=0, ggrossmargin=0, gcommissionpayable=0, gnetmargin=0,grandtotal=0;
+    //long nonights, noaccs, gnonights, gnoaccs;
+    //nonights = noaccs = gnonights = gnoaccs = 0;
+    StayBazar.Areas.Admin.Models.MargintrackingReportModel filterform = null;
+    if (ViewBag.Filter != null)
+    {
+        filterform = (StayBazar.Areas.Admin.Models.MargintrackingReportModel)ViewBag.Filter;
+    }
+    bool showGSTColumns = false;
+    if(filterform != null)
+    {
+        DateTime frdt = DateTime.Today;
+        if(DateTime.TryParse(filterform.FromDate, out frdt))
+        {
+            if(frdt>= new DateTime(2017, 7, 1)) { showGSTColumns = true; }
+        }
+        
+    }
+}
+<div class="">
+    <div class="topmargin10">
+        @{
+            if (ViewBag.Filter != null)
+            {
+                
+                using (Html.BeginForm("Pager", "MargintrackingReport", FormMethod.Post, new { @id = "frmPagersa" }))
+                {
+                    <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+                    <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                    <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                    <input type="hidden" id="FromDate" name="FromDate" value="@filterform.FromDate" />
+                    <input type="hidden" id="ToDate" name="ToDate" value="@filterform.ToDate" />
+                    <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+                }
+                gp.RowsInAPage = filterform.Limit;
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+                }
+            }
+            //long netmarpercent = 0;
+        }
+        <div class="" style="background:white;">
+            <div style="text-align:left"><h4> Margin Tracking Report </h4></div>
+            <table cellpadding="5" border="1" class="table table-bordered table-hover table-striped">
+                <thead style="background-color:whitesmoke">
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Booking Date</th>
+
+                        <th>Booking Category</th>
+                        <th>Booking Entity</th>
+
+                        <th>Booking Ref No</th>
+                        <th>Invoice Number</th>
+                        <th>Customer Name</th>
+                        <th>Customer City</th>
+                        <th>Property Name</th>
+                        <th>Supplier Name</th>
+                        <th>Property City</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Guest Name</th>
+                        <th>Total room nights</th>
+                        <th>Customer value before GST</th>
+                        <th>Supplier value before GST</th>
+                        <th>Gross Margin</th>
+                        @if(showGSTColumns)
+                        {
+                            <th>ORC Amount</th>
+                            <th>Net Margin</th>
+                        }
+                        <th>Sale Value inc. tax</th>
+                        <th>Buy Value inc. tax</th>
+                        @*<th>Staybazar margin inc. tax</th>*@
+                        <th>Sale Person</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (CLayer.MargintrackingReport reportList in Model)
+                    {
+                        DateTime checkin = reportList.CheckIn;
+                        DateTime checkout = reportList.CheckOut;
+                        long roomnights = reportList.TotalNights;
+                        <tr>
+                            <td align="center">@i</td>
+                            <td align="center">@reportList.BookingDate.ToString("dd/MM/yyyy")</td>
+                            <td>@reportList.BookingType</td>
+                            <td>@reportList.BillingEntity</td>
+                            <td>@reportList.orderno</td>
+                            <td>@reportList.InvoiceNumber</td>
+
+                            <td>@reportList.CustomerName</td>
+                            <td>@reportList.City</td>
+                            <td>@reportList.PropertyName</td>
+                            <td>@reportList.SupplierName</td>
+                            <td>@reportList.PropertyCity</td>
+                            <td align="center">
+                                @reportList.CheckIn.ToString("dd/MM/yyyy")
+                            </td>
+                            <td align="center">
+                                @reportList.CheckOut.ToString("dd/MM/yyyy")
+                            </td>
+                            <td>@reportList.GuestName</td>
+                            <td align="center">@roomnights</td>
+
+                            <td align="right"> 
+                                @if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                                {
+                                    @Math.Round(reportList.ManagementFee)
+                                }
+                                else if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+                                {
+                                    @Math.Round(reportList.TacAmount)
+                                }
+                                else
+                                {
+                                    @Math.Round(@reportList.CustomerValueBeforeGST, 2)
+                                }
+                            </td>
+                            <td align="right">@Math.Round(@reportList.SupplierValueBeforeGST, 2)     </td>
+                            <td align="right">
+                                @if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                                {
+                                    @Math.Round(reportList.DirectOnlyAmount)
+                                }
+                                else if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+                                {
+                                    @Math.Round(reportList.TAConlyAmount)
+                                }
+                                else
+                                {
+                                    @Math.Round(reportList.CustomerValueBeforeGST - reportList.SupplierValueBeforeGST)
+                                }
+                            </td>
+                            @if (showGSTColumns)
+                            {
+                                <td>@Math.Round(reportList.ORCAmount,2)</td>
+                                <td>
+                                    @if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                                    {
+                                        @Math.Round(reportList.DirectOnlyAmount - reportList.ORCAmount)
+                                    }
+                                    else if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+                                    {
+                                        @Math.Round(reportList.TAConlyAmount - reportList.ORCAmount)
+                                    }
+                                    else
+                                    {
+                                        @Math.Round((reportList.CustomerValueBeforeGST - reportList.SupplierValueBeforeGST) - reportList.ORCAmount, 0)
+                                    }
+                            
+                                </td>
+                            }
+                            <td align="right">
+                                @if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                                {
+                                    @Math.Round(reportList.SaleAmountDirect)
+                                }
+                                else if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+                                {
+                                    @Math.Round(reportList.SaleAmountTac)
+                                }
+                                else
+                                {
+                                    @reportList.CustomerBillvalue
+                                }
+                            </td>
+                            <td align="right">@reportList.SupplierRate</td>
+                            @*<td align="right">
+                                    @Math.Round( reportList.CustomerBillvalue - reportList.SupplierRate)
+                                </td>*@
+                            <td>@reportList.salepersonaname</td>
+                            <td>@Enum.GetName(typeof(CLayer.OfflineBooking.Statuslist), reportList.offlinestatus)</td>
+                        </tr>
+                                i = i + 1;
+
+
+                    }
+
+
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+        // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "MargintrackingReport", new { area = "Admin" })';
+        $.post(url, $("#frmPagersa").serialize(), function (data) {
+            $("#GrossMarrginList").html(data);
+        });
+    }
+</script>

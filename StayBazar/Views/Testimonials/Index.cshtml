@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Testimonials";
+    List<CLayer.Testimonial> testimonials = BLayer.Testimonial.GetAll((int)CLayer.ObjectStatus.StatusType.Active);
+
+}
+<div class="container">
+    <div class="col-lg-12">
+        <h2>@ViewBag.Title</h2>
+        <hr />
+        @foreach (CLayer.Testimonial t in testimonials)
+        {
+            <div class="col-lg-6">
+                <div class="testimonial">
+                    <h2>@t.Title</h2>
+                    <p>@t.Description</p>
+                    <hr />
+                    <p class="redtext">
+                        @t.Name
+                        <br />@t.Company
+                    </p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<br />

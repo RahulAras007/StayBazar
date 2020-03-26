@@ -1,0 +1,83 @@
+﻿
+@model StayBazar.Areas.Admin.Models.SuppierInvoiceModel
+@{
+    Layout = null;
+}
+
+
+
+<?xml version="1.0"?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <ss:Styles>
+     <ss:Style ss:ID="1">
+        <ss:Font ss:Bold="1" /> 
+     </ss:Style>
+  </ss:Styles>
+    <ss:Worksheet ss:Name="CollectionReport">
+                <ss:Table>
+                    <ss:Row ss:StyleID="1">
+                        <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">City</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Invoice Number</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Invoice Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Service Tax Reg No</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Base Amount</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Luxury Tax</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Service Tax</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Total Invoice Value</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Entry Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Confirmation No</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Created Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check In</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check Out</ss:Data></ss:Cell>
+                    </ss:Row>
+                    @foreach (var item in Model.SupplierInvList)
+                    {
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">@item.SupplierName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.Property_Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.InvoiceNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">
+                        @if (item.InvoiceDate != null && item.InvoiceDate != DateTime.MinValue)
+                        {
+                            @Convert.ToDateTime(item.InvoiceDate).ToShortDateString()
+                        }
+                        </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.ServiceTaxRegNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.BaseAmount</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.LuxuryTax</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.ServiceTax</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.TotalInvoiceValue</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">
+                        @if (item.EntryDate != null && item.EntryDate != DateTime.MinValue)
+                        {
+                            @Convert.ToDateTime(item.EntryDate).ToShortDateString()
+                        }
+                        </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.BookingRefNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">
+                        @if (item.BookinCreatedDT != null && item.BookinCreatedDT != DateTime.MinValue)
+                        {
+                            @Convert.ToDateTime(item.BookinCreatedDT).ToShortDateString()
+                        }
+                        </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">
+                        @if (item.CheckIn_date != null && item.CheckIn_date != DateTime.MinValue)
+                        {
+                            @Convert.ToDateTime(item.CheckIn_date).ToShortDateString()
+                        }
+                        </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">
+                        @if (item.CheckOut_date != null && item.CheckOut_date != DateTime.MinValue)
+                        {
+                            @Convert.ToDateTime(item.CheckOut_date).ToShortDateString()
+                        }
+                        </ss:Data></ss:Cell>
+                    </ss:Row>
+                    }
+              </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>
+

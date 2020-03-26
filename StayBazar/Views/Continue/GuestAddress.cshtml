@@ -1,0 +1,179 @@
+﻿@model StayBazar.Models.GuestAddressModel
+@{
+    ViewBag.Title = "Guest Address";
+}
+<!-- feedback popup -->
+@Html.Partial("~/Views/Feedback/Feedback.cshtml")
+<!-- feedback popup -->
+<div class="container bdy_min_height margin-top-10">
+    <div style="height:40px;"></div>
+    <div class="row">
+       <div class=" col-md-12">   
+    <h4>Please provide your address for Reservation.</h4>
+ </div>
+    </div>
+    <div class="row">
+@using (Html.BeginForm("SaveAddress", "Continue"))
+{
+    <div class="col-md-4 col-md-offset-1   ">
+        @Html.ValidationSummary(true)
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            @Html.LabelFor(m => m.FirstName)<span style="color:red">*</span>
+            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", required = "required" })
+            @Html.ValidationMessageFor(m => m.FirstName)
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Lastname)<span style="color:red">*</span>
+            @Html.TextBoxFor(m => m.Lastname, new { @class = "form-control", required = "required" })
+            @Html.ValidationMessageFor(m => m.Lastname)
+        </div>
+        <div class="form-group ">
+            @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+            @Html.TextAreaFor(m => m.Address, new { @class = "form-control", required = "required",style="resize:none;width:356px;height:91px;" })
+            @Html.ValidationMessageFor(m => m.Address)
+        </div>
+    </div>
+    <div class="col-md-4  ">
+        <div class="form-group">
+            @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+            @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @class = "form-control input-sm" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.State)<span style="color:red">*</span>
+            @Html.DropDownListFor(m => m.State, Model.StateList, new { @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.State)
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.CityId)<span style="color:red">*</span> &nbsp;
+            <a href="#" id="close_other_city" class="lnk" style="display:none;font-size:12px;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+            @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @class = "form-control input-sm" })
+            <div id="other_city" style="display:none;">
+                @Html.TextBoxFor(m => m.City, new { @class = "form-control input-sm" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Pincode)<span style="color:red">*</span>
+            @Html.TextBoxFor(m => m.Pincode, new { @class = "form-control input-sm", @onkeypress = "return isINNumbers(event)" })
+            @Html.ValidationMessageFor(m => m.Pincode)
+        </div>
+        
+
+        <div class="form-group col-md-2 col-md-offset-7">
+
+            <input type="submit" value="Save and continue" class="btn btn-info" />
+        </div>
+        <div>
+    </div>
+
+
+
+    </div>
+}
+        </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#CountryId').change(function () {
+            $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                if (data != "")
+                    $('#State').html(data);//.append('<option selected="selected" value="0">Other</option>');
+                else
+                    $('#State').empty().append('<option selected="selected" value="0">Not available...</option>');
+                Loadcity();
+            });
+        });
+        $('#State').change(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                if (data != "") {
+                    $('#CityId').html(data);
+                    if ($("select#CityId option").length == 1) {
+                        $("#CityId").hide();
+                        $("#City").val("");
+                        $("#other_city").show();
+                    }
+                }
+                else {
+                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+
+        });
+        $('#CityId').change(function () {
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#City").val("");
+                $("#other_city").show();
+                $("#close_other_city").show();
+            }
+        });
+        $('#close_other_city').click(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+        });
+        $('#BillingCountryId').change(function () {
+            $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
+                if (data != "")
+                    $('#BillingState').empty().append(data);
+                else
+                    $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+                
+            });
+        });
+        $('#BillingState').change(function () {
+            $("#BillingCityId").show();
+            $("#BillingCity").val("");
+            $("#other_billing_city").hide();
+            $.get("/Common/GetCity?id=" + $('#BillingState').val(), function (data) {
+                if (data != "") {
+                    $('#BillingCityId').empty().append(data);
+                    if ($("select#BillingCityId option").length == 1) {
+                        $("#BillingCityId").hide();
+                        $("#BillingCity").val("");
+                        $("#other_billing_city").show();
+                    }
+                }
+                else {
+                    $('#BillingCityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+
+        });
+        $('#BillingCityId').change(function () {
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#BillingCity").val("");
+                $("#other_billing_city").show();
+                $("#close_other_billing_city").show();
+            }
+        });
+        $('#close_other_billing_city').click(function () {
+            $("#BillingCityId").show();
+            $("#BillingCity").val("");
+            $("#other_billing_city").hide();
+            $("#close_other_billing_city").hide();
+        });
+    });
+
+    function Loadcity()
+    {
+        $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+            if (data != "") {
+                $('#CityId').empty().append(data);
+                if ($("select#CityId option").length == 1) {
+                    $("#CityId").hide();
+                    $("#City").val("");
+                    $("#other_city").show();
+                }
+            }
+            else {
+                $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+</script>

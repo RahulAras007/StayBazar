@@ -1,0 +1,32 @@
+www.staybazar.com
+
+User Name :       ramesh@ziacsoft.com
+
+Password  :         Ziac@2019
+
+User Category:  Admin
+
+
+other users in staybazar live
+
+gdscorpuser@gmail.com
+abc123
+gdstestcorporate@gmail.com
+abc123
+gdsapprover1@gmail.com
+abc123
+gdsapprover2@gmail.com
+abc123
+
+
+
+
+Remote Desktop details of server,
+
+Server: staybaza.cloudapp.net:50450
+User: vivek
+Password:  Easy1234$
+--vivek@sb3#
+
+Live database: staybazar_data
+

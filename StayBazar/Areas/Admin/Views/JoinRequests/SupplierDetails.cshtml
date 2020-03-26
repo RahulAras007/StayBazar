@@ -1,0 +1,306 @@
+﻿@model StayBazar.Areas.Admin.Models.UserDetailModel
+@{
+    Model.Businessname = BLayer.B2B.GetBusinessName(Model.UserId);
+    ViewBag.Title = "Supplier | " + Model.Businessname;
+    if (Model.Status == (int)CLayer.ObjectStatus.StatusType.Deleted)
+    {
+        ViewBag.Title += " [deleted]";
+    }
+
+}
+
+
+<hr />
+<div class="col-lg-12">
+    <div class="col-lg-8">
+        <span class="h2">
+            <a href="/Admin/JoinRequests/Supplier">Join Requests</a>
+            / @Model.Name
+        </span>
+    </div>
+    <div class="col-lg-4">
+        <div class="btn-group">
+            @if (Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.Read ||
+        Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.NotVerified ||
+        Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.Unread)
+            {
+                <a href="/Admin/JoinRequests/Accept/@Model.UserId" class="btn btn-default" onclick="return confirm('Are you sure you want to mark this request as accepted?')">Accept</a>
+                <a href="/Admin/JoinRequests/Reject/@Model.UserId" class="btn btn-danger" onclick="return confirm('Are you sure you want to mark this request as rejected?')">Reject</a>
+            }
+            else
+            {
+                <span class="h3"><span class="label label-danger">@(((CLayer.ObjectStatus.StatusType)Model.RequestStatus).ToString())</span></span>
+            }
+        </div>
+        @if (Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.Read ||
+        Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.NotVerified ||
+        Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.Unread)
+        {
+            <a href="/Admin/JoinRequests/Markasunread/@Model.UserId" class="btn btn-default" onclick="return confirm('Are you sure you want to mark this request as unread?')">Mark as Unread</a>
+        }
+    </div>
+</div>
+<br />
+<hr />
+<div class="col-lg-12">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#detials" data-toggle="tab">Details</a></li>
+        <li><a href="#documents" data-toggle="tab">Documents</a></li>
+       
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="detials">
+            <div class="row">
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger">
+
+                        @ViewBag.Message
+                    </div>
+                }
+                @using (Html.BeginForm("SupplierUpdate", "JoinRequests", FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    @Html.HiddenFor(m => m.UserId)
+                    @Html.HiddenFor(m => m.Sex)
+                    @Html.HiddenFor(m => m.Status)
+                    @Html.HiddenFor(m => m.Email)
+                    @Html.HiddenFor(m => m.AddressId)
+                    @Html.HiddenFor(m => m.AddressType)
+                    @Html.HiddenFor(m => m.DateOfBirth)
+                    <div class="col-lg-4 incontainer">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Name)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.Name, new { @tabindex = "2", @class = "form-control ", @readonly = "readonly" })
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Name</label><span style="color:red">*</span><br />
+                            @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.FirstName)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                            @Html.TextAreaFor(m => m.Address, new { @tabindex = "6", @class = "form-control", style = " height: 107px;" })
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+                  
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyDescription)<br />
+                            @Html.TextBoxFor(m => m.PropertyDescription, new { @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.AvailableProperties)<br />
+                            @Html.TextBoxFor(m => m.AvailableProperties, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 incontainer">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+                            @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "7", @class = "form-control" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.State)<span style="color:red">*</span>
+                            @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "8", @class = "form-control" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.City)<span style="color:red">*</span> &nbsp;
+                            <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                            @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "9", @class = "form-control" })
+                            <div id="other_city" style="display:none;">
+                                @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                                <input type="hidden" value="@Model.City" id="hdnCity" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ZipCode)
+                            @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "3", @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                            @Html.ValidationMessageFor(m => m.ZipCode)
+                            <input type="hidden" id="hiddenCity" value="@Model.CityId" />
+                        </div>
+                    </div>
+                    <div class="col-lg-4 incontainer">
+                        @*<div class="form-group ">
+                                @Html.LabelFor(m => m.PANNo)
+                                @Html.TextBoxFor(m => m.PANNo, new { @tabindex = "10", @class = "form-control" })
+                            </div>*@
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Mobile)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "11", @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                            @Html.ValidationMessageFor(m => m.Mobile)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Phone)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.Phone, new { @tabindex = "11", @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                            @Html.ValidationMessageFor(m => m.Phone)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Email)@*<span style="color:red">*</span>*@
+                            @Html.TextBoxFor(m => m.Email, new { @tabindex = "11", @class = "form-control", @readonly = "readonly" })
+                        </div>
+                        <div class="form-group">
+                            Registration date: @Model.CreatedDate.ToShortDateString()
+                        </div>
+                    </div>
+                   
+                      
+                 
+                    <div class="col-md-11">
+                        <div class="form-group text-right">
+                            <button type="submit" class="btn redbg whitetext border-radius0">Save</button>
+                            @*<a href="/Admin/Supplier" class="btn btn-default greybg whitetext ">Cancel</a>*@
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+        <div class="tab-pane" id="documents">
+            @Html.Partial("~/Areas/Admin/Views/JoinRequests/UserDocuments.cshtml", new StayBazar.Areas.Admin.Models.UserDocumentsModel() { UserId = Model.UserId, UserType = (int)CLayer.Role.Roles.Supplier })
+        </div>
+        <div class="tab-pane" id="properties">
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyDescription)<br />
+                @Html.DisplayFor(m => m.PropertyDescription, new { @class = "form-control input-sm" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.AvailableProperties)<br />
+                @Html.DisplayFor(m => m.AvailableProperties, new { @class = "form-control input-sm" })
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<script type="text/javascript">
+    $(function () {
+        $("#DateOfBirth").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-80:+0"
+        });
+    });
+</script>
+<script type="text/javascript">
+
+    function CityLoad() {
+        $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+            if (data != "") {
+                $('#CityId').empty().append(data);
+                if ($("select#CityId option").length == 1) {
+                    $("#CityId").hide();
+                    $("#City").val("");
+                    $("#other_city").show();
+                }
+            }
+            else {
+                $('#CityId').empty().append('<option selected="selected" value="0">None</option>');
+            }
+        });
+    }
+
+
+
+    $(function () {
+        // alert($("#State").val());
+
+        //$.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+        //    if (data != "") {
+        //        $('#CityId').empty().append(data);
+        //        if ($("select#CityId option").length == 1) {
+        //            $("#CityId").hide();
+        //            $("#City").val("");
+        //            $("#other_city").show();
+        //        }
+        //        else {
+        //            if ($("#hiddenCity").val() != "") {
+        //                $("#CityId").val($("#hiddenCity").val());
+        //            }
+        //            else {
+        //                $("#CityId").hide();
+        //                $("#other_city").show();
+        //                if ($("select#CityId option").length > 1) {
+        //                    $("#close_other_city").show();
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else {
+        //        $('#CityId').empty().append('<option selected="selected" value="0">None</option>');
+        //    }
+        //});
+
+        /*    if ($('#City').val() != "")
+            {
+                $("#CityId").hide();
+                $("#other_city").show();
+                if ($("select#CityId option").length > 1) {
+                    $("#close_other_city").show();
+                }
+            }*/
+        /*    if($('#CityId').val() <1) {
+                $("#CityId").hide();
+                $("#other_city").show();
+                if ($("select#CityId option").length > 1) {
+                    $("#close_other_city").show();
+                }
+            }*/
+        $('#CountryId').change(function () {
+            $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                if (data != "")
+                    $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                else
+                    $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                CityLoad();
+            });
+        });
+        $('#State').change(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                if (data != "") {
+                    $('#CityId').empty().append(data);
+                    if ($("select#CityId option").length == 1) {
+                        $("#CityId").hide();
+                        $("#City").val("");
+                        $("#other_city").show();
+                    }
+                }
+                else {
+                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+
+        });
+
+
+        $('#CityId').change(function () {
+            if ($(this).val() < 1) {
+                $(this).hide();
+                $("#City").val($("#hdnCity").val());
+                $("#other_city").show();
+                $("#close_other_city").show();
+            }
+        });
+        $('#close_other_city').click(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+        });
+
+    });
+
+
+
+    //Pagination for Booking List Corporate
+    function showPager(num) {
+        // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager","Corporate")';
+        $.post(url, $("#frmPagers").serialize(), function (data) {
+            $("#List").html(data);
+        });
+    }
+</script>

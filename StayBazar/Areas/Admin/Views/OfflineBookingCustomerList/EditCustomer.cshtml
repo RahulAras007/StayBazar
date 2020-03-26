@@ -1,0 +1,740 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+
+@{
+    ViewBag.title = "OfflineBookingCustomer";
+}
+
+
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-3">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+    </div>
+</div>
+@if (TempData["Success"] != null)
+{
+    <p class="alert alert-success" id="successMessage">@TempData["Success"]</p>
+}
+@using (Html.BeginForm("SaveCustomer", "OfflineBookingCustomerList", FormMethod.Post, new { enctype = "multipart/form-data", id = "FormofflineCustomer" }))
+{
+
+
+    <div id="divCoustmer" class="col-md-12 margin-bot-10" style="padding-top: 21px;">
+        <div id="customerDiv">
+            <div class="col-md-5">
+                <div id="cus1">
+                    @*Customer Details*@
+                    <div class="form-group">
+                      @*  @Html.HiddenFor(m => m.CustomerType, new { @id = "HiddenCustomerType", @name = "HiddenCustomerType" })*@
+                        <input type="hidden" id="HiddenCustomerType" name="HiddenCustomerType" value="@Model.CustomerType" />
+                        @*@Html.HiddenFor(m => m.CustomerCity1, new { @id = "HiddenCustomerCity1" })*@
+                        @*@Html.HiddenFor(m => m.BillingCity, new { @id = "HiddenBillingCity" })*@
+                        @Html.HiddenFor(m => m.CustomerId, new { @id = "CustomerId" })
+
+                        @Html.LabelFor(m => m.CustomerName1)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.CustomerName1, new { @class = "form-control input-sm" })
+                        <span id="CustomerName1Span" data-val="CustomerName1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerName1" data-valmsg-replace="true"><span for="CustomerName1" class="">Enter Customer Name</span></span>
+                        @*  @Html.ValidationMessageFor(m => m.CustomerName)*@
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CustomerEmail1)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.CustomerEmail1, new { @class = "form-control input-sm", })
+                        <span id="CustomerEmail1Span" data-val="CustomerEmail1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerEmail1" data-valmsg-replace="true"><span for="CustomerEmail1" class="">Enter Property Email</span></span>
+                        @* @Html.ValidationMessageFor(m => m.CustomerEmail)*@
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CustomerMobile1)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.CustomerMobile1, new { @class = "form-control input-sm" })
+                        <span id="CustomerMobile1Span" data-val="CustomerMobile1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerMobile1" data-valmsg-replace="true"><span for="CustomerMobile1" class="">Enter Customer Contact Number</span></span>
+                        @* @Html.ValidationMessageFor(m => m.CustomerMobile)*@
+                    </div>
+                    <div class="form-group" style="display:none">
+                        @Html.LabelFor(m => m.GuestName1)
+                        @Html.TextBoxFor(m => m.GuestName1, new { @class = "form-control input-sm" })
+                        @*@Html.ValidationMessageFor(m => m.GuestName)*@
+                    </div>
+                    <div class="form-group" style="display:none">
+                        @Html.LabelFor(m => m.GuestEmail1)
+                        @Html.TextBoxFor(m => m.GuestEmail1, new { @class = "form-control input-sm" })
+                        <span id="GuestEmail1Span" data-val="GuestEmail1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="GuestEmail1" data-valmsg-replace="true"><span for="GuestEmail1" class="">Enter Guest Email</span></span>
+                        @*  @Html.ValidationMessageFor(m => m.GuestEmail)*@
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CustomerAddress1)<span style="color:red">*</span>
+                        @Html.TextAreaFor(m => m.CustomerAddress1, new { @class = "form-control input-sm" })
+                        <span id="CustomerAddress1Span" data-val="CustomerAddress1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerAddress1" data-valmsg-replace="true"><span for="CustomerAddress1" class="">Select Customer City</span></span>
+                        @*@Html.ValidationMessageFor(m => m.CustomerAddress)*@
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CustomerpinCode)<br />
+                        @Html.TextBoxFor(m => m.CustomerpinCode, new { @class = "form-control input-sm" })
+                        <span id="CustomerAddress1Span" data-val="CustomerAddress1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerAddress1" data-valmsg-replace="true"><span for="CustomerAddress1" class="">Select Customer City</span></span>
+                        @*@Html.ValidationMessageFor(m => m.CustomerAddress)*@
+                    </div>
+                    <div class="form-group">
+                        @Html.CheckBoxFor(m => m.NoInvoiceMail)
+                        @Html.LabelFor(m => m.NoInvoiceMail)
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 ">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CustomerCountry1)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.CustomerCountry1, Model.CusCountryList, new { @class = "form-control input-sm" })
+                    <span id="CustomerCountry1Span" data-val="CustomerCountry1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerCountry1" data-valmsg-replace="true"><span for="CustomerCountry1" class="">Select Customer Country</span></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CustomerState1)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.CustomerState1, Model.CusStateList, new { @class = "form-control input-sm" })
+                    <span id="CustomerState1Span" data-val="CustomerState1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerState1" data-valmsg-replace="true"><span for="CustomerState1" class="">Select Customer State</span></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CustomerCity1)<span style="color:red">*</span> &nbsp;
+                    <a href="#" id="close_other_citycu" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                    @Html.DropDownListFor(m => m.CustomerCity1, Model.CusCityList, "select", new { @class = "form-control" })
+
+
+                    <div id="other_citycu" style="display:none;">
+                        @Html.TextBoxFor(m => m.CustomerCityname, new { @class = "form-control input-sm", @id = "CustomerCityname" })
+                    </div>
+
+                    <span id="CustomerCity1Span" data-val="CustomerCity1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerCity1" data-valmsg-replace="true"><span for="CustomerCity1" class="">Select Customer City</span></span>
+                    @* @Html.ValidationMessageFor(m => m.CustomerCity)*@
+                </div>
+                @{ 
+                    var CustomerPaymentModeStyle = "";
+                    if(Request.Browser.Type.ToLower().Contains("firefox"))
+                    {
+                        CustomerPaymentModeStyle = "padding-top: 35px;";
+                    }
+                    else
+                    {
+                        CustomerPaymentModeStyle = "padding-top: 17px;";
+                    }
+                }
+
+                <div class="form-group" style="padding-top: 5px;"> @*<strong>Customer Type</strong>*@
+                   @Html.LabelFor(m=>m.CustomerName1) <span style="color:red" id="ReqCustomerType">*</span>
+                    <select class="form-control input-sm valid" id="CustomerType" name="CustomerType">
+                        <option value="7" @if(Model.CustomerType == 7){<text>  Selected </text>} >Customer</option>
+                        <option value="5" @if (Model.CustomerType == 5) { <text>  Selected </text>}>Corporate</option>
+                    </select>
+                </div>
+                <div class="form-group" style="@CustomerPaymentModeStyle">
+                    @Html.LabelFor(m => m.CustomerPaymentMode)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.CustomerPaymentMode , Model.CustomerPaymentMode_Manage,"select", new { @class = "form-control input-sm" })
+                    @Html.ValidationMessageFor(M=>M.CustomerPaymentMode)
+                    <span id="CustomerPaymentModeSpan" data-val="CustomerPaymentMode" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerPaymentMode" data-valmsg-replace="true"><span for="CustomerPaymentMode" class="">Select Customer Payment Mode</span></span>
+                </div>
+                <div class="form-group" id="dvCreditDays">
+                    @Html.LabelFor(m => m.CreditDays)
+                    @Html.TextBoxFor(m => m.CreditDays, "{0:0.#}", new { @class = "form-control input-sm" })
+                </div>
+            </div>
+        </div>
+        <div id="BillingAddres" class="form-group">
+
+
+            <div class="col-md-12 margin-bot-10">
+                <h3>Billing Address</h3>
+                <div class="col-md-5">
+
+                    <div class="form-group">
+
+
+
+                        @Html.LabelFor(m => m.BillingCountryId)
+                        @Html.DropDownListFor(m => m.BillingCountryId, Model.BillingCountryList, new { @tabindex = "14", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+
+
+                        @Html.LabelFor(m => m.BillingState)
+                        @Html.DropDownListFor(m => m.BillingState, Model.CusStateList, new { @tabindex = "15", @class = "form-control input-sm" })
+                    </div>
+
+
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.BillingCity)<span style="color:red">*</span> &nbsp;
+                        <a href="#" id="close_other_citycuss" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                        @Html.DropDownListFor(m => m.BillingCity, Model.CusCityList, "select", new { @class = "form-control" })
+                        <div id="other_citycuss" style="display:none;">
+                            @Html.TextBoxFor(m => m.BillingCityname, new { @class = "form-control input-sm" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.BillingCity)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.PinCode)
+                        @Html.TextBoxFor(m => m.PinCode, new { @tabindex = "15", @class = "form-control input-sm" })
+
+                    </div>
+
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.BillingMobile)
+                        @Html.TextBoxFor(m => m.BillingMobile, new { @tabindex = "15", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.ContactPerson)
+                        @Html.TextBoxFor(m => m.ContactPerson, new { @tabindex = "15", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @*<strong>Office Number</strong>*@ @Html.LabelFor(m => m.OfficeNO) <br />
+                        @Html.TextBoxFor(m => m.OfficeNO, new { @tabindex = "15", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.BillingAddress)
+                        @Html.TextAreaFor(m => m.BillingAddress, new { @tabindex = "15", @class = "form-control input-sm" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 btn-toolbar margin-bot-10 col-lg-offset-1  margin-top-10">
+        <div class="submitctr marginleft30px">
+            @*<input type="submit" id="btnSave" value="Save" class="btn btn-success marginleft30px" tabindex="23" />*@
+            <input type="button" onclick="SaveCustomerSave()" id="btnSave1" value="Save" class="btn btn-success marginleft30px" tabindex="23" />
+            <a style="cursor:pointer;" href="/Admin/OfflineBookingCustomerList/Index" class="btn btn-danger" tabindex="24">Cancel</a>
+        </div>
+    </div>
+}
+
+<div id="div_gstaddrs">
+    <form id="frmgstAddress">
+        @Html.HiddenFor(m => m.OffGSTId)
+        <div class="col-md-12 margin-bot-10">
+            <div class="col-md-12">
+                <h3>GST Details</h3>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.GSTRegistrationNo)
+                        @Html.TextBoxFor(m => m.GSTRegistrationNo, new { @tabindex = "15", @class = "form-control input-sm" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.StateOfRegistration)<span style="color:red">*</span>
+                        @Html.DropDownListFor(m => m.StateOfRegistration, Model.CusStateList, "Select", new { @class = "form-control input-sm" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label></label>
+                        <br />
+                        <input type="button" class="btn-success" value="ADD" id="CustomerGSTEdit" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SubCustomerCity)&nbsp;
+                        <a id="close_other_gstcitycus" class="lnk" style="display:none; cursor:pointer;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                        @Html.DropDownListFor(m => m.SubCustomerCity, Model.SubCusCityList, "select", new { @class = "form-control" })
+                        <div id="other_gstcitycus" style="display:none;">
+                            @Html.TextBoxFor(m => m.SubCustomerCityname, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SubCustomerAddress)<span style="color:red">*</span>
+                        @Html.TextAreaFor(m => m.SubCustomerAddress, new { @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.SubCustomerAddress)
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.SubCustomerpinCode)
+                        @Html.TextBoxFor(m => m.SubCustomerpinCode, new { @class = "form-control input-sm" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bot-10" id="GSTListOfflineCustomer">
+
+            </div>
+        </div>
+    </form>
+
+    <div id="HiddenGstAddress">
+
+    </div>
+</div>
+<script>
+
+
+    function SaveCustomerSave() {
+        var CustomerPaymentModeID = $("#CustomerPaymentMode").val();
+        if ($("#CreditDays").val() == "") {
+            $("#CreditDays").val("0");
+        }
+        var CreditDaysValue=$("#CreditDays").val();
+        if (CustomerPaymentModeID == 3) {
+            if (CreditDaysValue == 0) {
+                alert("Enter Credit days");
+                return;
+            }
+        }
+
+        //Check Customer Already Exist
+        var urlPath = '@Url.Action("CheckOfflineCustomerExist", "OfflineBookingGST", new { area = "Admin" })?CustomerName1=' + $('#CustomerName1').val() + '&CustomerEmail1=' + $('#CustomerEmail1').val() + '&CustomerId=' + $('#CustomerId').val() + '&CustomerType=' + $('#CustomerType').val();
+        $.get(urlPath, function (data) {
+            if (data == 0) {
+                if($('#FormofflineCustomer').valid())
+                {
+                    $('#FormofflineCustomer').submit();
+                }
+            }
+            else {
+                alert("Customer already exist");
+            }
+        });
+    }
+
+    $(function () {
+        $("#BillingAddres").hide();
+        $("#ReqCustomerType").hide();
+
+        if ($("#CustomerPaymentMode").val() == 3) {
+            $("#dvCreditDays").show();
+        }
+        else {
+            $("#dvCreditDays").hide();
+        }
+
+        LoadDefaultState(@Model.CustomerCountry1,@Model.CustomerState1,@Model.CustomerCity1);
+        LoadSavedBillingState(@Model.BillingCountryId,@Model.BillingState,@Model.BillingCity);
+
+        var CustID = $('#CustomerId').val();
+        var url = '@Url.Action("GSTList", "OfflineBookingCustomerList")' + "?custid=" + CustID;
+        $.get(url, function (data) {
+            $('#GSTListOfflineCustomer').html(data);
+        });
+
+        $('#CustomerGSTEdit').click(function () {
+
+            if($('#StateOfRegistration').val() > 0 && $("#GSTRegistrationNo").val().trim().length > 0)
+            {
+                var CustID = $('#CustomerId').val();
+                var url = '@Url.Action("SaveGST", "OfflineBookingCustomerList")?CustID=' + CustID;
+                $.get(url,$('#frmgstAddress').serialize(), function () {
+                    var url = '@Url.Action("GSTList", "OfflineBookingCustomerList")' + "?custid=" + CustID;
+                    $.get(url, function (data) {
+                        $('#GSTListOfflineCustomer').html(data);
+                    });
+                });
+                $('#GSTRegistrationNo').val("");
+                $('#StateOfRegistration').val(0);
+                $('#OffGSTId').val(0);
+                $("#SubCustomerCity").val(0);
+                $("#SubCustomerCityname").val("");
+                $("#SubCustomerAddress").val(' ');
+                $("#SubCustomerpinCode").val(' ');
+
+                $("#SubCustomerCity").show();
+                $("#other_gstcitycus").hide();
+                $("#close_other_gstcitycus").hide();
+            }
+            else{
+                alert("Enter valid data");
+            }
+
+        });
+
+        ///on [page load hide and show Billing Addres div
+        if ($("#HiddenCustomerType").val() == 5) {
+            $("#BillingAddres").show();
+            $("#CustomerType").val(5);
+            $("#div_gstaddrs").show(); 
+        }
+        else {
+            $("#BillingAddres").hide();
+            $("#div_gstaddrs").hide(); 
+        }
+
+        $('#CustomerType').change(function () {
+
+            if ($("#CustomerType").val() == 5) {
+
+                $("#BillingAddres").show();
+                $("#div_gstaddrs").show(); 
+            }
+            else {
+                $("#BillingAddres").hide();
+                $("#div_gstaddrs").hide(); 
+
+            }
+
+        });
+
+        //customer payment mode and credit days
+
+        $('#CustomerPaymentMode').change(function () {
+            if ($("#CustomerPaymentMode").val() == 3) {
+                $("#dvCreditDays").show();
+            }
+            else {
+                $("#dvCreditDays").hide();
+            }
+        }); 
+
+  
+        $('#CreditDays').keypress(function (e) {
+            var a = [];
+            var k = e.which;
+
+            var KeystoInclude = [0, 8, 31, 46, 190];
+            for (i = 0; i < KeystoInclude.length; i++) {
+                a.push(KeystoInclude[i]);
+            }
+            for (i = 48; i < 58; i++) {
+                a.push(i);
+            }
+            var numValue = $(this).val();
+            if (e.which == 46) {
+                if ((numValue) && (numValue.indexOf('.') >= 0))
+                    e.preventDefault();
+            }
+            if (!(a.indexOf(k) >= 0))
+                e.preventDefault();
+        });
+        $('#CreditDays').blur(function (e) {
+            var dec = parseFloat($(this).val(), 10).toFixed(1);
+            $(this).val(dec);
+        })
+
+        $('#CustomerCity1').change(function () {
+            $("#CustomerCityname").val($("#CustomerCity1").find('option:selected').text());
+            if ($(this).val() == -1) {
+                $(this).hide();
+
+                $("#CustomerCityname").val("");
+
+                $("#other_citycu").show();
+                $("#close_other_citycu").show();
+            }
+        });
+        $('#close_other_citycu').click(function () {
+            $("#CustomerCity1").show();
+            $("#CustomerCityname").val("");
+            $("#other_citycu").hide();
+            $("#close_other_citycu").hide();
+        });
+
+
+        $('#BillingCity').change(function () {
+            $("#BillingCityname").val($("#BillingCity").find('option:selected').text());
+            if ($(this).val() == -1) {
+                $(this).hide();
+
+                $("#BillingCityname").val("");
+
+                $("#other_citycuss").show();
+                $("#close_other_citycuss").show();
+            }
+        });
+        $('#close_other_citycuss').click(function () {
+            $("#BillingCity").show();
+            $("#BillingCityname").val("");
+            $("#other_citycuss").hide();
+            $("#close_other_citycuss").hide();
+        });
+
+        $('#CustomerCountry1').change(function () {
+            LoadCustomerState();
+        });
+
+
+        //billing country change
+        $('#BillingCountryId').change(function () {
+            LoadBillingState();
+        });
+
+        // billing state chane
+        $('#BillingState').change(function () {
+            LoadBillingCity()
+        });
+
+        // costomr state chane
+        $('#CustomerState1').change(function () {
+            LoadCustomerCity();
+        });
+
+    }); // document load close
+
+
+    function LoadDefaultState(countryId,stateId,cityId)
+    {
+
+        $.get("/Common/GetState?id=" + countryId, function (data) {
+            if (data != "") {
+                $('#CustomerState1').empty().append(data);
+                $('#CustomerState1').val(stateId);
+                //$("#costmstateid").val(cs);
+                //$("#costmstateid option[value= '" + cs + "' ]").attr("selected", "selected");
+
+            }
+            else {
+                $('#CustomerState1').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+
+            $("#CustomerCity1").show();
+            $("#CustomerCity1").val("");
+            //$("#other_cityprop").hide();
+            $.get("/Common/GetCity?id=" + stateId, function (data) {
+                if (data != "") {
+                    $('#CustomerCity1').empty().append(data);
+                    $('#CustomerCity1').val(cityId);
+                    if (cityId == -1)
+                    {
+                        $("#CustomerCity1").hide();
+                        $("#other_citycu").show();
+                        $("#close_other_citycu").show();
+                    }
+                }
+                else {
+                    $('#CustomerCity1').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        });
+    }
+
+    function LoadSavedBillingState(countryId,stateId,cityId)
+    {
+        $.get("/Common/GetState?id=" + countryId, function (data) {
+            if (data != "") {
+                $('#BillingState').empty().append(data);
+                $("#BillingState").val(stateId);
+                //$("#BillingState option[value= '" + cs + "' ]").attr("selected", "selected");
+            }
+            else {
+                $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+
+            $("#BillingCity").show();
+            $("#BillingCity").val("");
+
+            //$("#other_cityprop").hide();
+            $.get("/Common/GetCity?id=" + stateId, function (data) {
+                if (data != "") {
+                    $('#BillingCity').empty().append(data);
+                    $("#BillingCity").val(cityId);
+                    if(cityId == -1)
+                    {
+                        $("#BillingCity").hide();
+                        $("#other_citycuss").show();
+                        $("#close_other_citycuss").show();
+                    }
+                    //if ($("select#BillingCity option").length == 1) {
+                    //    //$("#costmrcityid").hide();
+                    //    $("#BillingCity").val("");
+                    //    //$("#other_cityprop").show();
+                    //}
+                }
+                else {
+                    $('#BillingCity').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        });
+    }
+
+    function LoadCustomerCity()
+    {
+        $("#CustomerCity1").show();
+        $("#CustomerCity1").val("");
+        //$("#other_cityprop").hide();
+        $.get("/Common/GetCity?id=" + $('#CustomerState1').val(), function (data) {
+            if (data != "") {
+                $('#CustomerCity1').empty().append(data);
+                //$("#CustomerCity1").val($("#CustomerCity1").find('option:selected').text());
+                //if ($("select#CustomerCity1 option").length == 1) {
+                //    //$("#costmrcityid").hide();
+                //    $("#CustomerCity1").val("");
+                //    //$("#other_cityprop").show();
+                //}
+            }
+            else {
+                $('#CustomerCity1').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    function LoadCustomerState() {
+
+        $.get("/Common/GetState?id=" + $('#CustomerCountry1').val(), function (data) {
+            if (data != "") {
+                $('#CustomerState1').empty().append(data);
+                //$("#costmstateid").val(cs);
+                //$("#costmstateid option[value= '" + cs + "' ]").attr("selected", "selected");
+
+            }
+            else {
+                $('#CustomerState1').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+            LoadCustomerCity();
+        });
+    }
+    function LoadBillingState() {
+
+        $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
+            if (data != "") {
+                $('#BillingState').empty().append(data);
+                //$("#BillingState").val(cs);
+                //$("#BillingState option[value= '" + cs + "' ]").attr("selected", "selected");
+            }
+            else {
+                $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+            LoadBillingCity();
+        });
+    }
+    function LoadBillingCity() {
+        $("#BillingCity").show();
+        $("#BillingCity").val("");
+
+        //$("#other_cityprop").hide();
+        $.get("/Common/GetCity?id=" + $('#BillingState').val(), function (data) {
+            if (data != "") {
+                $('#BillingCity').empty().append(data);
+                //     $("#BillingCity").val($("#BillingCity").find('option:selected').text());
+                //if ($("select#BillingCity option").length == 1) {
+                //    //$("#costmrcityid").hide();
+                //    $("#BillingCity").val("");
+                //    //$("#other_cityprop").show();
+                //}
+            }
+            else {
+                $('#BillingCity').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+
+
+
+</script>
+
+
+<script>
+
+    function propedit(OffGSTId,GSTstateid) {
+        $('#GSTRegistrationNo').val("");
+        $('#StateOfRegistration').val(0);
+        $('#OffGSTId').val(0);
+        $("#SubCustomerCity").val(0);
+        $("#SubCustomerCityname").val("");
+        $("#SubCustomerAddress").val(' ');
+        $("#SubCustomerpinCode").val(' ');
+
+        $.get("/OfflineBookingCustomerList/GetOfflinegstDetailsById?OffGSTId=" + OffGSTId, function (data) {
+            if (data != "") {
+                $("#HiddenGstAddress").html(data);
+                $('#GSTRegistrationNo').val($("#HiddenSubCustomerGstRegNo").val());
+                $('#OffGSTId').val(OffGSTId);
+                $('#StateOfRegistration').val(GSTstateid);
+                //$("#CustomerCountry").val(1);
+                gstcusLoadState(1,GSTstateid);
+                $("#SubCustomerAddress").val($("#HiddenSubCustomerAddress").val());
+                $("#SubCustomerpinCode").val($("#HiddenSubCustomerpinCode").val());
+            }
+        });
+
+      
+    }
+    function gstcusLoadState(Couid,Sid) {
+        $.get("/Common/GetState?id=" + Couid, function (data) {
+            if (data != "") {
+                $('#StateOfRegistration').empty().append(data);
+                $("#StateOfRegistration").val(Sid);
+                gstcusLoadcity(Sid);
+            }
+            else {
+                $('#StateOfRegistration').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    function gstcusLoadcity(Sid) {
+        $.get("/Common/GetCity?id=" + Sid, function (data) {
+            if (data != "") {
+                $('#SubCustomerCity').html(data);
+                $("#SubCustomerCity").val($("#HiddenSubCustomerCity").val());
+                $("#SubCustomerCityname").val($("#HiddenSubCustomerCityname").val());
+                if ($("#HiddenSubCustomerCity").val() == -1) {
+                    $("#SubCustomerCity").hide();
+                    $("#other_gstcitycus").show();
+                    $("#close_other_gstcitycus").show();
+                }
+                else
+                {
+                    $("#SubCustomerCity").show();
+                    $("#other_gstcitycus").hide();
+                    $("#close_other_gstcitycus").hide();
+                }
+
+            }
+            else {
+                $('#SubCustomerCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+     @*Gst address*@
+    $('#StateOfRegistration').change(function () {
+        $("#SubCustomerCity").show();
+        $("#SubCustomerCityname").val("");
+        $("#other_gstcitycus").hide();
+        $.get("/Common/GetCity?id=" + $('#StateOfRegistration').val(), function (data) {
+            if (data != "") {
+                $('#SubCustomerCity').empty().append(data);
+                $("#SubCustomerCityname").val($("#SubCustomerCity").find('option:selected').text());
+                if ($("select#SubCustomerCity option").length == 1) {
+                    $("#SubCustomerCity").hide();
+                    $("#SubCustomerCityname").val("");
+                    $("#other_gstcitycus").show();
+                }
+            }
+            else {
+                $('#SubCustomerCity').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+    });
+    $('#SubCustomerCity').change(function () {
+        $("#SubCustomerCityname").val($("#SubCustomerCity").find('option:selected').text());
+        if ($(this).val() == -1) {
+            $(this).hide();
+            $("#SubCustomerCityname").val("");
+            $("#other_gstcitycus").show();
+            $("#close_other_gstcitycus").show();
+        }
+    });
+    $('#close_other_gstcitycus').click(function () {
+        $("#SubCustomerCity").show();
+        $("#SubCustomerCityname").val("");
+        $("#other_gstcitycus").hide();
+        $("#close_other_gstcitycus").hide();
+    });
+    function gstLoadcity() {
+        $.get("/Common/GetCity?id=" + $('#StateOfRegistration').val(), function (data) {
+            if (data != "") {
+                $('#SubCustomerCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+            }
+            else {
+                $('#SubCustomerCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+
+</script>

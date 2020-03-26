@@ -1,0 +1,122 @@
+﻿@model List<CLayer.ReportDailyPropertyBooking>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long accBookedNo = 0;
+    long invbal = 0;
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" />
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="CollectionReport">
+        <ss:Table>
+            <ss:Row>
+                @{
+                    CLayer.Address usr3 = new CLayer.Address();
+                    if (Model.Count > 0)
+                    {
+                        usr3 = BLayer.Address.GetAddressOnUserId(Model[0].SupplierId);
+                        <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String">Attn:@usr3.Firstname</ss:Data></ss:Cell>
+                    }
+                }
+            </ss:Row>        
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">@usr3.AddressText,@usr3.City</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">@usr3.StateName,@usr3.Country,@usr3.ZipCode</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">Contact:@usr3.Phone,@usr3.Mobile</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">Email:@usr3.Email</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="10"><ss:Data ss:Type="String">StayBazar has made bookings on your properties inventory as below. Please ensure accomodations booked are available for the guests on dates of stay.                      
+                    </ss:Data>
+                </ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="10">
+                    <ss:Data ss:Type="String">Also kindly check inventory balances for the dates and make replenishments/changes to inventory (as needed) by accessing your supplier account in StayBazar and using Inventory Management function.
+                    </ss:Data>
+                </ss:Cell>
+            </ss:Row>
+            @foreach (CLayer.ReportDailyPropertyBooking reportList in Model)
+            {
+                if (reportList.BookingId == 0)
+                {
+
+                }
+                else
+                {
+
+                    <ss:Row ss:StyleID="1">
+                        <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String">@reportList.PropertyName, @reportList.PropertyLocation</ss:Data></ss:Cell>
+                    </ss:Row>
+                    <ss:Row ss:StyleID="1">
+                        <ss:Cell><ss:Data ss:Type="String">Accomodation Type</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Date Booked</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">No of Accomodations  Booked</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">No of Accomodations Cancelled</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Inventory Allocated to StayBazar</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Inventory Balance</ss:Data></ss:Cell>
+                    </ss:Row>
+                    <ss:Row>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.AccomodationType</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.BookingDate.ToShortDateString()</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.NoofaccomodationsBooked </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.NoofAccomodationsCancelled </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.InventoryAllocatedtoStayBazar</ss:Data></ss:Cell>
+                        <ss:Cell>
+                            <ss:Data ss:Type="String">
+                                @{
+                    accBookedNo = reportList.NoofaccomodationsBooked - reportList.NoofAccomodationsCancelled;
+                    if (accBookedNo < 0) { accBookedNo = 0; }
+                    invbal = reportList.InventoryAllocatedtoStayBazar - accBookedNo;
+                    if (invbal < 0) { invbal = 0; }
+                                }@invbal
+                            </ss:Data>
+                        </ss:Cell>
+
+                    </ss:Row>
+               
+                }
+            }
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String"></ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String">StayBazar</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String">Email:  info@staybazar.com</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String">Phone:	080-4123 6677</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String">Subisidiary of Southern Ecommerce</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String"></ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String">Flat # S-2,EXSULTARE,	No. 38-A, 2nd Avenue </ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String">Shubh Enclave,Haralur Road, Off Sarjpur Road</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String"> Bangalore – 560102</ss:Data></ss:Cell>
+            </ss:Row>
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

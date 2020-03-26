@@ -1,0 +1,40 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    Layout = null;
+    long i = 0;
+  
+
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" / >
+        </ss:Style>
+        <ss:Style ss:ID="DateLiteral">
+            <NumberFormat ss:Format="0"/ >
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="Offline Payment Report">
+        <ss:Table>
+            
+            @foreach (CLayer.OfflineBooking pr in Model)
+            {
+                var amountPayable = string.Format("{0:n0}", pr.TotalSalePrice);
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.PropertyBank<!--Sl no--></ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@amountPayable<!--Request Id--></ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@DateTime.Now.ToString("dd-MM-yyyy")<!--Booking Id-->    </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.BeneficiaryName<!--Customer Name--></ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.AccountNumber <!--Customer City-->        </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.PropertyEmail <!--Customer Email-->     </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Payment From Staybazar after ded TDS Rs.@pr.TotalSalePrice.ToString().Replace(".00", "").Replace(".0", "")/- <!--Guest Name-->  </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">914020057277244 <!--check in--></ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@string.Empty <!--check out--></ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.IFSCCode<!--Total no of pax--></ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@(pr.AccountTypeCode=="0"?"":pr.AccountTypeCode)<!--Total room night--></ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">StayBazar.com<!--total customer payable including gst--></ss:Data></ss:Cell>
+                </ss:Row>
+            }
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

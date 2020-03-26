@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewBag.Title = "City Class Entitlement";
+
+
+    StayBazar.Models.CorporateCityEntitlement CEntitle = (StayBazar.Models.CorporateCityEntitlement)ViewBag.CityEntitle;
+<div id="bodycontent" class="container">
+    <h2>City Class Entitlement</h2>
+        @{
+            Html.RenderPartial("~/Views/CorporateCityEntitlement/_Details.cshtml", CEntitle, ViewData);
+        }
+    
+</div>
+}

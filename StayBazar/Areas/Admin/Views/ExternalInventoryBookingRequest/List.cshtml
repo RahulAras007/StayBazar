@@ -1,0 +1,416 @@
+﻿@model IEnumerable<CLayer.BookingExternalInventory>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "ExternalBookInvetpager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+}
+<div class="container-fluid">@*<br />*@
+    <div class="body-content">
+        @if (Model.Count() == 0)
+        {
+            <div class="alert alert-info">Data not found</div>
+        }
+        <div class="panel-group" id="accordion">
+            @{
+                StayBazar.Areas.Admin.Models.ExternalInventoryBookingRequestModel filterform = (StayBazar.Areas.Admin.Models.ExternalInventoryBookingRequestModel)ViewBag.Filter;
+                using (Html.BeginForm("Pager", "ExternalInventoryBookingRequest", FormMethod.Post, new { @id = "frmPagersExtInv" }))
+                {
+                    <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+                    <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                    <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                    <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+                }
+                gp.RowsInAPage = filterform.Limit;
+            }
+
+            @if (Model != null && Model.Count() > 0)
+            {
+                @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+            }
+
+            @foreach (CLayer.BookingExternalInventory usr in Model)
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#i_@usr.BookingId">
+                            <div class="row">
+
+                                <div class="col-md-2"><span></span>Date: @Convert.ToDateTime(@usr.CreateDate).ToShortDateString()</div>
+                                <div class="col-md-3">  Property: @usr.hotel_name </div>
+                                @{
+
+                                    string orderno = BLayer.Bookings.GetBookingordernoByBId(usr.BookingId);
+                                }
+                                <div class="col-md-3">  Confirmation No: @orderno </div>
+                                <div class="col-md-2">
+                                    API Type :
+                                    @if (usr.BookingApiType == 1)
+                                    {
+                                        <text>  Maximojo  </text>
+                                    }
+                                </div>
+                                <div class="col-md-2">
+                                    @{
+                                        string statuscheck = "";
+                                        long Booking_Id = usr.BookingId;
+
+                                        List<CLayer.BookingExternalInventory> CancBookcnt = BLayer.BookingExternalInventory.GetExternalInventoryCancelDetailsByBookingId(Booking_Id);
+
+                                        List<CLayer.BookingExternalInventory> DtBookReq1 = BLayer.BookingExternalInventory.GetExternalInventoryReqDetailsByBookingId(Booking_Id);
+
+
+                                        if (CancBookcnt.Count() == 0)
+                                        {
+
+
+                                            foreach (CLayer.BookingExternalInventory gg1 in DtBookReq1)
+                                            {
+                                                if (gg1.ReservationStatus == (int)CLayer.BookingExternalInventory.ReservationStatusenum.Booked && gg1.BookingStatus == (int)CLayer.BookingExternalInventory.BookingStatusenum.Success)
+                                                {
+                                                    statuscheck = "Booked";
+                                                }
+                                                else if (gg1.ReservationStatus == (int)CLayer.BookingExternalInventory.ReservationStatusenum.error || gg1.BookingStatus == (int)CLayer.BookingExternalInventory.BookingStatusenum.Failure || gg1.BookingStatus == (int)CLayer.BookingExternalInventory.BookingStatusenum.Pending)
+                                                {
+                                                    statuscheck = "Partially Booked";
+                                                    break;
+
+                                                }
+
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            bool cancelled = true;
+                                            foreach (CLayer.BookingExternalInventory gg in DtBookReq1)
+                                            {
+
+                                                if (gg.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.Success)
+                                                {
+                                                    cancelled = true;
+
+                                                }
+                                                else
+                                                {
+                                                    cancelled = false;
+                                                    break;
+                                                }
+                                            }
+                                            if (cancelled)
+                                            {
+                                                statuscheck = "Fully Cancelled";
+                                            }
+                                            else
+                                            {
+                                                statuscheck = "Cancelled";
+                                            }
+                                        }
+
+
+                                    }
+                                    Status : @statuscheck
+                                </div>
+
+
+                            </div>
+                        </a>
+
+                    </div>
+                    <div id="i_@usr.BookingId" class="panel-collapse collapse ">
+                        <div class="panel-body">
+                            <h4>Rooms Booked</h4>
+
+                            @{
+                                List<CLayer.BookingExternalInventory> DtBookReq = BLayer.BookingExternalInventory.GetExternalInventoryReqDetailsByBookingId(@usr.BookingId);
+
+
+
+                                <div class="row">
+
+                                    <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                                        <thead>
+                                            <tr>
+                                                <th>Room Name</th>
+                                                <th>Room Description</th>
+                                                <th>Check In</th>
+                                                <th>Check Out</th>
+                                                <th>Booking Status</th>
+                                                <th>Reservation Status</th>
+                                                @*@if (canroomdt == true)
+                                                    {*@
+                                                <th>Details</th>
+
+                                                <th>Cancel</th>
+
+                                                @*}*@
+
+
+                                            </tr>
+                                        </thead>
+
+
+
+                                        <tbody>
+                                            @{
+                                                foreach (CLayer.BookingExternalInventory ff in DtBookReq)
+                                                {
+
+                                                    bool canroomdt = false;
+                                                    CLayer.BookingExternalInventory Cancdt = new CLayer.BookingExternalInventory();
+                                                    if (CancBookcnt.Count() > 0)
+                                                    {
+                                                        long bookinBookingExtInvReqId = ff.BookingExtInvReqId;
+                                                        string ReservattionId = ff.reservation_id;
+                                                        Cancdt = BLayer.BookingExternalInventory.GetExternalBookingInvetoryCanceldetById(bookinBookingExtInvReqId, ReservattionId);
+                                                        if (Cancdt != null)
+                                                        {
+                                                            if (Cancdt.Cancellation_Number != null && Cancdt.Cancellation_Number != "")
+                                                            {
+                                                                canroomdt = true;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    <tr>
+                                                        <td>@ff.room_name</td>
+                                                        <td>@ff.room_desc</td>
+                                                        <td>@Convert.ToDateTime(@ff.CheckInDate).ToShortDateString()</td>
+                                                        <td>@Convert.ToDateTime(@ff.CheckOutDate).ToShortDateString()</td>
+                                                        <td>
+                                                            @if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.none)
+                                                            {
+
+                                                                if (ff.BookingStatus == 1)
+                                                                {
+                                                                    <text>  Success </text>
+                                                                }
+                                                                else if (ff.BookingStatus == 2)
+                                                                {
+                                                                    <text>  Failure </text>
+                                                                }
+                                                                else if (ff.BookingStatus == 3)
+                                                                {
+                                                                    <text>  Pending </text>
+                                                                }
+                                                                else if (ff.BookingStatus == 4)
+                                                                {
+                                                                    <text>  Verified </text>
+                                                                }
+                                                                else if (ff.BookingStatus == 5)
+                                                                {
+                                                                    <text>  Cancel </text>
+                                                                }
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.Success)
+                                                            {
+                                                                <text> Cancelled </text> <br />
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.AlreadyCancelled)
+                                                            {
+                                                                <text> AlreadyCancelled </text><br />
+
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.CannotBeCancelled)
+                                                            {
+                                                                <text> CannotBeCancelled </text><br />
+
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.Error)
+                                                            {
+                                                                <text> Error </text><br />
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.UnknownReference)
+                                                            {
+                                                                <text> UnknownReference </text><br />
+
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.none)
+                                                            {
+                                                                if (ff.ReservationStatus == 1)
+                                                                {
+                                                                    <text>  Booked </text>
+                                                                }
+                                                                else if (ff.ReservationStatus == 2)
+                                                                {
+                                                                    <text>  error </text>
+                                                                }
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.Success)
+                                                            {
+                                                                <text> Cancelled </text> <br />
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.AlreadyCancelled)
+                                                            {
+                                                                <text> AlreadyCancelled </text><br />
+
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.CannotBeCancelled)
+                                                            {
+                                                                <text> CannotBeCancelled </text><br />
+
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.Error)
+                                                            {
+                                                                <text> Error </text><br />
+                                                            }
+                                                            else if (ff.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.UnknownReference)
+                                                            {
+                                                                <text> UnknownReference </text><br />
+
+                                                            }
+                                                        </td>
+
+                                                        @if (canroomdt == true)
+                                                        {
+                                                            <td>
+                                                                @if (@Cancdt.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.Success)
+                                                                {
+                                                                    <text> Status : Cancelled , </text> <br />
+                                                                }
+                                                                else if (Cancdt.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.AlreadyCancelled)
+                                                                {
+                                                                    <text> Status : AlreadyCancelled ,</text><br />
+
+                                                                }
+                                                                else if (Cancdt.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.CannotBeCancelled)
+                                                                {
+                                                                    <text> Status : CannotBeCancelled , </text><br />
+
+                                                                }
+                                                                else if (Cancdt.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.Error)
+                                                                {
+                                                                    <text> Status :  Error , </text><br />
+                                                                }
+                                                                else if (Cancdt.Cancellation_Status == (int)CLayer.BookingExternalInventory.CancellationStatus.UnknownReference)
+                                                                {
+                                                                    <text> Status : UnknownReference , </text><br />
+
+                                                                }
+                                                                Date :  @Cancdt.Cancelled_Date , <br />
+                                                                No   :  @Cancdt.Cancellation_Number
+                                                            </td>
+
+                                                        }
+                                                        else
+                                                        {
+
+                                                            <td>
+                                                                Status :
+                                                                @if (ff.BookingStatus == 1)
+                                                                {
+                                                                    <text>  Booked ,  </text><br />
+                                                                }
+                                                                else if (ff.BookingStatus == 2)
+                                                                {
+                                                                    <text>  Failure , </text><br />
+                                                                }
+                                                                else if (ff.BookingStatus == 3)
+                                                                {
+                                                                    <text>  Pending , </text><br />
+                                                                }
+                                                                else if (ff.BookingStatus == 4)
+                                                                {
+                                                                    <text>  Verified , </text><br />
+                                                                }
+                                                                else if (ff.BookingStatus == 5)
+                                                                {
+                                                                    <text>  Cancel , </text><br />
+                                                                }
+                                                                Date :  @ff.CreateDate
+                                                            </td>
+                                                        }
+                                                        <td>
+                                                            @if (ff.Cancellation_Status == 0)
+                                                            {
+                                                                <a class="btn btn-danger over_div" onclick="CanceleachBReq(@ff.BookingExtInvReqId)">
+                                                                    <div id="loading2" style="display:none;" class="loader"><div class="center_load2"><img src="/images/loading.gif" width="30" height="30" /></div></div>
+                                                                    Cancel
+                                                                </a>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            }
+
+                            <div class="row " style="padding-right: 10px;">
+                                @{
+                                    List<CLayer.BookingExternalInventory> details = BLayer.BookingExternalInventory.GetExternalInventoryReqDetailsByBookingId(@usr.BookingId);
+
+                                    //Check booking is suceess or failure in booking table
+
+                                    CLayer.ObjectStatus.BookingStatus sts = BLayer.Bookings.GetStatus(usr.BookingId);
+
+                                    if (sts != CLayer.ObjectStatus.BookingStatus.BookingRequest && sts != CLayer.ObjectStatus.BookingStatus.Success)
+                                    {
+                                        bool EnableCancel = false;
+
+                                        foreach (CLayer.BookingExternalInventory CancelSts in details)
+                                        {
+
+                                            if (CancelSts.Cancellation_Status != 1 && CancelSts.Cancellation_Status != 2)
+                                            {
+                                                EnableCancel = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (EnableCancel)
+                                        {
+                                            <a class="btn btn-danger over_div" style="float:right; padding-right:10px;" onclick="ExtBCancel(@usr.BookingId)">
+                                                <div id="loading1" style="display:none;" class="loader"><div class="center_load1"><img src="/images/loading.gif" width="30" height="30" /></div></div>
+                                                Cancel All External Booking Request
+
+                                            </a>
+                                        }
+                                    }
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+
+    function ExternalBookInvetpager(num) {
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "ExternalInventoryBookingRequest", new { area = "Admin" })';
+        $.post(url, $("#frmPagersExtInv").serialize(), function (data) {
+            $("#List").html(data);
+        });
+    }
+
+    function CanceleachBReq(BookingExtInvReqId) {
+        if (confirm("Are you sure,you want to cancel this external booking request?")) {
+            document.getElementById('loading2').style.display = 'block';
+            //$('<div id="loading" class="loader" ><div class="center_load"><img src="/images/loading.gif" width="30" height="30" /></div></div>').prependTo(document.body);
+            var url = "/ExternalInventoryBookingRequest/CancelExternalRequestEach?BookingExtInvReqId=" + BookingExtInvReqId;
+            window.location.href = url;
+        }
+
+
+    }
+    function ExtBCancel(BId) {
+
+        if (confirm("Are you sure,you want to cancel all external booking request?")) {
+            document.getElementById('loading1').style.display = 'block';
+            //$('<div id="loading" class="loader" ><div class="center_load"><img src="/images/loading.gif" width="30" height="30" /></div></div>').prependTo(document.body);
+            var url = "/ExternalInventoryBookingRequest/CancelExternalRequest?BookingId=" + BId;
+            window.location.href = url;
+        }
+    }
+
+</script>

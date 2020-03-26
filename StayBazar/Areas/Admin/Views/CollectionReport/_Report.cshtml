@@ -1,0 +1,182 @@
+﻿@model IEnumerable<CLayer.CollectionReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+    string mtype = "";
+    string type = "";
+    decimal NoofAccomodations1=0, NoofNights1=0, TotalBookingValue1=0, PaymentGatewayCharges1=0, NetCreditReceivableBankAccount1=0;
+    decimal gNoofAccomodations = 0, gNoofNights = 0, gTotalBookingValue = 0, gPaymentGatewayCharges = 0, gNetCreditReceivableBankAccount = 0;
+    
+}
+<div class="row">
+    <div class="col-md-12  margin10px">
+        @{
+            if (ViewBag.Filter != null) { 
+            StayBazar.Areas.Admin.Models.CollectionReportModel filterform = (StayBazar.Areas.Admin.Models.CollectionReportModel)ViewBag.Filter;
+            using (Html.BeginForm("Pager", "CollectionReport", FormMethod.Post, new { @id = "frmPagersa" }))
+            {
+                <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+                <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                <input type="hidden" id="FromDate" name="FromDate" value="@filterform.FromDate" />
+                <input type="hidden" id="ToDate" name="ToDate" value="@filterform.ToDate" />
+                <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+       
+        if (Model != null && Model.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+        }
+        }
+   }
+        <div >
+            <div style="text-align:left">@*<h4>Collection Report</h4>*@ </div>
+            <table class="table table-bordered table-hover table-striped" border="1">
+                @*<caption>@{StayBazar.Areas.Admin.Models.CollectionReportModel b = new StayBazar.Areas.Admin.Models.CollectionReportModel();<text>Page:</text> @b.currentPage }</caption>*@
+                <thead style="background-color:whitesmoke">
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Booking Date</th>
+                        <th>Booking Ref No</th>
+                        <th>Property Name</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Accommodation Type</th>
+                        <th>No of Accommodation</th>
+                        <th>Period of Stay</th>
+                        <th>No of Nights</th>
+                        <th>CustomerType</th>
+                        <th>Customer Name</th>
+                        <th>Total Booking Value</th>
+                        <th>Customer Payment Mode</th>
+                        <th>Payment gateway commission %</th>
+                        <th>Payment gateway charges (Rs)</th>
+                        <th>Net Credit Receivable in bank account</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (CLayer.CollectionReport reportList in Model)
+                    {
+                        i = i + 1;
+                        
+                        
+                        
+                        DateTime checkin = reportList.CheckIn;
+                        DateTime checkout = reportList.CheckOut;
+                        TimeSpan ts = checkout - checkin;
+                        int differenceInDays = ts.Days;
+                        string differenceAsString = differenceInDays.ToString();
+
+                        mtype = reportList.CustomeType;
+                        if (type != mtype)
+                        {
+                            if (type != "")
+                            {
+                                <tr class="info">
+                                    <td colspan="7">@type Totals</td>
+                                    <td align="right"><b>@NoofAccomodations1</b></td>
+                                    <td >&nbsp;</td>
+                                    <td align="right"><b>@NoofNights1 </b></td>
+                                    <td colspan="2">&nbsp;</td>
+                                    <td align="right"><b>@TotalBookingValue1.ToString("N0")</b></td>
+                                    <td colspan="2">&nbsp;</td>
+                                    <td align="right"><b>@PaymentGatewayCharges1.ToString("N0")</b></td>
+                                    <td align="right"><b>@NetCreditReceivableBankAccount1.ToString("N0")</b></td>
+
+                                </tr>
+                                NoofNights1 = 0;
+                                TotalBookingValue1 = 0;
+                                PaymentGatewayCharges1 = 0;
+                                NetCreditReceivableBankAccount1 = 0;
+                                NoofAccomodations1 = 0;
+                            }
+                            type = reportList.CustomeType;
+                        }
+                        <tr>
+                            <td>@i</td>
+                            <td>@reportList.BookingDate.ToShortDateString()</td>
+                            <td>@reportList.BookingRefNo</td>
+                            <td>@reportList.PropertyName</td>
+                            <td>@reportList.City</td>
+                            <td>@reportList.State</td>
+                            <td>@reportList.AccomodationType</td>
+                            <td align="right">@reportList.NumberofAccomodation</td>
+                            <td>
+                                @reportList.CheckIn.ToShortDateString() - @reportList.CheckOut.ToShortDateString()
+
+                                @*@{ DateTime checkin = @reportList.CheckIn;
+                             DateTime checkout = @reportList.CheckOut;
+                             TimeSpan ts = checkout - checkin;
+                             int differenceInDays = ts.Days;
+                             string differenceAsString = differenceInDays.ToString();
+
+                            }*@
+
+                            </td>
+                            <td align="right">@differenceAsString    </td>
+                            <td>@reportList.CustomeType</td>
+                            <td>@reportList.CustomerName</td>
+                            <td align="right">@reportList.TotalSupplierValue </td>
+                            <td>@reportList.CustomerPaymenMode</td>
+                            <td align="right">@reportList.Paymentgatewaycommission</td>
+                            <td align="right">@reportList.Paymentgatewaycharges</td>
+                            <td align="right">@reportList.NetCreditReceivableinbankaccount</td>
+                        </tr>
+                        NoofNights1 = NoofNights1 + differenceInDays;
+                        TotalBookingValue1 = TotalBookingValue1 + reportList.TotalSupplierValue;
+                        PaymentGatewayCharges1 = PaymentGatewayCharges1 + reportList.Paymentgatewaycharges;
+                        NetCreditReceivableBankAccount1 = NetCreditReceivableBankAccount1 + reportList.NetCreditReceivableinbankaccount;
+                        NoofAccomodations1 = NoofAccomodations1 + reportList.NumberofAccomodation;
+                        
+                        gNoofAccomodations += reportList.NumberofAccomodation;
+                        gNoofNights = gNoofNights + differenceInDays;
+                        gTotalBookingValue = gTotalBookingValue + reportList.TotalSupplierValue;
+                        gPaymentGatewayCharges = gPaymentGatewayCharges + reportList.Paymentgatewaycharges;
+                        gNetCreditReceivableBankAccount = gNetCreditReceivableBankAccount + reportList.NetCreditReceivableinbankaccount;
+
+                    }
+                    <tr class="info">
+                        <td colspan="7">@type Totals</td>
+                        <td align="right"><b>@NoofAccomodations1</b></td>
+                        <td >&nbsp;</td>
+                        <td align="right"><b>@NoofNights1 </b></td>
+                        <td colspan="2">&nbsp;</td>
+                        <td align="right"><b>@TotalBookingValue1.ToString("N0")</b></td>
+                        <td colspan="2">&nbsp;</td>
+                        <td align="right"><b>@PaymentGatewayCharges1.ToString("N0")</b></td>
+                        <td align="right"><b>@NetCreditReceivableBankAccount1.ToString("N0")</b></td>
+                    </tr>
+                    <tr class="success">
+                        <td colspan="7">Grand Totals</td>
+                        <td align="right"><b>@gNoofAccomodations</b></td>
+                        <td>&nbsp;</td>
+                        <td align="right"><b>@gNoofNights </b></td>
+                        <td colspan="2">&nbsp;</td>
+                        <td align="right"><b>@gTotalBookingValue.ToString("N0")</b></td>
+                        <td colspan="2">&nbsp;</td>
+                        <td align="right"><b>@gPaymentGatewayCharges.ToString("N0")</b></td>
+                        <td align="right"><b>@gNetCreditReceivableBankAccount.ToString("N0")</b></td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+        // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "CollectionReport", new { area = "Admin" })';
+        $.post(url, $("#frmPagersa").serialize(), function (data) {
+            $("#CollectionReportList").html(data);
+        });
+    }
+</script>

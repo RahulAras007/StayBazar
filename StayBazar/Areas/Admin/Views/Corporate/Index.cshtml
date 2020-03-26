@@ -1,0 +1,111 @@
+﻿@model StayBazar.Areas.Admin.Models.UserSearchModel
+@{
+    ViewBag.Title = "Corporates";
+}
+<script type="text/javascript">
+    $(function () { validateRq(); });
+</script>
+@*<h2>@ViewBag.title</h2>*@
+@* , onsubmit = "return false;" *@
+<div class="page-title-container style3">
+
+    @* <div class="container">*@
+    
+        <div class="row">
+            <div class="col-md-2">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+            @using (Html.BeginForm("ExcelView", "Corporate", FormMethod.Post, new { @id = "frmFilters" }))
+            {
+
+                <div class="col-md-2">
+                    @Html.DropDownListFor(m => m.Status, Model.StatusTypes, new { @tabindex = "1", @class = "form-control" })
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                        <span class="input-group-btn">
+                            <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-control">
+                        @foreach (StayBazar.Areas.Admin.Models.UserSearchModel.CorporateValues ruv in (StayBazar.Areas.Admin.Models.UserSearchModel.CorporateValues[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.UserSearchModel.CorporateValues)))
+                        {
+                            <input type="radio" name="ruv" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text> } />
+                            <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                            <text>&nbsp;&nbsp;</text>
+                        }
+                    </div>
+                </div>
+                @*</div>  *@
+
+                @Html.HiddenFor(m => m.SearchValue)
+            }
+        </div>
+    
+</div>
+@*</div>*@
+<div class="container-fluid">
+
+
+    <div id="list" class="row">
+        @{
+            Html.RenderPartial("~/Areas/Admin/Views/Corporate/_List.cshtml", Model.userlist);
+        }
+    </div>
+</div>
+
+    @*<script type="text/javascript">
+
+            function stopRKey(evt) {
+                var evt = (evt) ? evt : ((event) ? event : null);
+                var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
+                if ((evt.keyCode == 13) && (node.type == "text")) { return false; }
+            }
+            document.onkeypress = stopRKey;
+
+        </script>*@
+
+    <script type="text/javascript">
+
+    $(function(){
+        $("#Status").change(function () {
+            var url = '@Url.Action("Filter", "Corporate")';
+            $.post(url, $("#frmFilters").serialize(),
+                    function (data) {
+                        $("#list").html(data);
+                    });
+        });
+    });
+
+    $(function () {
+        $("#SearchValue").val("1");
+        $(".css-radiobutton").change(function () {
+            $("#SearchValue").val("1");
+            $(".css-radiobutton").each(function () {
+                if (this.checked) {
+                    $("#SearchValue").val($(this).attr("id"));
+                }
+            });
+        });
+
+        $("#btnSearch").click(function () {
+            $("#div-Excel").show();
+            var url = '@Url.Action("Filter", "Corporate")';
+            $.post(url, $("#frmFilters").serialize(),
+                    function (data) {
+                        $("#list").html(data);
+                    });
+        });
+
+
+    });
+    function exportExcel() {
+        $("#frmFilters").submit();
+    }
+
+    </script>

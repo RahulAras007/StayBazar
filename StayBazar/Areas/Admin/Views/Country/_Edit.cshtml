@@ -1,0 +1,63 @@
+﻿@model StayBazar.Areas.Admin.Models.CountryModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Edit", "Country"))
+{
+    @*<h2>Country</h2>*@
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-2">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        @*<div class="incontainer">*@
+            @*<div class="form-group">*@
+            <div class="col-md-2">
+                @Html.LabelFor(m => m.Name)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Name)
+            </div>
+            @*<div class="form-group">*@
+            <div class="col-md-2">
+                @Html.LabelFor(m => m.Code)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.Code, new { @tabindex = "2", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Code)
+            </div>
+            @*<div class="form-group">*@
+            <div class="col-md-1">
+                @Html.CheckBoxFor(m => m.IsDefault, new { @tabindex = "3" })
+                @Html.LabelFor(m => m.IsDefault)
+            </div>
+            @*<div class="form-group">*@
+            <div class="col-md-1">
+                @Html.CheckBoxFor(m => m.ForProperty, new { @tabindex = "4" })
+                @Html.LabelFor(m => m.ForProperty)
+            </div>
+            @*<div class="form-group">*@
+            <div class="col-md-2">
+                @Html.LabelFor(m => m.Status)
+                @Html.DropDownListFor(m => m.Status, Model.StatusList, new { @tabindex = "5", @class = "form-control input-sm" })
+            </div>
+            <br />
+            <div class="col-md-2">
+                <div class="btn-toolbar">
+                    <div class="btn-group">
+                        <input type="submit" id="btnSave" value="Save" class="btn btn-default" tabindex="5" />
+                        <a href="~/Admin/Country" id="btnReset" class="btn btn-danger" tabindex="6">Cancel</a>
+                    </div>
+                </div>
+            </div>
+            </div>
+        @*</div>*@
+    </div>
+    <br />
+    <br />
+        @Html.HiddenFor(m => m.CountryId)
+        <script type="text/javascript">
+            $(function () {
+                $("#Name").focus();
+            });
+        </script>
+        }

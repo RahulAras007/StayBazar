@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="b6fa822f-4b16-4be1-90e8-f24a8681a7dc" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?wsdl" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="TamarindDataService.wsdl" MetadataType="Wsdl" ID="9ec970ab-2c4f-4511-9550-b8c3e49bcb24" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?wsdl" />
+    <MetadataFile FileName="TamarindDataService1.wsdl" MetadataType="Wsdl" ID="5a9db298-d50b-44a8-b129-8bedd6d165e3" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="TamarindDataService.xsd" MetadataType="Schema" ID="7796eb3e-d558-4311-83b0-f78a330738c5" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?xsd=xsd1" />
+    <MetadataFile FileName="TamarindDataService1.xsd" MetadataType="Schema" ID="a730d77a-a334-499c-a02e-9fde7e93f9b2" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?xsd=xsd0" />
+    <MetadataFile FileName="TamarindDataService2.xsd" MetadataType="Schema" ID="ee87bde9-2929-4597-aad2-e663b7402599" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?xsd=xsd2" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

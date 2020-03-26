@@ -1,0 +1,51 @@
+﻿@model StayBazar.Areas.Admin.Models.CorporateDiscountsModel
+@{
+    ViewBag.Title = "Corporate Discount Report";
+   // Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+}
+@*<h2>@ViewBag.Title</h2>*@
+<div id="content">
+    <div class="page-title-container style3">
+        <div class="row">
+
+            <div class="col-md-4">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+            @*<div class="row" id="Filter1">*@
+                <div class="col-md-8">
+                    <div class="row margin10px" id="DetailsInventoryAndBooking">
+                        @Html.Partial("_Filter", Model)
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="ReportCorporateDiscounts">
+            </div>
+        @*</div>*@
+        </div>
+    </div>
+        <!-- Modal -->
+        <div class="modal fade" id="chooseCorporate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Choose Supplier</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                @Html.Partial("_BrowseSupplier")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <script type="text/javascript">
+            $(".container").removeClass("container").addClass("container-fluid");
+
+        </script>

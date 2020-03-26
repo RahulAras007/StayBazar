@@ -1,0 +1,1037 @@
+﻿@model StayBazar.Areas.Admin.Models.UserDetailModel
+@{
+    ViewBag.Title = "Corporate | " + Model.Name;
+    if (Model.Status == (int)CLayer.ObjectStatus.StatusType.Deleted)
+    {
+        ViewBag.Title += " [deleted]";
+    }
+
+    CLayer.B2B Credirbookingdata = BLayer.B2B.GetbookingcreditforCorte(Model.UserId);
+    Model.IsCreditBooking = Credirbookingdata.IsCreditBooking;
+    Model.CreditAmount = Credirbookingdata.TotalCreditAmount;
+    decimal CreditLimitBalance = Credirbookingdata.CreditAmount;
+    Model.CreditDays = Credirbookingdata.CreditDays;
+
+
+    DateTime Credirbookingsmedayexp = BLayer.B2B.GetbookingsmedayforCorp(Model.UserId);
+    if (Credirbookingsmedayexp < DateTime.Now)
+    {
+        Model.IsCorpBookingtoday = 0;
+    }
+    else
+    {
+        Model.IsCorpBookingtoday = 1;
+    }
+
+}
+<style>
+    .nav-tabs {
+        border-bottom: none;
+    }
+   /*.form-control{
+       width:50%;
+       height:34px;
+   }*/
+</style>
+<div>
+    <div class="page-title-container style3">
+
+
+        <div class="row">
+            <div class="col-md-5">
+                <h2 style="color:white"><a href="/Admin/Corporate" class="btn btn-sm btn-default" title="back to list"><span class="glyphicon glyphicon-arrow-left green-color fa-2x"></span></a>&nbsp;@ViewBag.Title</h2>
+            </div>
+
+            @*<h2>
+            @ViewBag.Title
+        </h2>*@
+            <div class="col-md-7">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#detials" class="btn btn-sm btn-default" data-toggle="tab">Details</a></li>
+                    <li><a href="#documents" class="btn btn-sm btn-default" data-toggle="tab">Documents</a></li>
+                    <li><a href="#transactions" class="btn btn-sm btn-default" data-toggle="tab">Transaction History</a></li>
+                    <li><a href="#bookingcredit" class="btn btn-sm btn-default" data-toggle="tab">Credit Booking</a></li>
+                    <li><a href="#others" class="btn btn-sm btn-default" data-toggle="tab">Other</a></li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="container-fluid">
+        <div class="tab-content">
+            <div class="tab-pane active" id="detials">
+                <div class="row">
+                    @if (ViewBag.Message != null)
+                    {
+                    <div class="alert alert-danger">
+                        @ViewBag.Message.
+                    </div>
+                    }
+                    @using (Html.BeginForm("Update", "Corporate", FormMethod.Post, new { role = "form", id = "frmcorporate" }))
+                    {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    @Html.HiddenFor(m => m.UserId)
+                    @Html.HiddenFor(m => m.Sex)
+                    @Html.HiddenFor(m => m.Status)
+                    @*@Html.HiddenFor(m => m.Email)*@
+                    @Html.HiddenFor(m => m.AddressId)
+                    @Html.HiddenFor(m => m.AddressType)
+                    @Html.HiddenFor(m => m.SalutationId)
+                    @Html.HiddenFor(m => m.DateOfBirth)
+                    @Html.HiddenFor(m => m.BillingAddressType)
+                    @Html.HiddenFor(m => m.BillingAddressId)
+                    <input type="hidden" id="B2bGSTId" />
+                    <div class="col-md-12">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Name)
+                                <br />
+                                @Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control", @readonly = "readonly" })
+                                @Html.ValidationMessageFor(m => m.Name)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.FullName)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.FirstName)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                                @Html.TextAreaFor(m => m.Address, new { @tabindex = "6", @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.Address)
+                            </div>
+                            @{ CLayer.B2B obj11 = BLayer.B2B.Get(Model.UserId);
+
+                            Model.ContactDesignation = obj11.ContactDesignation;
+                            }<br />
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ContactDesignation)<br />
+                                @Html.TextBoxFor(m => m.ContactDesignation, new { @tabindex = "21", @class = "form-control input-sm" })
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.CountryId)
+                                <br />
+                                @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "7", @class = "form-control" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.State)<br />
+                                @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "8", @class = "form-control" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.City) &nbsp;
+                                <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove red-color fa-2x"></span>choose from the list</a>
+                                @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "9", @class = "form-control" })
+                                <div id="other_city" style="display:none;">
+                                    @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                                    <input type="hidden" value="@Model.City" id="hdnCity" />
+                                </div>
+                            </div><br />
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ZipCode)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "10", @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                                @Html.ValidationMessageFor(m => m.ZipCode)
+                            </div>
+
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group hidden">
+                                @Html.LabelFor(m => m.Phone)
+                                @Html.TextBoxFor(m => m.Phone, new { @tabindex = "10", @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Mobile)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "11", @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                                @Html.ValidationMessageFor(m => m.Mobile)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Email)<br />
+                                @Html.TextBoxFor(m => m.Email, new { @tabindex = "11", @class = "form-control", @readonly = "readonly" })
+                            </div>
+                            <div class="form-group">
+                                Registration date: @Model.CreatedDate.ToShortDateString()
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row">
+
+                            <div class="col-md-5">
+                                <h3>Billing Address [Optional]</h3>
+                                @Html.CheckBoxFor(m => m.IsClicked, new { onclick = "Addrsame()" })
+                                @*<input type="checkbox" id="IsClicked" checked="checked" onclick="Addrsame()" name="IsClicked" />*@
+                                Same address as the main address
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 incontainer">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.BillingAddress)
+                                    @Html.TextAreaFor(m => m.BillingAddress, new { @tabindex = "13", @class = "form-control input-sm" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.BillingCountryId)
+                                    @Html.DropDownListFor(m => m.BillingCountryId, Model.BillingCountryList, new { @tabindex = "14", @class = "form-control input-sm" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.BillingState)
+                                    @Html.DropDownListFor(m => m.BillingState, Model.BillingStateList, new { @tabindex = "15", @class = "form-control input-sm" })
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-4 incontainer">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.BillingCityId) &nbsp;
+                                    <a href="#" id="close_other_billing_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                    @Html.DropDownListFor(m => m.BillingCityId, Model.BillingCityList, new { @tabindex = "16", @class = "form-control input-sm" })
+                                    <div id="other_billing_city" style="display:none;">
+                                        @Html.TextBoxFor(m => m.BillingCity, new { @class = "form-control input-sm" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.BillingZipCode)
+                                    @Html.TextBoxFor(m => m.BillingZipCode, new { @tabindex = "7", @class = "form-control input-sm", @MaxLength = "12", @onkeypress = "return isINNumbers(event)" })
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row">
+                            @Html.HiddenFor(m => m.B2bGSTId)
+                            <div class="col-md-12 margin-bot-10">
+                                <div class="col-md-12">
+                                    <h3>GST Details</h3>
+                                    <div class="col-md-4">
+                                        @*<div class="form-group">
+                                            *@
+                                            @Html.LabelFor(m => m.GSTRegistrationNo)<br />
+                                            @Html.TextBoxFor(m => m.GSTRegistrationNo, new { @tabindex = "15", @class = "form-control input-sm" })
+                                            @*
+                                        </div>*@
+                                    </div>
+                                    <div class="col-md-4">
+                                        @*<div class="form-group">
+                                            *@
+                                            @Html.LabelFor(m => m.StateOfRegistration)<span style="color:red">*</span>
+                                            @Html.DropDownListFor(m => m.StateOfRegistration, Model.StateList, "Select", new { @class = "form-control input-sm" })
+                                            @*
+                                        </div>*@
+                                    </div>@*Enter valid data*@    <br /><br />
+                                    <div class="col-md-4">
+                                        @*<div class="form-group">
+                                            <label></label>
+
+                                            <div class="col-md-2">
+                                                *@<br />
+                                                <input type="button" class="btn-success" value="ADD" id="GSTadd" />
+                                            </div>
+                                            @*
+                                        </div>*@
+                                        @*
+                                    </div>*@
+                                </div>
+                                <br />
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.SubCustomerCity)&nbsp;
+                                            <a id="close_other_gstcitycus" class="lnk" style="display:none; cursor:pointer;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                            @Html.DropDownListFor(m => m.SubCustomerCity, Model.SubCusCityList, "select", new { @class = "form-control" })
+                                            <div id="other_gstcitycus" style="display:none;">
+                                                @Html.TextBoxFor(m => m.SubCustomerCityname, new { @class = "form-control input-sm" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.SubCustomerAddress)<span style="color:red">*</span>
+                                            @Html.TextAreaFor(m => m.SubCustomerAddress, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.SubCustomerAddress)
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4"></div>
+                                </div>
+                                <br />
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.SubCustomerpinCode)
+                                            @Html.TextBoxFor(m => m.SubCustomerpinCode, new { @class = "form-control input-sm" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 margin-bot-10" id="GSTListCorporate">
+
+                                </div>
+                            </div>
+                            <div id="HiddenGstAddress">
+                            </div>
+                        </div>
+                    </div>
+
+                                //redbg whitetext border - radius0
+                    <div class="col-md-11">
+                        <div class="form-group text-right">
+                            <button type="submit" class="btn btn-success">Save</button>
+                            @if (User.IsInRole("Administrator"))
+                            {
+                            if (Model.Status != (int)CLayer.ObjectStatus.StatusType.Deleted)
+                            {
+                            <a href="/Admin/Corporate/Delete/@Model.UserId" class="btn redbg whitetext border-radius0" onclick="return confirm('Are you sure you want to delete this customer?')">Delete</a>
+                            }
+                            }
+                            <a href="/Admin/Corporate" class="btn btn-danger">Cancel</a>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            <div class="tab-pane" id="documents">
+                <div class="container-fluid">
+                    @Html.Partial("~/Areas/Admin/Views/Common/_UserDocuments.cshtml", new StayBazar.Areas.Admin.Models.UserDocumentsModel() { UserId = Model.UserId, UserType = (int)CLayer.Role.Roles.Corporate })
+                </div>
+                </div>
+            <div class="tab-pane" id="transactions">
+                @if (Model.UserId != null)
+                {
+                StayBazar.Areas.Admin.Models.TransactionListModel b = new StayBazar.Areas.Admin.Models.TransactionListModel();
+                b.Bookinglist = BLayer.Transaction.GetUserId(Model.UserId, 0, 25);
+                Html.RenderPartial("~/Areas/Admin/Views/Common/_TransactionList.cshtml", b);
+                }
+            </div>
+            <div class="tab-pane" id="bookingcredit" style="background-color:white !important;">
+                @using (Html.BeginForm("SaveCBookCredit", "Corporate", new { area = "Admin" }, FormMethod.Post, new { id = "CBookingCredit" }))
+                {
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-2">
+                            @*<div class="input-group">row margin-bot-10 margin-top-10*@
+                            @Html.HiddenFor(m => m.UserId)
+
+                            @Html.Label("Credit Booking Allowed :")
+                            @Html.RadioButtonFor(m => m.IsCreditBooking, "1", new { @class = "css-radiobutton" })@Html.Label("ON", new { @class = "css-label" })&nbsp;&nbsp;&nbsp;&nbsp;
+                            @Html.RadioButtonFor(m => m.IsCreditBooking, "0", new { @class = "css-radiobutton" })@Html.Label("OFF", new { @class = "css-label" })
+                        </div>
+                        <div class="col-md-2">
+                            <label for="stdShort">No: Of Days for Credit :</label>
+                            @Html.TextBoxFor(m => m.CreditDays, new { @class = " form-control col-md-2" })
+                        </div>@*row margin-top-10*@
+                        <div class="col-md-2">
+                            <label for="stdShort">Credit Limit (INR) :</label>
+                            @Html.TextBoxFor(m => m.CreditAmount, new { @class = "form-control col-md-2" })
+                        </div>
+
+                        @*<div class="row margin-top-10">
+            <label for="stdShort">Credit Limit Balance(INR) :</label>
+            @CreditLimitBalance
+        </div>row margin-bot-10 margin-top-10 rightside rightalign*@
+                        
+                        <br />
+                        <div class="col-md-2">
+                            <input type="button" value="Save" onclick="savebkcredit()" class="btn btn-success" />
+                        </div>
+
+                    </div>
+                </div>
+                <br />
+                <br />
+                @*</div>*@
+                }
+                @using (Html.BeginForm("AllowCBookSamedaybook", "Corporate", new { area = "Admin" }, FormMethod.Post, new { id = "CBookingSameday" }))
+                {
+                @Html.HiddenFor(m => m.UserId)
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4">
+                            @*col-md-4 col-md-offset-1*@
+                            @*<div class="row margin-bot-10 margin-top-10">*@
+                            @Html.Label("Corporate Same day booking allowed :") &nbsp;&nbsp;@Html.RadioButtonFor(m => m.IsCorpBookingtoday, "1", new { @class = "css-radiobutton" })@Html.Label("ON", new { @class = "css-label" })
+                            &nbsp;&nbsp;&nbsp;&nbsp;@Html.RadioButtonFor(m => m.IsCorpBookingtoday, "0", new { @class = "css-radiobutton" })@Html.Label("OFF", new { @class = "css-label" })
+                            <br />
+                        </div>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <div class="col-md-4" style="margin-left: 220px;">
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="button" value="Save" onclick="allowbkcredit()" class="btn btn-success" />
+                        </div>
+                        <div class="col-md-4"></div>
+                    </div>
+                </div>
+                }
+            </div>
+            <div class="tab-pane" id="others">
+                <div class="row">
+                    @*@if (Model.Status != (int)CLayer.ObjectStatus.StatusType.Deleted)
+                    {*@
+                    @{
+                    Html.RenderPartial("~/Areas/Admin/Views/Status/_Status.cshtml", new StayBazar.Areas.Admin.Models.StatusModel() { UserId = Model.UserId, Status = Model.Status });
+                    }
+                    @*}*@
+                    @*Upload corporate logo ./ start*@
+                    @{
+                    Html.RenderPartial("~/Areas/Admin/Views/CorporateLogo/_CorporateLogo.cshtml", new StayBazar.Areas.Admin.Models.UserDocumentsModel() { UserId = Model.UserId, UserType = (int)CLayer.Role.Roles.Corporate });
+                    }
+                    @*./end*@
+                    <div class=" panel panel-body">
+                        @*col-lg-3 margin-top-10*@
+                        <h4>Registration Resend</h4>
+                        <div class="row ">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Email)@*<span style="color:red">*</span>*@
+                                    @Html.TextBoxFor(m => m.Email, new { @tabindex = "11", @class = "form-control", @readonly = "readonly" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Password)<span style="color:red">*</span>
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @autocomplete = "off" })
+                                    @Html.ValidationMessageFor(m => m.Password)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.ConfirmPassword)<span style="color:red">*</span>
+                                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @autocomplete = "off" })
+                                    @Html.ValidationMessageFor(m => m.ConfirmPassword)
+                                </div>
+                            </div>
+                             @*<div class="row col-lg-3 margin-top-10">
+        col-lg-3 margin-top-10
+                               </div>*@
+                            <div class="col-md-6">
+                                <label>Credit Period</label> &nbsp;<span id="spanCreditPeriod" style="color:red" class="success h5 hided padding5px">Saved</span>
+                                <div class="input-group">
+                                    <input type="text" id="CreditPeriod" class="form-control" value="@Model.CreditPeriod" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5"></div>
+                            <div class="col-md-1">
+                                @*<span class="input-group-btn">*@
+                                <button id="btnCreditPeriod" class="btn btn-success">Save</button>
+                                @*</span> col-md-offset-2*@
+                            </div>
+                            <div class="col-md-2">
+                                    @*<div class="form-group" style=" margin-left: 75px;">*@
+                                        <a href="#" id="rsdregemal" title="Resendemail" class="btn btn-success" onclick="ResendregemailCorp(@Model.UserId)">
+                                            Resend registration email
+                                        </a>
+                                    @*</div>*@
+                                </div>
+                            <div class="col-md-4"></div>
+                            </div>
+                    </div>
+
+                    <div id="maxstaff" class="h3 panel panel-body padding5px">
+                        <div class="row">
+                        <div class="col-md-3">
+                            Max. Staff&nbsp;<span id="maxstaffsuccess" class="success h5 hided padding5px">Saved</span><br /><br />
+                            <div class="input-group">
+                                <input type="text" id="txtMaxStaff" class="form-control" value="@Model.MaxStaff" />
+                                <span class="input-group-btn">
+                                    <button id="maxstaffsave" class="btn btn-success">Save</button>
+                                </span>
+                            </div>
+                        </div>
+                    @*</div>*@
+
+                    @*<div id="dvCustomerPaymentMode" class="h3 panel panel-body padding5px">*@
+                        <div class="col-md-3">
+                            <span id="CustomerPaymentModesuccess" class="success h5 hided padding5px"> Customer Payment Mode Saved</span>
+                            <div class="input-group">
+
+                                <div style="display:inline-block">
+                                    <span style="font-size:14px !important"> @Html.LabelFor(m => m.CustomerPaymentMode) </span><span style="color:red;font-size:14px">*</span>
+                                    @Html.DropDownListFor(m => m.CustomerPaymentMode, Model.CustomerPaymentMode_Manage, "select", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CustomerPaymentMode)
+                                </div>
+                            </div>
+                         </div>
+                        <div class="col-md-3">
+                                <div style="display:inline-block;padding-top:10px" id="dvCreditDays">
+                                    <span style="font-size:14px !important">
+                                        @Html.LabelFor(m => m.CustomerPaymentModeCreditDays)
+                                    </span><br />
+                                    @Html.TextBoxFor(m => m.CustomerPaymentModeCreditDays, "{0:0.#}", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CustomerPaymentModeCreditDays)
+                                </div>
+                           
+                        </div><br /><br />
+                                <div class="col-md-3">
+                                    <div class="input-group-btn" style="display:inline-block;padding-top:10px">
+                                        <button id="CustomerPaymentModeSave" class="btn btn-success">Save</button>
+                                    </div>
+                                </div>
+                            
+                        
+                        </div>
+                    </div>
+                    @*<div id="dvCreditDays" class="h3 panel panel-body padding5px">
+                        <div class="col-md-3">
+                            Credit Days&nbsp;<span id="CustomerPaymentModeCreditDayssuccess" class="success h5 hided padding5px">Saved</span>
+
+                        </div>
+                    </div>*@
+
+                    @*<div id="maxstaff" class="h3 panel panel-body padding5px">
+                        <div class="col-md-3">
+                            Max. Staff&nbsp;<span id="maxstaffsuccess" class="success h5 hided padding5px">Saved</span>
+                            <div class="input-group">
+                                <input type="text" id="txtMaxStaff" class="form-control" value="@Model.MaxStaff" />
+                                <span class="input-group-btn">
+                                    <button id="maxstaffsave" class="btn btn-default">Save</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>*@
+
+
+                    <div id="BillingAddress" class="panel panel-body padding5px" hidden>
+                        <div class="col-md-3">
+                            @{CLayer.Address addre = BLayer.Address.GetOnUserId(Model.UserId, (int)CLayer.Address.AddressTypes.Primary);}
+                            @if (addre != null)
+                            {
+                            <h3> Billing Address</h3>
+                            @addre.AddressText<br />
+                            @addre.Country<br />
+                            @addre.State<br />
+                            @addre.City
+                            }
+                        </div>
+                    </div>
+                    <h3>Recent Logins</h3>
+                    <hr />
+                    @if (Model.LastLoginOn >= Model.CreatedDate)
+                    {<text> Last Logged On:@Model.LastLoginOn</text>}
+                    else
+                    {<text> Not yet logged in</text>}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+
+<script type="text/javascript">
+
+    var CustID1 = $('#UserId').val();
+    var url = '@Url.Action("GSTList", "Corporate")' + "?custid=" + CustID1;
+    $.get(url, function (data) {
+        $('#GSTListCorporate').html(data);
+    });
+
+
+
+    $('#GSTadd').click(function () {
+        if ($('#StateOfRegistration').val() > 0 && $("#GSTRegistrationNo").val().trim().length > 0) {
+            var CustID = $('#UserId').val();
+            var url = '@Url.Action("SaveGST", "Corporate")?CustID=' + CustID;
+            $.get(url, $('#frmcorporate').serialize(), function () {
+                var url = '@Url.Action("GSTList", "Corporate")' + "?custid=" + CustID;
+                $.get(url, function (data) {
+                    $('#GSTListCorporate').html(data);
+                });
+            });
+
+            $('#GSTRegistrationNo').val("");
+            $('#StateOfRegistration').val(0);
+            $('#B2bGSTId').val(0);
+            $("#SubCustomerCity").val(0);
+            $("#SubCustomerCityname").val("");
+            $("#SubCustomerAddress").val(' ');
+            $("#SubCustomerpinCode").val(' ');
+
+            $("#SubCustomerCity").show();
+            $("#other_gstcitycus").hide();
+            $("#close_other_gstcitycus").hide();
+        }
+        else {
+            alert("Enter valid data");
+        }
+    });
+
+
+
+    function ResendregemailCorp(id) {
+
+        var Passwrd = $('#Password').val();
+        var CnfrmPasswrd = $('#ConfirmPassword').val();
+
+        Passwrd = Passwrd == null ? "" : Passwrd;
+        CnfrmPasswrd = CnfrmPasswrd == null ? "" : CnfrmPasswrd;
+
+
+        if (Passwrd.trim() != "" && CnfrmPasswrd.trim() != "") {
+
+            if (Passwrd == CnfrmPasswrd) {
+                var r = confirm("Are you sure you want to  Resend registration mail? ")
+                if (r == true) {
+                    var url = '@Url.Action("ResendregemailCorp", "Corporate")?UserId=' + id + "&Password=" + Passwrd;
+                    $.post(url, function (data) {
+                        if (data == "True") {
+                            alert("Successfully send Registration email");
+                            $('#Password').val("");
+                            $('#ConfirmPassword').val("");
+                        }
+
+                    });
+                }
+                else {
+                    return false
+                }
+            }
+            else {
+                alert("Passwords are do not match")
+            }
+        }
+        else {
+            if (Passwrd.trim() == "" && CnfrmPasswrd.trim() == "") {
+                alert("Enter password & Confirm password ")
+            }
+            else {
+                if (Passwrd.trim() == "" || CnfrmPasswrd.trim() == "") {
+                    if (Passwrd.trim() == "") { alert("Enter password"); }
+                    if (CnfrmPasswrd.trim() == "") { alert("Enter Confirm password"); }
+                }
+            }
+        }
+    }
+
+    function savebkcredit() {
+
+        $.post('@Url.Action("SaveCBookCredit", "Corporate", new { area = "Admin" })', $("#CBookingCredit").serialize(), function (data) {
+            alert("Updated Successfully");
+        });
+    }
+
+    function allowbkcredit() {
+
+        $.post('@Url.Action("AllowCBookSamedaybook", "Corporate", new { area = "Admin" })', $("#CBookingSameday").serialize(), function (data) {
+            alert("Updated Successfully");
+        });
+    }
+
+    function Addrsame() {
+        var enb = !$('#IsClicked').prop('checked');
+
+        if (enb = "true") {
+            $('#BillingAddress').prop("disabled", false);
+            $("#BillingCountryId").prop("disabled", false);
+            $("#BillingState").prop("disabled", false);
+            $("#BillingCityId").prop("disabled", false);
+            $("#BillingZipCode").prop("disabled", false);
+        }
+        if ($('#IsClicked').prop('checked') == true) {
+            $('#BillingAddress').prop("disabled", true);
+            $("#BillingCountryId").prop("disabled", true);
+            $("#BillingState").prop("disabled", true);
+            $("#BillingCityId").prop("disabled", true);
+            $("#BillingZipCode").prop("disabled", true);
+        }
+    }
+    Addrsame();
+
+    $(function () {
+
+        $('#DateOfBirth').datepicker(
+            {
+                dateFormat: "dd/mm/yy"
+            });
+
+        if ($("#CustomerPaymentMode").val() == 3) {
+            $("#dvCreditDays").show();
+        }
+        else {
+            $("#dvCreditDays").hide();
+        }
+
+        $('#CustomerPaymentMode').change(function () {
+            if ($("#CustomerPaymentMode").val() == 3) {
+                $("#dvCreditDays").show();
+            }
+            else {
+                $("#dvCreditDays").hide();
+            }
+        });
+        //now.setDate(now.getDate() + 7);
+
+        //$('#ToDate').datepicker(
+        //    {
+        //        /*           minDate: 1,
+        //                   defaultDate: now,
+        //                   numberOfMonths: 1,*/
+        //        dateFormat: "dd/mm/yy"
+        //    });
+
+
+        //$("#DateOfBirth").datepicker({
+        //    changeMonth: true,
+        //    changeYear: true,
+        //    yearRange: "-80:+0"
+        //});
+    });
+</script>
+<script type="text/javascript">
+    $(function () {
+
+
+        if ($('#City').val() != null) {
+            $("#CityId").hide();
+            $("#other_city").show();
+            if ($("select#CityId option").length > 1) {
+                $("#close_other_city").show();
+            }
+        }
+        if ($('#CityId').val() < 1) {
+            $("#CityId").hide();
+            $("#other_city").show();
+            if ($("select#CityId option").length > 1) {
+                $("#close_other_city").show();
+            }
+        }
+
+        $('#CountryId').change(function () {
+            $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                if (data != "")
+                    $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                else
+                    $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                CityLoad();
+            });
+        });
+        $('#State').change(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                if (data != "") {
+                    $('#CityId').empty().append(data);
+                    if ($("select#CityId option").length == 1) {
+                        $("#CityId").hide();
+                        $("#City").val("");
+                        $("#other_city").show();
+                    }
+                }
+                else {
+                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+
+        });
+        $('#CityId').change(function () {
+            if ($(this).val() == 1) {
+                $(this).hide();
+                $("#City").val($("#hdnCity").val());
+                $("#other_city").show();
+                $("#close_other_city").show();
+            }
+        });
+        $('#close_other_city').click(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+        });
+        $("#maxstaffsave").click(function () {
+            if ($("#txtMaxStaff").val() == "") {
+                $("#txtMaxStaff").val("0");
+            }
+            var url = '@Url.Action("SetMaxStaff", "Corporate")';
+            $.post(url, { b2bId: $("#UserId").val(), maxstaff: $("#txtMaxStaff").val() }, function (data) {
+                $("#maxstaffsuccess").show().fadeOut(2000);
+            });
+        });
+
+        $("#CustomerPaymentModeSave").click(function () {
+
+            var CustomerPaymentModeID = $("#CustomerPaymentMode").val();
+
+            if (CustomerPaymentModeID == "") {
+                alert("Select customer payment mode");
+                return;
+            }
+            if ($("#CustomerPaymentModeCreditDays").val() == "") {
+                $("#CustomerPaymentModeCreditDays").val("0");
+            }
+            if (CustomerPaymentModeID == 3) {
+                if ($("#CustomerPaymentModeCreditDays").val() == "0") {
+                    alert("Enter Credit days");
+                    return;
+                }
+            }
+            if ($("#CustomerPaymentModeCreditDays").val() == "") {
+                $("#CustomerPaymentModeCreditDays").val("0");
+            }
+            var url = '@Url.Action("SetCustomerPaymentMode", "Corporate")';
+            $.post(url, { b2bId: $("#UserId").val(), CustomerPaymentMode: $("#CustomerPaymentMode").val(), CustomerPaymentModeCreditDays: $("#CustomerPaymentModeCreditDays").val() }, function (data) {
+                $("#CustomerPaymentModesuccess").show().fadeOut(2000);
+            });
+        });
+
+        @* $("#maxstaffsave").click(function () {
+            if ($("#txtMaxStaff").val() == "") {
+                $("#txtMaxStaff").val("0");
+            }
+            var url = '@Url.Action("SetMaxStaff", "Corporate")';
+            $.post(url, { b2bId: $("#UserId").val(), maxstaff: $("#txtMaxStaff").val() }, function (data) {
+                $("#maxstaffsuccess").show().fadeOut(2000);
+            });
+        });*@
+
+        $("#btnCreditPeriod").click(function () {
+            if ($("#CreditPeriod").val() == "") {
+                $("#CreditPeriod").val("0");
+            }
+            var url = '@Url.Action("SetCreditPeriod", "Corporate")';
+            $.post(url, { b2bId: $("#UserId").val(), CreditPeriod: $("#CreditPeriod").val() }, function (data) {
+                $("#spanCreditPeriod").show().fadeOut(2000);
+            });
+        });
+
+        $('#CustomerPaymentModeCreditDays').keypress(function (e) {
+            var a = [];
+            var k = e.which;
+
+            var KeystoInclude = [0, 8, 31, 46, 190];
+            for (i = 0; i < KeystoInclude.length; i++) {
+                a.push(KeystoInclude[i]);
+            }
+            for (i = 48; i < 58; i++) {
+                a.push(i);
+            }
+            var numValue = $(this).val();
+            if (e.which == 46) {
+                if ((numValue) && (numValue.indexOf('.') >= 0))
+                    e.preventDefault();
+            }
+            if (!(a.indexOf(k) >= 0))
+                e.preventDefault();
+        });
+        $('#CustomerPaymentModeCreditDays').blur(function (e) {
+            var dec = parseFloat($(this).val(), 10).toFixed(1);
+            $(this).val(dec);
+        })
+    });
+
+
+    function CityLoad() {
+        $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+            if (data != "") {
+                $('#CityId').empty().append(data);
+                if ($("select#CityId option").length == 1) {
+                    $("#CityId").hide();
+                    $("#City").val("");
+                    $("#other_city").show();
+                }
+            }
+            else {
+                $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    //billing
+
+
+    $('#BillingCountryId').change(function () {
+        $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
+            if (data != "") {
+                // $('#BillingState').empty().append('<option selected="selected" value="-1">Other</option>');
+                $('#BillingState').html(data).append('<option selected="selected" value="-1">Select</option>');
+            }
+            else {
+                $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+            BillingCityLoad();
+        });
+    });
+    $('#BillingState').change(function () {
+        $("#BillingCityId").show();
+        $("#BillingCity").val("");
+        $("#other_billing_city").hide();
+        BillingCityLoad();
+    });
+    $('#BillingCityId').change(function () {
+        if ($(this).val() == -1) {
+            $(this).hide();
+            $("#BillingCity").val("");
+            $("#other_billing_city").show();
+            $("#close_other_billing_city").show();
+        }
+    });
+    $('#close_other_billing_city').click(function () {
+        $("#BillingCityId").show();
+        $("#BillingCity").val("");
+        $("#other_billing_city").hide();
+        $("#close_other_billing_city").hide();
+    });
+    function BillingstateLoad() {
+        $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
+            if (data != "") {
+                $('#BillingState').empty().append(data);
+            }
+            else {
+                $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    //function
+    function BillingCityLoad() {
+        $.get("/Common/GetCity?id=" + $('#BillingState').val(), function (data) {
+            if (data != "") {
+                $('#BillingCityId').html(data).append('<option selected="selected" value="0">Select</option>');
+                if ($("select#BillingCityId option").length == 1) {
+                    $("#BillingCityId").hide();
+                    $("#BillingCity").val("");
+                    $("#other_billing_city").show();
+                }
+            }
+            else {
+                $('#BillingCityId').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    //billing
+
+    //Pagination for Booking List Corporate
+    function showPager(num) {
+        alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager","Corporate")';
+        $.post(url, $("#frmPagers").serialize(), function (data) {
+            $("#List").html(data);
+        });
+    }
+
+
+
+</script>
+
+<script>
+
+    function propedit(B2bGSTId, GSTstateid) {
+        $('#GSTRegistrationNo').val("");
+        $('#StateOfRegistration').val(0);
+        $('#B2bGSTId').val(0);
+        $("#SubCustomerCity").val(0);
+        $("#SubCustomerCityname").val("");
+        $("#SubCustomerAddress").val(' ');
+        $("#SubCustomerpinCode").val(' ');
+
+        $.get("/Corporate/GetCorporategstDetailsById?B2bGSTId=" + B2bGSTId, function (data) {
+            if (data != "") {
+                $("#HiddenGstAddress").html(data);
+
+                $('#GSTRegistrationNo').val($("#HiddenSubCustomerGstRegNo").val());
+                $('#B2bGSTId').val(B2bGSTId);
+                $('#StateOfRegistration').val(GSTstateid);
+                //$("#CustomerCountry").val(1);
+                gstcusLoadState(1, GSTstateid);
+                $("#SubCustomerAddress").val($("#HiddenSubCustomerAddress").val());
+                $("#SubCustomerpinCode").val($("#HiddenSubCustomerpinCode").val());
+            }
+        });
+    }
+
+
+
+    function gstcusLoadState(Couid, Sid) {
+        $.get("/Common/GetState?id=" + Couid, function (data) {
+            if (data != "") {
+                $('#StateOfRegistration').empty().append(data);
+                $("#StateOfRegistration").val(Sid);
+                gstcusLoadcity(Sid);
+            }
+            else {
+                $('#StateOfRegistration').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    function gstcusLoadcity(Sid) {
+        $.get("/Common/GetCity?id=" + Sid, function (data) {
+            if (data != "") {
+                $('#SubCustomerCity').html(data);
+                $("#SubCustomerCity").val($("#HiddenSubCustomerCity").val());
+                $("#SubCustomerCityname").val($("#HiddenSubCustomerCityname").val());
+                if ($("#HiddenSubCustomerCity").val() == -1) {
+                    $("#SubCustomerCity").hide();
+                    $("#other_gstcitycus").show();
+                    $("#close_other_gstcitycus").show();
+                }
+                else {
+                    $("#SubCustomerCity").show();
+                    $("#other_gstcitycus").hide();
+                    $("#close_other_gstcitycus").hide();
+                }
+
+            }
+            else {
+                $('#SubCustomerCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+    @* Gst address *@
+    $('#StateOfRegistration').change(function () {
+        $("#SubCustomerCity").show();
+        $("#SubCustomerCityname").val("");
+        $("#other_gstcitycus").hide();
+        $.get("/Common/GetCity?id=" + $('#StateOfRegistration').val(), function (data) {
+            if (data != "") {
+                $('#SubCustomerCity').empty().append(data);
+                $("#SubCustomerCityname").val($("#SubCustomerCity").find('option:selected').text());
+                if ($("select#SubCustomerCity option").length == 1) {
+                    $("#SubCustomerCity").hide();
+                    $("#SubCustomerCityname").val("");
+                    $("#other_gstcitycus").show();
+                }
+            }
+            else {
+                $('#SubCustomerCity').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+    });
+    $('#SubCustomerCity').change(function () {
+        $("#SubCustomerCityname").val($("#SubCustomerCity").find('option:selected').text());
+        if ($(this).val() == -1) {
+            $(this).hide();
+            $("#SubCustomerCityname").val("");
+            $("#other_gstcitycus").show();
+            $("#close_other_gstcitycus").show();
+        }
+    });
+    $('#close_other_gstcitycus').click(function () {
+        $("#SubCustomerCity").show();
+        $("#SubCustomerCityname").val("");
+        $("#other_gstcitycus").hide();
+        $("#close_other_gstcitycus").hide();
+    });
+    function gstLoadcity() {
+        $.get("/Common/GetCity?id=" + $('#StateOfRegistration').val(), function (data) {
+            if (data != "") {
+                $('#SubCustomerCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+            }
+            else {
+                $('#SubCustomerCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+
+</script>

@@ -1,0 +1,111 @@
+﻿@{
+    StayBazar.Areas.Admin.Models.StaticPageModel newly1 = new StayBazar.Areas.Admin.Models.StaticPageModel();
+    newly1.StaticPropertyList = BLayer.StaticPage.GetAllWidget();
+    List<CLayer.StaticPage> StaticPropertyList = newly1.StaticPropertyList;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+
+}
+
+<div class="col-md-12">
+    <div class="line">
+        <div class="pull-left leftside whitebg">Popular Destinations</div>
+        <div class="pull-right rightside whitebg">
+            <a href="javascript:void(0)" class="spty prev">
+                <img src="../images/arrow-left.png" alt="Left">
+            </a>
+            <a href="javascript:void(0)" class="spty next">
+                <img src="../images/arrow-right.png" alt="Right">
+            </a>
+        </div>
+    </div>
+    <div id="StaticPage" class="owl-carousel">
+        @if (StaticPropertyList.Count > 0)
+        {
+            foreach (CLayer.StaticPage stc in StaticPropertyList)
+            {
+                <text>
+                    <div class="prop">
+@{
+                            
+                string alttext = "";
+                        }
+     @if (stc.City == "Bangalore")
+     {
+         alttext = "Serviced Apartments in Bangalore, Staybazar – alternate stays";
+     }
+     else if (stc.City == "Chennai")
+     {
+         alttext = "Serviced Apartments in Chennai, Staybazar – Online market for alternate stays";
+     }
+     else if (stc.City == "Hyderabad")
+     {
+         alttext = "Serviced Apartments in Hyderabad, Staybazar – Affordable and safe alternate stays.";
+     }
+     else if (stc.City == "Goa")
+     {
+         alttext = "Serviced Apartments in Goa, Staybazar – alternate stays";
+     }
+     else if (stc.City == "Mumbai")
+     {
+         alttext = "Serviced Apartments in Mumbai, Staybazar – Alternate Accomodation to stays";
+     }
+     else if (stc.City == "Pune")
+     {
+         alttext = "Serviced Apartments in Pune, Staybazar – alternate stays";
+     }
+     else if (stc.City == "Delhi")
+     {
+         alttext = "Serviced Apartments in Delhi, Staybazar – safe alternate stays.";
+     }
+                        <div class="prop-image">
+                            <a href="~/@stc.RootFolder.ToLower()">
+                                @if (stc.FileName == "")
+                                {
+                                    <img src="~/@no_image" height="177" alt="noimage" />
+                                }
+                                else
+                                { <img src="~/files/seo/@stc.Image.ToLower()" height="177" alt="@alttext" />}
+                            </a>
+                        </div>
+                        <div class="tile_desc">
+                            <a href="~/@stc.RootFolder.ToLower()">
+                                <span class="name">
+                                    @{
+                string title = StayBazar.Common.Utils.ConvertShortLengthString(@stc.City, 20);
+                                @String.Format(title);
+                                    }
+                                    @if(stc.Location != ""){
+                                <br />
+                                <b>@stc.Location</b>
+                           }
+                                </span>
+                            </a>
+                            <br />
+                            @if (stc.Description != "")
+                        {
+                        <div>@stc.Description <a class="redtext" href="~/@stc.RootFolder.ToLower()">more</a></div>
+                        }
+                        @*<a href="" class="redtext">
+                                <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                            </a>*@
+                    </div>
+                </div>
+                </text>
+            }
+        }
+    </div>
+</div>
+<script type='text/javascript'>
+    //$(document).ready(function () {
+    //    var owl = $("#StaticPage")
+          
+    //    owl.owlCarousel({
+    //        pagination: false,
+    //        items: 4,
+    //        loop: true,
+    //        itemsDesktop: [1199, 3],
+    //        autoPlay: 5000
+    //    });
+    //});
+</script>
+

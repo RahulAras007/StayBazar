@@ -1,0 +1,52 @@
+﻿@model List<CLayer.B2B>
+@{
+    ViewBag.Title = "Supplier List";
+    int SupplierList = Model.Count;
+    
+    long B2BId;
+    long.TryParse(ViewData["B2bId"].ToString(), out B2BId);
+    //TempData["Id"] = B2BId; 
+}
+    <div class="row top_space_10">
+      
+        @*<div class="col-md-1"><div class="height_adjust"></div><a href="/Admin/SearchSupplier" title="Add New" class="create_new">Add New</a></div>*@
+    </div>
+  
+    @if (SupplierList > 0)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <table border="0" class="table table-condensed table-responsive table-custom">
+                    <thead>
+                        <tr>
+                            <th>Buisiness Name</th>
+                            <th>Email</th>
+                            <th>View</th>
+                            @*<th>Edit</th>*@
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (CLayer.B2B pr in Model)
+                        {
+                            <tr>
+                                <td>@pr.Name</td>
+                                <td>@pr.Email</td>
+                                <td><a href="/Admin/SupplierEdit/Details?id=@pr.B2BId&B2bId=@B2BId" title="Details"><span class="glyphicon glyphicon-arrow-right"></span></a></td>
+                                @*<td><a href="/SupplierEdit/Index/@pr.B2BId" title="Edit"><span class="glyphicon glyphicon-edit"></span></a></td>*@
+                                <th><a href="/Admin/SupplierEdit/Delete?Userid=@pr.B2BId&B2bId=@B2BId" onclick="return confirm('Are you sure you want to Remove this Supplier?')"><span class="glyphicon glyphicon-remove"></span></a></th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row margin-top-10">
+            <div class="col-md-4 col-md-offset-4 margin-top-10">
+                <div class="alert alert-info">You haven't chosen any suppliers yet.</div>
+            </div>
+        </div>
+    }

@@ -1,0 +1,94 @@
+﻿@model List<CLayer.OfflineBooking>
+@{ 
+    Layout = null;
+}
+<div class="panel-group" id="accordion">
+    @{
+        long i = 0;
+    }
+    @if (Model.Count > 0)
+    {
+        foreach (CLayer.OfflineBooking usr in Model)
+        {
+            <div class="panel panel-default" style="width: 98%; margin-left: 12px;">
+                <div class="panel-heading">
+                    <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#i_@usr.vendorId">
+                        <div class="row">
+                            <div class="col-md-2"><span></span>Vendor Name: @usr.vendorname</div>
+                            <div class="col-md-3">  City: @usr.City </div>
+                            <div class="col-md-2">  Pin: @usr.pin </div>
+                            <div class="col-md-3">  Email Address: @usr.emailaddress </div>
+                            <div class="col-md-2">
+                                Contact Number:
+                                @usr.contactno
+
+
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div id="i_@usr.vendorId" class="panel-collapse collapse ">
+                    <div class="panel-body">
+                        <div class="row">
+
+                            <div class="col-md-10" id="databuyer_@usr.vendorId">
+                                <b>Vendor Details</b><br />
+                                <div class="col-md-4">
+                                    Vendor Name:@usr.vendorname<br />
+                                    Address:@usr.vendoraddress<br />
+                                    Address1:@usr.address1<br />
+                                    Address2: @usr.address2
+                                </div>
+                                <div class="col-md-4">
+                                    City:@usr.City<br />
+                                    Pin:@usr.pin<br />
+                                    Contact Person:@usr.contactperson<br />
+                                    Nature Of Service:@usr.natureofservice<br />
+                                </div>
+                                <div class="col-md-4">
+                                    value before service tax:@usr.valuebeforeservicetax<br />
+                                    Service Tax Amount:@usr.servicetaxamount<br />
+                                    Total Amount Payable:@usr.totalamountpayable<br />
+                                </div>
+
+                                  
+                                </div>
+
+                            <div class="col-md-2">
+                                <a href="#" title="Resendemail" class="btn btn-success" onclick="EditVendorDetails(@usr.vendorId,@usr.OfflineBookingId)">
+                                    Edit
+                                </a>
+                                <a href="#" title="Resendemail" class="btn btn-success marginleft10" onclick="deleteVendorDetails(@usr.vendorId,@usr.OfflineBookingId)">
+                                    Delete
+                                </a>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        }
+    }
+</div>
+
+
+<script>
+    function EditVendorDetails(id, id1) {
+        $.get("/Admin/OfflineBooking/GetofflineVendordetails?offlinebookingid=" + id1, "&vendorid=" + id, function (data) {
+            $("#VendorPayment").html(data);
+            $("#myModalVendor").modal('show');
+        });
+    }
+    function deleteVendorDetails(id, id1) {
+        var ss = confirm("Do You Want To delete");
+        if (ss) {
+            $.get("/Admin/OfflineBooking/DeleteVendorDetails?OfflineBookingId=" + id1, "&vendorid=" + id, function (data) {
+                $("#VendorPaymentList").html(data);
+            });
+        }
+    }
+</script>

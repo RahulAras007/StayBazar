@@ -1,0 +1,70 @@
+﻿@model StayBazar.Areas.Admin.Models.APIUserModel
+
+@{
+    Layout = null;
+}
+<style>
+    #errmsg {
+        color: red;
+    }
+</style>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">New API Price Markup</h4>
+            </div>
+            <div class="modal-body">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="cudetails">
+                        @using (Html.BeginForm("SaveDetails", "NewAPIPriceMarkup", FormMethod.Post, new { role = "form", id = "apiform", name = "apiform" }))
+                        {
+                            @Html.ValidationSummary(true)
+                            @Html.HiddenFor(m => m.APIPriceMarkupCode)
+                            <div class=" row">
+                                <div class="form-group  col-lg-12">
+                                    @*<div class="form-group">
+                                        @Html.LabelFor(m => m.CustomerId,"Customer Name")<span style="color:red">*</span>
+                                        @Html.DropDownListFor(m => m.CustomerId, Model.ECustomerList, "Select", new { @class = "form-control input-sm" })
+                                    </div>*@
+                                    @*<div class="form-group">
+                                            @Html.LabelFor(m => m.APIDescription)<span style="color:red">*</span>
+                                            @Html.TextAreaFor(m => m.APIDescription, new { @class = "form-control", @style = "resize: vertical;" })
+                                        </div>*@
+                                    @*<div class="form-group">
+                                        @Html.LabelFor(m => m.DescriptionId, "API")<span style="color:red">*</span>
+                                        @Html.DropDownListFor(m => m.DescriptionId, Model.Description, new { @class = "form-control" })
+                                    </div>*@
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.SellPrice,"Sell Markup Percentage")@*<span style="color:red">*</span>*@
+                                        @Html.TextBoxFor(m => m.SellPrice, new { @type = "number", @step = "1", @min = "0", @max = "99", @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="form-group  col-lg-12" >
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            @*<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="SaveData()">Save changes</button>
+                </div>*@
+        </div>
+
+    </div>
+    @*<script type="text/javascript">
+        function SaveData() {
+
+        if ($('#cuserform').validate().form() == false) return;
+        $.post('@Url.Action("SaveDetails", "APIPriceMarkup")',("#cuserform").serialize(), function (data) {
+        $("#myModal").modal('hide');
+        //$("#userlist").html(data);
+        });
+
+        }
+        </script>*@

@@ -1,0 +1,81 @@
+﻿@{
+    ViewBag.Title = "Tax";
+    try
+    {
+        var grid = new WebGrid(Model, defaultSort: "Name", canPage: true, rowsPerPage: 25,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Areas.Admin.Models.TaxTitleModel Taxtitle = (StayBazar.Areas.Admin.Models.TaxTitleModel)ViewBag.TaxTitle;
+        <text>
+            <div id="bodycontent">
+                <div id="divEdit">                    
+        @Html.Partial("~/Areas/Admin/Views/TaxTitle/_Edit.cshtml", Taxtitle, ViewData)                   
+                </div>
+                @if (Model.Count > 0)
+                {
+                <div id="gridContent">
+                    <div class="container-fluid">
+
+                        @grid.GetHtml(tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered",
+            headerStyle: "header",
+            alternatingRowStyle: "alt",
+            selectedRowStyle: "select",
+             columns: grid.Columns(grid.Column("Title", "Title"),
+              grid.Column("Status", format: (item) =>
+              {
+                  int i = item.Status;
+                  if (i < (int)CLayer.ObjectStatus.StatusType.Active)
+                  {
+                      return Html.Raw("Active");
+                  }
+                  else
+                 {
+                     return Html.Raw("Inactive");
+                 }
+              }),
+            grid.Column("Edit", style: "gridcellstyle",format: @<text><a href="#" onclick="EditTitle(@item.TaxTitleId)" title="Edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>),
+   grid.Column("Delete", style: "gridcellstyle", format: (item) =>
+    {
+       if (item.CanDelete)
+       {
+           return Html.Raw("<a title='Delete' class='lnk' href='/Admin/TaxTitle/Delete?id=" + item.TaxTitleId + "' onclick=\"return confirm('Are you sure you want to delete?')\"><span class='glyphicon glyphicon-remove red-color fa-2x'></span></a>");
+       }
+       else
+       {
+           return Html.Raw("<a title='Delete' href=\"#\" onclick=\"alert('Cannot delete, already in use.')\"><span class='glyphicon glyphicon-remove red-color fa-2x'></span></a>");
+       }
+   })
+                @*grid.Column("Tax Rate", format: @<text><a href="/Admin/Tax/Index/@item.TaxTitleId" title="Tax Rate"><span class="glyphicon glyphicon-arrow-right" ></span></a></text>)*@
+                ))
+                    </div>
+                </div>
+                }
+                else
+                {
+                    <div class="bottom">&nbsp;</div>
+                    <div class="alert alert-info">is Empty</div>
+                }
+            </div>
+            <script type="text/javascript">               
+                function EditTitle(Id) {
+                        //alert("dd");
+                    $.get("/TaxTitle/Editdata1?Id="+Id, function (data) {
+                        $("#divEdit").html(data);
+                        });
+                    }                
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}
+@*@Html.ActionLink("sample", "CategoryLevel", "Product", new { CategoryId = 1, ProductName = "Rami Vemula" }, null)*@
+
+            <style>
+                .gridcellstyle {
+                    text-align: center;
+                }
+            </style>

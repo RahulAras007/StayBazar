@@ -1,0 +1,19 @@
+Changelog
+=========
+
+2.2
+	- new layout available: columns
+
+2.1
+	- fixed missing vendor prefixes in CSS
+
+
+2.0
+	- brand new algorithm
+	- new effects
+	- video/iframe support
+	- Facebook share clicked image
+	
+	
+1.0
+	- first release

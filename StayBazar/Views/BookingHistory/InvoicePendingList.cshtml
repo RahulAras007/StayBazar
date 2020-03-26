@@ -1,0 +1,232 @@
+﻿@model List<CLayer.Invoice>
+@{
+    Layout = null;
+}
+
+<table style="width:60%; font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+    <thead>
+        <tr>
+            <th align="left" style="padding-top: 2%;" colspan="3">
+                <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+            </th>
+            <th width="400" align="right" style="font-size:12px;">
+                Phone: @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)<br />
+                Toll Free Number: 1800-425- 2393
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        <tr>
+            <td colspan="4">
+                <br />
+                <h3>Invoice Not Generated</h3>
+                <table border="1" class="table">
+                    <thead>
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Customer Name</th>
+                            <th>Booking ID</th>
+                            <th>Value including tax</th>
+                            <th>Guest Name</th>
+
+                            <th>Property Name</th>
+                            <th>City</th>
+                            <th>Supplier Name</th>
+                            <th>Check-In Date</th>
+                            <th>Check-Out Date</th>
+
+                            <th>No of Rooms</th>
+                            <th>Total room nights</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{int slno = 1;}
+                        @foreach (CLayer.Invoice dt in Model)
+                        {
+                            if (dt.CheckStatus == "NotGenerated")
+                            {
+                                CLayer.OfflineBooking customer = BLayer.OfflineBooking.GetAllCustomerDetails(dt.OfflineBookingId);
+                                CLayer.OfflineBooking data = BLayer.OfflineBooking.GetAllDetailsById(dt.OfflineBookingId);
+
+                                CLayer.OfflineBooking off = BLayer.OfflineBooking.GetAllpropertyDetails(dt.OfflineBookingId);
+                                long Duedatedays = Convert.ToInt32(BLayer.Settings.GetValue(CLayer.Settings.INVOICE_DUE_DAYS));
+
+
+                                string GuestName = @data.GuestName;
+                                decimal TotalSalePrice = @data.TotalSalePrice;
+                                string CheckIn = @data.CheckIn.ToShortDateString();
+                                string CheckOut = @data.CheckOut.ToShortDateString();
+                                long NoOfRooms = @data.NoOfRooms;
+                                long TotalRoomsnight = (data.NoOfRooms * data.NoOfNight);
+
+                                <text>
+                                    @if (dt.IsGst == 2)
+                                    {
+                                        if (dt.BookingDetailsId > 0)
+                                        {
+                                            CLayer.OfflineBooking Offlinedata = BLayer.OfflineBooking.GetBookingDetailsGST(dt.BookingDetailsId);
+                                            GuestName = Offlinedata.GuestName;
+                                            //TotalSalePrice = Offlinedata.TotalSalePrice;
+                                            CheckIn = Offlinedata.CheckIn.ToShortDateString();
+                                            CheckOut = Offlinedata.CheckOut.ToShortDateString();
+                                            NoOfRooms = Offlinedata.NoOfRooms;
+                                            TotalRoomsnight = (Offlinedata.NoOfRooms * Offlinedata.NoOfNight);
+                                        }
+                                    }</text>
+                                <tr>
+                                    <td>@slno</td>
+                                    <td>
+                                        @if (customer != null)
+                                        {
+                                            if (customer.CustomerName != null && customer.CustomerName != "")
+                                            {
+                                        <text> @customer.CustomerName</text>
+                                            }
+                                        }
+                                    </td>
+                                    <td>@data.ConfirmationNumber</td>
+                                    <td>@TotalSalePrice</td>
+                                    <td>@GuestName</td>
+
+                                    <td>@off.PropertyName</td>
+                                    <td>@off.PropertyCityname</td>
+                                    <td>@off.SupplierName</td>
+                                    <td>@CheckIn</td>
+                                    <td>@CheckOut</td>
+
+                                    <td>@NoOfRooms</td>
+                                    <td>@TotalRoomsnight</td>
+                                </tr>
+                                        slno = slno + 1;
+
+
+                            }
+                        }
+                    </tbody>
+                </table>
+
+
+                <br />
+                <br />
+                <h3>Invoice Not Submitted</h3>
+                <table border="1" class="table">
+                    <thead>
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Customer Name</th>
+                            <th>Booking ID</th>
+                            <th>Value including tax</th>
+                            <th>Guest Name</th>
+
+                            <th>Property Name</th>
+                            <th>City</th>
+                            <th>Supplier Name</th>
+                            <th>Check-in Date</th>
+                            <th>Check-out Date</th>
+
+                            <th>No of Rooms</th>
+                            <th>Total room nights</th>
+
+                            <th>Invoice Number</th>
+                            <th>Invoice date</th>
+                            @*<th>Status</th>*@
+                            <th>Invoice Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{int slno1 = 1;}
+                        @foreach (CLayer.Invoice dt1 in Model)
+                        {
+                            if (dt1.CheckStatus == "NotSubmitted")
+                            {
+                                CLayer.OfflineBooking customer1 = BLayer.OfflineBooking.GetAllCustomerDetails(dt1.OfflineBookingId);
+                                CLayer.OfflineBooking data1 = BLayer.OfflineBooking.GetAllDetailsById(dt1.OfflineBookingId);
+                                CLayer.OfflineBooking off1 = BLayer.OfflineBooking.GetAllpropertyDetails(dt1.OfflineBookingId);
+                                long Duedatedays1 = Convert.ToInt32(BLayer.Settings.GetValue(CLayer.Settings.INVOICE_DUE_DAYS));
+
+                                string GuestName1 = @data1.GuestName;
+                                decimal TotalSalePrice1 = @data1.TotalSalePrice;
+                                string CheckIn1 = @data1.CheckIn.ToShortDateString();
+                                string CheckOut1 = @data1.CheckOut.ToShortDateString();
+                                long NoOfRooms1 = @data1.NoOfRooms;
+                                long TotalRoomsnight1 = (data1.NoOfRooms * data1.NoOfNight);
+                                <text>
+                                    @if (dt1.IsGst == 2)
+                                    {
+                                        if (dt1.BookingDetailsId > 0)
+                                        {
+                                            CLayer.OfflineBooking Offlinedata1 = BLayer.OfflineBooking.GetBookingDetailsGST(dt1.BookingDetailsId);
+                                            GuestName1 = Offlinedata1.GuestName;
+                                            //TotalSalePrice1 = Offlinedata1.TotalSalePrice;
+                                            CheckIn1 = Offlinedata1.CheckIn.ToShortDateString();
+                                            CheckOut1 = Offlinedata1.CheckOut.ToShortDateString();
+                                            NoOfRooms1 = Offlinedata1.NoOfRooms;
+                                            TotalRoomsnight1 = (Offlinedata1.NoOfRooms * Offlinedata1.NoOfNight);
+                                        }
+
+                                    }
+                                </text>
+
+                                <tr>
+                                    <td>@slno1</td>
+                                    <td>
+                                        @if (customer1 != null)
+                                        {
+                                            if (customer1.CustomerName != null && customer1.CustomerName != "")
+                                            {
+                                        <text> @customer1.CustomerName</text>
+                                            }
+                                        }
+                                    </td>
+                                    <td>@data1.ConfirmationNumber</td>
+                                    <td>@TotalSalePrice1</td>
+                                    <td>@GuestName1</td>
+
+                                    <td>@off1.PropertyName</td>
+                                    <td>@off1.PropertyCityname</td>
+                                    <td>@off1.SupplierName</td>
+                                    <td>@CheckIn1</td>
+                                    <td>@CheckOut1</td>
+
+                                    <td>@NoOfRooms1</td>
+                                    <td>@TotalRoomsnight1</td>
+
+                                    <td>@dt1.InvoiceNumber</td>
+                                    <td>@dt1.InvoiceDate.ToShortDateString()</td>
+                                    <td>@data1.CheckOut.AddDays(@Duedatedays1).ToShortDateString()</td>
+                                </tr>
+                                        slno1 = slno1 + 1;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td align="center" colspan="4">
+                <br />
+                <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px;">
+                    View your online itinerary for additional information
+                </p>
+                <p style="font-size:14px;">
+                    Need help with your reservation? – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                </p>
+                <p style="font-size:14px;">
+                    Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                </p>
+                <p style="font-size:14px;">
+                    www.staybazar.com
+                </p>
+                <p style="font-size:14px;">
+                    <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                    <span style="font-weight:bold;">Phone: </span>080-2570-2898 / 4091 - 6686
+                </p>
+            </td>
+        </tr>
+    </tfoot>
+</table>

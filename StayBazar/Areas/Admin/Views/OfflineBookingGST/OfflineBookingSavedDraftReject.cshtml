@@ -1,0 +1,67 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@using Microsoft.AspNet.Identity
+@{
+    Layout = null;
+    CLayer.OfflineBooking Offlinedata = BLayer.OfflineBooking.GetOfflineboikingdetailsforBookDeleteRequest(Model.OfflineBookingId);
+    string username = "";
+    if (Model.LoginUserid > 0)
+    {
+        CLayer.User userdt = BLayer.User.Get(Model.LoginUserid);
+        if (userdt != null)
+        {
+            username = userdt.FirstName + ' ' + userdt.LastName;
+        }
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>BookingSavedasDraft</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <tr>
+            <td align="center">
+                <table width="700">
+                    <thead>
+                        <tr>
+                            <th align="left" style="padding-top: 2%;" colspan="3">
+                                <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                            </th>
+                            <th width="200" align="right" style="font-size:12px;">
+                                Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" align="center">
+                                <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">BOOKING REJECTED</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" align="left">
+                                <p>Dear @username, </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <p>
+                                    Your booking has been rejected. Booking ID: @Offlinedata.ConfirmationNumber.
+                                </p>
+                            </td>
+
+                        </tr>
+                        <tr style="height:150px;"></tr>
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+

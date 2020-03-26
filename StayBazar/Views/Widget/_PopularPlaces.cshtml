@@ -1,0 +1,30 @@
+﻿@{
+    StayBazar.Areas.Admin.Models.StaticPageModel newly1 = new StayBazar.Areas.Admin.Models.StaticPageModel();
+    newly1.StaticPropertyList = BLayer.StaticPage.GetAllWidget();
+    List<CLayer.StaticPage> StaticPropertyList = newly1.StaticPropertyList;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+    string city = "";
+    if (ViewBag.CurrentCity != null)
+    {
+       city = ViewBag.CurrentCity;
+    }
+}
+    <div class="col-md-12 pad padding10px poplrplcs">
+    @if (StaticPropertyList.Count > 0)
+    {
+        foreach (CLayer.StaticPage stc in StaticPropertyList)
+        {
+
+            string title = StayBazar.Common.Utils.ConvertShortLengthString(@stc.City, 20);
+            if (city != title)
+            {
+                <text>
+                    <a href="~/@stc.RootFolder.ToLower()"><i style="color:#79BEDB !important" class="glyphicon glyphicon-arrow-right"></i>&nbsp; &nbsp;Serviced Appartments in @title</a><br />
+                </text>
+            }
+        }
+    }
+</div>
+
+
+

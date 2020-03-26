@@ -1,0 +1,48 @@
+﻿@model StayBazar.Models.RatesAccommodationModel
+@{
+    Layout = null;
+}
+<h4><a>Rate Details</a>/@Model.Type</h4>
+<div class="row">
+    <div class="col-lg-12">
+
+        <table class=" table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Rates</th>
+                    <th>B2C</th>
+                    <th>B2B (Corporate)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Daily</td>
+                    <td>@Model.RCDaily</td>
+                    <td>@Model.CCDaily</td>
+                </tr>
+                <tr>
+                    <td>Weekly</td>
+                    <td>@Model.RCWeekly</td>
+                    <td>@Model.CCWeekly</td>
+                </tr>
+                <tr>
+                    <td>Monthly</td>
+                    <td>@Model.RCMonthly</td>
+                    <td>@Model.CCMonthly</td>
+                </tr>
+                <tr>
+                    <td>Long Term (90 Days)</td>
+                    <td>@Model.RCLong</td>
+                    <td>@Model.CCLong</td>
+                </tr>
+                <tr>
+                    <td>Guest</td>
+                    <td>@Model.RCGuest</td>
+                    <td>@Model.CCGuest</td>
+                </tr>
+            </tbody>
+
+        </table>
+        <p>All Rates are inclusive of taxes.</p>
+    </div>
+</div>

@@ -1,0 +1,200 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    Layout=null;
+	long i = 0;
+    decimal tt = 0;
+    decimal m = 0;
+
+
+    long totalnights = 0;
+
+    double sgst, cgst, igst;
+    double tsgst, tcgst, tigst;
+    double tbgst, togst;
+    int bookingType = 0;
+
+    double osgst, ocgst, oigst;
+    double otsgst, otcgst, otigst;
+
+    double AmountBeforeServiceTax = 0;
+    double totalAmountBeforeTax = 0;
+    double totalAmountAfterTax = 0;
+	
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" />
+        </ss:Style>
+  <ss:Style ss:ID="DateLiteral">
+         <NumberFormat ss:Format="0"/>
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="Customer Invoice Report">
+        <ss:Table>
+            <ss:Row ss:StyleID="1">
+					<ss:Cell><ss:Data ss:Type="String">Sl No</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">Booking Category</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Billing Entity</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Invoice Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Invoice No</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Booking ID</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Customer Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Customer State</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Property City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Property State</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Guest Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Check In Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Check Out Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">No Of Pax</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">No Of Room</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">No Of Night</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total Room Night</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Room Value Before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">SGST %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">SGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">CGST %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">CGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">IGST %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">IGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total GST Value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Other Services Before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">SGST %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">SGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">CGST %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">CGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">IGST %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">IGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total GST Value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total Value Before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Reimbursement (+)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Discount (-)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Others (+)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Invoice Total</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Sales Person</ss:Data></ss:Cell>		
+            </ss:Row>
+            @foreach (CLayer.OfflineBooking pr in Model)
+            {
+                i = i + 1;
+                //if (pr.Noofnight > 0)
+                //{
+                //    totalnights = pr.NoOfRooms * pr.Noofnight;
+                //}
+                //else
+                //{
+                //    totalnights = pr.NoOfRooms;
+                //}
+                totalnights = pr.TotalNights;
+                m = totalnights * pr.AvgDailyRateBefreStaxForSalePrice;
+                tt = pr.AvgDailyRateBefreStaxForSalePrice * totalnights;
+
+                bookingType = pr.BookingTypeInt;
+
+
+                DateTime checkin = pr.CheckIn_date;
+                DateTime checkout = pr.CheckOut_date;
+                TimeSpan ts = checkout - checkin;
+                int differenceInDays = ts.Days;
+
+                long NoOfPaxAdultS = pr.NoOfPaxAdult;
+
+                long NoOfPaxChild = pr.NoOfPaxChild;
+                long NOofPax = (NoOfPaxAdultS + NoOfPaxChild);
+
+                //Customer Value -- amount without tax
+                if(bookingType == (int) CLayer.ObjectStatus.OfflineBookingType.Regular)
+                {
+
+                    AmountBeforeServiceTax = (double) ((pr.AvgDailyRateBefreStaxForSalePrice * totalnights)) + pr.VSalePriceBeforeTax;
+                    sgst = pr.SGST;
+                    cgst = pr.CGST;
+                    igst = pr.IGST;
+
+                }
+                else
+                {
+                    AmountBeforeServiceTax =  pr.DirectAmount + pr.VSalePriceBeforeTax;
+                    sgst = pr.btSGST;
+                    cgst = pr.btCGST;
+                    igst = pr.btIGST;
+
+                }
+                tsgst = AmountBeforeServiceTax * sgst * 0.01;
+                tcgst = AmountBeforeServiceTax * cgst * 0.01;
+                tigst = AmountBeforeServiceTax * igst * 0.01;
+                tbgst = tsgst + tcgst + tigst + pr.vSaleGST;
+
+                double Otherservicesamount = Math.Round( (double) pr.BuyPriceforotherservicesForSalePrice, 2);
+                ocgst = pr.oCGST;
+                osgst = pr.oSGST;
+                oigst = pr.oIGST;
+
+                otcgst = Otherservicesamount * ocgst * 0.01;
+                otsgst = Otherservicesamount * osgst * 0.01;
+                otigst = Otherservicesamount * oigst * 0.01;
+
+                togst = otsgst + otcgst + otigst;
+
+
+                totalAmountAfterTax = AmountBeforeServiceTax +  Otherservicesamount + togst + tbgst;
+                totalAmountBeforeTax = AmountBeforeServiceTax + Otherservicesamount;
+
+                <ss:Row>
+                
+                    <ss:Cell><ss:Data ss:Type="Number">@i</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@if (bookingType == (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+                        {
+                        <text>TAC Booking</text>}
+                        else {
+                            if (bookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                            { <text>Direct Booking</text>}
+                            else {  <text>Regular Booking</text>}
+                        }</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.SBEntityName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.InvoiceDate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.InvoiceNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.ConfirmationNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.FirstName</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.CustomerStatename</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.PropertyName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.City</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.PropertyStatename</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.Guestname</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.CheckIn_date.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.CheckOut_date.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@(pr.NoOfPaxAdult + pr.NoOfPaxChild)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@pr.NoOfRooms</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@pr.Noofnight</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@totalnights</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(AmountBeforeServiceTax,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@sgst.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tsgst,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@cgst.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tcgst,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@igst.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tigst,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tbgst,2)</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="Number">@Math.Round(Otherservicesamount,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@osgst.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(otsgst,2)</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">@ocgst.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(otcgst,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@oigst.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(otigst,2)</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="Number">@Math.Round(togst,2)</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="Number">@Math.Round(totalAmountBeforeTax,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tbgst + togst, 2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(pr.ReimbursementsAmount,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(pr.DiscountAmount,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(pr.OthersAmount,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(totalAmountAfterTax - (double) pr.DiscountAmount + (double) pr.ReimbursementsAmount + (double) pr.OthersAmount,0)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.SalesPerson</ss:Data></ss:Cell>
+</ss:Row>
+            }
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

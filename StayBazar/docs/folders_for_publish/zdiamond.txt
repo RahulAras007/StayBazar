@@ -1,0 +1,9 @@
+areas/admin/views
+content/area/css
+content
+img
+views/shared
+views/account
+views/home
+views/offlinepayment
+views/query

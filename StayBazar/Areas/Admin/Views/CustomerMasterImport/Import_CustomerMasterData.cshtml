@@ -1,0 +1,69 @@
+﻿
+@{
+    ViewBag.Title = "Import Customer Master Data";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<div class="page-title-container style3">
+    <div class="row">
+
+        <div class="col-md-6">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+
+
+        <div class="col-sm-6">
+
+            
+                <nav class="navbar navbar-default">
+                    <ul class="nav navbar-nav">
+                        <li>@Html.ActionLink("ExcelImport", "Index", "ExcelImport", new { area = "Admin" }, new { })</li>
+                        <li>@Html.ActionLink("Booking", "Import_BookingData", "BookingImport", new { area = "Admin" }, new { })</li>
+                        <li>@Html.ActionLink("BookingModification", "Import_BookingModificationData", "BookingModificationImport", new { area = "Admin" }, new { })</li>
+                        <li>@Html.ActionLink("Cancellation", "Import_CancellationData", "CancellationImport", new { area = "Admin" }, new { })</li>
+                        <li class="active">@Html.ActionLink("CustomerMaster", "Import_CustomerMasterData", "CustomerMasterImport", new { area = "Admin" }, new { })</li>
+                        <li>@Html.ActionLink("SupplierMaster", "Import_SupplierMasterData", "SupplierMasterImport", new { area = "Admin" }, new { })</li>
+                    </ul>
+
+                </nav>
+            </div>
+        </div>
+    </div>
+<div class="container-fluid">
+    <div class="jumbotron">
+        <div>
+            <h5>Any Customers imported from this option will be marked as blocked.  This will not show up in any of the entry screens.</h5>
+            <h6 class="text-center"><i class="fa fa-hand-o-right green-color"></i> @Html.ActionLink("Click here to download a CustomerMaster Excel Sheet", "DownloadFile", "CustomerMasterImport", new { area = "Admin" }, new { })</h6>
+            @using (Html.BeginForm("Import_CustomerMasterData", "CustomerMasterImport", new { area = "Admin" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @*<h2>Import Customer Master Data</h2>*@
+
+                <table>
+                    <tr>
+                        <td colspan="2">
+                            <input type="file" name="file" />
+                        </td>
+                        <td>
+                            <input type="submit" value="Submit" class="btn btn-success" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <hr />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.ActionLink("Display Excel Data", "DisplayCustomerMasterData", "CustomerMasterImport", new { area = "Admin" }, new { @class = "btn btn-primary" })
+
+                        </td>
+                        <td style="padding-left:10px;">
+                            @Html.ActionLink("Save Excel Data To Master Tables", "SaveData", "CustomerMasterImport", new { area = "Admin" }, new { @class = "btn btn-primary" })
+                        </td>
+                    </tr>
+                </table>
+            }
+        </div>
+    </div>
+</div>

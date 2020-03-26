@@ -1,0 +1,153 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflinePropertyBookingModel
+@{
+    Layout = null;
+}
+@if (Model.Type == 2)
+{
+    int i=1;
+    foreach (CLayer.BookingItem  data in Model.bookingitmList)
+    {
+    
+        <div id="acc_types" style="margin-top:40px;">
+            <div class="row margin-bot-10" style="margin-bottom:15px;">
+                <div class="col-xs-12 col-md-12">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NoOfAccomodation) 
+                        <input type="number" id="NoOfAccomodation_@i" name="NoOfAccomodation_@i" value="@data.NoOfAccommodations"  class="form-control input-sm" />
+                    </div>
+                    <div class="col-md-6 pad0 bold">No Of Pax:</div><br />
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NoOfPaxAdult)
+                        <input type="number" id="NoOfPaxAdult_@i" name="NoOfPaxAdult_@i" value="@data.NoOfAdults" class="form-control input-sm" />
+                        @Html.ValidationMessageFor(m => m.NoOfPaxAdult)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NoOfPaxChild)
+                        <input type="number" id="NoOfPaxChild_@i" name="NoOfPaxChild_@i" value="@data.NoOfChildren" class="form-control input-sm" />
+                        @Html.ValidationMessageFor(m => m.NoOfPaxChild)
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom:15px;">
+                <div class="col-xs-12 col-md-12">
+                    <div class="row"><div class="col-md-5 bold">Accommodation Type  &nbsp; </div><a onclick="Accdivdisplay()" id="close_other_Acctype" class="lnk handpointer " style="display:none; "><span class="glyphicon glyphicon-remove"></span>choose from the list</a></div>
+                    <div id="other_Acctype">
+                        <input type="text" id="AccommodationTypeName_@i" name="AccommodationTypeName_@i" value="@data.AccommodationTitle" class="form-control input-sm" />
+                        <input type="hidden" id="Accommodationid_@i" name="Accommodationid_@i" value="@data.AccommodationId" class="form-control input-sm" />
+                        <input type="hidden" id="Accommodationtypeid_@i" name="Accommodationtypeid_@i" value="@data.AccommodationTypeId" class="form-control input-sm" />
+                    </div>
+                    <div class="row" style="display:none;">
+                        <div class="col-md-12">
+                            <div id="Accdiv">
+                                @*@Html.HiddenFor(m => m.Accommodationid)
+                                    @Html.HiddenFor(m => m.Accommodationtypeid)*@
+                                <select class="styleselect" style="width:100%;" name="AccommodatoinType_@i"  id="AccommodatoinType_@i">
+                                    @{
+        List<CLayer.AccommodationType>
+            Acctypes = BLayer.AccommodationType.GetAll();
+                                    }
+                                    @foreach (CLayer.AccommodationType sc in Acctypes)
+                                    {
+                                        <option value="@sc.AccommodationTypeId">@sc.Title</option>
+                                    }
+                                    <option value="-1">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+           
+            $("#AccommodationTypeName_@i").autocomplete({
+                minLength: 0,
+                source: "/Common/GetAccommodationForOffline",
+                focus: function (event, ui) {
+                    $("#AccommodationTypeName_@i").val(ui.item.value);
+                    $("#Accommodationtypeid_@i").val(ui.item.Text);
+                    return false;
+                }
+            }).autocomplete("instance")._renderItem = function (ul, item) {
+                ul.addClass("custom");
+                return $("<li>")
+                .append("<a>" + item.label)
+                .appendTo(ul);
+            };
+        </script>
+    i=i+1;
+    }
+}
+else
+{
+    int i = Model.Count;
+
+    <div id="acc_types" style="margin-top:40px;">
+        <div class="row margin-bot-10" style="margin-bottom:15px;">
+            <div class="col-xs-12 col-md-12">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.NoOfAccomodation)
+                    <input type="number" id="NoOfAccomodation_@i" name="NoOfAccomodation_@i" class="form-control input-sm" />
+                </div>
+                <div class="col-md-6 pad0 bold">No Of Pax:</div><br />
+                <div class="form-group">
+                    @Html.LabelFor(m => m.NoOfPaxAdult)
+                    <input type="number" id="NoOfPaxAdult_@i" name="NoOfPaxAdult_@i" class="form-control input-sm" />
+                    @Html.ValidationMessageFor(m => m.NoOfPaxAdult)
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.NoOfPaxChild)
+                    <input type="number" id="NoOfPaxChild_@i" name="NoOfPaxChild_@i" class="form-control input-sm" />
+                    @Html.ValidationMessageFor(m => m.NoOfPaxChild)
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom:15px;">
+            <div class="col-xs-12 col-md-12">
+                <div class="row"><div class="col-md-5 bold">Accommodation Type  &nbsp; </div><a onclick="Accdivdisplay()" id="close_other_Acctype" class="lnk handpointer " style="display:none; "><span class="glyphicon glyphicon-remove"></span>choose from the list</a></div>
+                <div id="other_Acctype">
+                    <input type="text" id="AccommodationTypeName_@i" name="AccommodationTypeName_@i" class="form-control input-sm" />
+                    <input type="hidden" id="Accommodationid_@i" name="Accommodationid_@i" class="form-control input-sm" />
+                    <input type="hidden" id="Accommodationtypeid_@i" name="Accommodationtypeid_@i" class="form-control input-sm" />
+                </div>
+                <div class="row" style="display:none;">
+                    <div class="col-md-12">
+                        <div id="Accdiv">
+
+                            <select class="styleselect" style="width:100%;" name="AccommodatoinType_@i" id="AccommodatoinType_@i">
+                                @{
+    List<CLayer.AccommodationType> Acctypes = BLayer.AccommodationType.GetAll();
+                                }
+                                @foreach (CLayer.AccommodationType sc in Acctypes)
+                                {
+                                    <option value="@sc.AccommodationTypeId">@sc.Title</option>
+                                }
+                                <option value="-1">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#AccommodationTypeName_@i").autocomplete({
+            minLength: 0,
+            source: "/Common/GetAccommodationForOffline",
+            focus: function (event, ui) {
+                $("#AccommodationTypeName_@i").val(ui.item.value);
+                $("#Accommodationtypeid_@i").val(ui.item.Text);
+                return false;
+            }
+        }).autocomplete("instance")._renderItem = function (ul, item) {
+            ul.addClass("custom");
+            return $("<li>")
+            .append("<a>" + item.label)
+            .appendTo(ul);
+        };
+    </script>
+}
+<input type="hidden" id="hdnAccNumbers" value="@Model.Count" />
+

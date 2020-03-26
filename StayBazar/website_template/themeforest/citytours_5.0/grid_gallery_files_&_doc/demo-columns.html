@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	    <!--
+			Final Tiles Grid Gallery 2.0
+			by GreenTreeLabs - http://codecanyon.net/item/final-tiles-grid-gallery/4734090?ref=GreenTreeLabs
+		-->
+		
+        <meta charset="utf-8">
+        <title>jQuery Final Tiles Grid Gallery demo</title>
+		
+		<!-- CSS for this demo, don't use in your project -->
+		<link rel="stylesheet" href="css/main.css">
+		
+		<!-- FontAwesome CSS for cool icons -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">        
+		
+		<!-- Final Tiles Grid Gallery CSS -->
+        <link rel="stylesheet" href="css/finaltilesgallery.css">
+
+		<!-- Include jQuery only if it is not already present in your code -->
+		<script src="js/jquery-1.11.1.min.js"></script>
+		
+		<!-- Final Tiles Grid Gallery script --> 
+        <script src="js/jquery.finaltilesgallery.js"></script>
+        
+        <script>
+	        $(function () {
+		        
+		        //we call Final Tiles Grid Gallery without parameters,
+		        //see reference for customisations: http://final-tiles-gallery.com/index.html#get-started
+		        $(".final-tiles-gallery").finalTilesGallery({
+		        	layout: 'columns',
+		        	gridSize: 0
+		        });
+	        });	        
+	    </script>
+    </head>
+    <body>
+		
+		<div id="page">
+			<h1>Final Tiles Grid Gallery «Columns» demo</h1>
+			<p>
+				In this demo we use the <code>columns</code> layout so the images have all the same width. We also set the parameter <code>gridSize</code> to 0 because we don't need the images to be aligned on the bottom edge.
+			</p>
+			<pre>
+$(".final-tiles-gallery").finalTilesGallery({
+	layout: 'columns',
+	gridSize: 0
+});
+			</pre>
+	        <p>
+		        See complete reference <a href="http://final-tiles-gallery.com/index.html#get-started">here</a>.
+	        </p>
+	        <div id="gallery" class="final-tiles-gallery">
+			    <div class="ftg-items">
+			        <div class="tile" data-ftg-ignore-size-factor="0">
+			            <a class="tile-inner" href="#">
+			                <img class="item" width="250" height="150" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/500x300/B52626/ffffff&text=1" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/250x250/2B7E7E/ffffff&text=2" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/400x800/99C542/ffffff&text=3" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/600x400/F57373/ffffff&text=4" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/250x600/7CA924/ffffff&text=5" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/800x400/76B8B8/ffffff&text=6" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/800x800/B52626/ffffff&text=7" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/800x600/8F0D0D/ffffff&text=8" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/250x300/5D860C/ffffff&text=9" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/900x300/76B8B8/ffffff&text=10" />
+			            </a>
+			        </div>
+					<div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/250x250/8F0D0D/ffffff&text=11" />
+			            </a>
+			        </div>
+			        <div class="tile">
+			            <a class="tile-inner" href="#">
+			                <img class="item" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-src="http://placehold.it/400x250/459393/ffffff&text=12" />
+			            </a>
+			        </div>
+			    </div>
+			</div>			
+		</div>
+    </body>
+</html>

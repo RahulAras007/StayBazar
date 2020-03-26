@@ -1,0 +1,82 @@
+﻿
+@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    Layout = null;
+}
+
+
+
+@using (Html.BeginForm("Filter", "SupplierInvoicePendingReport", FormMethod.Post, new { @id = "frmFiltersSupplierInvoicePending_Report" }))
+{
+    <div class="row">
+        <div class="col-md-2" style="width: 142px;">
+            <div class="form-group">
+                @Html.LabelFor(m => m.FromDate)
+                @Html.TextBoxFor(m => m.FromDate, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm", Title = "From Date" })
+            </div>
+        </div>
+        <div class="col-md-2" style="width: 180px;">
+            @Html.LabelFor(m => m.ToDate)
+            <div class="input-group ">
+                @Html.TextBoxFor(m => m.ToDate, "{0:dd/MM/yyyy}", new { @class = "form-control ", Title = "To Date" })
+                <span class="input-group-btn">
+                    <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <br />
+            <div class="col-md-3 exporticons">
+                <a title="Print" href=" #" onclick="printDoc()" id="btnNextClick" class="fa fa-print white-color fa-2x" tabindex="6"> </a>
+                <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6"></a>
+                <a title="Export" style=" cursor: pointer;" onclick="Export()" id="btnNextClick" class="fa fa-file-excel-o" tabindex="6"></a>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<script type="text/javascript">
+
+    $(function () {
+        $('#FromDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy"
+            });
+        $('#ToDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+                beforeShow: function () {
+                    $(this).datepicker('option', 'minDate', $('#FromDate').val());
+                    if ($('#FromDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+    });
+
+    $('#btnSearch').click(function () {
+        var url = '@Url.Action("Filter", "SupplierInvoicePendingReport")?' + $('#frmFiltersSupplierInvoicePending_Report').serialize();
+        $.get(url, function (data) {
+            $('#DivSuppInvPendingList_Report').html(data);
+        });
+    });
+
+    function PDF() {
+        var url = '@Url.Action("PDFView", "SupplierInvoicePendingReport")?' + $('#frmFiltersSupplierInvoicePending_Report').serialize();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+
+    function Export() {
+        var url = '@Url.Action("ExcelView", "SupplierInvoicePendingReport")?' + $('#frmFiltersSupplierInvoicePending_Report').serialize();
+        window.location = url;
+    }
+
+    function printDoc() {
+        var url = '@Url.Action("ReportPrint", "SupplierInvoicePendingReport")?' + $('#frmFiltersSupplierInvoicePending_Report').serialize();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+
+</script>

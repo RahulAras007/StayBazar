@@ -1,0 +1,23 @@
+﻿@{
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+    var approverName =Convert.ToString(TempData["ApproverName"]);
+    var approverEmail = Convert.ToString(TempData["ApproverEmail"]);
+}
+
+<div class="container bdy_min_height">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 topmargin10">
+            <h4 class="alert alert-warning">An email has been sent to <a href="mailto:@approverEmail">@approverName</a> to approve current bookings.</h4>
+            <br />
+            <div>
+                <a href="/Home">Go back to Home</a>
+                <a href="/BookingHistory" style="padding-left:10px">Go to My Stays</a>
+              
+                @*<div>
+                    <a href="/Account/LoginForBookingApproval">  (Click here to approve / reject)</a>
+                </div>*@
+            </div>
+        
+        </div>
+    </div>
+</div>

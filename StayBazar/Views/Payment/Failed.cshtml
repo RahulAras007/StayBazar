@@ -1,0 +1,42 @@
+﻿@model int
+@{
+
+}
+@*<div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h4>Payment Failed</h4>
+        </div>
+    </div>*@
+
+<div class="container bdy_min_height">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h4>Payment Failed</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            @if (Model > 0)
+            {
+                if (Model == 1)
+                {
+                    <div class="alert-info">
+
+                    </div>
+                }
+            }
+            else
+            {
+
+                <h4 class="alert alert-danger">There has been a technical issue. The issue has been notified.</h4>
+            }
+            <br />
+            <a href="@Url.Action("Index","Home")">Back to home</a>
+        </div>
+    </div>
+    @*<div class="row">
+            <div class="col-md-6 col-md-offset-3">
+
+            </div>
+        </div>*@
+</div>

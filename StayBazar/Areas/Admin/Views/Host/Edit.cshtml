@@ -1,0 +1,332 @@
+﻿@model StayBazar.Areas.Admin.Models.HostModel
+@{
+    if (Model.CountryId < 1)
+    {
+        Model.CountryId = 1; //india
+        Model.State = 3; //karnataka
+        Model.City = "Bangalore";
+        Model.CityId = 7; //bangalore
+    }
+}
+<link href="~/Content/multiple-select.css" rel="stylesheet" />
+<style>
+    .ms-drop.bottom {
+        width: 382px;
+    }
+</style>
+@try
+{
+    ViewBag.Title = "Staff";
+    using (Html.BeginForm("Edit", "Host"))
+    {
+        @*<h2>@ViewBag.Head</h2>*@
+        <div class="page-title-container style3">
+            <div class="row">
+                <div class="col-md-2">
+                    <h2 style="color:white">@ViewBag.Title</h2>
+                </div>
+        <div class="alert-danger">@ViewBag.ErrorMessage</div>
+
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(m => m.UserId)
+        @Html.HiddenFor(m => m.AddressId)
+        </div>
+            </div>
+            <br />
+            <div class="container-fluid">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.Salutations)
+                        @Html.DropDownListFor(m => m.SalutationId, Model.Salutations, new { @tabindex = "1", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.FirstName)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.FirstName)
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.LastName)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.LastName, new { @tabindex = "3", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.DateOfBirth)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.DateOfBirth, new { @tabindex = "4", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.SexList)
+                        @Html.DropDownListFor(m => m.Sex, Model.SexList, new { @tabindex = "5", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+
+                        @Html.DisplayNameFor(m => m.UserTypes)
+                        @Html.DropDownListFor(m => m.UserTypeId, Model.UserTypes, new { @id = "ddlUserTypes", @tabindex = "6", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group" id="salesregionSbEntities" style=" width:281px;">
+                        @Html.DisplayNameFor(m => m.SbEntities)
+                        @{
+                            List<CLayer.SBEntity> objEntity = new List<CLayer.SBEntity>();
+                            objEntity = Model.SelectedSbEntity;
+                        }
+                        @if (Model.SelectedSbEntity != null)
+                        {
+                            @Html.ListBoxFor(m => m.SbEntities, new MultiSelectList(Model.SbEntityList, "EntityId", "Name", Model.SelectedSbEntity.Select(m => m.EntityId)), new { multiple = "multiple", @id = "SbEntities" })
+                        }
+                        else
+                        {
+                            @Html.ListBoxFor(m => m.SbEntities, new MultiSelectList(Model.SbEntityList, "EntityId", "Name", Model.SelectedSbEntity), new { multiple = "multiple", @id = "SbEntities" })
+                        }
+
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.StatusList)
+                        @Html.DropDownListFor(m => m.Status, Model.StatusList, new { @tabindex = "7", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.Email)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.Email, new { @tabindex = "8", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.Email)
+                    </div>
+                    <div class="form-group">
+
+                        @Html.DisplayNameFor(m => m.OPSEmail)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.OPSEmail, new { @tabindex = "9", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.Phone)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.Phone, new { @tabindex = "10", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.Mobile)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "11", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group" id="salesregion" style="display:none">
+                        @Html.DisplayNameFor(m => m.SalesRegion)
+                        @Html.TextAreaFor(m => m.SalesRegion, new { @tabindex = "12", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.SalesRegion)
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <div style="display:none;">
+                            <input type="text" id="UserName" name="UserName" />
+                            <input type="password" id="password" name="password" />
+                        </div>
+                        @if (ViewBag.Head != "New Staff")
+                        {
+                            <div class="form-group">
+                                <span style="font-weight: normal;">New Password</span>
+                                @Html.PasswordFor(m => m.PasswordHash, new { @tabindex = "13", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.PasswordHash)
+                            </div>
+                            <div class="form-group">
+                                <span style="font-weight: normal;">Confirm Password</span>
+                                @Html.PasswordFor(m => m.ConfirmPassowrd, new { @tabindex = "14", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.ConfirmPassowrd)
+                            </div>}
+                        @if (Model.UserTypeId == 9 || Model.UserTypeId == 16)
+                        {
+                            <input value="1" id="hdeUserTypeId" type="hidden" />
+                        }
+                        else
+                        {
+                            <input value="0" id="hdeUserTypeId" type="hidden" />
+                        }
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.Address)<span style="color:red">*</span>
+                        @Html.TextAreaFor(m => m.Address, new { @tabindex = "15", @class = "form-control", @style = "resize: vertical;" })
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.CountryId)<span style="color:red">*</span>
+                        @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "16", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.State)<span style="color:red">*</span>
+                        @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "17", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.State)
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.CityId)<span style="color:red">*</span>
+                        <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                        @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "18", @class = "form-control input-sm" })
+                        <div id="other_city" style="display:none;">
+                            @Html.TextBoxFor(m => m.City, new { @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.DisplayNameFor(m => m.ZipCode)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "19", @class = "form-control input-sm" })
+                    </div>
+                    <div class="form-group">
+                        @if (Model.UserId > 0)
+                        {
+                            <div class="form-group">
+                                Created On: @Model.CreatedDate
+                            </div>
+                        }
+                    </div>
+                    <div class="btn-toolbar form-group">
+                        <div class="btn-group">
+                            <input type="submit" id="btnSave" value="Save" class="btn btn-success" tabindex="10" />
+                            @if (Model.Status == (int)StayBazar.Areas.Admin.Models.HostModel.StatusTypes.Active)
+                            {
+                                if (Model.UserId > 1)
+                                {
+                                    <a href="/Admin/Host/Block/@Model.UserId" class="btn btn-default" onclick="return confirm('Are you sure you want to block?')">Block</a>
+                                    <a href="/Admin/Host/Delete/@Model.UserId" class="btn btn-primary btn-danger" onclick="return confirm('Are you sure you want to delete?')">Delete</a>
+                                }
+                                <a href="/Admin/Host" id="btnReset" class="btn btn-danger" tabindex="11">Cancel</a>
+                            }
+                            else if (Model.Status == (int)StayBazar.Areas.Admin.Models.HostModel.StatusTypes.Blocked)
+                            {
+                                <a href="/Admin/Host/Restore/@Model.UserId" class="btn btn-default" onclick="return confirm('Are you sure you want to Restore?')">Restore</a>
+                                <a href="/Admin/Host/Delete/@Model.UserId" class="btn btn-primary btn-danger" onclick="return confirm('Are you sure you want to delete?')">Delete</a>
+                                <a href="~/Admin/Host/Blocked" id="btnReset" class="btn btn-primary" tabindex="11">Cancel</a>
+                            }
+                            else
+                            {
+                                <a href="/Admin/Host/Restore/@Model.UserId" class="btn btn-default" onclick="return confirm('Are you sure you want to Restore?')">Restore</a>
+                                <a href="~/Admin/Host/RecentlyDeleted" id="btnReset" class="btn btn-primary" tabindex="11">Cancel</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <script src="~/Scripts/jquery.multiple.select.js"></script>
+        <script type="text/javascript">
+            $(function () {
+
+
+
+
+                var CitySelected = $("#CityId").val();
+
+                $('#CityId [value="' + CitySelected + '"]').attr('selected', 'true');
+
+                if ($('#CityId').val() == -1) {
+                    $("#CityId").hide();
+                    $("#other_city").show();
+                    if ($("select#CityId option").length > 1) {
+                        $("#close_other_city").show();
+                    }
+                }
+
+                $('#CountryId').change(function () {
+                    $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                        if (data != "") {
+                            $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                            $('#ddlStateID').html(data).append('<option selected="selected" value="0">Select</option>');
+                        }
+                        else {
+                            $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                            $('#ddlStateID').html(data).append('<option selected="selected" value="0">Select</option>');
+                        }
+
+                        loadcity();
+                    });
+                });
+                $('#State').change(function () {
+                    $("#CityId").show();
+                    $("#City").val("");
+                    $("#other_city").hide();
+                    $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                        if (data != "") {
+                            $('#CityId').empty().append(data);
+                            if ($("select#CityId option").length == 1) {
+                                $("#CityId").hide();
+                                $("#City").val("");
+                                $("#other_city").show();
+
+                            }
+
+                        }
+                        else {
+                            $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                        }
+
+                    });
+                });
+                $('#CityId').change(function () {
+                    if ($(this).val() == -1) {
+                        $(this).hide();
+                        $("#City").val($("#hdnCity").val());
+                        $("#other_city").show();
+                        $("#close_other_city").show();
+                    }
+                });
+                $('#close_other_city').click(function () {
+                    $("#CityId").show();
+                    $("#City").val("");
+                    $("#other_city").hide();
+                    $("#close_other_city").hide();
+                });
+            });
+
+            function loadcity() {
+                $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                    if (data != "") {
+                        $('#CityId').empty().append(data);
+                        if ($("select#CityId option").length == 1) {
+                            $("#CityId").hide();
+                            $("#City").val("");
+                            $("#other_city").show();
+                        }
+                    }
+                    else {
+                        $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                    }
+                });
+            }
+        </script>
+        <script type="text/javascript">
+            $("#SbEntities").multipleSelect({
+                placeholder: "Select",
+                width: "100%"
+            });
+            $(document).ready(function () {
+                if ($('#hdeUserTypeId').val() == 1) {
+                    $("#salesregion").css("display", "block");
+                    //$("#salesregionSbEntities").css("display", "block");
+                }
+                else {
+                    //$("#salesregionSbEntities").css("display", "none");
+                }
+
+            });
+            $(function () {
+                $("#SalutationId").focus();
+
+
+                $('#DateOfBirth').datepicker(
+                    {
+                        dateFormat: "dd/mm/yy"
+                    });
+                //$("#DateOfBirth").datepicker({
+                //    changeYear: true
+                //});
+            });
+            $('#ddlUserTypes').change(function (e) {
+
+                if ($(this).val() == 9 || $(this).val() == 16) {
+                    $("#salesregion").css("display", "block");
+                    //$("#salesregionSbEntities").css("display", "block");
+                }
+                else {
+
+                    $("#salesregion").css("display", "none");
+                    //$("#salesregionSbEntities").css("display", "none");
+                }
+            });
+
+
+        </script>
+    }
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+    Response.Redirect("~/ErrorPage");
+}
+
+

@@ -1,0 +1,388 @@
+﻿@model StayBazar.Areas.Admin.Models.UserDetailModel
+@{
+    ViewBag.Title = "Customer | " + Model.FirstName + " " + Model.LastName;
+    if (Model.Status == (int)CLayer.ObjectStatus.StatusType.Deleted)
+    {
+        ViewBag.Title += " [deleted]";
+    }
+}
+
+<div class="page-title-container style3">
+    @* <div class="container">*@
+
+    <div class="row">
+        <div class="col-md-4">
+            <h2 style="color:white"><a href="/Admin/RegularUser" class="btn btn-sm btn-default" title="back to list"><span class="glyphicon glyphicon-arrow-left green-color fa-2x"></span></a>&nbsp;&nbsp;@ViewBag.Title</h2>
+        </div>
+        @*<div class="h2">
+        &nbsp;@ViewBag.Title*@
+
+
+        <div class="col-md-8">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#detials" data-toggle="tab">Details</a></li>
+                <li><a href="#transactions" data-toggle="tab">Transaction History</a></li>
+                <li><a href="#others" data-toggle="tab">Other</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<br />
+<br />
+<div class="container-fluid">
+    <div class="tab-content">
+        <div class="tab-pane active" id="detials">
+            <div class="row">
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger">
+                        @ViewBag.Message.
+                    </div>
+                }
+                @using (Html.BeginForm("Update", "RegularUser", FormMethod.Post, new { role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    @Html.HiddenFor(m => m.UserId)
+                    @Html.HiddenFor(m => m.Sex)
+                    @Html.HiddenFor(m => m.Status)
+                    @Html.HiddenFor(m => m.Email)
+                    @Html.HiddenFor(m => m.AddressId)
+                    @Html.HiddenFor(m => m.AddressType)
+                    <div class="col-lg-4 incontainer">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SalutationId)<br />
+                            @Html.DropDownListFor(m => m.SalutationId, Model.Salutations, new { @tabindex = "1", @class = "form-control" })
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.FirstName)<span style="color:red"> *</span>
+                            @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.FirstName)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.LastName)
+                            @Html.TextBoxFor(m => m.LastName, new { @tabindex = "3", @class = "form-control" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.DateOfBirth)<br />
+                            @Html.TextBoxFor(m => m.DateOfBirth, "{0:dd/MM/yyyy}", new { @tabindex = "4", @class = "form-control" })
+                        </div>
+                        <div class="form-group hidden">
+                            @Html.LabelFor(m => m.SexList)
+                            @Html.DropDownListFor(m => m.Sex, Model.SexList, new { @tabindex = "5", @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-4 incontainer">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Address)<span style="color:red"> *</span>
+                            @Html.TextAreaFor(m => m.Address, new { @tabindex = "6", @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CountryId)<br />
+                            @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "7", @class = "form-control" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.State)
+                            @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "8", @class = "form-control" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.City) &nbsp;
+                            <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove red-color"></span>choose from the list</a>
+                            @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "9", @class = "form-control" })
+                            <div id="other_city" style="display:none;">
+                                @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                                <input type="hidden" value="@Model.City" id="hdnCity" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ZipCode)<span style="color:red"> *</span>
+                            @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "10", @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                            @Html.ValidationMessageFor(m => m.ZipCode)
+                        </div>
+                    </div>
+                    <div class="col-lg-4 incontainer">
+                        <div class="form-group hidden">
+                            @Html.LabelFor(m => m.Phone)
+                            @Html.TextBoxFor(m => m.Phone, new { @tabindex = "10", @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Mobile)<span style="color:red"> *</span>
+                            @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "11", @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                            @Html.ValidationMessageFor(m => m.Mobile)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Email)
+                            <span class="whitebg alert-info padding5px">
+                                @Model.Email
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            Registration date: @Model.CreatedDate.ToShortDateString()
+
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group text-right">
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-success">Save</button>
+                            @if (User.IsInRole("Administrator"))
+                            {
+                                if (Model.Status != (int)CLayer.ObjectStatus.StatusType.Deleted)
+                                {
+                                    <a href="/Admin/RegularUser/Delete/@Model.UserId" class="btn redbg whitetext border-radius0" onclick="return confirm('Are you sure you want to delete this customer?')">Delete</a>
+                                }
+                            }
+                            <a href="/Admin/RegularUser" class="btn btn-danger">Cancel</a>
+                        </div>
+                    </div>
+
+
+                }
+            </div>
+        </div>
+        <div class="tab-pane" id="transactions">
+            <div class="container-fluid">
+                @if (Model.UserId != null)
+                {
+                    StayBazar.Areas.Admin.Models.TransactionListModel b = new StayBazar.Areas.Admin.Models.TransactionListModel();
+                    b.Bookinglist = BLayer.Transaction.GetUserId(Model.UserId, 0, 25);
+                    Html.RenderPartial("~/Areas/Admin/Views/Common/_TransactionList.cshtml", b);
+                }
+            </div>
+        </div>
+        <div class="tab-pane" id="others">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="dvCustomerPaymentMode" class="h3 panel panel-body padding5px">
+                        <div class="col-md-3">
+                            <span id="CustomerPaymentModesuccess" class="success h5 hided padding5px">Customer Payment Mode Saved</span>
+                            <div class="input-group">
+
+                                <div style="display:inline-block">
+                                    <span style="font-size:14px !important"> @Html.LabelFor(m => m.CustomerPaymentMode) </span><span style="color:red;font-size:14px">*</span>
+                                    @Html.DropDownListFor(m => m.CustomerPaymentMode, Model.CustomerPaymentMode_Manage, "select", new { @class = "form-control input-sm" })
+                                </div>
+                                <br />
+
+                                <div>
+                                    <div style="display:inline-block;padding-top:10px" id="dvCreditDays">
+                                        <span style="font-size:14px !important">
+                                            @Html.LabelFor(m => m.CustomerPaymentModeCreditDays)
+                                        </span>
+                                        @Html.TextBoxFor(m => m.CustomerPaymentModeCreditDays, "{0:0.#}", new { @class = "form-control input-sm" })
+                                    </div>
+                                    <div class="input-group-btn" style="display:inline-block;vertical-align:bottom;padding-top:10px">
+                                        <button id="CustomerPaymentModeSave" class="btn btn-success">Save</button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    @if (Model.Status != (int)CLayer.ObjectStatus.StatusType.Deleted)
+                    {
+                        Html.RenderPartial("~/Areas/Admin/Views/Status/_Status.cshtml", new StayBazar.Areas.Admin.Models.StatusModel() { UserId = Model.UserId, Status = Model.Status });
+                    }
+                    <br /><h4>Recent Logins</h4>
+                    @*<hr />*@
+                    @if (Model.LastLoginOn >= Model.CreatedDate)
+                    {<text> Last Logged On:@Model.LastLoginOn</text>}
+                else
+                {<text> Not yet logged in</text>}
+                </div>@*<div class="col-md-1"></div>*@
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<script type="text/javascript">
+    $(function () {
+
+        $('#DateOfBirth').datepicker({
+            dateFormat: "dd/mm/yy"
+        });
+
+        if ($("#CustomerPaymentMode").val() == 3) {
+            $("#dvCreditDays").show();
+        }
+        else {
+            $("#dvCreditDays").hide();
+        }
+
+        $('#CustomerPaymentMode').change(function () {
+            if ($("#CustomerPaymentMode").val() == 3) {
+                $("#dvCreditDays").show();
+            }
+            else {
+                $("#dvCreditDays").hide();
+            }
+        });
+
+        //date error
+        $.validator.addMethod('date',
+            function (value, element, params) {
+                if (this.optional(element)) {
+                    return true;
+                }
+
+                var ok = true;
+                try {
+                    $.datepicker.parseDate('dd/mm/yy', value);
+                }
+                catch (err) {
+                    ok = false;
+                }
+                return ok;
+            });
+
+
+    });
+</script>
+<script type="text/javascript">
+    $(function () {
+
+        if ($('#City').val() != null) {
+            $("#CityId").hide();
+            $("#other_city").show();
+            if ($("select#CityId option").length > 1) {
+                $("#close_other_city").show();
+            }
+        }
+        if ($('#CityId').val() < 1) {
+            $("#CityId").hide();
+            $("#other_city").show();
+            if ($("select#CityId option").length > 1) {
+                $("#close_other_city").show();
+            }
+        }
+
+        $('#CountryId').change(function () {
+            $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                if (data != "")
+                    $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                else
+                    $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                Loadcity();
+            });
+        });
+        $('#State').change(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                if (data != "") {
+                    $('#CityId').empty().append(data);
+                    if ($("select#CityId option").length == 1) {
+                        $("#CityId").hide();
+                        $("#City").val("");
+                        $("#other_city").show();
+                    }
+                }
+                else {
+                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+
+        });
+        $('#CityId').change(function () {
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#City").val($("#hdnCity").val());
+                $("#other_city").show();
+                $("#close_other_city").show();
+            }
+        });
+        $('#close_other_city').click(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+        });
+
+        $("#CustomerPaymentModeSave").click(function () {
+            var CustomerPaymentModeID = $("#CustomerPaymentMode").val();
+            if ($("#CustomerPaymentModeCreditDays").val() == "") {
+                $("#CustomerPaymentModeCreditDays").val("0");
+            }
+            if (CustomerPaymentModeID == "") {
+                alert("Select customer payment mode");
+                return;
+            }
+            if (CustomerPaymentModeID == 3)
+            {
+                if($("#CustomerPaymentModeCreditDays").val()=="0")
+                {
+                    alert("Enter Credit days");
+                    return;
+                }
+            }
+            var url = '@Url.Action("SetCustomerPaymentMode", "RegularUser")';
+            $.post(url, { b2bId: $("#UserId").val(), CustomerPaymentMode: $("#CustomerPaymentMode").val(), CustomerPaymentModeCreditDays: $("#CustomerPaymentModeCreditDays").val() }, function (data) {
+                $("#CustomerPaymentModesuccess").show().fadeOut(2000);
+            });
+        });
+
+        $('#CustomerPaymentModeCreditDays').keypress(function (e) {
+            var a = [];
+            var k = e.which;
+
+            var KeystoInclude = [0, 8, 31, 46, 190];
+            for (i = 0; i < KeystoInclude.length; i++) {
+                a.push(KeystoInclude[i]);
+            }
+            for (i = 48; i < 58; i++) {
+                a.push(i);
+            }
+            var numValue = $(this).val();
+            if (e.which == 46) {
+                if ((numValue) && (numValue.indexOf('.') >= 0))
+                    e.preventDefault();
+            }
+            if (!(a.indexOf(k) >= 0))
+                e.preventDefault();
+        });
+        $('#CustomerPaymentModeCreditDays').blur(function (e) {
+            var dec = parseFloat($(this).val(), 10).toFixed(1);
+            $(this).val(dec);
+        })
+    });
+
+
+
+    //Pagination for Booking List Corporate
+    function showPager(num) {
+        alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager","Corporate")';
+        $.post(url, $("#frmPagers").serialize(), function (data) {
+            $("#List").html(data);
+        });
+    }
+
+    function Loadcity()
+    {
+        $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+            if (data != "") {
+                $('#CityId').empty().append(data);
+                if ($("select#CityId option").length == 1) {
+                    $("#CityId").hide();
+                    $("#City").val("");
+                    $("#other_city").show();
+                }
+            }
+            else {
+                $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+</script>

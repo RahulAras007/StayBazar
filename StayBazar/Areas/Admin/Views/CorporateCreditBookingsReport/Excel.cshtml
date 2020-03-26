@@ -1,0 +1,119 @@
+﻿@model IEnumerable<CLayer.CreditBookingReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+    long cn1 = 0;
+    long bookuserid = 0;
+    DateTime FDate = DateTime.Today.AddDays(-30);
+    DateTime TDate = DateTime.Today;
+    
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" / >
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="CreditBooking">
+        <ss:Table>
+            <ss:Row ss:styleid="1" >
+                <ss:Cell><ss:Data ss:Type="String">Sl No </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Corporate Name </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Customer Name </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking Date </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking Ref No </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property Booked</ss:Data></ss:Cell>                           
+                <ss:Cell><ss:Data ss:Type="String">Check in</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Checkout</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking amount</ss:Data></ss:Cell>   
+
+                <ss:Cell><ss:Data ss:Type="String">Payment Status</ss:Data></ss:Cell>   
+                <ss:Cell><ss:Data ss:Type="String">Date Due</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Over Due</ss:Data></ss:Cell>           
+            </ss:Row>
+            @foreach (CLayer.CreditBookingReport reportList in Model)
+            {
+                i = i + 1;
+                FDate = reportList.FromDate;
+                TDate = reportList.ToDate;
+                long BuserId = BLayer.Bookings.GetBookedByUserId(Convert.ToInt32(reportList.BookingId));
+                CLayer.B2B Creditbookingdata = BLayer.B2B.GetbookingcreditforCorte(BuserId);
+                DateTime datedue = reportList.BookingDate.AddDays(Creditbookingdata.CreditDays);
+                DateTime today = DateTime.Today;
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">@i</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CorporateName </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CustomerName </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingDate.ToShortDateString() </ss:Data></ss:Cell>  
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingRefNo </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CheckIn </ss:Data></ss:Cell>              
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CheckOut </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.TotalAmount </ss:Data></ss:Cell>  
+                     
+                    <ss:Cell><ss:Data ss:Type="String">
+
+                                 @if (reportList.IsCorpbookingpaid == 1)
+                                 {
+                                     <text>Paid</text>
+                                 }
+                                 else
+                                 {
+                                     <text>Pending</text>
+                                 }
+
+                        </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@datedue</ss:Data></ss:Cell>  
+                    <ss:Cell><ss:Data ss:Type="String">
+                                 @if (datedue < today)
+                                 { <text> YES </text> }
+                                 else
+                                 { <text> NO </text> }
+                        </ss:Data></ss:Cell>
+                </ss:Row>
+              
+
+                if (bookuserid != BuserId)
+                {
+                    bookuserid = BuserId;
+                    long countno = BLayer.CreditBooking.GetCountForBookings(bookuserid, FDate, TDate);
+                    cn1 = cn1 + countno;
+                }
+                    if (i == cn1)
+                        {
+                            CLayer.B2B Creditbookingdata1 = BLayer.B2B.GetbookingcreditforCorte(BuserId);
+                            decimal amt = BLayer.Bookings.GetTotalcreditbookamountforReport(BuserId, FDate, TDate);
+
+                            decimal amtforcreditblnc = BLayer.Bookings.GetTotalcreditbookamount(BuserId);
+                            decimal creditbalceAmt = Creditbookingdata1.TotalCreditAmount - amtforcreditblnc;
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">Booking Summary</ss:Data></ss:Cell>                  
+                </ss:Row>
+    <ss:Row>
+        <ss:Cell><ss:Data ss:Type="String">Total Amount booked by Corporate</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">Credit Limit Total</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">Credit Limit Balance</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">Payments Due </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">Date Due </ss:Data></ss:Cell>       
+    </ss:Row>
+    <ss:Row>
+        <ss:Cell><ss:Data ss:Type="String">@amt</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@Creditbookingdata.TotalCreditAmount</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@creditbalceAmt</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">
+        @if (creditbalceAmt < 0)
+        { <text> YES </text> }
+        else
+        { <text> NO </text> } 
+        </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.BookingDate.AddDays(Creditbookingdata.CreditDays) </ss:Data></ss:Cell>
+    </ss:Row>
+            }
+            }
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

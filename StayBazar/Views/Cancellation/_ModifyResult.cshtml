@@ -1,0 +1,13 @@
+﻿@model StayBazar.Models.ModifyModel
+
+<div class="container bdy_min_height">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="height40"></div>
+            <div @if (Model.Failed) { <text> class="alert alert-danger" </text>  } else { <text> class="alert alert-success" </text>  }>@Model.Msg
+                
+            </div>
+            <a href="@Url.Action("Index", "BookingHistory")">Go back to My Stays</a>
+        </div>
+    </div>
+</div>

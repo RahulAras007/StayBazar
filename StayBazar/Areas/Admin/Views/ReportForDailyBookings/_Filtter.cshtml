@@ -1,0 +1,75 @@
+﻿@model StayBazar.Areas.Admin.Models.ReportForDailyBookingModel
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("FilterDailyBookings", "ReportForDailyBookings", FormMethod.Post, new { @id = "frmFiltersForDailyBooking", onsubmit = "return false;" }))
+        {
+            <div class="row">
+                <div class="col-md-2" style="width: 180px;">
+                    <div class="input-group ">
+                        @Html.TextBoxFor(m => m.CurrentDate, "{0:dd/MM/yyyy}", new { @class = "form-control ", Title = " Date" })
+                        <span class="input-group-btn">
+                            <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </span>
+
+                    </div>
+                </div>
+                <div class="col-md-2 exporticons">
+                    <a title="Print" href="#" onclick="printDoc()" id="btnNextClick" class="fa fa-print white-color fa-2x"> </a>
+                    <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o"></a>
+                    <a title="Export" onclick="Export()" id="btnNextClick" class="fa fa-file-excel-o"></a>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#CurrentDate').datepicker(
+             {
+                 dateFormat: "dd/mm/yy"
+             });
+
+    });
+    $("#btnSearch").click(function () {
+        var url = '@Url.Action("FilterDailyBookings", "ReportForDailyBookings", new { area = "Admin" })';
+        //alert($("#frmFiltersForDailyBooking").serialize());
+        $.post(url, $("#frmFiltersForDailyBooking").serialize(),
+                function (data) {
+                    // aler(data);
+                    $("#DailyBooking").html(data);
+
+                });
+    });
+    function PDF() {
+        var pfromdate = $("#CurrentDate").val();
+        // var pToDate = $("#ToDate").val();
+
+        var pLimit = $("#Limit").val();
+        var pcurrentPage = $("#currentPage").val();
+        var url = '@Url.Action("ReportPdf", "ReportForDailyBookings")?' + "FromDate=" + pfromdate + "&" + "Limit=" + pLimit + "&" + "currentPage=" + pcurrentPage;
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function Export() {
+        var pfromdate = $("#CurrentDate").val();
+        // var pToDate = $("#ToDate").val();
+        var pLimit = $("#Limit").val();
+        var pcurrentPage = $("#currentPage").val();
+        window.location = '@Url.Action("ExcelReport", "ReportForDailyBookings", new { area = "Admin" })?' + "FromDate=" + pfromdate + "&" + "Limit=" + pLimit + "&" + "currentPage=" + pcurrentPage;
+        //window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function printDoc() {
+        var pfromdate = $("#CurrentDate").val();
+
+        // var pToDate = $("#ToDate").val();
+        var pLimit = $("#Limit").val();
+        var pcurrentPage = $("#currentPage").val();
+        var url = '@Url.Action("ReportPrint", "ReportForDailyBookings")?' + "FromDate=" + pfromdate + "&" + "Limit=" + pLimit + "&" + "currentPage=" + pcurrentPage;
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+</script>

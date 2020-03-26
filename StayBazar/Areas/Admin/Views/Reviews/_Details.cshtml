@@ -1,0 +1,282 @@
+﻿@model StayBazar.Areas.Admin.Models.ReviewsModel
+@using Microsoft.AspNet.Identity
+@{
+    Layout = null;
+    if (Model.PropertyId > 0)
+    {
+        CLayer.Property pro = BLayer.Property.Get(Model.PropertyId);
+        if (pro != null)
+        {
+            if (pro.City != null)
+            {
+                Model.AccommodationCity = pro.City;
+            }
+        }
+    }
+}
+
+<style>
+    .table > thead > tr > th {
+        border-bottom: 1px solid #ffffff !important;
+    }
+
+    .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+        border-top: 1px solid #ffffff !important;
+    }
+</style>
+@try
+{
+    using (Html.BeginForm("Verify", "Reviews", FormMethod.Post, new { @id = "frmFiltersUpdate" }))
+    {
+        @*@Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)*@
+        @Html.HiddenFor(m => m.PropertyId)
+        @Html.HiddenFor(m => m.BookingId)
+        @Html.HiddenFor(m => m.UserId)
+        @Html.HiddenFor(m => m.Rating)
+
+        <div class="row">
+            <div class="col-md-7 h4">
+                @Model.Title
+            </div>
+            <div class="col-md-3">
+                <!-- With Predefined Rating -->
+                <div id="predefined-star" data-score="@Model.Rating">
+                </div>
+                <div id="result" style="font-size: 15px !important;"></div>
+                <p class="text-warning">@Model.FirstName @Model.LastName</p>
+            </div>
+        </div>
+        <div class="row marginleft10" >
+            <div class="row">
+                @Html.HiddenFor(m => m.AccommodationCity)
+                <p style="text-align:justify">
+                    Hope you had a successful trip to  @Html.DisplayFor(m => m.AccommodationCity, new { @class = "bottomborderline" })  recently.
+                    Please spare a moment to give us feedback on your stay. Your feedback would help us to improve our services:
+                </p>
+            </div>
+
+            <div class="row ">
+                <div class="table-responsive">
+                    <table width="100%" class="table">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center;"></th>
+                                <th> &nbsp;</th>
+                                <th> &nbsp;</th>
+                                <th style="text-align:center;">Excellent</th>
+                                <th style="text-align:center;">Very Good</th>
+                                <th style="text-align:center;">Average</th>
+                                <th style="text-align:center;">Poor</th>
+                                <th style="text-align:center;">Terrible</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td align="center">(1)</td>
+                                <td>Accessibility to property</td>
+                                <td align="center">:</td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Accessibility" name="Accessibility" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Excellent)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Accessibility" name="Accessibility" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.VeryGood)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Accessibility" name="Accessibility" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Average)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Accessibility" name="Accessibility" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Poor)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Accessibility" name="Accessibility" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Terrible)" /></td>
+                            </tr>
+                            <tr>
+                                <td align="center">(2)</td>
+                                <td>Easiness in check-in</td>
+                                <td align="center">:</td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Easiness" name="Easiness" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Excellent)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Easiness" name="Easiness" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.VeryGood)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Easiness" name="Easiness" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Average)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Easiness" name="Easiness" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Poor)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Easiness" name="Easiness" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Terrible)" /></td>
+                            </tr>
+                            <tr>
+                                <td align="center">(3)</td>
+                                <td>Cleanliness - Bedroom</td>
+                                <td align="center">:</td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBed" name="CleanlinessBed" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Excellent)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBed" name="CleanlinessBed" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.VeryGood)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBed" name="CleanlinessBed" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Average)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBed" name="CleanlinessBed" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Poor)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBed" name="CleanlinessBed" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Terrible)" /></td>
+                            </tr>
+                            <tr>
+                                <td align="center">(4)</td>
+                                <td>Cleanliness - Bathroom</td>
+                                <td align="center">:</td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBath" name="CleanlinessBath" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Excellent)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBath" name="CleanlinessBath" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.VeryGood)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBath" name="CleanlinessBath" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Average)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBath" name="CleanlinessBath" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Poor)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="CleanlinessBath" name="CleanlinessBath" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Terrible)" /></td>
+                            </tr>
+                            <tr>
+                                <td align="center">(5)</td>
+                                <td>Sleep Quality</td>
+                                <td align="center">:</td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="SleepQuality" name="SleepQuality" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Excellent)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="SleepQuality" name="SleepQuality" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.VeryGood)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="SleepQuality" name="SleepQuality" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Average)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="SleepQuality" name="SleepQuality" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Poor)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="SleepQuality" name="SleepQuality" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Terrible)" /></td>
+                            </tr>
+                            <tr>
+                                <td align="center">(6)</td>
+                                <td>Staff behavior</td>
+                                <td align="center">:</td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Staffbehave" name="Staffbehave" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Excellent)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Staffbehave" name="Staffbehave" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.VeryGood)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Staffbehave" name="Staffbehave" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Average)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Staffbehave" name="Staffbehave" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Poor)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="Staffbehave" name="Staffbehave" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Terrible)" /></td>
+                            </tr>
+                            <tr>
+                                <td align="center">(7)</td>
+                                <td>Overall experience</td>
+                                <td align="center">:</td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="OverallExp" name="OverallExp" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Excellent)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="OverallExp" name="OverallExp" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.VeryGood)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="OverallExp" name="OverallExp" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Average)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="OverallExp" name="OverallExp" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Poor)" /></td>
+                                <td align="center"><input type="radio" class="radio" style="width:16px;" id="OverallExp" name="OverallExp" value="@((int)StayBazar.Models.ReviewModel.Feedbackratings.Terrible)" /></td>
+                            </tr>
+
+                            <tr>
+                                <td align="center">(8)</td>
+                                <td colspan="1">Will you consider this property during your next travel </td>
+                                <td align="center">:</td>
+                                <td colspan="4">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td width="20px"></td>
+                                                <td>
+                                                    <label style="float:left">Yes</label>
+                                                </td>
+                                                <td width="20px"></td>
+                                                <td>
+                                                    <input type="radio" style="width:16px; float:right" class="radio" name="Considerfornext" id="Considerfornext" value="@((int)StayBazar.Models.ReviewModel.considernext.Yes)" />
+                                                </td>
+                                                <td width="20px"></td>
+                                                <td>
+                                                    <label style="float:left">No</label>
+                                                </td>
+                                                <td width="20px"></td>
+                                                <td>
+                                                    <input type="radio" style="width:16px; float:right" class="radio" name="Considerfornext" id="Considerfornext" value="@((int)StayBazar.Models.ReviewModel.considernext.No)" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row margin-top-10">
+                <h5>Your remarks if any:</h5>
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control border_radius20 margin-bot-10 ", @rows = "6" })
+            </div>
+
+            @*<div class="col-md-12">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td> Accessibility to property</td>
+                            <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @Model.Accessibility)</td>
+                        </tr>
+                        <tr>
+                            <td>Easiness in check-in</td>
+                            <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @Model.Easiness)</td>
+                        </tr>
+                        <tr>
+                            <td>Cleanliness - Bedroom</td>
+                            <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @Model.CleanlinessBed)</td>
+                        </tr>
+                        <tr>
+                            <td>Cleanliness - Bathroom</td>
+                            <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @Model.CleanlinessBath)</td>
+                        </tr>
+                        <tr>
+                            <td> Sleep Quality</td>
+                            <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @Model.SleepQuality)</td>
+                        </tr>
+                        <tr>
+                            <td>Staff behavior</td>
+                            <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @Model.Staffbehave)</td>
+                        </tr>
+                        <tr>
+                            <td> Overall experience</td>
+                            <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @Model.OverallExp)</td>
+                        </tr>
+                        <tr>
+                            <td>Will you consider this property during your next travel</td>
+                            <td> : @Enum.GetName(typeof(CLayer.Review.considernext), @Model.Considerfornext)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>*@
+        </div>
+        @*<div class="row">
+            <div class="col-md-6">
+                <div class="form-group ">
+                    @Html.TextAreaFor(m => m.Description, new { @class = "reviewtextarea" })
+                    @Html.ValidationMessageFor(m => m.Description)
+                </div>
+            </div>
+        </div>*@
+    
+    
+    
+    
+        <div class="row">
+            <div class="col-md-2">
+                <b>@Html.CheckBoxFor(model => model.Recommended, new { id = "Recommended_ReviewData" }) Recommended</b>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10">
+                <div class1="form-control">
+                    <b>
+                        @Html.RadioButtonFor(m => m.Status, (int)CLayer.ObjectStatus.StatusType.Verified)Moderated
+                        @Html.RadioButtonFor(m => m.Status, (int)CLayer.ObjectStatus.StatusType.Rejected)Rejected
+                        @Html.RadioButtonFor(m => m.Status, (int)CLayer.ObjectStatus.StatusType.NotVerified)Waiting
+                    </b>
+                </div>
+            </div>
+        </div>
+    }
+}
+catch (Exception ex)
+{
+    Response.Redirect("~/Admin/Reviews/Index");
+}
+<!--Adding jQuery rating plug-in-->
+<script type="text/javascript">
+
+    $(function () {
+        $("input[name=Accessibility][value=" + @Model.Accessibility + "]").attr('checked', 'checked');
+        $("input[name=Easiness][value=" + @Model.Easiness + "]").attr('checked', 'checked');
+        $("input[name=CleanlinessBed][value=" + @Model.CleanlinessBed + "]").attr('checked', 'checked');
+        $("input[name=CleanlinessBath][value=" + @Model.CleanlinessBath + "]").attr('checked', 'checked');
+        $("input[name=Considerfornext][value=" + @Model.Considerfornext + "]").attr('checked', 'checked');
+        $("input[name=SleepQuality][value=" + @Model.SleepQuality + "]").attr('checked', 'checked');
+        $("input[name=Staffbehave][value=" + @Model.Staffbehave + "]").attr('checked', 'checked');
+        $("input[name=OverallExp][value=" + @Model.OverallExp + "]").attr('checked', 'checked');
+
+        $('#predefined-star').raty(
+        {
+            path: '../../Content/raty27/images/',
+            half: true,
+            readOnly: true,
+            targetKeep: true,
+            score: function () {
+                return $(this).attr('data-score');
+            }
+        });
+    });
+</script>

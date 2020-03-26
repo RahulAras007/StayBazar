@@ -1,0 +1,177 @@
+﻿@model IEnumerable<CLayer.Query>
+@{
+    var grid = new WebGrid(Model, canSort: false, canPage: true, rowsPerPage: 25,
+    selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+    grid.Pager(WebGridPagerModes.NextPrevious);
+    var currentAction = "";
+    HtmlHelper htmlHelper = this.Html;
+    var routeData = htmlHelper.ViewContext.RouteData;
+    currentAction = routeData.GetRequiredString("Action");
+    int mtype = 1;
+    if (ViewBag.MsgType != null)
+    {
+        mtype = ViewBag.MsgType;
+    }
+    if (ViewBag.Head == null)
+    {
+        ViewBag.Head = "Query";
+    }
+}
+<style>
+    .gridcellstyle {
+        text-align: center;
+    }
+</style>
+<div class="page-title-container style3">
+    @* <div class="container">*@
+    @*<form>*@
+    <div class="row">
+        <div class="col-md-6">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        @*@ViewBag.Head&nbsp;*@
+        @if (Model.Count() > 0)
+        {
+            <div class="btn-group" id="div-actions">
+                @if (currentAction == "Inbox")
+                {
+                    <button id="btnReadAll" data-action="markusread" class="btn btn-default" disabled>Mark as Read</button>
+                    <button id="btnUnreadAll" data-action="markusunread" class="btn btn-default" disabled>Mark as Unread</button>
+                    <button id="btnArchiveAll" data-action="archive" class="btn btn-default" disabled>Archive</button>
+                }
+                else
+                {
+                    <button id="btnRestoreAll" data-action="restore" class="btn btn-default" disabled>Restore</button>
+                }
+                <button id="btnDeleteAll" data-action="delete" class="btn btn-danger" disabled>Delete</button>
+            </div>
+            <form id="frmIds" method="post">
+                <input id="data" name="data" type="hidden" value="" />
+                <input id="type" name="type" type="hidden" value="" />
+            </form>
+        }
+    </div>
+
+    @*</form>*@
+</div>
+@*</div>*@
+<br />
+<div class="col-md-12">
+    <ul class="nav nav-tabs">
+        <li @if (currentAction == "Inbox") { <text> class="active" </text> }><a href="/Admin/Query/Inbox?id=@mtype">Inbox</a></li>
+        <li @if (currentAction != "Inbox") { <text> class="active" </text> }><a href="/Admin/Query/Archivebox?id=@mtype">Archive</a></li>
+    </ul>
+</div>
+<div class="col-md-12">
+    <div id="gridContent">
+        @*@if (Model.Count() > 0)
+            {*@
+        @grid.GetHtml(
+                     tableStyle: "webGrid table table-responsive table-striped table-hover table-condensed table-custom table-bordered",
+             headerStyle: "header",
+             alternatingRowStyle: "alt",
+             selectedRowStyle: "select",
+             columns: grid.Columns(
+                  grid.Column(header: "head", format: @<text><input type="checkbox" class="chk checkbox-inline" value="@item.QueryId" /></text>),
+                                                                       grid.Column("Subject", format: (item) =>
+                                                                       {
+                                                                           if (item.Status == 0)
+                                                                           {
+                                                                               return Html.Raw("<b>" + item.Subject + "</b>");
+                                                                           }
+                                                                           else
+                                                                           {
+                                                                               return Html.Raw(item.Subject);
+                                                                           }
+                                                                       }),
+                                                                                            grid.Column("Date", format: (item) =>
+                                                                                            {
+                                                                                                if (item.Status == 0)
+                                                                                                {
+                                                                                                    return Html.Raw("<b>" + item.CreatedOn + "</b>");
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                    return Html.Raw(item.CreatedOn);
+                                                                                                }
+                                                                                            }),
+                      grid.Column("View", style: "gridcellstyle", format: @<text><a href="#" title="open" onclick="Edit(@item.QueryId )"><span class="soap-icon-search-plus fa-3x green-color"></span></a></text>)))
+        @*}*@
+    </div>
+</div>
+@*<div class="=col-md-1"></div>*@
+<script type="text/javascript">
+    $(function () {
+        $(".header th").each(function () {
+            if ($(this).html().trim() == "head") {
+                $(this).html("<input type='checkbox' id='chkAll' />");
+            }
+        });
+        function checkchange() {
+            var ids = "";
+            var cnt = 0;
+            var chkcnt = 0;
+            $(".chk").each(function () {
+                cnt += 1;
+                if ($(this).is(":checked") == true) { ids += $(this).attr("value") + ","; chkcnt += 1; }
+            });
+            if (ids.length > 0) { ids = ids.substr(0, ids.length - 1); }
+            if (ids == "") { $("#div-actions button").attr("disabled", "disabled"); }
+            else { $("#data").val(ids); $("#div-actions button").removeAttr("disabled"); }
+            if (cnt > 0 && chkcnt > 0) {
+                if (cnt == chkcnt) { $("#chkAll").prop('checked', true); }
+                else { $("#chkAll").prop('checked', false); }
+            }
+            else { $("#chkAll").prop('checked', false); }
+        }
+        $(".chk").change(function () { checkchange(); });
+        $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+        $(".webGrid tfoot tr td a").click(function () {
+            $("#chkAll").prop('checked', false);
+            $("#div-actions button").attr("disabled", "disabled");
+            $(".chk").change(function () { checkchange(); });
+            $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+        });
+        $("#div-actions button").click(function () {
+            $("#type").val($(this).attr("data-action"));
+
+            var gettext = $("#type").val();
+            var msg = "";
+            //alert(gettext);
+            if (gettext == "markusunread")
+            {
+               // alert("in")
+                msg = "mark as unread";
+               // alert(msg);
+            }
+            if (gettext == "markusread")
+            {
+                msg = "mark as read";
+            }
+            if (gettext == "archive")
+            {
+                msg = "archive";
+            }
+            if (gettext == "restore")
+            {
+
+                msg = "restore";
+            }
+            if (gettext == "delete")
+            {
+                msg = "delete";
+            }
+
+
+
+
+            if (confirm("Are you sure you want to " + msg + " the selected items?")) {
+                var url = '@Url.Action("ActionSet", "Query")';
+                $.post(url, $("#frmIds").serialize(),
+                        function (data) {
+                            window.location = location;
+                        });
+            }
+        });
+    });
+</script>

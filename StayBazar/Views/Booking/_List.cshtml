@@ -1,0 +1,447 @@
+﻿@model List<CLayer.BookingItem>
+@{
+    /**/
+
+    /**/
+
+    Layout = null;
+    string ratesText;
+    int noOfDays;
+    //decimal TotalTax1 = 0;
+    var RateError = Convert.ToString(TempData["RateError"]);
+}
+
+@if (Model.Count > 0)
+{
+    decimal tax = BLayer.PropertyTax.GetTotalTax(Model[0].PropertyId);
+    //decimal GrantTotalTax = BLayer.BookingItem.GetGrantTotalTaxbyBookingId(Model[0].BookingId);
+
+    List<CLayer.Tax> taxrates = BLayer.Tax.GetAllTypeTaxRate(Model[0].BookingId);
+
+    List<CLayer.Rates> AmadeusRates = (List<CLayer.Rates>)TempData["AmadeusRates"];
+    TempData.Keep("AmadeusRates");
+
+
+    List<CLayer.Tax> Amadeustaxrates = new List<CLayer.Tax>();
+    int InventoryAPIType = (TempData["InventoryAPIType"] == null) ? 0 : (int)TempData["InventoryAPIType"];
+    if (InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+    {
+        foreach (var item in AmadeusRates)
+        {
+
+            CLayer.Tax objTax = new CLayer.Tax();
+
+            if (item.IsCustStateEqualtoBillingEntity)
+            {
+                // objTax.Title = "CGST";
+
+                objTax.TotalCGSTTaxAmount = Math.Round(item.CGSTTax, 2, MidpointRounding.AwayFromZero);
+                objTax.TotalSGSTTaxAmount = Math.Round(item.SGSTTax, 2, MidpointRounding.AwayFromZero);
+                objTax.CGSTTitle = "CGST";
+                objTax.SGSTTitle = "SGST";
+                objTax.CGSTTaxRate = Math.Round(Convert.ToDouble(item.CGSTTaxPercent), 0, MidpointRounding.AwayFromZero);
+                objTax.SGSTTaxRate = Math.Round(Convert.ToDouble(item.SGSTTaxPercent), 0, MidpointRounding.AwayFromZero);
+                //objTax.CGSTTaxRate = (objTax.CGSTTaxRate > 0) ? (objTax.CGSTTaxRate / 2) : Convert.ToDouble(BLayer.Settings.GetValue(CLayer.Settings.CGST_TAXRATE));
+                //objTax.SGSTTaxRate = (objTax.SGSTTaxRate > 0) ? (objTax.SGSTTaxRate / 2) : Convert.ToDouble(BLayer.Settings.GetValue(CLayer.Settings.SGST_TAXRATE));
+                objTax.TotalTaxAmount = objTax.TotalCGSTTaxAmount + objTax.TotalSGSTTaxAmount;
+                objTax.GDSAmount = item.GDSAmount;
+            }
+            else
+            {
+                objTax.TotalIGSTTaxAmount = Math.Round(item.IGSTTax, 2, MidpointRounding.AwayFromZero);
+                objTax.IGSTTitle = "IGST";
+                objTax.IGSTTaxRate = Math.Round(Convert.ToDouble(item.IGSTTaxPercent), 0, MidpointRounding.AwayFromZero);
+                //   objTax.IGSTTaxRate = (objTax.IGSTTaxRate > 0) ? objTax.IGSTTaxRate : Convert.ToDouble(BLayer.Settings.GetValue(CLayer.Settings.IGST_TAXRATE));
+                objTax.TotalTaxAmount = objTax.TotalIGSTTaxAmount;
+                objTax.GDSAmount = item.GDSAmount;
+            }
+
+            Amadeustaxrates.Add(objTax);
+            //insert amadeustaxrates into database
+            long TaxID = BLayer.Tax.GetAmadeusTaxRates(item.BookingCode, Model[0].PropertyId, Model[0].BookingId);
+            objTax.TaxId = Convert.ToInt32(TaxID);
+            objTax.PropertyId = Model[0].PropertyId;
+            objTax.AccommodationId = item.AccommodationId;
+            objTax.BookingId = Model[0].BookingId;
+            objTax.TaxRate = Convert.ToDouble(item.taxpercent);
+            objTax.BookingType = 1;
+
+            objTax.BookingCode = item.BookingCode;
+            BLayer.Tax.AddAmadeusTaxRates(objTax);
+
+        }
+
+    }
+    if (Convert.ToString(TempData["Errorcomes"]) == "error")
+    {
+        <div class="alert alert-danger">
+            <strong>Unable to do booking.Please try again later.</strong>
+        </div>
+    }
+    <div>
+            @foreach (CLayer.BookingItem item in Model)
+            {
+                CLayer.BookingItem RateTax = BLayer.BookingItem.GetTotalTaxDetails(item.BookingItemId);
+
+
+                noOfDays = (item.CheckOut - item.CheckIn).Days;
+                decimal Amtpernit = Math.Round((item.TotalAmount - RateTax.TotalRateTax - RateTax.TotalGuestTax) / noOfDays);
+                ratesText = "";
+                ratesText = BLayer.BookingItem.GetRatesAppliedHtmlFormatted(item.BookingItemId, true);
+                <div class="constant-column-3 timing clearfix">
+                    <div class="check-in">
+                        <label>Check in</label>
+                        <span>@item.CheckIn.ToShortDateString()</span>
+                    </div>
+                    <div class="duration text-center">
+                        <i class="soap-icon-clock"></i>
+                        <span>@(noOfDays) Nights</span>
+                    </div>
+                    <div class="check-out">
+                        <label>Check out</label>
+                        <span>@item.CheckOut.ToShortDateString()</span>
+                    </div>
+                </div>
+                <h4>Other Details</h4>
+                <dl class="other-details">
+                    <dt class="feature">Room type:</dt>
+                    <dd class="value">@item.AccommodationTypeT</dd>
+                    <dt class="feature">Avg daily rate:</dt>
+                    <dd class="value">@(Math.Round((Amtpernit)))</dd>
+                    <dt class="feature">Total Price</dt>
+                    <dd class="value">@(Math.Round(Amtpernit * noOfDays))</dd>
+                </dl>
+            }
+                <div>
+
+                    @if ((taxrates.Count > 0) || (Amadeustaxrates.Count > 0 && InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus))
+                    {
+                    <div>
+                        @if (InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+                        {
+                            <input type="hidden" value="@Amadeustaxrates[0].TaxRate" />
+
+                            <input type="hidden" value="@Amadeustaxrates[0].GDSAmount" />
+                        }
+                        else
+                        {
+                            <input type="hidden" value="@taxrates[0].TaxRate" />
+
+                            <input type="hidden" value="@taxrates[0].GDSAmount" />
+                        }
+                    </div>
+                        <dl class="other-details">
+                            @if (InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+                            {
+                                foreach (CLayer.Tax ttx in Amadeustaxrates)
+                                {
+                                    if (string.IsNullOrEmpty(ttx.IGSTTitle))
+                                    {
+
+                                        string taxtitle = ttx.CGSTTitle + "(" + ttx.CGSTTaxRate + "%)";
+                                        decimal TotalTaxAmount = ttx.TotalCGSTTaxAmount;
+                                        if (TotalTaxAmount > 0)
+                                        {
+                                            <dt class="feature">@taxtitle :</dt>
+                                            <dd class="value">@TotalTaxAmount</dd>
+                                        }
+                                        taxtitle = ttx.SGSTTitle + "(" + ttx.SGSTTaxRate + "%)";
+                                        TotalTaxAmount = ttx.TotalSGSTTaxAmount;
+                                        if (TotalTaxAmount > 0)
+                                        {
+                                            <dt class="feature">@taxtitle :</dt>
+                                            <dd class="value">@TotalTaxAmount</dd>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        string taxtitle = ttx.IGSTTitle + "(" + ttx.IGSTTaxRate + "%)";
+                                        decimal TotalTaxAmount = ttx.TotalIGSTTaxAmount;
+                                        if (TotalTaxAmount > 0)
+                                        {
+                                            <dt class="feature">@taxtitle :</dt>
+                                            <dd class="value">@TotalTaxAmount</dd>
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (CLayer.Tax ttx in taxrates)
+                                {
+                                    string taxtitle = ttx.Title;
+                                    decimal TotalTaxAmount = ttx.TotalTaxAmount;
+                                    if (TotalTaxAmount > 0)
+                                    {
+                                        <dt class="feature">@taxtitle :</dt>
+                                        <dd class="value">@TotalTaxAmount</dd>
+                                    }
+                                }
+                            }
+                            </dl>
+                            }
+                        <dl  class="other-details">
+                            <dt class="total-price">Grand total :</dt>
+                            <dd class="total-price-value">
+                                &#8377 
+                                @if (Model.Count > 0)
+                                {@(Math.Round(BLayer.Bookings.GetTotal(Model[0].BookingId)))}
+                            </dd>
+                        </dl>
+                    </div>
+        </div>
+
+    @*<table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Stay Category</th>
+                <th>Accommodation Type</th>
+                <th>&nbsp;</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+                <th>Quantity</th>
+                <th>No. of nights</th>
+                <td align="right"><span class="bold">Avg. daily rate</span></td>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (CLayer.BookingItem item in Model)
+            {
+                CLayer.BookingItem RateTax = BLayer.BookingItem.GetTotalTaxDetails(item.BookingItemId);
+
+                noOfDays = (item.CheckOut - item.CheckIn).Days;
+                decimal Amtpernit = Math.Round((item.TotalAmount - RateTax.TotalRateTax - RateTax.TotalGuestTax) / noOfDays);
+                <tr>
+                    <td>@item.StayCategoryT</td>
+                    <td colspan="2">@item.AccommodationTypeT</td>
+                    <td>@item.CheckIn.ToShortDateString()</td>
+                    <td>@item.CheckOut.ToShortDateString()</td>
+                    <td>@item.NoOfAccommodations</td>
+                    <td>@(noOfDays)</td>
+                    <td align="right">
+                        <div class="rightalign"><span class="cxcurele">@(Math.Round((Amtpernit)))</span>.00</div>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        Adults: @if (item.NoOfAdults > 0)
+                        {@item.NoOfAdults }
+                    else
+                    {<text>None</text>},
+                        Children: @if (item.NoOfChildren > 0)
+                        {@item.NoOfChildren }
+                    else
+                    {<text>None</text>},
+                        Additional Guests: @if (item.NoOfGuests > 0)
+                        {@item.NoOfGuests }
+                    else
+                    {<text>None</text>}
+                    </td>
+                    <td align="right"><b>Total: <span class="cxcurele">@(Math.Round(Amtpernit * noOfDays))</span>.00</b></td>
+                </tr>
+                ratesText = "";
+                ratesText = BLayer.BookingItem.GetRatesAppliedHtmlFormatted(item.BookingItemId, true);
+                if (ratesText != "")
+                {
+                    <tr>
+                        <td colspan="8">Rates Applied: @Html.Raw(ratesText)</td>
+                    </tr>
+                }
+                ratesText = BLayer.BookingItem.GetOfferAppliedAsString(item.BookingItemId);
+                if (ratesText != "")
+                {
+                    <tr><td colspan="8">Offers Applied: @ratesText</td></tr>
+                }
+            }
+
+            @if ((taxrates.Count > 0) || (Amadeustaxrates.Count > 0 && InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus))
+            {
+                <tr>
+
+                    <td colspan="3" id="GDSTaxes">
+                        @if (InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+                        {
+                            <input type="hidden" value="@Amadeustaxrates[0].TaxRate" />
+
+                            <input type="hidden" value="@Amadeustaxrates[0].GDSAmount" />
+                        }
+                        else
+                        {
+                            <input type="hidden" value="@taxrates[0].TaxRate" />
+
+                            <input type="hidden" value="@taxrates[0].GDSAmount" />
+                        }
+
+
+                    </td>
+
+                    <td colspan="4">
+                        <text>
+                            Taxes Applicable<a id="Taxestooltip" href="#" data-toggle="popover" data-placement="left" data-html="true" data-content="@Html.Partial("~/Views/Booking/_Taxesapplicable.cshtml",Model[0].BookingId)">
+                                <span class="fa fa-info-circle" style="color:#2f5df5;"></span>
+                            </a>
+                        </text>
+                    </td>
+
+                    <td align="right">
+                        @if (InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+                        {
+                            foreach (CLayer.Tax ttx in Amadeustaxrates)
+                            {
+                                if (string.IsNullOrEmpty(ttx.IGSTTitle))
+                                {
+
+                                    string taxtitle = ttx.CGSTTitle + "(" + ttx.CGSTTaxRate + "%)";
+                                    decimal TotalTaxAmount = ttx.TotalCGSTTaxAmount;
+                                    if (TotalTaxAmount > 0)
+                                    {
+                                        <text><b style="font-size:14px;">@taxtitle: <span class="cxcurele">@TotalTaxAmount</span></b></text> <br />
+                                    }
+                                    taxtitle = ttx.SGSTTitle + "(" + ttx.SGSTTaxRate + "%)";
+                                    TotalTaxAmount = ttx.TotalSGSTTaxAmount;
+                                    if (TotalTaxAmount > 0)
+                                    {
+                                        <text><b style="font-size:14px;">@taxtitle: <span class="cxcurele">@TotalTaxAmount</span></b></text> <br />
+                                    }
+                                }
+                                else
+                                {
+                                    string taxtitle = ttx.IGSTTitle + "(" + ttx.IGSTTaxRate + "%)";
+                                    decimal TotalTaxAmount = ttx.TotalIGSTTaxAmount;
+                                    if (TotalTaxAmount > 0)
+                                    {
+                                        <text><b style="font-size:14px;">@taxtitle: <span class="cxcurele">@TotalTaxAmount</span></b></text> <br />
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (CLayer.Tax ttx in taxrates)
+                            {
+                                string taxtitle = ttx.Title;
+                                decimal TotalTaxAmount = ttx.TotalTaxAmount;
+                                if (TotalTaxAmount > 0)
+                                {
+                                    <text><b style="font-size:14px;">@taxtitle: <span class="cxcurele">@TotalTaxAmount</span></b></text> <br />
+                                }
+                            }
+                        }
+
+
+                    </td>
+                </tr>
+            }
+
+
+
+            @{
+                decimal paypalcomm = Convert.ToDecimal(BLayer.Settings.GetValue(CLayer.Settings.PAYPAL_COMMISSION));
+                decimal payco = Math.Round(BLayer.Bookings.getPaypalCommAmt(Model[0].BookingId));
+                long UserId = BLayer.Bookings.GetBookedByUserId(Model[0].BookingId);
+                CLayer.User dat = BLayer.User.GetCountrUser(UserId);
+                string ct = dat.Country;
+                if (ct != "India")
+                {
+                    <tr>
+                        <td colspan="3"></td>
+
+                        <td colspan="4"></td>
+
+                        <td align="right">
+                            <b style="font-size:14px;">International Processing fees: <span class="cxcurele">@payco</span>.00</b>
+                        </td>
+                    </tr>
+                }
+            }
+
+
+
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="4"></td>
+                <td align="right">
+                    Grand Total: <b>
+                        <span class="fa cxprice fa-rupee">
+                            <b>
+                                <span id="grandTotal" class="cxcurele">
+                                    @if (Model.Count > 0)
+                                    {@(Math.Round(BLayer.Bookings.GetTotal(Model[0].BookingId))) }
+                                else
+                                {@("0")}
+                                </span><span class="cxcurele">.00</span>
+                            </b>
+                        </span>
+                    </b>
+                </td>
+            </tr>
+            <tr id="lastRowBooking" class="hidden">
+                <td colspan="7" align="right">
+                    &nbsp;<span id="inrGrandTotal">
+                        Grand Total in INR <span>
+                            @if (Model.Count > 0)
+                            {@(Math.Round(BLayer.Bookings.GetTotal(Model[0].BookingId)))
+                        }
+                        else
+                        {@("0")}
+                        </span><span class="cxcurele">.00</span>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>*@
+
+    @*<div class="row">
+        <div class="col-md-12">
+            <p style="background-color:#eee; padding:5px;">Please complete booking using payment options as above. You can make payment using any of these:  Visa, MasterCard, American Express, Netbanking (most banks), Debit cards, JCB, Diners Club</p>
+        </div>
+    </div>*@
+    <script type="text/javascript">
+        $(function () {
+            $('#Taxestooltip').popover({ trigger: "hover" });
+        });
+
+
+        $(function () {
+            $('#Paypalcommtooltip').popover({ trigger: "hover" });
+        });
+
+        function showGrandTotal() {
+            if ($("#curPick").val() == "INR") {
+                $("#lastRowBooking").addClass("hidden");
+                $("#inrGrandTotal").addClass("hidden");
+            }
+            else {
+                $("#lastRowBooking").removeClass("hidden");
+                $("#inrGrandTotal").removeClass("hidden");
+            }
+        }
+    </script>
+}
+else if (RateError == "696")
+{
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="alert alert-info">
+                Selected accommodation not available at this moment.please try later!
+            </div>
+        </div>
+    </div> @* leave empty function to avoid javascript error - this gets called while currency changed *@
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="alert alert-info">
+                You haven't selected any stays!
+            </div>
+        </div>
+    </div> @* leave empty function to avoid javascript error - this gets called while currency changed *@
+    <script type="text/javascript">
+        function showGrandTotal() {
+
+        }
+    </script>
+}

@@ -1,0 +1,159 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    Layout=null;
+	long i = 0;
+    decimal tt = 0;
+    decimal m = 0;
+
+
+    long totalnights = 0;
+
+
+    int bookingType = 0;
+    double gross = 0;
+
+
+    double AmountBeforeServiceTax = 0;
+    double totalAmountBeforeTax = 0;
+    double totalSupplierAmountBeforeTax = 0;
+	
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" />
+        </ss:Style>
+  <ss:Style ss:ID="DateLiteral">
+         <NumberFormat ss:Format="0"/>
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="Customer Invoice Report">
+        <ss:Table>
+            <ss:Row ss:StyleID="1">
+					<ss:Cell><ss:Data ss:Type="String">Sl No</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">Booking Category</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Billing Entity</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Invoice Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Invoice No</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Booking ID</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Customer Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Customer State</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Property City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Property State</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Guest Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Check In Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Check Out Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total Room Night</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total Customer Value Before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total Supplier value before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Gross Margin</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">ORC Amount</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Net Margin</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">ORC Payee Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Bank</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Branch</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Account No</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">PAN</ss:Data></ss:Cell>
+            </ss:Row>
+            @foreach (CLayer.OfflineBooking pr in Model)
+            {
+                 i = i + 1;
+                       //if (pr.Noofnight > 0)
+                       //{
+                       //    totalnights = pr.NoOfRooms * pr.Noofnight;
+                       //}
+                       //else
+                       //{
+                       //    totalnights = pr.NoOfRooms;
+                       //}
+                       totalnights = pr.TotalNights;
+                       m = totalnights * pr.AvgDailyRateBefreStaxForSalePrice;
+                       tt = pr.AvgDailyRateBefreStaxForSalePrice * totalnights;
+
+                       bookingType = pr.BookingTypeInt;
+
+
+                       DateTime checkin = pr.CheckIn_date;
+                       DateTime checkout = pr.CheckOut_date;
+                       TimeSpan ts = checkout - checkin;
+                       int differenceInDays = ts.Days;
+
+                       long NoOfPaxAdultS = pr.NoOfPaxAdult;
+
+                       long NoOfPaxChild = pr.NoOfPaxChild;
+                       long NOofPax = (NoOfPaxAdultS + NoOfPaxChild);
+
+                       //Customer Value -- amount without tax
+                       if (bookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                       {
+
+                           AmountBeforeServiceTax = (double)((pr.AvgDailyRateBefreStaxForSalePrice * totalnights)) + pr.VSalePriceBeforeTax;
+                           totalSupplierAmountBeforeTax = (double)((pr.AvgDailyRateBefreStaxForBuyPrice * totalnights)) + pr.VBuyPriceBeforeTax;
+                       }
+                       else
+                       {
+                           AmountBeforeServiceTax = pr.DirectAmount + pr.VSalePriceBeforeTax;
+                           totalSupplierAmountBeforeTax = (double)((pr.AvgDailyRateBefreStaxForBuyPrice * totalnights)) + pr.VBuyPriceBeforeTax;
+                       }
+
+
+                       double Otherservicesamount = Math.Round((double)pr.BuyPriceforotherservicesForSalePrice, 2);
+                       double OtherServicesBuy = (double)pr.BuyPriceforotherservicesForBuyprice;
+
+
+                       totalAmountBeforeTax = AmountBeforeServiceTax + Otherservicesamount;
+
+                       totalSupplierAmountBeforeTax = totalSupplierAmountBeforeTax + OtherServicesBuy;
+
+                       if (bookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                       { gross = totalAmountBeforeTax - totalSupplierAmountBeforeTax; }
+                       else
+                       { gross = pr.DirectAmount + ((Otherservicesamount - OtherServicesBuy) + (pr.VSalePriceBeforeTax - pr.VBuyPriceBeforeTax)); }
+                       //Supplier Value -- amount without tax
+                       // decimal TotalAmountBeforeServiceTaxSupplier = ((pr.AvgDailyRateBefreStaxForBuyPrice * total));
+                       // decimal OtherservicesamountSupplier = Math.Round(pr.BuyPriceforotherservicesForBuyprice, 2);
+
+                       //                       decimal TotalAmountBeforeServiceTaxSupplierandOtherservicesamountSupplier = TotalAmountBeforeServiceTaxSupplier + OtherservicesamountSupplier;
+
+                       
+                <ss:Row>
+                
+                    <ss:Cell><ss:Data ss:Type="Number">@i</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@if (bookingType == (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+                        {
+                        <text>TAC Booking</text>}
+                        else {
+                            if (bookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                            { <text>Direct Booking</text>}
+                            else {  <text>Regular Booking</text>}
+                        }</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.SBEntityName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.InvoiceDate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.InvoiceNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.ConfirmationNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.FirstName</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.CustomerStatename</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.PropertyName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.City</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.PropertyStatename</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.Guestname</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.CheckIn_date.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.CheckOut_date.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@totalnights</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(totalAmountBeforeTax,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(totalSupplierAmountBeforeTax,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(gross,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(pr.ORCAmount,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(gross-pr.ORCAmount,0)</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.AgentName</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.AgentBank</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.AgentBranch</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.AgentAccount</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@pr.AgentPAN</ss:Data></ss:Cell>
+</ss:Row>
+            }
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

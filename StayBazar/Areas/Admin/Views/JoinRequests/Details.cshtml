@@ -1,0 +1,434 @@
+﻿@model StayBazar.Areas.Admin.Models.B2BModel
+@{
+    ViewBag.Title = "Join Requests/" + Model.Name;
+}
+<br />
+<div class="col-lg-12">
+    <div class="col-lg-8">
+        <span class="h2">
+            @if (@Model.UserType == (int)CLayer.Role.Roles.Agent)
+            {
+            <a href="/Admin/JoinRequests/TravelAgent">Join Requests</a>
+            }
+            else if (@Model.UserType == (int)CLayer.Role.Roles.Corporate)
+            {
+            <a href="/Admin/JoinRequests/Corporate">Join Requests</a>
+            }
+            else if (@Model.UserType == (int)CLayer.Role.Roles.Affiliate)
+            {
+            <a href="/Admin/JoinRequests/Affiliates">Join Requests</a>
+            }
+            else
+            {
+            <a href="/Admin/JoinRequests/Supplier">Join Requests</a>
+            }
+            @Model.Name
+        </span>
+    </div>
+    <div class="col-lg-4">
+        <div class="btn-group">
+            @if (Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.Read ||
+        Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.NotVerified ||
+        Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.Unread)
+            {
+                <a href="/Admin/JoinRequests/Accept/@Model.B2BId" class="btn btn-default" onclick="return confirm('Are you sure you want to mark this request as accepted?')">Accept</a>
+                <a href="/Admin/JoinRequests/Reject/@Model.B2BId" class="btn btn-danger" onclick="return confirm('Are you sure you want to mark this request as rejected?')">Reject</a>
+            }
+            else
+            {
+                <span class="h3"><span class="label label-danger">@(((CLayer.ObjectStatus.StatusType)Model.RequestStatus).ToString())</span></span>
+            }
+        </div>
+        @if (Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.Read ||
+        Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.NotVerified ||
+        Model.RequestStatus == (int)CLayer.ObjectStatus.StatusType.Unread)
+        {
+            <a href="/Admin/JoinRequests/Markasunread/@Model.B2BId" class="btn btn-default" onclick="return confirm('Are you sure you want to mark this request as unread?')">Mark as Unread</a>
+        }
+
+    </div>
+</div>
+<br />
+<hr />
+<div class="col-lg-12">
+    <div class="col-lg-6">
+        <div class="form-group">
+            @Html.LabelFor(m => m.UserType)<br />
+            @(((CLayer.Role.Roles)Model.UserType).ToString())
+        </div>
+        <div class="form-group">
+            @*@Html.LabelFor(m => m.Name)*@<label>Business Name</label><br />
+            @Html.DisplayFor(m => m.Name, new { @class = "form-control input-sm" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email)<br />
+            @Html.DisplayFor(m => m.Email, new { @class = "form-control input-sm" })
+        </div>
+        @*For Affiliate*@
+        @if (Model.UserType == (int)CLayer.Role.Roles.Affiliate)
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.ServiceTaxRegNo)<br />
+                @Html.DisplayFor(m => m.ServiceTaxRegNo, new { @class = "form-control input-sm" })
+            </div>
+        }
+        @if (Model.UserType == (int)CLayer.Role.Roles.Corporate)
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.ServiceTaxRegNo)<br />
+                @Html.DisplayFor(m => m.ServiceTaxRegNo, new { @class = "form-control input-sm" })
+            </div>
+            {
+                CLayer.B2B obj11 = BLayer.B2B.Get(Model.B2BId);
+                Model.PANNo = obj11.PANNo;
+                Model.ContactDesignation = obj11.ContactDesignation;
+            }
+            <div class="form-group">
+                @Html.LabelFor(m => m.PANNo)<br />
+                @Html.DisplayFor(m => m.PANNo, new { @class = "form-control input-sm" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ContactDesignation)<br />
+                @Html.DisplayFor(m => m.ContactDesignation, new { @class = "form-control input-sm" })
+            </div>
+        }
+        @if (Model.UserType == (int)CLayer.Role.Roles.Agent)
+        {
+            <div class="form-group hidden">
+                @Html.LabelFor(m => m.MarkupPercent)
+                @Html.TextBoxFor(m => m.MarkupPercent, new { @class = "form-control input-sm" })
+            </div>
+            <div class="form-group hidden">
+                @Html.LabelFor(m => m.CommissionPercent)
+                @Html.TextBoxFor(m => m.CommissionPercent, new { @class = "form-control input-sm" })
+            </div>
+        }
+        else
+        {
+            <div class="form-group ">
+                @Html.LabelFor(m => m.ContactName)<br />
+                @Html.DisplayFor(m => m.ContactName, new { @class = "form-control input-sm" })
+            </div>
+
+        }
+
+        @if (Model.UserType == (int)CLayer.Role.Roles.Supplier)
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.VATRegNo)<br />
+                @Html.DisplayFor(m => m.VATRegNo, new { @class = "form-control input-sm" })
+            </div>
+            <hr />
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyDescription)<br />
+                @Html.DisplayFor(m => m.PropertyDescription, new { @class = "form-control input-sm" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.AvailableProperties)<br />
+                @Html.DisplayFor(m => m.AvailableProperties, new { @class = "form-control input-sm" })
+            </div>
+        }
+        @*For Affiliate*@
+        @if (Model.UserType == (int)CLayer.Role.Roles.Affiliate)
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.VATRegNo)<br />
+                @Html.DisplayFor(m => m.VATRegNo, new { @class = "form-control input-sm" })
+            </div>
+            <hr />
+            @*<div class="form-group">
+                    @Html.LabelFor(m => m.PropertyDescription)<br />
+                    @Html.DisplayFor(m => m.PropertyDescription, new { @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AvailableProperties)<br />
+                    @Html.DisplayFor(m => m.AvailableProperties, new { @class = "form-control input-sm" })
+                </div>*@
+
+        }
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel">
+            <h3 class="btn-group">Addresses</h3>
+            @{
+                bool primaryShown = false;
+            }
+            @foreach (CLayer.Address dr in Model.Addresses)
+            {
+                string CountryName = "";
+                string StateName = "";
+                CLayer.Country cntry = BLayer.Country.Get(dr.CountryId);
+                if (cntry != null) { CountryName = cntry.Name; }
+                CLayer.State st = BLayer.State.Get(dr.State);
+                if (st != null) { StateName = st.Name; }
+            <div>
+                @dr.AddressText,
+                <br />Country: @CountryName,
+                <br />State: @StateName,
+                @if (dr.CityId < 0)
+                    {
+                    <text><br />City: @dr.City</text>
+                    }
+                    else
+                    {
+                        CLayer.City thisCity = BLayer.City.Get(dr.CityId);
+                        if (thisCity != null)
+                        {
+                    <text><br />City: @thisCity.Name</text>
+                        }
+                    },
+                @if (dr.ZipCode != "")
+                    {
+                    <text><br />Zip Code:</text> @dr.ZipCode<text>,</text>
+                    }
+                <br />Phone: @dr.Phone
+                @if (dr.Mobile != "")
+                    {
+                    <text>,<br />Mobile:</text> @dr.Mobile<text></text>
+                    }
+                <br />
+                @if (!primaryShown)
+                    {
+                        if (dr.AddressType == (int)CLayer.Address.AddressTypes.Primary)
+                        {
+                    <span class="label label-primary">Primary</span>
+                            primaryShown = true;
+                        }
+                    }
+            </div>
+            <hr />
+            }
+        </div>
+    </div>
+
+
+    @if (Model.UserType == (int)CLayer.Role.Roles.Supplier)
+    {
+        <div class="col-lg-6">
+            <div class="panel">
+                <h3>Bank Details</h3>
+                <label>Account Name:</label>@Model.BankDetails.AccountName<br />
+                <label>Account Number:</label>@Model.BankDetails.AccountNumber<br />
+                <label>Bank Name:</label>@Model.BankDetails.BankName<br />
+                <label>Branch Address:</label>@Model.BankDetails.BranchAddress<br />
+                <label>MICR Code:</label>@Model.BankDetails.MICRCode<br />
+                <label>RTGS Number:</label>@Model.BankDetails.RTGSNumber
+            </div>
+        </div>
+    }
+    @*For Affiliate*@
+    @if (Model.UserType == (int)CLayer.Role.Roles.Affiliate)
+    {
+        <div class="col-lg-6">
+            <div class="panel">
+                <h3>Bank Details</h3>
+                <label>Account Name:</label>@Model.BankDetails.AccountName<br />
+                <label>Account Number:</label>@Model.BankDetails.AccountNumber<br />
+                <label>Bank Name:</label>@Model.BankDetails.BankName<br />
+                <label>Branch Address:</label>@Model.BankDetails.BranchAddress<br />
+                <label>MICR Code:</label>@Model.BankDetails.MICRCode<br />
+                <label>RTGS Number:</label>@Model.BankDetails.RTGSNumber
+            </div>
+        </div>
+    }
+
+</div>
+<ul class="mytab nav nav-tabs" id="myTab">
+    @if (Model.UserType == (int)CLayer.Role.Roles.Agent)
+    {
+        <li class="active"><a href="#brc" data-toggle="tab">Business Registration Certificate</a></li>
+        <li><a href="#streg" data-toggle="tab">Service Tax Reg</a></li>
+        <li><a href="#pan" data-toggle="tab">PAN</a></li>
+        <li><a href="#coc" data-toggle="tab">Copy of Cheque</a></li>
+    }
+    else if (Model.UserType == (int)CLayer.Role.Roles.Supplier)
+    {
+        <li class="active"><a href="#streg" data-toggle="tab">Service Tax Reg</a></li>
+        <li><a href="#vatreg" data-toggle="tab">VAT</a></li>
+    }
+    @*For Affiliate*@
+    else if (Model.UserType == (int)CLayer.Role.Roles.Affiliate)
+    {
+        <li class="active"><a href="#streg" data-toggle="tab">Service Tax Reg</a></li>
+        <li><a href="#vatreg" data-toggle="tab">VAT</a></li>
+    }
+    else if (Model.UserType == (int)CLayer.Role.Roles.Corporate)
+    {
+        <li class="active"><a href="#streg" data-toggle="tab">Service Tax Reg</a></li>
+        <li><a href="#pan" data-toggle="tab">PAN</a></li>
+    }
+    else
+    {
+        <li style="display:none;" class="active"><a href="#streg" data-toggle="tab">Company Reg</a></li>
+    }
+</ul>
+<div class="tab-content">
+    @{
+        string extensions = System.Configuration.ConfigurationManager.AppSettings.Get("NonImageDocumentFileTypes");
+        string[] allowedFileExtensions = extensions.Split(',');
+    }
+    @if (Model.UserType == (int)CLayer.Role.Roles.Corporate)
+    {
+        <div class="tab-pane" id="pan">
+            @{CLayer.UserFiles pan = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.PANCard);}
+            @if (pan != null)
+            {
+                if (allowedFileExtensions.Contains(pan.FileName.Substring(pan.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@pan.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@pan.FileName" alt="PANCard" class="img-thumbnail" />
+                }
+            }
+        </div>
+
+    }
+    @if (Model.UserType == (int)CLayer.Role.Roles.Agent)
+    {
+        <div class="tab-pane active" id="brc">
+            @{CLayer.UserFiles brc = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.BusinessRegistrationCertificate);}
+            @if (brc != null)
+            {
+                if (allowedFileExtensions.Contains(brc.FileName.Substring(brc.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@brc.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@brc.FileName" alt="BusinessRegistrationCertificate" class="img-thumbnail" />
+                }
+            }
+        </div>
+        <div class="tab-pane" id="streg">
+            @{CLayer.UserFiles str = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.ServiceTaxRegNo);}
+            @if (str != null)
+            {
+                if (allowedFileExtensions.Contains(str.FileName.Substring(str.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@str.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@str.FileName" alt="ServiceTaxRegNo" class="img-thumbnail" />
+                }
+            }
+        </div>
+        <div class="tab-pane" id="pan">
+            @{CLayer.UserFiles pan = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.PANCard);}
+            @if (pan != null)
+            {
+                if (allowedFileExtensions.Contains(pan.FileName.Substring(pan.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@pan.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@pan.FileName" alt="PANCard" class="img-thumbnail" />
+                }
+            }
+        </div>
+        <div class="tab-pane" id="coc">
+            @{CLayer.UserFiles coc = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.CopyOfCheque);}
+            @if (coc != null)
+            {
+                if (allowedFileExtensions.Contains(coc.FileName.Substring(coc.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@coc.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@coc.FileName" alt="CopyOfCheque" class="img-thumbnail" />
+                }
+            }
+        </div>
+    }
+    else if (Model.UserType == (int)CLayer.Role.Roles.Supplier)
+    {
+        <div class="tab-pane active" id="streg">
+            @{CLayer.UserFiles str = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.ServiceTaxRegNo);}
+            @if (str != null)
+            {
+                if (allowedFileExtensions.Contains(str.FileName.Substring(str.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@str.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@str.FileName" alt="ServiceTaxRegNo" class="img-thumbnail" />
+                }
+            }
+        </div>
+        <div class="tab-pane" id="vatreg">
+            @{CLayer.UserFiles vat = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.VATRegNo);}
+            @if (vat != null)
+            {
+                if (allowedFileExtensions.Contains(vat.FileName.Substring(vat.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@vat.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@vat.FileName" alt="VATRegNo" class="img-thumbnail" />
+                }
+            }
+        </div>
+    }
+    @*For Affiliate*@
+    else if (Model.UserType == (int)CLayer.Role.Roles.Affiliate)
+    {
+        <div class="tab-pane active" id="streg">
+            @{CLayer.UserFiles str = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.ServiceTaxRegNo);}
+            @if (str != null)
+            {
+                if (allowedFileExtensions.Contains(str.FileName.Substring(str.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@str.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@str.FileName" alt="ServiceTaxRegNo" class="img-thumbnail" />
+                }
+            }
+        </div>
+        <div class="tab-pane" id="vatreg">
+            @{CLayer.UserFiles vat = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.VATRegNo);}
+            @if (vat != null)
+            {
+                if (allowedFileExtensions.Contains(vat.FileName.Substring(vat.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@vat.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@vat.FileName" alt="VATRegNo" class="img-thumbnail" />
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <div class="tab-pane active" id="streg">
+            @{CLayer.UserFiles str = BLayer.UserFiles.GetOnUserAndType(Model.B2BId, (int)CLayer.UserFiles.Documents.ServiceTaxRegNo);}
+            @if (str != null)
+            {
+                if (allowedFileExtensions.Contains(str.FileName.Substring(str.FileName.LastIndexOf('.'))))
+                {
+                    <a href="~/Files/Users/@Model.UserId/@str.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                }
+                else
+                {
+                    <img src="~/Files/Users/@Model.UserId/@str.FileName" alt="ServiceTaxRegNo" class="img-thumbnail" />
+                }
+            }
+        </div>
+    }
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#myTab').tab();
+    })
+</script>
+

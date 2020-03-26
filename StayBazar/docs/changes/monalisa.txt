@@ -1,0 +1,542 @@
+13-01-2020
+
+DELIMITER $$
+  
+DROP PROCEDURE `Property_Amadeus_Save` 
+$$
+CREATE  PROCEDURE `Property_Amadeus_Save`(
+						    INout pPropertyId BIGINT,
+						     IN pTitle VARCHAR(100),
+						     IN pDescription VARCHAR(1000),
+						     IN pLocation VARCHAR(200),
+						     IN pStatus INT(11),
+						     IN pOwnerId BIGINT(20),
+						     pPositionLat VARCHAR(15),
+						     pPositionLng VARCHAR(15),
+						     pAddress varchar(500),
+						     pCountryId INT,
+						     pState int,
+						     pCity varchar(50),
+						     pCityID INT,
+						     pZipCode varchar(200),
+						     pInventoryAPIType INT,
+						     pHotelId varchar(500),
+						     pTBOHotelId varchar(25),
+						     pTBOFlag char(1),
+						     pTamarindHotelId varchar(25),
+						     pTamarindFlag char(1)
+    )
+BEGIN
+  IF not EXISTS (SELECT *  FROM property WHERE (tbo_hotelid = pTBOHotelId and InventoryAPIType = 5) or (tamarind_hotelid = pTamarindHotelId and InventoryAPIType = 4)) THEN
+  INSERT INTO property(Title,Description,Location,`Status`,OwnerId,PositionLat,PositionLng,Address,Country,State,City,CityID,ZipCode,InventoryAPIType,Hotel_Id,tamarind_flag,tamarind_hotelid,tbo_flag,tbo_hotelid)
+			VALUES(pTitle,pDescription,pLocation,pStatus,pOwnerId,PositionLat,PositionLng,pAddress,pCountryId,pState,pCity,pCityID,pZipCode,pInventoryAPIType,pHotelId,pTamarindFlag,pTamarindHotelId,pTBOFlag,pTBOHotelId);
+			SELECT LAST_INSERT_ID() INTO pPropertyId;
+ else
+	UPDATE property SET
+			Title = pTitle,
+			-- Description = pDescription,
+			Location = pLocation,
+			`Status` = pStatus,
+			OwnerId = pOwnerId,
+			PositionLat = pPositionLat,
+			PositionLng = pPositionLng,
+			Address=pAddress,
+			Country = pCountryId,
+			State=pState,
+			City=pCity,
+			CityID=pCityID,
+			ZipCode=pZipCode,
+			Hotel_Id=pHotelId
+		WHERE
+		    tbo_hotelid = pTBOHotelId or tamarind_hotelid = pTamarindHotelId;
+		    
+		    set pPropertyId=(SELECT propertyid  FROM property WHERE (tbo_hotelid = pTBOHotelId and InventoryAPIType = 5) or (tamarind_hotelid = pTamarindHotelId and InventoryAPIType = 4));
+  end if;
+  select pPropertyId;
+    END
+ $$
+  
+    DROP PROCEDURE `propertyfiles_Save`
+$$
+CREATE  PROCEDURE `propertyfiles_Save`(in pFileId bigINT,
+					in pPropertyId bigint,
+					in pFileName VARCHAR(250))
+BEGIN
+IF not EXISTS (SELECT *  FROM propertyfiles WHERE PropertyId = pPropertyId and FileName = pFileName) THEN
+	-- IF pFileId < 1 THEN
+		INSERT INTO propertyfiles (PropertyId,FileName)
+			VALUES (pPropertyId,pFileName);
+			-- ,
+			-- IN pFileType INT(11)
+			 -- ,FileType
+			 -- ,pFileType
+		SET pFileId = LAST_INSERT_ID();
+	-- ELSE
+	--	UPDATE files SET 
+	--		PropertyId = pPropertyId, 
+	--		FileName = pFileName 
+	--	WHERE FileId = pFileId;
+	-- END IF;
+	SELECT pFileId;
+end if;
+END $$
+DELIMITER;
+
+----------------------------------------------------------------------------------------------------------------
+17-01-2020
+
+alter TABLE property ADD COLUMN tamarind_RateCardDetailId varchar(50)
+$$
+alter table accommodationtype add column tamarind_flag char(1)
+$$
+alter table accommodationtype add column tam_catid int 
+$$
+DROP PROCEDURE `Property_Amadeus_Save`
+$$
+CREATE  PROCEDURE `Property_Amadeus_Save`(
+						    INout pPropertyId BIGINT,
+						     IN pTitle VARCHAR(100),
+						     IN pDescription VARCHAR(1000),
+						     IN pLocation VARCHAR(200),
+						     IN pStatus INT(11),
+						     IN pOwnerId BIGINT(20),
+						     pPositionLat VARCHAR(15),
+						     pPositionLng VARCHAR(15),
+						     pAddress varchar(500),
+						     pCountryId INT,
+						     pState int,
+						     pCity varchar(50),
+						     pCityID INT,
+						     pZipCode varchar(200),
+						     pInventoryAPIType INT,
+						     pHotelId varchar(500),
+						     pTBOHotelId varchar(25),
+						     pTBOFlag char(1),
+						     pTamarindHotelId varchar(25),
+						     pTamarindFlag char(1),
+						     pRateCardDetailedId varchar(50)
+    )
+BEGIN
+  IF not EXISTS (SELECT *  FROM property WHERE (tbo_hotelid = pTBOHotelId 
+  					and InventoryAPIType = 5) or (tamarind_hotelid = pTamarindHotelId 
+  					and InventoryAPIType = 4)) THEN
+  
+  INSERT INTO property(Title,Description,Location,`Status`,OwnerId,PositionLat,
+  PositionLng,Address,Country,State,City,CityID,ZipCode,InventoryAPIType,
+  Hotel_Id,tamarind_flag,tamarind_hotelid,tbo_flag,tbo_hotelid,tamarind_RateCardDetailId)
+  VALUES(pTitle,pDescription,pLocation,pStatus,pOwnerId,PositionLat,PositionLng,
+  pAddress,pCountryId,pState,pCity,pCityID,pZipCode,pInventoryAPIType,pHotelId,
+  pTamarindFlag,pTamarindHotelId,pTBOFlag,pTBOHotelId,pRateCardDetailedId);
+				
+  SELECT LAST_INSERT_ID() INTO pPropertyId;
+ else
+	UPDATE property SET
+			Title = pTitle,
+			-- Description = pDescription,
+			Location = pLocation,
+			`Status` = pStatus,
+			OwnerId = pOwnerId,
+			PositionLat = pPositionLat,
+			PositionLng = pPositionLng,
+			Address=pAddress,
+			Country = pCountryId,
+			State=pState,
+			City=pCity,
+			CityID=pCityID,
+			ZipCode=pZipCode,
+			Hotel_Id=pHotelId,
+			tamarind_RateCardDetailId=pRateCardDetailedId
+		WHERE
+		    tbo_hotelid = pTBOHotelId or tamarind_hotelid = pTamarindHotelId;
+		    
+		    set pPropertyId=(SELECT propertyid  FROM property WHERE (tbo_hotelid = pTBOHotelId and InventoryAPIType = 5) or (tamarind_hotelid = pTamarindHotelId and InventoryAPIType = 4));
+  end if;
+  select pPropertyId;
+    END
+    $$
+    create procedure Sp_GetPropertyRateCardDetail ( pPropertyId BIGINT)
+	BEGIN
+	select tamarind_RateCardDetailId from property WHERE PropertyId = pPropertyId; 
+	END
+	$$
+	create procedure Sp_GetTamrindCityId ( pPropertyId BIGINT)
+BEGIN
+	select cityid from city where tamarind_flag = 'y' and 
+	tam_cityid=(select CityId from property 
+	WHERE PropertyId = pPropertyId);
+END
+$$
+DROP PROCEDURE `sp_accommodationtype_Save`
+
+GO
+
+CREATE  PROCEDURE `sp_accommodationtype_Save`( 
+						     IN pTitle VARCHAR(50),
+						     in pCatID int
+						    )
+BEGIN
+	IF not EXISTS (SELECT *  FROM accommodationtype WHERE Title = pTitle) THEN 
+		INSERT INTO accommodationtype(`Title`,tamarind_flag,tam_catid)
+			VALUES(pTitle,'Y',pCatID);
+			SELECT  LAST_INSERT_ID() As TypeId;
+	else 
+		update accommodationtype set tamarind_flag = 'Y',tam_catid = pCatID
+		where Title = pTitle;
+		SELECT AccommodationTypeId As TypeId FROM accommodationtype 
+		WHERE Title = pTitle order by AccommodationTypeId desc limit 1;
+	END IF;
+END
+$$
+-----------------------------------------------------------------------------------------------
+
+18-01-2020
+
+create procedure Sp_GetAccommodation_tamcatid(pAccommodationId BIGINT)
+begin
+	select tam_catid from accommodationtype 
+	where tamarind_flag = 'Y' and accommodationtypeid = (select AccommodationTypeId from accommodation
+	where accommodationid = pAccommodationId);
+end
+----------------------------------------------------------------------------------------------------
+Above codes are merged done in server
+-----------------------------------------------------------------------------------------------------
+24-01-2020
+
+DROP PROCEDURE `sp_accommodation_save_byapi`
+$$
+CREATE  PROCEDURE `sp_accommodation_save_byapi`(
+						     IN pAccommodationTypeId int(11),
+						     in pStayCategoryId int(11),
+						     in pAccommodationCount int(11),
+						     in pPropertyId bigint(20),
+						     in pDescription text,						
+						     in pMaxNoOfPeople int(11),
+						     in pMaxNoOfChildren int(11),
+						     in pMinNoOfPeople int(11),
+						     in pBedRooms int(11),
+						     in pArea decimal(14,2),
+						     in pStatus int(11),
+						     in pUpdatedBy bigint(20),
+						     in pTotalAccommodations int
+						    )
+BEGIN
+IF not EXISTS (SELECT *  FROM accommodation WHERE PropertyId = pPropertyId 
+				and AccommodationTypeId = pAccommodationTypeId and StayCategoryId = pStayCategoryId) THEN
+		INSERT INTO accommodation(AccommodationTypeId,StayCategoryId,AccommodationCount,PropertyId,
+				Description,MaxNoOfPeople,MaxNoOfChildren,MinNoOfPeople,
+				BedRooms,`Area`,`Status`,UpdatedBy,TotalAccommodations)
+			VALUES(pAccommodationTypeId,pStayCategoryId,pAccommodationCount,pPropertyId,
+				pDescription,pMaxNoOfPeople,pMaxNoOfChildren,pMinNoOfPeople,
+				pBedRooms,pArea,pStatus,pUpdatedBy,pTotalAccommodations);
+			SELECT LAST_INSERT_ID() as AccommodationId;
+	else
+		update accommodation set Status = 1,AccommodationCount = pAccommodationCount  
+		where PropertyId = pPropertyId;
+		SELECT AccommodationId  FROM accommodation WHERE PropertyId = pPropertyId;
+END IF;
+END
+$$
+DROP PROCEDURE `SP_inventory_Save`
+$$
+CREATE  PROCEDURE `SP_inventory_Save`(pAccommodationId bigint,pQuantity int,pFromDate date,pTodate date)
+BEGIN
+IF not EXISTS (SELECT *  FROM inventory WHERE AccommodationId = pAccommodationId ) THEN
+        insert into inventory(AccommodationId,Quantity,FromDate,ToDate)
+        values(pAccommodationId,pQuantity,pFromDate,pTodate);
+        SELECT LAST_INSERT_ID() as InventoryId;
+ else
+        Update inventory set 
+        AccommodationId=pAccommodationId,
+        Quantity=pQuantity,
+        FromDate=pFromDate,ToDate=pTodate where InventoryId=pInventoryId;
+        select pAccommodationId;
+  end if;
+END
+$$
+DROP PROCEDURE `sp_API_rates_Save`
+$$
+CREATE  PROCEDURE `sp_API_rates_Save`(
+    pAccommodationId BIGINT, pRateFor INT,
+    pDailyRate DECIMAL(16,2), pWeeklyRate DECIMAL(16,2),pMonthlyRate DECIMAL(16,2),pLongTermRate DECIMAL(16,2),pGuestRate DECIMAL(16,2),
+    pStartDate DATE,pEndDate DATE,pStatus INT,IsB2CMarkup BIT, pUser BIGINT)
+ratesave:BEGIN
+	DECLARE vShortTerm DECIMAL(5,2);
+	DECLARE vLongTerm DECIMAL(5,2);
+	DECLARE vPropertyId BIGINT;
+	declare vTax DECIMAL(16,2);
+	declare vpDailyRatetax DECIMAL(16,2);
+	DECLARE vpWeeklyRatetax DECIMAL(16,2);
+	DECLARE vpMonthlyRatetax DECIMAL(16,2);
+	DECLARE vpLongTermRatetax DECIMAL(16,2);
+	
+	SELECT PropertyId INTO vPropertyId FROM accommodation WHERE AccommodationId = pAccommodationId;
+		
+	IF vPropertyId IS NULL THEN
+		LEAVE ratesave;
+	END IF;
+	
+ -- set tax values 
+	SELECT SUM(pt.TaxValue) into  vTax FROM propertyTax pt WHERE  pt.PropertyId=vPropertyId;
+	
+	IF vTax IS NULL THEN
+			SET vTax = 0;
+	END IF;	
+		
+	-- set vpDailyRatetax = pDailyRate -((pDailyRate * vTax)/100);
+	-- SET vpWeeklyRatetax =pWeeklyRate- ((pWeeklyRate * vTax)/100);	
+	-- SET vpMonthlyRatetax = pMonthlyRate-((pMonthlyRate * vTax)/100);
+	-- SET vpLongTermRatetax =pLongTermRate- ((pLongTermRate * vTax)/100);
+	
+	SET vpDailyRatetax =  ROUND(pDailyRate / ( 1 + (vTax/100) ) );
+	SET vpWeeklyRatetax = ROUND(pWeeklyRate / ( 1 + (vTax/100) ));	
+	SET vpMonthlyRatetax = ROUND( pMonthlyRate / ( 1 + (vTax/100) ));
+	SET vpLongTermRatetax = ROUND(pLongTermRate / ( 1 + (vTax/100) ) );
+		
+	IF IsB2CMarkup = 1 THEN
+		SELECT B2CMarkupShortTerm,B2CMarkupLongTerm INTO vShortTerm,vLongTerm
+		FROM property WHERE PropertyId= vPropertyId;
+	ELSE	
+		SELECT B2BMarkupShortTerm,B2BMarkupLongTerm INTO vShortTerm,vLongTerm
+		FROM property WHERE PropertyId= vPropertyId;
+	END IF;
+		
+	SET vShortTerm = vShortTerm / 100;
+	SET vLongTerm = vLongTerm / 100;
+	
+	IF EXISTS (SELECT *  FROM rates WHERE AccommodationId = pAccommodationId and RateFor = pRateFor) THEN
+			UPDATE rates SET 
+			DailyRate=pDailyRate ,
+			MonthlyRate = pMonthlyRate ,
+			WeeklyRate = pWeeklyRate,
+			LongTermRate = pLongTermRate,
+			GuestRate = pGuestRate,
+			StartDate = pStartDate,EndDate=pEndDate,
+			UpdatedBy=pUser,UpdatedDate = NOW(),
+			CalcDailyRate = round((vpDailyRatetax + (vpDailyRatetax *  vShortTerm)),0) ,
+			CalcWeeklyRate = ROUND((vpWeeklyRatetax + (vpWeeklyRatetax * vShortTerm)),0) ,
+			CalcMonthlyRate = ROUND((vpMonthlyRatetax + (vpMonthlyRatetax * vLongTerm)),0) ,
+			CalcLongTermRate = ROUND((vpLongTermRatetax + (vpLongTermRatetax * vLongTerm)),0) 
+			WHERE AccommodationId = pAccommodationId and RateFor = pRateFor;	
+	ELSE
+			INSERT INTO rates (AccommodationId,RateFor,DailyRate,MonthlyRate,WeeklyRate,LongTermRate,
+			GuestRate,StartDate,EndDate,`Status`,CalcDailyRate,CalcWeeklyRate,CalcMonthlyRate,CalcLongTermRate,
+			UpdatedBy,UpdatedDate)
+			VALUES(pAccommodationId,pRateFor,
+			pDailyRate,
+			pMonthlyRate,
+			pWeeklyRate,
+			pLongTermRate,
+			pGuestRate,pStartDate,pEndDate,pStatus,
+			ROUND((vpDailyRatetax + (vpDailyRatetax * vShortTerm)),0),
+			ROUND((vpWeeklyRatetax + (vpWeeklyRatetax * vShortTerm)),0),
+			ROUND((vpMonthlyRatetax + (vpMonthlyRatetax * vLongTerm)),0),
+			ROUND((vpLongTermRatetax + (vpLongTermRatetax * vLongTerm)),0),
+			pUser,
+			NOW());
+			SELECT LAST_INSERT_ID() as RateId;
+		
+	END IF;
+	SELECT pRateId;
+    END
+$$
+
+----------------------------
+1-2-2020
+
+DROP PROCEDURE `Property_Amadeus_Save`
+
+GO
+
+CREATE  PROCEDURE `Property_Amadeus_Save`(
+						   INout pPropertyId BIGINT,
+						    IN pTitle VARCHAR(100),
+						    IN pDescription VARCHAR(1000),
+						    IN pLocation VARCHAR(200),
+						    IN pStatus INT(11),
+						    IN pOwnerId BIGINT(20),
+						     pPositionLat VARCHAR(15),
+						     pPositionLng VARCHAR(15),
+						     pAddress varchar(500),
+						     pCountryId INT,
+						     pState int,
+						     pCity varchar(50),
+						     pCityID INT,
+						     pZipCode varchar(200),
+						     pInventoryAPIType INT,
+						     pHotelId varchar(500),
+						     pTBOHotelId varchar(25),
+						     pTBOFlag char(1),
+						     pTamarindHotelId varchar(25),
+						     pTamarindFlag char(1),
+						     pRateCardDetailedId varchar(50),
+						     pTaxPercentage decimal(5,2),
+						     pGSTFlag int(1)
+    )
+BEGIN
+DECLARE vSGST int;
+DECLARE vCGST int;
+DECLARE vIGST int;
+  IF not EXISTS (SELECT *  FROM property WHERE (tbo_hotelid = pTBOHotelId 
+  					and InventoryAPIType = 5) or (tamarind_hotelid = pTamarindHotelId 
+  					and InventoryAPIType = 4)) THEN
+  
+		  INSERT INTO property(Title,Description,Location,`Status`,OwnerId,PositionLat,
+		  PositionLng,Address,Country,State,City,CityID,ZipCode,InventoryAPIType,
+		  Hotel_Id,tamarind_flag,tamarind_hotelid,tbo_flag,tbo_hotelid,tamarind_RateCardDetailId)
+		 VALUES(pTitle,pDescription,pLocation,pStatus,pOwnerId,PositionLat,PositionLng,
+		  pAddress,pCountryId,pState,pCity,pCityID,pZipCode,pInventoryAPIType,pHotelId,
+		  pTamarindFlag,pTamarindHotelId,pTBOFlag,pTBOHotelId,pRateCardDetailedId);
+						
+		 SELECT LAST_INSERT_ID() INTO pPropertyId;
+ else
+	UPDATE property SET
+			Title = pTitle,
+			-- Description = pDescription,
+			Location = pLocation,
+			`Status` = pStatus,
+			OwnerId = pOwnerId,
+			PositionLat = pPositionLat,
+			PositionLng = pPositionLng,
+			Address=pAddress,
+			Country = pCountryId,
+			State=pState,
+			City=pCity,
+			CityID=pCityID,
+			ZipCode=pZipCode,
+			Hotel_Id=pHotelId,
+			tamarind_RateCardDetailId=pRateCardDetailedId
+		WHERE
+		   tbo_hotelid = pTBOHotelId or tamarind_hotelid = pTamarindHotelId;
+		   
+		   set pPropertyId=(SELECT propertyid  FROM property WHERE (tbo_hotelid = pTBOHotelId and InventoryAPIType = 5) or (tamarind_hotelid = pTamarindHotelId and InventoryAPIType = 4));
+  end if;
+  
+  	select TaxTitleId into vSGST from taxtitle where Title = 'SGST';
+  	select TaxTitleId into vCGST from taxtitle where Title = 'CGST';
+  	select TaxTitleId into vIGST from taxtitle where Title = 'IGST';
+  	
+  	
+    if pGSTFlag = 1 then
+  		IF not EXISTS (SELECT *  FROM propertytax WHERE PropertyId = pPropertyId and taxtitle = vSGST) THEN
+  			insert into propertytax (propertyid,taxtitle,taxvalue,updateddate)
+	 		values (pPropertyId,vSGST,ROUND(pTaxPercentage/2),NOW());
+	 	else
+	 		update propertytax set taxvalue = ROUND(pTaxPercentage/2),taxtitle = vSGST,
+  			updateddate = NOW() WHERE PropertyId = pPropertyId and taxtitle = vSGST;	
+  		end if;
+  		
+  		IF not EXISTS (SELECT *  FROM propertytax WHERE PropertyId = pPropertyId and taxtitle = vCGST) THEN
+  			insert into propertytax (propertyid,taxtitle,taxvalue,updateddate)
+	 		values (pPropertyId,vCGST,ROUND(pTaxPercentage/2),NOW());
+	 	else
+	 		update propertytax set taxvalue = ROUND(pTaxPercentage/2),taxtitle = vCGST,
+  			updateddate = NOW() WHERE PropertyId = pPropertyId and taxtitle = vCGST;	
+  		end if;
+  	else	
+  		IF not EXISTS (SELECT *  FROM propertytax WHERE PropertyId = pPropertyId and taxtitle = vIGST) THEN
+  			insert into propertytax (propertyid,taxtitle,taxvalue,updateddate)
+	 		values (pPropertyId,vIGST,pTaxPercentage,NOW());
+  		else
+  			update propertytax set taxvalue = pTaxPercentage,taxtitle = vIGST,
+  			updateddate = NOW() WHERE PropertyId = pPropertyId and taxtitle = vIGST;	
+  		end if;
+  	end if;
+
+  select pPropertyId;
+  
+  
+    END
+Go
+insert into taxtitle (title,status) values ('SGST',1);
+Go
+insert into taxtitle (title,status) values ('CGST',1);
+GO
+insert into taxtitle (title,status) values ('IGST',1);
+GO
+DROP PROCEDURE `sp_API_rates_Save`
+
+GO
+
+CREATE  PROCEDURE `sp_API_rates_Save`(
+    pAccommodationId BIGINT, pRateFor INT,
+    pDailyRate DECIMAL(16,2), pWeeklyRate DECIMAL(16,2),pMonthlyRate DECIMAL(16,2),pLongTermRate DECIMAL(16,2),pGuestRate DECIMAL(16,2),
+    pStartDate DATE,pEndDate DATE,pStatus INT,IsB2CMarkup BIT, pUser BIGINT)
+ratesave:BEGIN
+	DECLARE vShortTerm DECIMAL(5,2);
+	DECLARE vLongTerm DECIMAL(5,2);
+	DECLARE vPropertyId BIGINT;
+	declare vTax DECIMAL(16,2);
+	declare vpDailyRatetax DECIMAL(16,2);
+	DECLARE vpWeeklyRatetax DECIMAL(16,2);
+	DECLARE vpMonthlyRatetax DECIMAL(16,2);
+	DECLARE vpLongTermRatetax DECIMAL(16,2);
+	
+	SELECT PropertyId INTO vPropertyId FROM accommodation WHERE AccommodationId = pAccommodationId;
+		
+	IF vPropertyId IS NULL THEN
+		LEAVE ratesave;
+	END IF;
+	
+ -- set tax values 
+	SELECT SUM(pt.TaxValue) into  vTax FROM propertyTax pt WHERE  pt.PropertyId=vPropertyId;
+	
+	IF vTax IS NULL THEN
+			SET vTax = 0;
+	END IF;	
+		
+	-- set vpDailyRatetax = pDailyRate -((pDailyRate * vTax)/100);
+	-- SET vpWeeklyRatetax =pWeeklyRate- ((pWeeklyRate * vTax)/100);	
+	-- SET vpMonthlyRatetax = pMonthlyRate-((pMonthlyRate * vTax)/100);
+	-- SET vpLongTermRatetax =pLongTermRate- ((pLongTermRate * vTax)/100);
+	
+	SET vpDailyRatetax =  ROUND(pDailyRate / ( 1 + (vTax/100) ) );
+	SET vpWeeklyRatetax = ROUND(pWeeklyRate / ( 1 + (vTax/100) ));	
+	SET vpMonthlyRatetax = ROUND( pMonthlyRate / ( 1 + (vTax/100) ));
+	SET vpLongTermRatetax = ROUND(pLongTermRate / ( 1 + (vTax/100) ) );
+		
+	IF IsB2CMarkup = 1 THEN
+		SELECT B2CMarkupShortTerm,B2CMarkupLongTerm INTO vShortTerm,vLongTerm
+		FROM property WHERE PropertyId= vPropertyId;
+	ELSE	
+		SELECT B2BMarkupShortTerm,B2BMarkupLongTerm INTO vShortTerm,vLongTerm
+		FROM property WHERE PropertyId= vPropertyId;
+	END IF;
+		
+	SET vShortTerm = vShortTerm / 100;
+	SET vLongTerm = vLongTerm / 100;
+	
+	IF EXISTS (SELECT *  FROM rates WHERE AccommodationId = pAccommodationId and RateFor = pRateFor) THEN
+			UPDATE rates SET 
+			DailyRate=pDailyRate ,
+			MonthlyRate = pMonthlyRate ,
+			WeeklyRate = pWeeklyRate,
+			LongTermRate = pLongTermRate,
+			GuestRate = pGuestRate,
+			StartDate = pStartDate,EndDate=pEndDate,
+			UpdatedBy=pUser,UpdatedDate = NOW(),
+			CalcDailyRate = round((vpDailyRatetax + (vpDailyRatetax *  vShortTerm)),0) ,
+			CalcWeeklyRate = ROUND((vpWeeklyRatetax + (vpWeeklyRatetax * vShortTerm)),0) ,
+			CalcMonthlyRate = ROUND((vpMonthlyRatetax + (vpMonthlyRatetax * vLongTerm)),0) ,
+			CalcLongTermRate = ROUND((vpLongTermRatetax + (vpLongTermRatetax * vLongTerm)),0) 
+			WHERE AccommodationId = pAccommodationId and RateFor = pRateFor;	
+	ELSE
+			INSERT INTO rates (AccommodationId,RateFor,DailyRate,MonthlyRate,WeeklyRate,LongTermRate,
+			GuestRate,StartDate,EndDate,`Status`,CalcDailyRate,CalcWeeklyRate,CalcMonthlyRate,CalcLongTermRate,
+			UpdatedBy,UpdatedDate)
+			VALUES(pAccommodationId,pRateFor,
+			pDailyRate,
+			pMonthlyRate,
+			pWeeklyRate,
+			pLongTermRate,
+			pGuestRate,pStartDate,pEndDate,pStatus,
+			ROUND((vpDailyRatetax + (vpDailyRatetax * vShortTerm)),0),
+			ROUND((vpWeeklyRatetax + (vpWeeklyRatetax * vShortTerm)),0),
+			ROUND((vpMonthlyRatetax + (vpMonthlyRatetax * vLongTerm)),0),
+			ROUND((vpLongTermRatetax + (vpLongTermRatetax * vLongTerm)),0),
+			pUser,
+			NOW());
+			SELECT LAST_INSERT_ID() as RateId;
+		
+	END IF;
+	SELECT RateId  FROM rates WHERE AccommodationId = pAccommodationId and RateFor = pRateFor limit 1;
+    END

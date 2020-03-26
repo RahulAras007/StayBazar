@@ -1,0 +1,62 @@
+﻿@model  StayBazar.Areas.Admin.Models.Invoice
+@{
+    Layout = null;
+}
+@*<p style="line-height: 35px; font-size: 16px; color: #666;">
+    Dear @Model.CustomerName,<br />
+
+    Invoice  Details is given below
+</p>*@
+
+<div style="width:100%; ">
+    <table style="width:100%; font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <thead>
+            <tr>
+                <th style="padding-top: 2%;" colspan="3">
+                    <img style="width:30%; float: left;" src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                </th>
+                <th width="400" align="right" style="font-size:12px;">
+                    Phone: @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                    Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)<br />
+                    Toll Free Number: 1800-425- 2393
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+                <td colspan="4">
+                    <br />
+                    @Html.Partial("~/Views/BookingHistory/_InvoiceHeader.cshtml")
+                    @Html.Raw(Model.HtmlSection1)
+                    @Html.Raw(Model.HtmlSection2)
+                    @Html.Raw(Model.HtmlSection3)
+                    @Html.Partial("~/Views/BookingHistory/_InvoiceFooter.cshtml")
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td align="center" colspan="4">
+                    <br />
+                    <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px;">
+                        View your online itinerary for additional information
+                    </p>
+                    <p style="font-size:14px;">
+                        Need help with your reservation? – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                    </p>
+                    <p style="font-size:14px;">
+                        Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                    </p>
+                    <p style="font-size:14px;">
+                        www.staybazar.com
+                    </p>
+                    <p style="font-size:14px;">
+                        <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                        <span style="font-weight:bold;">Phone: </span>080-2570-2898 / 4091 - 6686
+                    </p>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

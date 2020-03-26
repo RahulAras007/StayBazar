@@ -1,0 +1,138 @@
+﻿@model StayBazar.Models.BookingModel
+
+@{
+    Layout = null;
+}
+
+<style>
+    .feedbackbutton {
+        width: 150px !important;
+        padding: 8px 0;
+        background: #A51E22;
+        color: #fff;
+        border-radius: 5px;
+        font-weight: 700;
+        font-style: normal;
+        font-size: 14px;
+        text-decoration: none;
+        border: 1px solid #A51E22;
+        margin-left: 290px;
+    }
+</style>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Feedback</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <thead>
+            <tr>
+                <th style="padding-top: 2%;" colspan="3">
+                    <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                </th>
+                <th width="400" align="right" style="font-size:12px;">
+                    Phone: @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                    Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="4" align="center">
+                    <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">FEEDBACK</h5>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="4">
+                    <p style="line-height: 35px; font-size: 12px; color: #666;">
+                        Dear @Model.OrderedBy.Firstname,<br />
+                        @{
+
+                            string link = System.Configuration.ConfigurationManager.AppSettings["Reviewsendmail"] + Model.BookingDetails.OrderNo;
+                        }
+                        Hope you had a successful trip to  @Model.BookingDetails.City  recently.
+                        Please spare a moment to give us feedback on your stay. Your feedback would help us to improve our services:
+                    </p>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td colspan="4" style="text-align:center;">
+                    <a target="_blank" style="text-decoration:none;" href="@link">
+                        <div style="width: 150px !important;
+        padding: 8px 0;
+        background: #A51E22;
+        color: #fff;
+        border-radius: 5px;
+        font-weight: 700;
+        font-style: normal;
+        font-size: 14px;
+        text-decoration: none;
+        border: 1px solid #A51E22;
+        margin-left: 290px;">
+                            Leave your feedback
+                        </div>
+                    </a>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td colspan="4" style="text-align:center;">
+                    <p style="font-size: 12px; padding-top:20px; ">
+                        Or
+                    </p>
+                </td>
+                
+            </tr>
+
+            <tr>
+                <td colspan="4" style="text-align:center;">
+                    <p style="font-size: 12px; padding-top:10px; ">
+                        you can paste the following url in the browser
+                    <p style="font-size: 12px; ">
+                        <a>@link</a>
+                    </p>
+                    </p>
+                </td>
+            </tr>
+          
+            <tr>
+                <td align="center" colspan="4">
+                    <p style="margin-top: 20px; margin-bottom: 10px;font-size:12px;">
+                        Thank you for choosing Staybazar!<br />
+                        <a href="https://www.staybazar.com/Home/TermsOfUse">Terms & Conditions</a>
+                        | <a href="https://www.staybazar.com/Home/Privacy">Privacy Policy</a>
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td align="center" colspan="4">
+                    <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px;">
+                        View your online itinerary for additional information
+                    </p>
+                    <p style="font-size:14px;">
+                        Need help with your reservation? – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                    </p>
+                    <p style="font-size:14px;">
+                        Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                    </p>
+                    <p style="font-size:14px;">
+                        www.staybazar.com
+                    </p>
+                    <p style="font-size:14px;">
+                        <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                        <span style="font-weight:bold;">Phone: </span>080-2570-2898 / 4091 - 6686
+                    </p>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

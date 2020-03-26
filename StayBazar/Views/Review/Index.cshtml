@@ -1,0 +1,205 @@
+﻿@model StayBazar.Models.ReviewModel
+@{
+    ViewBag.Title = "My Reviews";
+}
+@using Microsoft.AspNet.Identity
+@{
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.RowsInAPage = 25;
+    gp.ColumnsInPager = 8;
+}
+<div class="container bdy_min_height">
+    <script type="text/javascript">
+        $(function () { validateRq(); });
+    </script>
+    <div class="row margin10px">
+        <h2>@ViewBag.Title</h2>
+        <div class="row">
+        </div>
+        @if (Model.ReviewList.Count() == 0)
+        {
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    @*<div class="panel">
+                            <div class="panel-body">You haven't reviewed any stays yet.</div>
+                        </div>*@
+                    <div class="alert alert-info">
+                        You haven't reviewed any stays / waiting for moderation.<br />
+                        @if (ViewBag.Message != null)
+                        {
+                            <div class="alert alert-warning">
+                                @ViewBag.Message
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        }
+        else
+        {
+
+
+            StayBazar.Models.ReviewModel filterform = (StayBazar.Models.ReviewModel)ViewBag.Filter;
+            using (Html.BeginForm("Pager", "Review", FormMethod.Post, new { @id = "frmPagers" }))
+            {
+                <input type="hidden" id="Status" name="Status" value="@filterform.Status" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+
+            if (Model != null && Model.ReviewList.Count() > 0)
+            {
+                @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+            }
+            <div class="col-lg-12" id="Tabledata2">
+                @{
+            bool flag = false;
+                }
+                @if (Model != null && Model.ReviewList.Count() > 0)
+                {
+                    <div class="panel panel-default">
+                        @foreach (CLayer.Review usr in Model.ReviewList)
+                        {
+                            if (flag)
+                            {
+                                <hr />
+                            }
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        @usr.Title<br />
+                                        @(Html.Raw(StayBazar.Common.Utils.GetStarRating(usr.Rating)))<br />
+
+                                        @{
+                            int id = usr.Status;
+                            if (id == (int)CLayer.ObjectStatus.StatusType.Verified)
+                            {
+                                        <text> [Active]</text>
+                            }
+                            else if (id == (int)CLayer.ObjectStatus.StatusType.Rejected)
+                            {
+                                        <text>[Waiting for verification or Rejected]</text>
+                            }
+                            else
+                            {
+                                        <text>Waiting for verification</text>
+                            }
+                                        }
+                                        @usr.ReviewDate.ToShortDateString()
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td> Accessibility to property</td>
+                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.Accessibility)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Easiness in check-in</td>
+                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.Easiness)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Cleanliness - Bedroom</td>
+                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.CleanlinessBed)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Cleanliness - Bathroom</td>
+                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.CleanlinessBath)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td> Sleep Quality</td>
+                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.SleepQuality)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Staff behavior</td>
+                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings), @usr.Staffbehave)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td> Overall experience</td>
+                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.OverallExp)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Will you consider this property during your next travel</td>
+                                                    <td> : @Enum.GetName(typeof (CLayer.Review.considernext), @usr.Considerfornext)</td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        Remarks : 
+                                       <p style="text-align:justify;">@usr.Description</p>
+                                    </div>
+                                </div>
+                            </div>
+                            flag = true;
+                        }
+                    </div>
+                }
+            </div>
+            if (Model != null && Model.ReviewList.Count() > 0)
+            {
+                @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+            }
+        }
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    function EditStatusBT(id, Statusid) {
+        $.post('@Url.Action("StatusEdit", "Review")', { OfferId: id, Status: Statusid }, function (data) {
+            var itemname = "#status" + data;
+            if ($(itemname).html() == "Active") {
+                $(itemname).html("Disabled");
+                $(itemname).removeClass("status1").addClass("status2");
+            }
+            else {
+                //$(itemname).html("Active");
+                //$(itemname).removeClass("status2").addClass("status1");
+            }
+        });
+    }
+    function showPager(num) {
+        //alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "Review")';
+        $.post(url, $("#frmPagers").serialize(),
+                function (data) {
+                    $("#Tabledata2").html(data);
+                });
+    }
+</script>
+<!--Adding jQuery rating plug-in-->
+<!--<div class="starr" data-score="usr.Rating"></div>
+<div id="result"></div>-->
+<script type="text/javascript">
+    $(function () {
+
+        $(".starr").each(function () {
+            // $('#input-id').rating('update',5);
+            // alert($(this).attr('data-score'))
+            $(this).raty(
+         {
+             path: '../Content/raty27/images/',
+             half: true,
+             readOnly: true,
+             targetKeep: true,
+             score: function () {
+                 return $(this).attr('data-score');
+             }
+         });
+        });
+    });
+</script>
+
+
+
+<!--Adding jQuery rating plug-in-->
+<script src="~/Content/raty27/jquery.raty.js"></script>
+<link href="~/Content/raty27/jquery.raty.css" rel="stylesheet" property="" />

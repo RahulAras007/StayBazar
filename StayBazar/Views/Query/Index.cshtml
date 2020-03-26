@@ -1,0 +1,165 @@
+﻿@model StayBazar.Models.QueryModel
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<style>
+    .form-control {
+        display: block;
+        width: 100%;
+        height: calc(3.25rem + 4px);
+        padding-top: 0.375rem;
+        padding-right: 0.75rem;
+        padding-bottom: 0.375rem;
+        padding-left: 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #496057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+    }
+    input, optgroup, select, textarea {
+        margin: 0;
+        font-family: inherit;
+        font-size: inherit;
+        /* line-height: inherit; */
+        line-height: 2.5;
+        width: 122px;
+    }
+</style>
+<div class="parent-div">
+    <!--Landing Starts Here -->
+    <div class="landing-img">
+        <div class="landing-heading" style="padding-bottom:0px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                         
+                        <h2>Go where the Road</h2>
+                        <h3 class="landing-caption">takes you...</h3>
+                    </div>
+                    <!-- <div class="col-6">
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ABout us heading section-->
+    <section class="about-section text-left">
+        <div class="title-heading">
+            <h3> QUERY</h3>
+        </div>        
+        
+        @using CaptchaMvc.HtmlHelpers
+        @try
+        {
+
+
+            if (ViewBag.Head == null)
+            { }
+
+            if (ViewBag.MsgType == null)
+            {
+                ViewBag.MsgType = (int)CLayer.ObjectStatus.MsgType.Query;
+            }
+            else
+            {
+                switch ((int)ViewBag.MsgType)
+                {
+                    case (int)CLayer.ObjectStatus.MsgType.Query:
+                        ViewBag.Head = "Query";
+                        ViewBag.BreadCrumb = " <p style='margin-top: -29px; margin-left: 38px;'> > </p> <div id='breads' style='margin-top: -30px; margin-left: 50px;'> <div itemscope itemtype='http://data-vocabulary.org/Breadcrumb'> <a href=''  itemprop='url'  class=' whitetext breadhvr' > <span class=' whitetext breadhvr'  itemprop='title'>Query</span></a>  </div> </div>";
+                        break;
+                    case (int)CLayer.ObjectStatus.MsgType.Complaint:
+                        ViewBag.Head = "Complaint";
+                        ViewBag.BreadCrumb = " <p style='margin-top: -29px; margin-left: 38px;'> > </p> <div id='breads' style='margin-top: -30px; margin-left: 50px;'> <div itemscope itemtype='http://data-vocabulary.org/Breadcrumb'> <a href=''  itemprop='url'  class=' whitetext breadhvr' > <span class=' whitetext breadhvr'  itemprop='title'>Complaint</span></a>  </div> </div>";
+
+                        break;
+                    case (int)CLayer.ObjectStatus.MsgType.Feedback:
+                        ViewBag.Head = "Feedback";
+                        ViewBag.BreadCrumb = " <p style='margin-top: -29px; margin-left: 38px;'> > </p> <div id='breads' style='margin-top: -30px; margin-left: 50px;'> <div itemscope itemtype='http://data-vocabulary.org/Breadcrumb'> <a href=''  itemprop='url'  class=' whitetext breadhvr' > <span class=' whitetext breadhvr'  itemprop='title'>Feedback</span></a>  </div> </div>";
+                        break;
+                    default:
+                        ViewBag.Head = "Query";
+                        break;
+
+                }
+            }
+            ViewBag.Title = ViewBag.Head;
+            
+                
+                <div class="row">
+                    <div class="col-md-6 sidesplash">
+                        <img src="/images/imac.jpg" />
+                    </div>
+                    <div class="col-md-6">
+                        @using (Html.BeginForm("Save", "Query"))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)
+                        <div class="formcontainer border-radius">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Name, new { style = "padding-left:0px;" }) <span style="color:red"> * </span>
+                                @Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.Name)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Email, new { style = "padding-left:0px;" }) <span style="color:red"> * </span>
+                                @Html.TextBoxFor(m => m.Email, new { @tabindex = "2", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.Email)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Phone, new { style = "padding-left:0px;" }) <span style="color:red"> * </span>
+                                @Html.TextBoxFor(m => m.Phone, new { @tabindex = "3", @class = "form-control input-sm", @maxlength = "15" })
+                                @Html.ValidationMessageFor(m => m.Phone)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Subject, new { style = "padding-left:0px;" }) <span style="color:red"> * </span>
+                                @Html.TextBoxFor(m => m.Subject, new { @tabindex = "4", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.Subject)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Body, new { style = "padding-left:0px;" }) <span style="color:red"> * </span>
+                                @Html.TextAreaFor(m => m.Body, new { @tabindex = "5", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.Body)
+                                <input type="hidden" name="MsgType" id="MsgType" value="@ViewBag.MsgType" />
+                            </div>
+                
+                            <div class="form-group" style="font-size:14px;">
+                                @Html.Captcha("try another", "enter the text you see above:", 5, "is required field", true)
+                            </div>
+                      
+                            <br />
+                            <div id="divMessage">
+                                @ViewBag.Message
+                            </div>
+
+                        </div>
+                          
+                        <div class="btn-toolbar">
+                            <div class="btn-group submitctr">
+                                <input type="submit" id="btnSave" value="Send" class="btn btn-success" tabindex="8" style="width:260px;height:50px;font-size:18px;font-family:'Times New Roman';border-radius: 10px;" />
+                            </div>
+                            <a href="~/Query" id="btnReset" class="btn btn-danger" tabindex="8" style="width:260px;height:50px;font-size:18px;font-family:'Times New Roman';border-radius: 10px;">Cancel</a>
+
+                        </div>
+                            <script type="text/javascript">
+                                $(function () {
+                                    $("#Name").focus();
+                                    $("#CaptchaInputText").attr("tabindex", "6");
+                                });
+                            </script>
+                        }
+                        <p></p>
+                    </div>
+                </div>
+                    }
+        catch (Exception ex)
+        {
+            StayBazar.Common.LogHandler.HandleError(ex);
+            Response.Redirect("~/ErrorPage");
+        }
+
+    </section>
+</div>

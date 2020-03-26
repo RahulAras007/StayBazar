@@ -1,0 +1,47 @@
+﻿@model long
+@{
+    Layout = null;
+    CLayer.Property canc = BLayer.Property.GetCancellationCharges(Model);
+    if (canc == null)
+    {
+        canc = new CLayer.Property();
+    }
+    int days = canc.CancellationPeriod;
+}
+@*<p>
+    You can cancel your booking any time before check-in date.
+    @if (days > 0)
+    {
+        <text>There will not be a cancellation charge if you cancel your booking before <strong>@days</strong> days from the check-in date.</text>
+    }
+</p>*@
+<p>
+    
+    @*If you cancel your booking in cancellation period, there will be a charge.
+    <br />*@
+    @{
+        switch (canc.CancellationMethod)
+        {
+            case CLayer.ObjectStatus.CancellationType.FixedNight:
+                <text>
+    If you cancel within <strong>@days</strong> days  there will be charge of @canc.CancellationCharge night/s
+    
+    The rate of @canc.CancellationCharge nights will be reduced as cancellation charge.</text>
+                break;
+            case CLayer.ObjectStatus.CancellationType.FixedPercent:
+            <text>If you cancel within <strong>@days</strong> day/s there will be charge of @(Math.Round(canc.CancellationCharge, 2)) % of one night.</text>
+                break;
+            case CLayer.ObjectStatus.CancellationType.VariableNights:
+            <text><strong>@days</strong> days' notice of cancellation is required prior to check-in for all lengths of stay in order to
+     avoid charges. Notice given within <strong>@days</strong> days will result in a charge equal to <strong>@days</strong> nights minus the number of days' notice given. Service fees might apply as appropriate.
+            </text>
+                break;
+        }
+    }
+</p>
+@*<p>There will a be a Service charge for the cancellation.</p>*@
+@if (canc.IsChargeAppliesToRefund)
+{
+    <text><p>This policy also applies to shortening of stays or changes on check-in date</p></text>
+}
+

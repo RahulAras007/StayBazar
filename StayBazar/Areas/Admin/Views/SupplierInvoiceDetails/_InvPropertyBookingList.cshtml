@@ -1,0 +1,81 @@
+﻿@model StayBazar.Areas.Admin.Models.SuppierInvoiceModel
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    gp.RowsInAPage = Model.Limit_Booking;
+}
+
+@if (Model.BookingList != null)
+{
+    if (Model.BookingList.Count() > 0)
+    {
+        <div class="col-md-12">
+            <input type="button" class="btn btn-primary" value="Choose" onclick="onAddClickOnBrowseBookingPopUp();" />
+        </div>
+        <div class="col-md-12">
+            @if (Model.BookingList != null && Model.BookingList.Count() > 0)
+            {
+                @Html.Raw(gp.GetPager((int)Model.TotalRows_Booking, Model.currentPage_Booking))
+            }
+            @Html.HiddenFor(m => m.currentPage_Booking)
+            @Html.HiddenFor(m => m.TotalRows_Booking)
+        </div>
+        <div class="col-md-12">
+            <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                <thead>
+                    <tr>
+                        <th></th>
+                        @*<th>Booking ID</th>*@
+                        <th>Booking Ref:No</th>
+                        <th>Property Name</th>
+                        <th>Supplier Name</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Amount Payable</th>
+                        <th>City</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.BookingList)
+                    {
+                        <tr>
+                            <td> <input class="clsCheckTick" data-val="@item.ConfirmationNumber" type="checkbox" @if (item.isCheckBook) { <text> checked </text>     } onclick="onClickBookingCheck(this)" /> </td>
+                            @*<td>@item.OfflineBookingId</td>*@
+                            <td>@item.ConfirmationNumber</td>
+                            <td>@item.PropertyName</td>
+                            <td>@item.SupplierName</td>
+                            <td>
+                                @if (item.CheckIn_date != null || item.CheckIn_date != DateTime.MinValue)
+                                {
+                                    @item.CheckIn_date.ToShortDateString()
+                                }
+                            </td>
+                            <td>
+                                @if (item.CheckOut_date != null || item.CheckOut_date != DateTime.MinValue)
+                                {
+                                    @item.CheckOut_date.ToShortDateString()
+                                }
+                            </td>
+                            <td>
+                                @if (item.AmtTobePaid < 0 || item.AmtTobePaid == 0) { item.AmtTobePaid = 0; }
+                                @item.AmtTobePaid
+                            </td>
+                            <td>@item.City</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+
+    }
+}
+
+
+
+
+
+

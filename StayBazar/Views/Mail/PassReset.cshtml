@@ -1,0 +1,82 @@
+﻿@model long
+@{
+    Layout = null;
+    CLayer.User usr = BLayer.User.Get(Model);
+    if (usr == null) { usr = new CLayer.User(); }
+    string newpass = Request.QueryString["code"];
+    //.Replace("Register", "Verify").ToString() + "?token=" + token; ;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>B2CRegistration</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <thead>
+            <tr>
+                <th style="padding-top: 2%;" align="left">
+                    <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                </th>
+                <th width="70" align="left" style="font-weight:normal; font-size:12px;">
+                    Phone<br />
+                    Email
+                </th>
+                <th align="left" style="font-weight: normal; font-size: 12px;">
+                    @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                    @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td colspan="3">
+                    <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;">Dear @usr.FirstName @usr.LastName,</p>
+                    <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;">
+                        Your password has been reset. Your new password is : <strong>@newpass</strong>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+            @*<tr>
+                <td align="center" colspan="3">
+                    <a href="@url" title="" target="_blank" style="background: #a51e22; color: #FFF; border-radius: 5px; border: 0; padding: 12px; text-decoration: none; display: inline-block;">Verify your account</a>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" colspan="3">
+                    <p style="margin-top: 20px; margin-bottom: 10px;">
+                        Or verify using this link
+                    </p>
+                    <a href="@url" title="" target="_blank" style="color:#a51e22; text-decoration: none;">@url</a>
+                    <br />
+                    <p style="font-size:14px;font-weight:bold;">Thank you for choosing Staybazar!</p>
+                </td>
+            </tr>*@
+        <tfoot>
+            <tr>
+                <td align="center" colspan="3">
+                    <p style="border-top: 1px solid #CCC; padding:1% 0;">
+
+                        <a href="https://www.staybazar.com/Home/TermsOfUse" style="color:#a51e22; text-decoration: none;">Terms & Conditions</a> 
+                        | <a style="color:#a51e22; text-decoration: none;" href="https://www.staybazar.com/Home/Privacy">Cancellation Policies</a><br />
+                        <span style="font-weight:bold;">Need any help or clarifications?</span> – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                        <span style="font-weight:bold;">
+                            Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                        </span><br />
+                        <a href="https://www.staybazar.com">www.staybazar.com</a><br />
+                        @*<span style="font-weight:bold;">Address</span> No. 38-A, 2nd avenue,Shubh Enclave, Haralur road, Bangalore 560102, Karnataka*@
+                        <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                        <span style="font-weight:bold;">Phone: </span>080-2570-2898 / 4091 - 6686
+                    </p>
+                </td>
+            </tr>
+        </tfoot>
+        </tbody>
+    </table>
+</body>
+</html>

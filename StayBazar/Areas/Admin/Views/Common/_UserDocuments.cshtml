@@ -1,0 +1,513 @@
+﻿@model StayBazar.Areas.Admin.Models.UserDocumentsModel
+@{
+                /**/
+
+                string extensions = System.Configuration.ConfigurationManager.AppSettings.Get("NonImageDocumentFileTypes");
+                string[] allowedFileExtensions = extensions.Split(',');
+                string classHidden = "";
+
+                List<int> items = new List<int>();
+                if (Model.UserType == (int)CLayer.Role.Roles.Agent)
+                {
+                    items.Add(5);
+                    items.Add(6);
+                    items.Add(7);
+                }
+                else if (Model.UserType == (int)CLayer.Role.Roles.Supplier)
+                {
+                    items.Add(1);
+                    items.Add(3);
+                    items.Add(4);
+
+                }
+                else if (Model.UserType == (int)CLayer.Role.Roles.Affiliate)
+                {
+                    items.Add(1);
+                    items.Add(3);
+                    items.Add(4);
+
+                }
+                else if (Model.UserType == (int)CLayer.Role.Roles.Corporate)
+                {
+                    items.Add(1);
+                    items.Add(4);
+                    items.Add(5);
+                    items.Add(6);
+                }
+}
+
+    @using System.Configuration;
+    @using (Html.BeginForm("UserDocumentdataSave", "Custom", FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadServiceTaxRege" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(m => m.UserId)
+        @Html.HiddenFor(m => m.UserType)
+
+        @*<div class="panel-heading bold">Business Registration Certificate</div>*@
+
+        classHidden = "";
+        if (items.Contains(1)) { classHidden = "hidden"; }//business
+        <div class="panel @classHidden">
+            <div class="panel-heading bold">Business Registration Certificate</div>
+            <div class="panel-body">
+                @{CLayer.UserFiles brc = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.BusinessRegistrationCertificate);}
+                <input type="file" id="BusinessRegistrationCertificate" name="BusinessRegistrationCertificate" tabindex="9" style="border: 0px;" />
+                @if (brc != null)
+                {
+                    if (brc.FileName != "0")
+                    {
+                        if (allowedFileExtensions.Contains(brc.FileName.Substring(brc.FileName.LastIndexOf('.'))))
+                        {
+                            if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + brc.FileName)))
+                            {
+                                <a href="~/Files/Users/@Model.UserId/@brc.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                            }
+                            else
+                            {
+                                <span class="danger">File not found</span>
+                            }
+                        }
+                        else
+                        {
+                            if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + brc.FileName)))
+                            {
+                                <div class="thumbnail col-md-4 col-xs-4">
+                                    <a href="~/Files/Users/@Model.UserId/@brc.FileName" target="_blank"> <img src="~/Files/Users/@Model.UserId/@brc.FileName" alt="BusinessRegistrationCertificate" class="img img-responsive" /></a>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="danger">File not found</span>
+                            }
+                        }
+                    }
+                }
+            </div>
+        </div>
+
+    classHidden = "";
+    if (items.Contains(2)) { classHidden = "hidden"; }//ServiceTaxRegNo
+    <div class="panel  @classHidden">
+        @{CLayer.B2B b2b = BLayer.B2B.Get(Model.UserId);
+            if (b2b != null)
+            {
+                Model.ServiceTaxRegNo = b2b.ServiceTaxRegNo;
+            }
+        }<br />
+        <div class="panel-heading bold">
+            <div class="row">
+                <div class=" col-md-4 ">
+                    @Html.LabelFor(m => m.ServiceTaxRegNo)@*<span style="color:red">*</span>*@
+                    @Html.TextBoxFor(m => m.ServiceTaxRegNo, new { @tabindex = "7", @class = "form input-sm", @onkeypress = "return isINNumbersletters(event)", @MaxLength = "15" })
+                </div>
+            </div><br />
+            <label for="ServiceTaxReg">Copy of ServiceTax Registration Document</label>
+            <input type="file" id="ServiceTaxReg" name="ServiceTaxReg" tabindex="8" style="border:0px;" />
+            @*Service Tax Registration [ No:
+            @if (b2b != null)
+            {
+                      @b2b.ServiceTaxRegNo
+            }]*@
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-12">
+                @{CLayer.UserFiles str = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.ServiceTaxRegNo);}
+                @if (str != null)
+                {
+                    if (str.FileName != "0")
+                    {
+
+                        if (allowedFileExtensions.Contains(str.FileName.Substring(str.FileName.LastIndexOf('.'))))
+                        {
+
+                            if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + str.FileName)))
+                            {
+                                <a href="~/Files/Users/@Model.UserId/@str.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                            }
+                            else
+                            {
+                                <span class="danger">File not found</span>
+                            }
+
+                        }
+                        else
+                        {
+                            if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + str.FileName)))
+                            {
+                                <div class="thumbnail col-md-4 col-xs-4">
+                                    <a href="~/Files/Users/@Model.UserId/@str.FileName" target="_blank"> <img src="~/Files/Users/@Model.UserId/@str.FileName" alt="ServiceTaxRegNo" class="img img-responsive" /></a>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="danger">File not found</span>
+                            }
+                        }
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="right padding10px">
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="submit" id="btnSave" value="Save" class="btn btn-success" />
+        </div>
+        <br />
+    </div>
+    @*<div class="panel">
+        
+
+    </div>*@
+
+    classHidden = "";
+    if (items.Contains(7)) { classHidden = "hidden"; }
+    <div class="col-lg-12  @classHidden">
+        @*<div class="panel-heading bold">*@
+            <div class="col-lg-12">
+                @{ CLayer.B2B obj11 = BLayer.B2B.Get(Model.UserId);
+                    Model.PANNo = obj11.PANNo;
+                    //Model.ContactDesignation = obj11.ContactDesignation;
+                }
+                @*<div class="col-md-4">*@<br />
+                                          <div class="form-group">
+                                              @Html.LabelFor(m => m.PANNo)@*-control*@
+                                              @Html.TextBoxFor(m => m.PANNo, new { @tabindex = "21", @class = "form input-sm", @onkeypress = "return isINNumbersletters(event)", @MaxLength = "12" })
+                                          </div>
+                    @*<div class="form-group">
+                            @Html.LabelFor(m => m.ContactDesignation)
+                            @Html.TextBoxFor(m => m.ContactDesignation, new { @tabindex = "21", @class = "form-control input-sm", @onkeypress = "return isINNumbersletters(event)" })
+                        </div>*@
+                @*</div>*@
+            @*</div>*@
+        </div>
+    </div>
+    classHidden = "";
+    if (items.Contains(3)) { classHidden = "hidden"; }//PANCard
+    <div class="panel  @classHidden">
+        <div class="panel-heading bold">
+            &nbsp;&nbsp;
+            PAN card
+            <input type="file" id="PANCard" name="PANCard" tabindex="10" style="border: 0px;" />
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-12">
+                @{CLayer.UserFiles pan = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.PANCard);}
+
+                @if (pan != null)
+                {
+                    if (allowedFileExtensions.Contains(pan.FileName.Substring(pan.FileName.LastIndexOf('.'))))
+                    {
+                        if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + pan.FileName)))
+                        {
+                            <a href="~/Files/Users/@Model.UserId/@pan.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                        }
+                        else
+                        {
+                            <span class="danger">File not found</span>
+                        }
+                    }
+                    else
+                    {
+                        if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + pan.FileName)))
+                        {
+                            <div class="thumbnail col-md-4 col-xs-4">
+                                <a href="~/Files/Users/@Model.UserId/@pan.FileName" target="_blank"> <img src="~/Files/Users/@Model.UserId/@pan.FileName" alt="PANCard" class="img img-responsive" /></a>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="danger">File not found</span>
+                        }
+                    }
+                }
+
+            </div>
+            <div class="left padding10px">
+                <input type="submit" id="btnSave" value="Save" class="btn btn-success" />
+            </div>
+
+        </div>
+    </div>
+
+
+    classHidden = "";
+    if (items.Contains(4)) { classHidden = "hidden"; }//Cheque
+    <div class="panel  @classHidden">
+        <div class="panel-heading bold">
+            Copy of Cheque
+        </div>
+        <div class="panel-body">
+            @{CLayer.UserFiles coc = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.CopyOfCheque);}
+            <input type="file" id="CopyOfCheque" name="CopyOfCheque" tabindex="11" style="border: 0px;" />
+            @if (coc != null)
+            {
+                if (coc.FileName != "0")
+                {
+                    if (allowedFileExtensions.Contains(coc.FileName.Substring(coc.FileName.LastIndexOf('.'))))
+                    {
+                        if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + coc.FileName)))
+                        {
+                            <a href="~/Files/Users/@Model.UserId/@coc.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                        }
+                        else
+                        {
+                            <span class="danger">File not found</span>
+                        }
+                    }
+                    else
+                    {
+                        if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + coc.FileName)))
+                        {
+                            <div class="thumbnail col-md-4 col-xs-4">
+                                <a href="~/Files/Users/@Model.UserId/@coc.FileName" target="_blank">   <img src="~/Files/Users/@Model.UserId/@coc.FileName" alt="CopyOfCheque" class="img img-responsive" /></a>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="danger">File not found</span>
+                        }
+                    }
+                }
+            }
+        </div>
+    </div>
+    classHidden = "";
+    if (items.Contains(5)) { classHidden = "hidden"; }//bank
+    <div class="panel @classHidden">
+        <div class="panel-heading bold">Bank Details</div>
+        <div class="panel-body">
+            @{CLayer.BankAccount bank = BLayer.BankAccount.GetOnUser(Model.UserId);
+
+                if (bank != null)
+                {
+                    Model.BankAccountId = bank.BankAccountId;
+                    Model.AccountNumber = bank.AccountNumber;
+                    Model.BankName = bank.BankName;
+                    Model.BranchAddress = bank.BranchAddress;
+                    Model.RTGSNumber = bank.RTGSNumber;
+                    Model.MICRCode = bank.MICRCode;
+
+                }
+            }
+            <div class="thumbnail col-md-4 col-xs-4">
+                @Html.HiddenFor(m => m.BankAccountId)
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AccountNumber)
+                    @Html.TextBoxFor(m => m.AccountNumber, new { @tabindex = "17", @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.BankName)
+                    @Html.TextBoxFor(m => m.BankName, new { @tabindex = "18", @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.BranchAddress)
+                    @Html.TextAreaFor(m => m.BranchAddress, new { @tabindex = "19", @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RTGSNumber)
+                    @Html.TextBoxFor(m => m.RTGSNumber, new { @tabindex = "20", @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.MICRCode)
+                    @Html.TextBoxFor(m => m.MICRCode, new { @tabindex = "21", @class = "form-control input-sm" })
+                </div>
+                @*<div class="form-group">
+                        @Html.LabelFor(m => m.AccountType)
+                        @Html.DropDownListFor(m => m.AccountType, Model.AccountTypeList as SelectList, "Select", new { @tabindex = "3", @class = "form-control input-sm" })
+                    </div>*@
+            </div>
+
+        </div>
+    </div>
+
+    @*<div class="panel @classHidden">
+            <div class="panel-body">
+                @{ CLayer.B2B obj = BLayer.B2B.Get(Model.UserId);
+                    Model.PANNo = obj.PANNo;
+                }
+                <div class="thumbnail col-md-4 col-xs-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.PANNo)
+                        @Html.TextBoxFor(m => m.PANNo, new { @tabindex = "21", @class = "form-control input-sm", @onkeypress = "return isINNumbersletters(event)" })
+                    </div>
+                </div>
+
+            </div>
+        </div>*@
+
+
+    classHidden = "";
+    if (items.Contains(6)) { classHidden = "hidden"; }//VATRegNo
+    <div class="panel  @classHidden">
+        @{CLayer.B2B b2b3 = BLayer.B2B.Get(Model.UserId);
+            if (b2b3 != null)
+            {
+                Model.VATRegNo = b2b3.VATRegNo;
+            }
+        }
+        <div class="panel-heading bold">
+            <div class="row">
+                <div class=" col-md-4 ">
+                    @Html.LabelFor(m => m.VATRegNo)@*<span style="color:red">*</span>*@
+                    @Html.TextBoxFor(m => m.VATRegNo, new { @tabindex = "13", @class = "form-control input-sm", @onkeypress = "return isINNumbersletters(event)", @MaxLength = "15" })
+                </div>
+            </div>
+            <label for="VATReg">Copy of VAT Registration Document</label>@*<span style="color:red">*</span>*@
+            <input type="file" id="VATReg" name="VATReg" tabindex="14" style="border: 0px;" />
+        </div>
+
+        <div class="panel-body">
+            <div class="row">
+                @{CLayer.UserFiles vat = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.VATRegNo);}
+                @if (vat != null)
+                {
+                    if (vat.FileName != "0")
+                    {
+                        if (allowedFileExtensions.Contains(vat.FileName.Substring(vat.FileName.LastIndexOf('.'))))
+                        {
+                            if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + vat.FileName)))
+                            {
+
+                                <a href="~/Files/Users/@Model.UserId/@vat.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                            }
+                            else
+                            {
+                                <span class="danger">File not found</span>
+                            }
+                        }
+                        else
+                        {
+                            if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + vat.FileName)))
+                            {
+                                <div class="thumbnail col-md-4 col-xs-4">
+                                    <a href="~/Files/Users/@Model.UserId/@vat.FileName" target="_blank"> <img src="~/Files/Users/@Model.UserId/@vat.FileName" alt="VATRegNo" class="img img-responsive" /></a>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="danger">File not found</span>
+                            }
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    @*<div class="panel-body">
+            <div class="row">
+                Copy Of PAN card<br />
+                @{CLayer.UserFiles pan1 = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.PANCard);}
+                <input type="file" id="PANCard" name="PANCard" tabindex="10" style="border: 0px;" />
+                @if (pan1 != null)
+                {
+                    if (allowedFileExtensions.Contains(pan1.FileName.Substring(pan1.FileName.LastIndexOf('.'))))
+                    {
+                        if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + pan1.FileName)))
+                        {
+                            <a href="~/Files/Users/@Model.UserId/@pan1.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                        }
+                        else
+                        {
+                            <span class="danger">File not found</span>
+                        }
+                    }
+                    else
+                    {
+                        if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + pan1.FileName)))
+                        {
+                            <br />
+                            <div class="thumbnail col-md-4 col-xs-4">
+                                <a href="~/Files/Users/@Model.UserId/@pan1.FileName" target="_blank">  <img src="~/Files/Users/@Model.UserId/@pan1.FileName" alt="PANCard" class="img img-responsive" /></a>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="danger">File not found</span>
+                        }
+                    }
+                }
+            </div>
+        </div>*@
+
+
+    @*<div class="col-lg-12">
+        
+    </div>*@
+
+    @*<div class="btn-toolbar">
+            <div class="btn-group submitctr">
+                <input type="submit" id="btnSave" value="Save" class="btn btn-default" tabindex="23" />
+
+            </div>
+        </div>*@
+
+
+}
+
+<script type="text/javascript">
+
+    //file configeration
+    @*@using System.Configuration;*@
+        @{
+        int fi = Convert.ToInt32(ConfigurationManager.AppSettings.Get("FileSizeInMB"));
+        long by = fi * 1024 * 1024;
+         }
+    $('#BusinessRegistrationCertificate').bind('change', function (){
+        var filesizeget = this.files[0].size;
+        //alert(filesizeget + "bytes");
+        if (filesizeget > @by) {
+            alert("Please Upload below @(fi)MB file size");
+        $('#BusinessRegistrationCertificate').val("");
+        return false;
+    }
+    });
+
+    $('#PANCard').bind('change', function(){
+        var filesizeget = this.files[0].size;
+        //alert(filesizeget + "bytes");
+        if (filesizeget > @by) {
+            alert("Please Upload below @(fi)MB file size");
+        $('#PANCard').val("");
+        return false;
+    }
+    });
+    $('#CopyOfCheque').bind('change', function(){
+        var filesizeget = this.files[0].size;
+        //alert(filesizeget + "bytes");
+        if (filesizeget > @by) {
+            alert("Please Upload below @(fi)MB file size");
+        $('#CopyOfCheque').val("");
+        return false;
+    }
+    });
+
+    $('#VATReg').bind('change', function (){
+        var filesizeget = this.files[0].size;
+        //alert(filesizeget + "bytes");
+        if (filesizeget > @by){
+            alert("Please Upload below @(fi)MB file size");
+        $('#VATReg').val("");
+        return false;
+    }
+    });
+    $('#ServiceTaxReg').bind('change', function (){
+        var filesizeget = this.files[0].size;
+        // alert(filesizeget + "bytes");
+        if (filesizeget > @by)
+        {
+       alert("Please Upload below @(fi)MB file size");
+        $('#ServiceTaxReg').val("");
+        return false;
+    }
+    });
+    @*$("#btnSave").click(function () {
+        var url = '@Url.Action("UserDocumentdataSave", "Custom", new { area = "Admin" })';
+        // alert("hai");
+        $.post(url, $("#uploadServiceTaxRege").serialize());
+    });*@
+
+
+
+</script>

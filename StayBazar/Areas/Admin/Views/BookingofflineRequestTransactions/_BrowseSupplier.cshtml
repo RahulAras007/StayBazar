@@ -1,0 +1,49 @@
+﻿@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-lg-8">
+
+        <input type="radio" name="radiocheck1" value="1" id="Defaultcheck1" checked="checked" />  Standard Properties
+        <input type="radio" name="radiocheck1" value="0" id="customcheck1" />       Additional Properties
+
+        <div class="input-group">
+            <input type="text" id="searchsup" class="form-control">
+            <span class="input-group-btn">
+                <button class="btn btn-default" onclick="findsupplier()" type="button">Go!</button>
+            </span>
+        </div><!-- /input-group -->
+    </div>
+</div>
+<div class="row top-margin-10px" id="browseListsup">
+    @Html.Partial("_SupplierList", new List<CLayer.B2B>())
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("input[id=Defaultcheck1]").is(":checked") == true;
+    });
+    function findsupplier()
+    {
+        if ($("#searchsup").val().trim() == "")
+        {
+            alert('Search criteria not found!');
+            return;
+        }
+        var cname3 = $("#searchsup").val();
+        if ($("input[id=Defaultcheck1]").is(":checked") == true) {
+            $.post('@Url.Action("Searchsupplierforofflinebook", "Supplier", new { area = "Admin" })', { name: cname3 }, function (data) {
+                $("#browseListsup").html(data);
+            });
+        }
+        else {
+
+            $.post('@Url.Action("Searchsupplierforofflinebookfromcustom", "Supplier", new { area = "Admin" })', { name: cname3 }, function (data) {
+
+                $("#browseListsup").html(data);
+            });
+        }
+    }
+    function selectCorporate() {
+    }
+</script>

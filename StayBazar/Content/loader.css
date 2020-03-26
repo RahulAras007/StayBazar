@@ -1,0 +1,137 @@
+﻿
+.loader-main
+{
+    min-height:250px;
+}
+.body-no-scroll{
+    overflow:hidden;
+}
+
+.loader-box {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 999;
+    background-color: transparent;
+    text-align: center;
+}
+
+.loader {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    border: 4px solid #086aa6;
+    background-color: rgba(8, 106, 166, 0.25);
+    top: 50%;
+    animation: loader 2s infinite ease;
+}
+
+.loader-inner {
+    vertical-align: top;
+    display: inline-block;
+    width: 100%;
+    background-color: #086aa6;
+    animation: loader-inner 2s infinite ease-in;
+}
+
+@keyframes loader {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(180deg);
+    }
+
+    50% {
+        transform: rotate(180deg);
+    }
+
+    75% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes loader-inner {
+    0% {
+        height: 0%;
+    }
+
+    25% {
+        height: 0%;
+    }
+
+    50% {
+        height: 100%;
+    }
+
+    75% {
+        height: 100%;
+    }
+
+    100% {
+        height: 0%;
+    }
+}
+
+/* Booking approval for corporate user*/
+
+.submit-progress {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    height:5em;
+    padding-top: 2.3em;
+    /* The following rules are the
+     ones most likely to change */
+    width: 35em;
+    /* Set 'margin-left' to a negative number
+     that is 1/2 of 'width' */
+    margin-left: -10em;
+    padding-left: 2.1em;
+    background-color: green;
+    color: white;
+    -webkit-border-radius: 0.4em;
+    -moz-border-radius: 0.4em;
+    border-radius: 0.4em;
+    box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
+    -webkit-box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
+    -moz-box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
+    align-items:center;
+}
+
+.submit-progress-bg {
+ /*   background-color: lightgray;*/
+/*    opacity: .5;*/
+    overflow:hidden;
+}
+
+.submit-progress i {
+    margin-right: 0.5em;
+}
+
+.ApprovalMsg {
+    font-size: 25px;
+    font-weight: normal;
+}
+
+.fa.fa-close.padbtm10px.isize {
+    font-size: 25px;
+    color: red;
+}
+
+.fa.fa-check.padbtm10px.isize {
+    font-size: 25px;
+    color: green;
+}
+
+.Progress-size {
+    font-size: 25px;
+}

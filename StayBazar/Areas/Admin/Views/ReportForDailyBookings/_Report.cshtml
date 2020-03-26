@@ -1,0 +1,395 @@
+﻿@model IEnumerable<CLayer.ReportForDailyBooking>
+@using System.Linq
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    //long i = 0;
+    //long j = 0;
+    //long k = 0;
+    //long l = 0;
+    //long m = 0;
+    //long n = 0;
+    //long p = 0;
+    long q = 0;
+    long t = 0;
+    double totalamount =0;
+    double totalcomm = 0;
+    
+}
+
+    <div class="row">
+        <div class="col-md-12  margin10px">
+            @{
+                StayBazar.Areas.Admin.Models.ReportForDailyBookingModel filterform = (StayBazar.Areas.Admin.Models.ReportForDailyBookingModel)ViewBag.Filter;
+                using (Html.BeginForm("Pager", "ReportForDailyBookings", FormMethod.Post, new { @id = "frmPagersDailyBookings" }))
+                {
+                    <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                    <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                    <input type="hidden" id="CurrentDate" name="CurrentDate" value="@filterform.CurrentDate" />
+                    <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+                }
+                gp.RowsInAPage = filterform.Limit;
+            }
+            @if (Model != null && Model.Count() > 0)
+            {
+                @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+            }
+            </div>
+                </div>
+                    @*<caption class="left h3">Daily Booking Report</caption>*@
+
+
+                    @{
+                        IEnumerable<CLayer.ReportForDailyBooking> newBooking = Model.Where(x => x.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success);
+                        q = 0;
+                    }
+                    <table class="table table-bordered table-hover table-striped" border="1">
+                        <thead>
+                            <tr>
+                                <th colspan="18">
+                                    New Bookings
+                                </th>
+                            </tr>
+                        </thead>
+                        <thead>
+                            <tr>
+                                <th>New Bookings</th>
+                                <th>Supplier Name</th>
+                                <th>Property Name</th>
+                                <th>Destination</th>
+                                <th> Accomodation Type</th>
+                                <th>Booking Category</th>
+                                <th>Rate Type</th>
+                                <th>Checkin date</th>
+                                <th>Checkout Date</th>
+                                <th>No of Nights</th>
+                                <th>No of accomodations</th>
+                                <th>No of Adults</th>
+                                <th>No of Children</th>
+                                <th>Additional Guests</th>
+                                <th>Total booking Amount</th>
+                                <th>Stay Bazar Commission</th>
+                                <th>Travel Agent Commission Payable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (CLayer.ReportForDailyBooking reportList in newBooking)
+                            {
+
+                                if (reportList.NewBookingAmount == 0 && reportList.TotalbookingAmountcancelled == 0 && reportList.TotalRefund == 0)
+                                {
+                                    q++;
+
+
+
+
+                                    <tr>
+                                        <td>@q</td>
+                                        <td>@reportList.SupplierName</td>
+                                        <td>@reportList.PropertyName</td>
+                                        <td>@reportList.Destination</td>
+                                        <td>@reportList.AccomodationType</td>
+                                        <td>
+                                            @reportList.BookingCategory
+                                            @*@if ((int)CLayer.Role.Roles.CorporateUser ==Convert.ToInt16( reportList.BookingCategory))
+                                    {
+                                        <text>Corporate  </text>
+                                    }
+                                    else if ((int)CLayer.Role.Roles.Agent ==Convert.ToInt16( reportList.BookingCategory))
+                                    {
+                                     <text> Travel Agent  </text>
+                                    }
+                                    else
+                                    {
+                                         <text>Regular  </text>
+                                    }*@
+                                        </td>
+                                        <td>
+                                            @reportList.RateType @{
+
+                                    DateTime checkin = reportList.Checkindate;
+                                    DateTime checkout = reportList.CheckoutDate;
+                                    TimeSpan ts = checkout - checkin;
+                                    int differenceInDays = ts.Days;
+                                    string nights = differenceInDays.ToString();
+                                    @*if (differenceInDays < 7)
+                            {
+                                <text>Daily </text>
+                            }
+                            else if(differenceInDays <30)
+                            {
+                                <text>Weekly </text>
+                            }
+                            else if(differenceInDays < 90)
+                            {
+                                <text>Monthly </text>
+                            }
+                            else
+                            {
+                               <text> Long (90+) </text>
+                            }*@
+                                            }
+                                        </td>
+                                        <td>@reportList.Checkindate.ToShortDateString()</td>
+                                        <td>@reportList.CheckoutDate.ToShortDateString()</td>
+                                        <td>@nights</td>
+                                        <td>@reportList.Noofaccomodations</td>
+                                        <td>@reportList.NoofAdults</td>
+                                        <td>@reportList.NoofChildren</td>
+                                        <td>@reportList.NoOfGuests</td>
+                                        <td>@reportList.TotalbookingAmount</td>
+                                        <td>@reportList.StayBazarCommission</td>
+                                        <td>@reportList.TravelAgentCommission</td>
+                                    </tr>
+                                    totalamount = totalamount + reportList.TotalbookingAmount;
+                                    totalcomm = totalcomm + reportList.StayBazarCommission;
+                                    t = t + reportList.Noofaccomodations;
+                                    q++;
+                                }
+                            }
+                            <tr>
+                                <td>Summary</td>
+                                <td colspan="16">Total Accommodations : @t, Total Amount: @Math.Round(totalamount), Total Commission: @Math.Round(totalcomm)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    @{
+                        // IEnumerable<CLayer.ReportForDailyBooking> newBooking = Model.Where(x =>x.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success);
+                        q = 1;
+                        double charges = 0;
+                        totalcomm = 0;
+                        totalamount = 0;
+                    }
+                    <table class="table table-bordered table-hover table-striped" border="1">
+                        <thead>
+                            <tr>
+                                <th colspan="18">Changes to booking</th>
+                            </tr>
+                        </thead>
+                        <thead>
+                            <tr>
+                                <th>Ser No</th>
+                                <th>Supplier Name</th>
+                                <th>Property Name</th>
+                                <th>Destination</th>
+                                <th>Accomodation Type</th>
+                                <th>Booking Category</th>
+                                <th>Rate Type</th>
+                                <th>Checkin date</th>
+                                <th>Checkout Date</th>
+                                <th>No of Nights</th>
+                                <th>New Checkin Date</th>
+                                <th>New Checkout Date</th>
+                                <th>Summary of changes</th>
+                                <th>Original Booking Amout</th>
+                                <th>New Booking Amount</th>
+                                <th>Original Commission</th>
+                                <th>New Commission</th>
+                                <th>Charges for change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (CLayer.ReportForDailyBooking reportList in newBooking)
+                            {
+                                if (reportList.NewBookingAmount != 0 || reportList.TotalbookingAmountcancelled != 0 || reportList.TotalRefund != 0)
+                                {
+
+                                    <tr>
+                                        <td>@q</td>
+                                        <td>@reportList.SupplierName</td>
+                                        <td>@reportList.PropertyName</td>
+                                        <td>@reportList.Destination</td>
+                                        <td>@reportList.AccomodationType</td>
+                                        <td>@reportList.BookingCategory</td>
+                                        <td>@reportList.RateType</td>
+                                        <td>@reportList.Checkindate.ToShortDateString()</td>
+                                        <td>@reportList.CheckoutDate.ToShortDateString()</td>
+                                        <td>
+                                            @{
+
+                                    DateTime checkin = reportList.Checkindate;
+                                    DateTime checkout = reportList.CheckoutDate;
+                                    TimeSpan ts = checkout - checkin;
+                                    int differenceInDays = ts.Days;
+                                    string nights = differenceInDays.ToString();}@nights
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>@reportList.TotalbookingAmount</td>
+                                <td>@reportList.NewBookingAmount</td>
+                                <td>@reportList.StayBazarCommission</td>
+                                <td>@reportList.NewCommission</td>
+                                <td>@reportList.Chargesforchange</td>
+
+                            </tr>
+                                    totalamount += reportList.TotalbookingAmount;
+                                    totalcomm += reportList.StayBazarCommission;
+                                    charges += reportList.Chargesforchange;
+                                    q++;
+                                }
+                            }
+                            <tr>
+                                <td>Summary</td>
+                                <td colspan="16">Original Booking Amount: @Math.Round(totalamount) , Net Booking Amount: @Math.Round(totalcomm), Net Charges: @Math.Round(charges) </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-bordered table-hover table-striped" border="1">
+                        <thead>
+                            <tr>
+                                <th colspan="18">Cancellations</th>
+                            </tr>
+                        </thead>
+                        <thead>
+                            <tr>
+                                <th>Ser No</th>
+                                <th>Supplier Name</th>
+                                <th>Property Name</th>
+                                <th>Destination</th>
+                                <th> Accomodation Type</th>
+                                <th>Booking Category</th>
+                                <th>Rate Type</th>
+                                <th>Checkin date</th>
+                                <th>Checkout Date</th>
+                                <th>No of Nights</th>
+                                <th>Rate type</th>
+                                <th>Total booking Amount cancelled</th>
+                                <th>Stay Bazar Commission cancelled</th>
+                                <th>Charges for change</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                IEnumerable<CLayer.ReportForDailyBooking> canrecords = Model.Where(x => x.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Cancelled);
+                                q = 0;
+                                long amnt;
+                            }
+                            @foreach (CLayer.ReportForDailyBooking reportList in canrecords)
+                            {
+                                q++;
+                                <tr>
+                                    <td>@q</td>
+                                    <td>@reportList.SupplierName</td>
+                                    <td>@reportList.PropertyName</td>
+                                    <td>@reportList.Destination</td>
+                                    <td>@reportList.AccomodationType</td>
+                                    <td>@reportList.BookingCategory</td>
+                                    <td>@reportList.RateType</td>
+                                    <td>@reportList.Checkindate.ToShortDateString()</td>
+                                    <td>@reportList.CheckoutDate.ToShortDateString()</td>
+                                    <td>
+                                        @{ DateTime checkin = reportList.Checkindate;
+                                         DateTime checkout = reportList.CheckoutDate;
+                                         TimeSpan ts = checkout - checkin;
+                                         int differenceInDays = ts.Days;
+                                         string nights = differenceInDays.ToString();
+                                        }@nights
+                                    </td>
+                                    <td>
+                                        @{
+                                         amnt = (long)Math.Round(reportList.TotalbookingAmount - reportList.TotalRefund);
+                                         if (amnt < 0) { amnt = 0; }
+                                        }
+                                        &nbsp;
+                                    </td>
+                                    <td>@reportList.TotalbookingAmountcancelled</td>
+                                    <td>@reportList.StayBazarCommission</td>
+                                    <td>@reportList.Chargesforchange</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <table class="table table-bordered table-hover table-striped" border="1">
+    <thead>
+        <tr>
+            <th colspan="18">Bookings with Failed Transactions</th>
+        </tr>
+    </thead>
+    <thead>
+        <tr>
+            <th>Ser No</th>
+            <th>Supplier Name</th>
+            <th>Property Name</th>
+            <th>Destination</th>
+            <th> Accomodation Type</th>
+            <th>Booking Category</th>
+            <th>Rate Type</th>
+            <th>Checkin date</th>
+            <th>Checkout Date</th>
+            <th>Rate type</th>
+            <th>total booking Amount</th>
+            <th>Stay Bazar Commission</th>
+            <th>Current Status</th>
+            <th>Booking Time</th>
+            <th>Issue</th>
+            <th>ResolutionTime</th>
+            <th>Resolution</th>
+            <th>Resolved BY</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            IEnumerable<CLayer.ReportForDailyBooking> failed = Model.Where(x => x.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.CheckOut);
+            q = 0;
+
+        }
+        @foreach (CLayer.ReportForDailyBooking reportList in failed)
+        {
+            q++;
+            <tr>
+                <td>@q</td>
+                <td>@reportList.SupplierName</td>
+                <td>@reportList.PropertyName</td>
+                <td>@reportList.Destination</td>
+                <td>@reportList.AccomodationType</td>
+                <td>@reportList.BookingCategory</td>
+                <td>@reportList.RateType</td>
+                
+                @{ DateTime checkin = reportList.Checkindate;
+                 DateTime checkout = reportList.CheckoutDate;
+                 TimeSpan ts = checkout - checkin;
+                 int differenceInDays = ts.Days;
+                 string nights = differenceInDays.ToString();
+                }&nbsp;
+                <td>@reportList.Checkindate.ToShortDateString()</td>
+                <td>@reportList.CheckoutDate.ToShortDateString()</td>
+
+                <td>&nbsp;</td>
+                <td>@reportList.TotalbookingAmount</td>
+                <td>@reportList.StayBazarCommission</td>
+                <td>&nbsp;</td>
+                <td>@reportList.BookingTime.ToShortDateString()</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+
+        }
+    </tbody>
+    @*}else
+        {
+        <text> </text>
+        }*@
+
+
+    @*@Html.Raw("</table>")*@
+</table>
+             
+
+<script type="text/javascript">
+    function showPager(num) {
+        //alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "ReportForDailyBookings", new { area = "Admin" })';
+        $.post(url, $("#frmPagersDailyBookings").serialize(), function (data) {
+            $("#DailyBooking").html(data);
+        });
+    }
+</script>
+

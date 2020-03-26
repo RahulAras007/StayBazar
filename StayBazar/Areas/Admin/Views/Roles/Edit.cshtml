@@ -1,0 +1,139 @@
+﻿@model StayBazar.Areas.Admin.Models.RoleModel
+@{
+    int idx = 0;
+    int len = Model.Permissions.Count();
+    string head = "";
+}
+@try
+{
+    ViewBag.Title = "Role";
+    using (Html.BeginForm("Save", "Roles"))
+    {
+        @*<h2>@ViewBag.Head</h2>*@
+<div class="page-title-container style3">
+
+    @* <div class="container">*@
+
+    <div class="row">
+        <div class="col-md-3">
+            <h2 style="color:white">@ViewBag.Head</h2>
+        </div>
+    </div>
+</div>
+    <br />
+    <div class="alert-danger">@ViewBag.ErrorMessage</div>
+
+    @*@Html.AntiForgeryToken()*@
+    @Html.ValidationSummary(true)
+
+                <div class="container-fluid">
+                    <div class="incontainer">
+
+                        <div class="form-group">
+                            @Html.DisplayNameFor(m => m.Name)
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.Name)
+                            @Html.HiddenFor(m => m.Id)
+                            @Html.HiddenFor(m => m.PermissionIds)
+                        </div>
+
+                        <div class="h2">Has access to</div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="row">
+                                    @for (idx = 0; idx < len && idx < 26; idx++)
+                                    {
+                                        if (head != Model.Permissions[idx].Heading)
+                                        {
+                                            head = Model.Permissions[idx].Heading;
+                                            <div class="col-md-12"><h4>@Model.Permissions[idx].Heading</h4></div>
+                                        }
+                                        <div class="col-md-12"><input type="checkbox" class="chk checkbox-inline permit" data-val="@Model.Permissions[idx].ModuleId" /> @Model.Permissions[idx].ModuleName</div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                @for (; idx < len && idx < 49; idx++)
+                                {
+                                    if (head != Model.Permissions[idx].Heading)
+                                    {
+                                        head = Model.Permissions[idx].Heading;
+                                        <div class="col-md-12"><h4>@Model.Permissions[idx].Heading</h4></div>
+                                    }
+                                    <div class="col-md-12"><input type="checkbox" class="chk checkbox-inline permit" data-val="@Model.Permissions[idx].ModuleId" /> @Model.Permissions[idx].ModuleName</div>
+                                }
+                            </div>
+                            <div class="col-md-4 form-group">
+                                @for (; idx < len; idx++)
+                                {
+                                    if (head != Model.Permissions[idx].Heading)
+                                    {
+                                        head = Model.Permissions[idx].Heading;
+                                        <div class="col-md-12"><h4>@Model.Permissions[idx].Heading</h4></div>
+                                    }
+                                    <div class="col-md-12"><input type="checkbox" class="chk checkbox-inline permit" data-val="@Model.Permissions[idx].ModuleId" /> @Model.Permissions[idx].ModuleName </div>
+                                }
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 col-md-offset-10 margin-top-10">
+                            <div class="btn-toolbar ">
+                                <div class="btn-group">
+                                    <input type="submit" id="btnSave" value="Save" class="btn btn-success" tabindex="10" />
+                                    <a href="/Admin/Roles" class="btn btn-primary btn-danger">Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="margin-top-30"></div>
+                <script type="text/javascript">
+                    $(function () {
+                        applyTicks();
+                        $(".permit").click(function () {
+                            v = "";
+                            $(".permit").each(function () {
+                                if (!$(this).prop("checked")) {
+                                    if (v == "") {
+                                        v = "" + $(this).attr("data-val");
+                                    } else {
+                                        v = v + "," + $(this).attr("data-val");
+                                    }
+                                }
+                            });
+                            $("#PermissionIds").val(v);
+                        });//permit-click
+
+                    });//document load
+
+                    function applyTicks() {
+                        var val = $("#PermissionIds").val();
+                        if (val == "") {
+                            $(".permit").prop('checked', true);
+                            return;
+                        }
+                        var ids = val.split(',');
+                        var len = ids.length;
+                        $(".permit").each(function () {
+                            id = $(this).attr("data-val");
+                            found = false;
+                            for (i = 0; i < len; i++) {
+                                if (id == ids[i]) { found = true; break; }
+                            }
+                            $(this).prop("checked", !found);
+                        });
+                    }
+                </script>
+                }
+                }
+                catch (Exception ex)
+                {
+                StayBazar.Common.LogHandler.HandleError(ex);
+                Response.Redirect("~/ErrorPage");
+                }
+
+

@@ -1,0 +1,129 @@
+﻿@model IEnumerable<CLayer.Suggest>
+@{
+
+    ViewBag.Title = "Suggestions";
+    try
+    {
+        var grid = new WebGrid(Model, canSort: false, canPage: true, rowsPerPage: 10,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        var currentAction = "";
+        HtmlHelper htmlHelper = this.Html;
+        var routeData = htmlHelper.ViewContext.RouteData;
+        currentAction = routeData.GetRequiredString("Action").ToLower();
+        <div class="h2">
+            Suggestions&nbsp;
+            @if (Model.Count() > 0)
+            {
+                <div class="btn-group" id="div-actions">
+                    @if (currentAction == "index")
+                    {
+                        <button id="btnReadAll" data-action="markusread" class="btn btn-default" disabled>Mark as Read</button>
+                        <button id="btnUnreadAll" data-action="markusunread" class="btn btn-default" disabled>Mark as Unread</button>
+                        <button id="btnVerify" data-action="verify" class="btn btn-default" disabled>Verify All</button>
+                        <button id="btnReject" data-action="reject" class="btn btn-default" disabled>Reject All</button>
+                    }
+                    else
+                    {
+                        if (currentAction == "verified")
+                        {
+                            <button id="btnReject" data-action="reject" class="btn btn-default" disabled>Reject All</button>
+                        }
+                        else
+                        {
+                            <button id="btnVerify" data-action="verify" class="btn btn-default" disabled>Verify All</button>
+                        }
+                    }
+                    <button id="btnDeleteAll" data-action="delete" class="btn btn-danger" disabled>Delete</button>
+                </div>
+            }
+        </div>
+        <ul class="nav nav-tabs">
+            <li @if (currentAction == "index") { <text> class="active" </text>                   }><a href="/Admin/Suggest" ">Inbox</a></li>
+            <li @if (currentAction == "verified") { <text> class="active" </text>                    }><a href="/Admin/Suggest/Verified">Verified</a></li>
+            <li @if (currentAction == "rejected") { <text> class="active" </text>                     }><a href="/Admin/Suggest/Rejected">Rejected</a></li>
+        </ul>
+        <form id="frmIds" method="post">
+            <input id="data" name="data" type="hidden" value="" />
+            <input id="type" name="type" type="hidden" value="" />
+        </form>
+
+        <div id="gridContent">
+            @if (Model.Count() > 0)
+            {
+                @grid.GetHtml(
+                       tableStyle: "webGrid table table-striped table-hover table-condensed",
+        headerStyle: "header",
+        alternatingRowStyle: "alt",
+        selectedRowStyle: "select",
+        columns: grid.Columns(
+        grid.Column(header: "head", format: @<text><input type="checkbox" class="chk checkbox-inline" value="@item.InfoId" /></text>),
+        grid.Column("Name", format: @<text>@if (item.Status == (int)StayBazar.Models.SuggestModel.StatusTypes.NotViewed)
+        {<text><b>@item.Name</b></text>}
+        else
+        {<text>@item.Name</text>}&nbsp;</text>),
+        grid.Column("Location", format: @<text>@if (item.Status == (int)StayBazar.Models.SuggestModel.StatusTypes.NotViewed)
+        {<text><b>@item.Location</b></text>}
+        else
+        {<text>@item.Location</text>}&nbsp;</text>),
+        grid.Column("City", format: @<text>@if (item.Status == (int)StayBazar.Models.SuggestModel.StatusTypes.NotViewed)
+        {<text><b>@item.City</b></text>}
+        else
+        {<text>@item.City</text>}&nbsp;</text>),
+                    grid.Column("SuggestionDate", "Suggestion Date"),
+        grid.Column("View", format: @<text><a href="/Admin/Suggest/Edit/@item.InfoId" title="open"><span class="glyphicon glyphicon-edit"></span></a></text>)))
+            }
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $(".header th").each(function () {
+                    if ($(this).html().trim() == "head") {
+                        $(this).html("<input type='checkbox' id='chkAll' />");
+                    }
+                });
+                function checkchange() {
+                    var ids = "";
+                    var cnt = 0;
+                    var chkcnt = 0;
+                    $(".chk").each(function () {
+                        cnt += 1;
+                        if ($(this).is(":checked") == true) { ids += $(this).attr("value") + ","; chkcnt += 1; }
+                    });
+                    if (ids.length > 0) { ids = ids.substr(0, ids.length - 1); }
+                    if (ids == "") { $("#div-actions button").attr("disabled", "disabled"); }
+                    else { $("#data").val(ids); $("#div-actions button").removeAttr("disabled"); }
+                    if (cnt > 0 && chkcnt > 0) {
+                        if (cnt == chkcnt) { $("#chkAll").prop('checked', true); }
+                        else { $("#chkAll").prop('checked', false); }
+                    }
+                    else { $("#chkAll").prop('checked', false); }
+                }
+                $(".chk").change(function () { checkchange(); });
+                $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+                $(".webGrid tfoot tr td a").click(function () {
+                    $("#chkAll").prop('checked', false);
+                    $("#div-actions button").attr("disabled", "disabled");
+                    $(".chk").change(function () { checkchange(); });
+                    $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+                });
+                $("#div-actions button").click(function () {
+                    $("#type").val($(this).attr("data-action"));
+                    if (confirm("Are you sure you want to " + $("#type").val() + " the selectd items?")) {
+                        var url = '@Url.Action("ActionSet", "Suggest")';
+                        $.post(url, $("#frmIds").serialize(),
+                                function (data) {
+                                    window.location = location;
+                                });
+                    }
+                });
+            });
+        </script>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}
+
+

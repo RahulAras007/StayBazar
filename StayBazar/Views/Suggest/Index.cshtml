@@ -1,0 +1,67 @@
+﻿@model StayBazar.Models.SuggestModel
+@try
+{
+    ViewBag.Title = "Suggestions";
+    using (Html.BeginForm("Save", "Suggest"))
+    {
+        <div class="container">
+            <h2>Suggest a property</h2>
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            @Html.HiddenFor(m => m.InfoId)
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Name)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Location)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.Location, new { @tabindex = "2", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Location)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.City)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.City, new { @tabindex = "3", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.City)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+                @Html.DropDownListFor(m => m.CountryId, Model.Country, new { @tabindex = "4", @class = "form-control input-sm" })
+                &nbsp;
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                @Html.TextAreaFor(m => m.Address, new { @tabindex = "5", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Address)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Phone)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.Phone, new { @tabindex = "6", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Phone)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.Email, new { @tabindex = "7", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+            <div id="divMessage">
+                @ViewBag.Message
+            </div>
+
+                    <input type="submit" id="btnSave" value="Send" class="btn btn-default" tabindex="8" />
+                    @*<a href="~/Suggest" id="btnReset" class="btn btn-default" tabindex="9">Cancel</a>*@
+            <input type="reset" id="btnReset" class="btn btn-default" tabindex="9" value="Cancel"/>
+            <script type="text/javascript">
+                $(function () {
+                    $("#Name").focus();
+                });
+            </script>
+        </div>
+    }
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+    Response.Redirect("~/ErrorPage");
+}
+

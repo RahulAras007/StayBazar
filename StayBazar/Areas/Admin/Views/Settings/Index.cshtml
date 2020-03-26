@@ -1,0 +1,801 @@
+﻿@model StayBazar.Areas.Admin.Models.SettingsModel
+@{
+    ViewBag.Title = "Settings";
+}
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-3">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        </div>
+    </div>
+<br />
+<br />
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-8">
+                    @*<h2>Settings</h2>*@
+                    <div class="panel-group" id="accordion">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+                                        Email
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseTwo" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("MailSave", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MailServer)
+                                                    @Html.TextBoxFor(m => m.MailServer, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Port)
+                                                    @Html.TextBoxFor(m => m.Port, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MailSecurity)
+                                                    @Html.DropDownListFor(m => m.MailSecurity, Model.SecurityListing, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="QueryEmail">Query Email (No multiple emails)</label>
+                                                    @Html.TextBoxFor(m => m.QueryEmail, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.QueryPassword)
+                                                    @Html.TextBoxFor(m => m.QueryPassword, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="ReservationEmail">Reservation Email (No multiple emails)</label>
+                                                    @Html.TextBoxFor(m => m.ReservationEmail, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.ReservationPassword)
+                                                    @Html.TextBoxFor(m => m.ReservationPassword, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="SupportEmail">Support Email (No multiple emails)</label>
+                                                    @Html.TextBoxFor(m => m.SupportEmail, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.SupportEmailPassword)
+                                                    @Html.TextBoxFor(m => m.SupportEmailPassword, new { @class = "form-control" })
+                                                </div>
+
+                                                @*add Cc For Customercommunication*@
+                                                <div class="form-group">
+                                                    <label for="CCCustomercommunications">Cc added for customer communications (Emails separated by comma, no spaces)</label>
+                                                    @Html.TextBoxFor(m => m.CCCustomercommunications, new { @class = "form-control" })
+                                                </div>
+                                                @*add Cc For Suppliercommunications*@
+                                                <div class="form-group">
+                                                    <label for="CCSuppliercommunications">Cc added for supplier communications (Emails separated by comma, no spaces)</label>
+                                                    @Html.TextBoxFor(m => m.CCSuppliercommunications, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="AccountMail">Account Emails (Emails separated by comma, no spaces)</label>
+                                                    @Html.TextBoxFor(m => m.AccountMail, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="InvoiceAccountMail">Supplier Invoice request - mails</label>
+                                                    @Html.TextBoxFor(m => m.SupplierInvoicerequestMails, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="BDeleteReqAccountMail">Booking delete alert mails</label>
+                                                    @Html.TextBoxFor(m => m.Bookingdeletealertmails, new { @class = "form-control" })
+                                                </div>
+
+
+                                                <div class="form-group">
+                                                    <label for="InvoiceAccountMail">Booking Draft alert mails</label>
+                                                    @Html.TextBoxFor(m => m.BookingDraftalertmails, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="BDeleteReqAccountMail">Booking rejected alert mails - CC</label>
+                                                    @Html.TextBoxFor(m => m.Bookingrejectedalertmails, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="SupplierPaymentScheduleEmail">SupplierPaymentSchedule Emails</label>
+                                                    @Html.TextBoxFor(m => m.SupplierPaymentScheduleEmail, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="SupplierPaymentScheduleEmail">Customer Query mails - CC</label>
+                                                    @Html.TextBoxFor(m => m.CustomerQueryCCMails, new { @class = "form-control" })
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-2 col-md-offset-1">
+                                                <input type="submit" class="btn btn-success" value="Save" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+                                        Gateway Settings
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseThree" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SaveGateway", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GatewayAccountId)
+                                                    @Html.TextBoxFor(m => m.GatewayAccountId, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GatewayDescription)
+                                                    @Html.TextBoxFor(m => m.GatewayDescription, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GatewayReturnURL)
+                                                    @Html.TextBoxFor(m => m.GatewayReturnURL, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.RefundLink)
+                                                    @Html.TextBoxFor(m => m.RefundLink, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GatewaySecretKey)
+                                                    @Html.TextBoxFor(m => m.GatewaySecretKey, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.OfflinePaymentGatewayReturnURL)
+                                                    @Html.TextBoxFor(m => m.OfflinePaymentGatewayReturnURL, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.OfflinePaymentPaypalGatewayReturnURL)
+                                                    @Html.TextBoxFor(m => m.OfflinePaymentPaypalGatewayReturnURL, new { @class = "form-control" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-md-offset-1">
+                                                <input type="submit" class="btn btn-success" value="Save" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapsePaypal">
+                                        Paypal Settings
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapsePaypal" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SavePaypal", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.PaypalRequestURL)
+                                                    @Html.TextBoxFor(m => m.PaypalRequestURL, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Paypal_ReturnUrl)
+                                                    @Html.TextBoxFor(m => m.Paypal_ReturnUrl, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Paypal_TokenUrl)
+                                                    @Html.TextBoxFor(m => m.Paypal_TokenUrl, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Paypal_Signature)
+                                                    @Html.TextBoxFor(m => m.Paypal_Signature, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Paypal_User)
+                                                    @Html.TextBoxFor(m => m.Paypal_User, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Paypal_Pwd)
+                                                    @Html.TextBoxFor(m => m.Paypal_Pwd, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Paypal_Confirmation_URL)
+                                                    @Html.TextBoxFor(m => m.Paypal_Confirmation_URL, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Paypal_CancelUrl)
+                                                    @Html.TextBoxFor(m => m.Paypal_CancelUrl, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.paypalcommission)
+                                                    @Html.TextBoxFor(m => m.paypalcommission, new { @class = "form-control" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-md-offset-1">
+                                                <input type="submit" class="btn btn-success" value="Save" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">
+                                        Google/SMS API
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse4" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SaveAPI", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GoogleAPIKey)
+                                                    @Html.TextBoxFor(m => m.GoogleAPIKey, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GoogleLocationLink)  <a class="maxpinfo" href="#" data-toggle="popover" data-placement="right" data-content="Keywords: [ADDR] - will get replaced by address.[API] will get replaced by API key."><span class="glyphicon glyphicon-info-sign"></span></a>
+                                                    @Html.TextBoxFor(m => m.GoogleLocationLink, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.SMSAccountId)
+                                                    @Html.TextBoxFor(m => m.SMSAccountId, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.SMSAPI)
+                                                    @Html.TextBoxFor(m => m.SMSAPI, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.SMSLink)
+                                                    @Html.TextBoxFor(m => m.SMSLink, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.SMSUserName)
+                                                    @Html.TextBoxFor(m => m.SMSUserName, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.SMSPassword)
+                                                    @Html.TextBoxFor(m => m.SMSPassword, new { @class = "form-control" })
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-2 col-md-offset-1">
+                                                <input type="submit" class="btn btn-success" value="Save" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                                        Markups &amp; Default Rates
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseOne" class="panel-collapse collapse ">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SaveMarkup", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.B2BMarkupLongTerm)
+                                                    @Html.TextBoxFor(m => m.B2BMarkupLongTerm, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.B2BMarkupShortTerm)
+                                                    @Html.TextBoxFor(m => m.B2BMarkupShortTerm, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.B2CMarkupLongTerm)
+                                                    @Html.TextBoxFor(m => m.B2CMarkupLongTerm, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.B2CMarkupShortTerm)
+                                                    @Html.TextBoxFor(m => m.B2CMarkupShortTerm, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.B2BStdLongTerm)
+                                                    @Html.TextBoxFor(m => m.B2BStdLongTerm, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.B2BStdShortTerm)
+                                                    @Html.TextBoxFor(m => m.B2BStdShortTerm, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.CancellationCharges)
+                                                    @Html.TextBoxFor(m => m.CancellationCharges, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.CancellationPeriod)
+                                                    @Html.TextBoxFor(m => m.CancellationPeriod, new { @class = "form-control" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-md-offset-1">
+                                                <input type="submit" class="btn btn-success" value="Save" onclick="javascript:return Confirm();" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse5">
+                                        Payment Gateway Rates
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse5" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SaveCharges", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GTAmex)
+                                                    @Html.TextBoxFor(m => m.GTAmex, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GTCredit)
+                                                    @Html.TextBoxFor(m => m.GTCredit, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GTCashCard)
+                                                    @Html.TextBoxFor(m => m.GTCashCard, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GTDebit)
+                                                    @Html.TextBoxFor(m => m.GTDebit, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GTNetbanking)
+                                                    @Html.TextBoxFor(m => m.GTNetbanking, new { @class = "form-control" })
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-2 col-md-offset-1">
+                                                <input type="submit" class="btn btn-success" value="Save" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse6">
+                                        Widget Settings
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse6" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SaveWidgets", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.WMostPopular)
+                                                    @Html.TextBoxFor(m => m.WMostPopular, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.WDeals)
+                                                    @Html.TextBoxFor(m => m.WDeals, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.WNewProperties)
+                                                    @Html.TextBoxFor(m => m.WNewProperties, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.WSpecial)
+                                                    @Html.TextBoxFor(m => m.WSpecial, new { @class = "form-control" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-md-offset-1">
+                                                <input type="submit" class="btn btn-success" value="Save" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseChat">
+                                        Chat Settings
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseChat" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SaveChat", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <label>Chat :&nbsp;&nbsp;</label>
+                                                @foreach (StayBazar.Areas.Admin.Models.SettingsModel.chatset ruv in (StayBazar.Areas.Admin.Models.SettingsModel.chatset[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.SettingsModel.chatset)))
+                                                {
+                                                    <input type="radio" name="chat" value="@((int)ruv)" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == Model.Chat) { <text> checked </text> } />
+                                                    <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                                                    <text>&nbsp;&nbsp;</text>
+                                                }
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Liveservechat)
+                                                    @Html.TextAreaFor(m => m.Liveservechat, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Zopimchat)
+                                                    @Html.TextAreaFor(m => m.Zopimchat, new { @class = "form-control" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-md-offset-1">
+                                                <input type="submit" class="btn btn-success" value="Save" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseMaximojo">
+                                        Maximojo Settings
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseMaximojo" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SaveMaximojo", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MaximojoHotelAvailability)
+                                                    @Html.TextBoxFor(m => m.MaximojoHotelAvailability, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MaximojoBookingAvailability)
+                                                    @Html.TextBoxFor(m => m.MaximojoBookingAvailability, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MaximojoBookingSubmit)
+                                                    @Html.TextBoxFor(m => m.MaximojoBookingSubmit, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MaximojoBookingVerify)
+                                                    @Html.TextBoxFor(m => m.MaximojoBookingVerify, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MaximojoBookingCancel)
+                                                    @Html.TextBoxFor(m => m.MaximojoBookingCancel, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MaximojoPartnerCode)
+                                                    @Html.TextBoxFor(m => m.MaximojoPartnerCode, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MaximojoUserName)
+                                                    @Html.TextBoxFor(m => m.MaximojoUserName, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MaximojoPassword)
+                                                    @Html.TextBoxFor(m => m.MaximojoPassword, new { @class = "form-control" })
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-2 col-md-offset-1">
+                                                <input type="submit" class="btn btn-success" value="Save" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse7">
+                                        Other
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapse7" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SaveOther", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.MaximumCorpUsers)
+                                                    @Html.TextBoxFor(m => m.MaximumCorpUsers, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.BookingLockTime)
+                                                    @Html.TextBoxFor(m => m.BookingLockTime, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.GalleryMaxFiles)
+                                                    @Html.TextBoxFor(m => m.GalleryMaxFiles, new { @class = "form-control" })
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-9">
+                                                        <div class="form-group">
+                                                            @Html.LabelFor(m => m.PageLock)
+                                                            @Html.TextBoxFor(m => m.PageLock, new { @class = "form-control" })
+                                                        </div>
+                                                    </div><div class="col-md-3" style="margin-top:24px;"><input type="button" onclick="generateAPI()" class="btn btn-info" value="Generate key" /></div>
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.B2CPartialPaymentsPctge)
+                                                    @Html.TextBoxFor(m => m.B2CPartialPaymentsPctge, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.B2BPartialPaymentsPctge)
+                                                    @Html.TextBoxFor(m => m.B2BPartialPaymentsPctge, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.PartialPaymentFirstReminder)
+                                                    @Html.TextBoxFor(m => m.PartialPaymentFirstReminder, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.PartialPaymentSecondReminder)
+                                                    @Html.TextBoxFor(m => m.PartialPaymentSecondReminder, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.CreditAmount)
+                                                    @Html.TextBoxFor(m => m.CreditAmount, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.CreditDays)
+                                                    @Html.TextBoxFor(m => m.CreditDays, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.CorporateSmedybookrxp)
+                                                    @Html.TextBoxFor(m => m.CorporateSmedybookrxp, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Default_Password)
+                                                    @Html.TextBoxFor(m => m.Default_Password, new { @class = "form-control" })
+                                                </div>
+
+
+                                                <div class="height10">
+                                                </div>
+                                                <div></div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.ContactNumber)
+                                                    @Html.TextBoxFor(m => m.ContactNumber, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.SignatureImage)
+                                                    <input type="file" name="SignImage" id="UploadImg" />
+                                                    @Html.ValidationMessageFor(m => m.SignatureImage)
+
+                                                    <img id="imgPreview" src="~/@Model.SignatureImage" />
+
+                                                </div>
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.InvDueDays)
+                                                    @Html.TextBoxFor(m => m.InvDueDays, new { @class = "form-control" })
+                                                </div>
+                                                @*add Cc For Bank*@
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.bank)
+                                                    @Html.TextBoxFor(m => m.bank, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.Grossmarginperc)
+                                                    @Html.TextBoxFor(m => m.Grossmarginperc, new { @class = "form-control" })
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-md-2">
+                                                            <input type="button" onclick="Sitemapref()" class="btn btn-success" value="Refresh Sitemap file" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-md-offset-1">
+                                            <input type="submit" class="btn btn-success" value="Save" />
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseGsttaxRate">
+                                        GST Tax Rates
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseGsttaxRate" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("SaveGSTTaxRates", "Settings", new { Area = "Admin" })">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.CGSTTaxRate)
+                                                    @Html.TextBoxFor(m => m.CGSTTaxRate, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.SGSTTaxRate)
+                                                    @Html.TextBoxFor(m => m.SGSTTaxRate, new { @class = "form-control" })
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.IGSTTaxRate)
+                                                    @Html.TextBoxFor(m => m.IGSTTaxRate, new { @class = "form-control" })
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-md-offset-1">
+                                            <input type="submit" class="btn btn-success" value="Save" />
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    @*<div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapsesm">
+                                        Sitemap
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapsesm" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <form method="post" action="@Url.Action("Index", "Sitemap")">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <input type="button" onclick="Sitemapref()" class="btn btn-success" value="Refresh Sitemap file" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>*@
+
+                </div>
+
+
+            </div>
+            <div class="col-lg-4">
+
+            </div>
+        </div>
+
+        <script type="text/javascript">
+    function Sitemapref()
+    {
+        $.get("@Url.Action("Index", "Sitemap", new { Area = "Admin" })", function (data) {
+            if (data == "True" || data == "False") {
+                alert("Successfully updated");
+            }
+        });
+
+    }
+    function Signatureup() {
+
+        $.post("@Url.Action("saveimg", "Settings", new { Area = "Admin" })", function (data) {
+            if (data == "True" || data == "False") {
+                alert("Successfully updated");
+            }
+        });
+    }
+
+
+
+    function Confirm() {
+        var result = confirm("Are you sure. Do you want to submit?");
+        if (result) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+        </script>
+        <script type="text/javascript">
+    $(function () { $(".maxpinfo").popover({ trigger: "hover" }); });
+
+    $("#QueryPassword").prop("type", "password");
+    $("#QueryPassword").focusin(function () { $(this).prop("type", "text"); });
+    $("#QueryPassword").focusout(function () { $(this).prop("type", "password"); });
+    $("#ReservationPassword").prop("type", "password");
+    $("#ReservationPassword").focusin(function () { $(this).prop("type", "text"); });
+    $("#ReservationPassword").focusout(function () { $(this).prop("type", "password"); });
+    $("#GatewayAccountId").prop("type", "password");
+    $("#GatewayAccountId").focusin(function () { $(this).prop("type", "text"); });
+    $("#GatewayAccountId").focusout(function () { $(this).prop("type", "password"); });
+    $("#SupportEmailPassword").prop("type", "password");
+    $("#SupportEmailPassword").focusin(function () { $(this).prop("type", "text"); });
+    $("#SupportEmailPassword").focusout(function () { $(this).prop("type", "password"); });
+
+    $("#SMSPassword").prop("type", "password");
+    $("#SMSPassword").focusin(function () { $(this).prop("type", "text"); });
+    $("#SMSPassword").focusout(function () { $(this).prop("type", "password"); });
+
+
+    $("#MaximojoPassword").prop("type", "password");
+    $("#MaximojoPassword").focusin(function () { $(this).prop("type", "text"); });
+    $("#MaximojoPassword").focusout(function () { $(this).prop("type", "password"); });
+
+
+    $("#Default_Password").prop("type", "password");
+    $("#Default_Password").focusin(function () { $(this).prop("type", "text"); });
+    $("#Default_Password").focusout(function () { $(this).prop("type", "password"); });
+    function generateAPI() {
+        $.get("@Url.Action("GetNewLock", "Settings", new { Area = "Admin" })", function (data) {
+            $("#PageLock").val(data);
+        });
+    }
+        </script>
+        <script>
+            $("#UploadImg").change(function () {
+
+                var data = new FormData();
+                var files = $("#UploadImg").get(0).files;
+                if (files.length > 0) {
+                    data.append("MyImages", files[0]);
+                }
+
+                $.ajax({
+                    url: "/Settings/UploadFile",
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    data: data,
+                    success: function (response) {
+                        //code after success
+                        //$("#txtImg").val(response);
+                        $("#imgPreview").attr('src', '/Files\\signature\\' + response);
+                    },
+                    error: function (er) {
+                        //  alert(er);
+                    }
+
+                });
+            });
+        </script>

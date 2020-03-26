@@ -1,0 +1,103 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+           @*StayBazar.Areas.Admin.Models.OfflineBookingModel*@
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Offline Booking";
+}
+<div id="content">
+    <h2>@ViewBag.Title</h2>
+    <div class="row">
+
+        <div class="col-md-12">
+            @using (Html.BeginForm("Filter", "BookingHistory", FormMethod.Post, new { @id = "frmFilters", onsubmit = "return false;" }))
+            {
+                <div class="row">
+                    @*<div class="col-md-2">
+                        <label>Staff </label>
+                     @*   @Html.DropDownListFor(m => m.CreatedUser, Model.CreatedUsers, new { @tabindex = "1", @class = "form-control" })
+                    </div>
+                    <div class="col-md-2">
+                        <label>Status </label>
+                     @*   @Html.DropDownListFor(m => m.SaveStatus, Model.SavedStatusTypes_Manage, new { @tabindex = "1", @class = "form-control" })
+                    </div>*@
+                    <div class="col-md-4">
+                        <br />
+                        <div class="input-group">
+                            <input class="form-control" id="SearchString" name="SearchString" tabindex="2" type="text" >
+                            <span class="input-group-btn">
+                                <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <br />
+                        <div class="form-control">
+                            @foreach (StayBazar.Areas.Admin.Models.OfflineBookingModel.OfflineBookingStatusValues ruv in (StayBazar.Areas.Admin.Models.OfflineBookingModel.OfflineBookingStatusValues[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.OfflineBookingModel.OfflineBookingStatusValues)))
+                            {
+                                <input type="radio" name="ruv" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text>             } />
+                                <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                                <text>&nbsp;&nbsp;</text>
+                            }
+                        </div>
+                    </div>
+                </div>
+                @*@Html.HiddenFor(m => m.SearchValue)*@
+            }
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <div id="List" class="row">
+                @{
+                    Html.RenderPartial("~/Views/BookingHistory/_List.cshtml", Model.ToList());
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@Html.Partial("~/Views/Cancellation/_CancelBox.cshtml")
+<script type="text/javascript">
+
+            $(function () {
+                @*$("#SaveStatus").change(function () {
+                    var url = '@Url.Action("Filter", "ManageOfflineBooking")';
+                    $.post(url, $("#frmFilters").serialize(),
+                            function (data) {
+                                $("#List").html(data);
+                            });
+                });*@
+
+
+                @*$("#CreatedUser").change(function () {
+                    var url = '@Url.Action("Filter", "ManageOfflineBooking")';
+                    $.post(url, $("#frmFilters").serialize(),
+                            function (data) {
+                                $("#List").html(data);
+                            });
+                });*@
+            });
+
+
+            $(function () {
+                $("#SearchValue").val("1");
+                $(".css-radiobutton").change(function () {
+                    $("#SearchValue").val("1");
+                    $(".css-radiobutton").each(function () {
+                        if (this.checked) {
+                            $("#SearchValue").val($(this).attr("id"));
+                        }
+                    });
+                });
+                $("#btnSearch").click(function () {
+                    var url = '@Url.Action("Filter", "BookingHistory")';
+                    $.post(url, data = { searchString: $("#SearchString").val(), searchItem: $("#SearchValue").val(), start: 0, limit: 25, Status: 0, Userid: 1 },
+                            function (data) {
+                                $("#List").html(data);
+                            });
+                });
+            });
+
+</script>

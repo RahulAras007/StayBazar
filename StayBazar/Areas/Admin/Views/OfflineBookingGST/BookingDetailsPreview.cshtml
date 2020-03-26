@@ -1,0 +1,1208 @@
+﻿@model  StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    CLayer.OfflineBooking offedit = BLayer.OfflineBooking.GetAllDetailsById(Model.OfflineBookingId);
+    CLayer.OfflineBooking customerdetails = BLayer.OfflineBooking.GetAllCustomerDetails(Model.OfflineBookingId);
+    CLayer.OfflineBooking offprodt = BLayer.OfflineBooking.GetAllpropertyDetails(Model.OfflineBookingId);
+
+    List<CLayer.OfflineBooking> BListGST = BLayer.OfflineBooking.GetMultipleBookingDetailsGST(Model.OfflineBookingId);
+
+    List<CLayer.OfflineBooking> VendorList = BLayer.OfflineBooking.GetMultipleVendorDetailsGST(Model.OfflineBookingId);
+
+    List<CLayer.SupplierPaymentSchedule> SupplierPaymentSchedule = BLayer.OfflineBooking.GetAllSupplierPaymentSchedule(Model.OfflineBookingId);
+    if(SupplierPaymentSchedule.Count>0)
+    {
+        Model.SupplierPaymentMode = SupplierPaymentSchedule[0].SupplierPaymentMode;
+        Model.SupplierPaymentCreditDays = SupplierPaymentSchedule[0].SupplierCreditDays;
+    }
+
+
+    string viewpage = ViewBag.viewonly;
+
+    <link href="~/Content/jquery.dpNumberPicker-holoLight-1.0.1.css" rel="stylesheet" />
+        <link href="~/Content/datepicker.css" rel="stylesheet" />
+        <script src="~/Scripts/jquery.dpNumberPicker-1.0.1.js"></script>
+        <script src="~/Scripts/Moment.js"></script>
+
+}
+@if (viewpage == "yes")
+{
+    <div class="row ">
+        <div class="col-md-1 col-md-offset-10 margin-top-30">
+            <a title="Pdf" href="#" onclick="PDF(@Model.OfflineBookingId)" id="btnNextClick" class="fa fa-file-pdf-o" style="font-size: 22px;"></a>
+        </div>
+    </div>
+}
+
+
+<div class="container" id="SubmitForm">
+    <div class="col-md-12">
+        <h4 class="bold">Customer Details</h4>
+        <div class="col-md-5">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            @Html.Label("Name")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @customerdetails.CustomerName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Email")
+                        </td>
+                        <td>
+                            &nbsp;: &nbsp; &nbsp;@customerdetails.CustomerEmail
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Mobile")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @customerdetails.CustomerMobile
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("State")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @customerdetails.CustomerStatename
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Address")
+                            </div>
+                        </td>
+                        <td>
+                            <div class="group"><div style="padding-left:27px;">@customerdetails.CustomerAddress </div></div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Zip Code")
+                            </div>
+                        </td>
+                        <td>
+                            <div class="group"><div style="padding-left:27px;">@customerdetails.CustomerpinCode </div></div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Country")
+                            </div>
+                        </td>
+                        <td>
+                            &nbsp; &nbsp; &nbsp;  @customerdetails.CustomerCountryname
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @Html.Label("City")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @customerdetails.CustomerCityname
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <h4 class="bold">Property Details</h4>
+
+        <div class="col-md-5">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            @Html.Label("Property Name")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offprodt.PropertyName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Supplier Name")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offprodt.SupplierName
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Property Email")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @offprodt.PropertyEmail
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Mobile")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offprodt.PropertyContactNo
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="col-md-5">
+            <table>
+
+                <tbody>
+
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Address")
+                            </div>
+                        </td>
+                        <td>
+                            <div class="group"><div style="padding-left:27px;">@offprodt.PropertyAddress </div></div>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Zip Code")
+                            </div>
+                        </td>
+                        <td>
+                            <div class="group"><div style="padding-left:27px;">@offprodt.PropertyPinCode </div></div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @Html.Label("Country")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offprodt.PropertyCountryname
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("State")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @offprodt.PropertyStatename
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("City")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offprodt.PropertyCityname
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+<h4 class="bold">Booking Details</h4>
+<div class="panel-group" id="BookingDetails">
+    <div class="col-md-12" style="padding: 0;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th width="174">&nbsp;Accommodation</th>
+                    <th width="160">&nbsp;Date</th>
+                    <th width="80" class="textalgncenter"> No Of Night</th>
+                    <th width="90" class="textalgncenter"> No Of rooms</th>
+                    <th width="50" class="textalgncenter"> Adults</th>
+                    <th width="50" class="textalgncenter"> Children</th>
+                    <th width="150">Guest Name</th>
+                    <th width="200">Guest Email</th>
+                    <th width="80" class="textalgncenter"> Amount</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="panel panel-default">
+        @foreach (CLayer.OfflineBooking dt in BListGST)
+        {
+            if (BListGST.Count > 0)
+            {
+                <div class="panel-heading padding0 panelheadbackimagenone">
+                    <a data-toggle="collapse" class="blacktext " data-parent="#BookingDetails" href="#iAcc_@dt.BookingDetailsId">
+                        <div class="row">
+                            <table class="table ">
+                                <tbody>
+                                    <tr>
+                                        <td width="174">@dt.AccommodatoinTypename</td>
+                                        <td width="160">
+                                            <b>Check In</b>:@dt.CheckIn.ToShortDateString() <br />
+                                            <b>Check out</b>: @dt.CheckOut.ToShortDateString()
+                                        </td>
+                                        <td width="80" class="textalgncenter">@dt.NoOfNight</td>
+                                        <td width="90" class="textalgncenter">@dt.NoOfRooms</td>
+                                        <td width="50" class="textalgncenter">@dt.NoOfPaxAdult</td>
+                                        <td width="50" class="textalgncenter">@dt.NoOfPaxChild</td>
+                                        <td width="150">&nbsp;@dt.GuestName</td>
+                                        <td width="200">@dt.GuestEmail</td>
+                                        <td width="80" class="textalgncenter">@dt.TotalSalePrice</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </a>
+                </div>
+                <div id="iAcc_@dt.BookingDetailsId" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <b>Buy Price</b><br />
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                Average Daily Rate Before GST :
+                                            </td>
+                                            <td align="right">
+                                                @dt.AvgDailyRateBefreStaxForBuyPrice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                GST <span>( % )</span> :
+                                            </td>
+                                            <td align="right">
+                                                @dt.StaxForBuyPrice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Total Amount - Accommodation :
+                                            </td>
+                                            <td align="right">
+                                                @dt.TotalAmtForBuyPrice
+
+                                            </td>
+                                        </tr>
+
+
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                GST - other services <span>( % )</span> :
+                                            </td>
+                                            <td align="right">
+                                                @dt.StaxForotherBuyPrice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Total Amount - other services :
+                                            </td>
+                                            <td align="right">
+                                                @dt.TotalAmtotherForBuyPrice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Buy Price for other services :
+                                            </td>
+                                            <td align="right">
+                                                @dt.BuyPriceforotherservicesForBuyprice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight:bold;">
+                                                Total Buy Price :
+                                            </td>
+                                            <td align="right" style="font-weight:bold;">
+                                                @dt.TotalBuyPrice
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6">
+                                <b>Sale Price</b><br />
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                Average Daily Rate Before GST:
+                                            </td>
+                                            <td align="right">
+                                                @dt.AvgDailyRateBefreStaxForSalePrice
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                GST <span>( % )</span> :
+                                            </td>
+                                            <td align="right">
+                                                @dt.StaxForSalePrice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Total Amount - Accommodation :
+                                            </td>
+                                            <td align="right">
+                                                @dt.TotalAmtForSalePrice
+
+                                            </td>
+                                        </tr>
+
+
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                GST - other services <span>( % )</span> :
+                                            </td>
+                                            <td align="right">
+                                                @dt.StaxForotherForSalePrice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Total Amount - other services:
+                                            </td>
+                                            <td align="right">
+                                                @dt.TotalAmtotherForSalePrice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Sale Price for other services :
+                                            </td>
+                                            <td align="right">
+                                                @dt.BuyPriceforotherservicesForSalePrice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight:bold;">
+                                                Total Sale Price :
+                                            </td>
+                                            <td align="right" style="font-weight:bold;">
+                                                @dt.TotalSalePrice
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <br />
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                Hotel Conformation No:
+                                            </td>
+                                            <td align="right">
+                                                @dt.HotelConfirmationNo
+
+                                            </td>
+                                        </tr>
+                                        <tr></tr>
+                                        <tr></tr>
+
+
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                Nature of Service:
+                                            </td>
+                                            <td align="right">
+                                                @dt.Natureofservice
+
+                                            </td>
+                                        </tr>
+                                        <tr></tr>
+                                        <tr></tr>
+                                        <tr></tr>
+                                    </table>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6">
+                                <br />
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                Stay options:
+                                            </td>
+                                            <td align="right">
+                                                @dt.StayCategoryName
+                                            </td>
+                                        </tr>
+                                        <tr></tr>
+                                        <tr></tr>
+
+
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr></tr>
+                                        <tr></tr>
+                                        <tr></tr>
+                                        <tr></tr>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <br />
+
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+@if (VendorList.Count > 0) { 
+<h4 class="bold">Additional Services From Third Party Vendor</h4>
+<div class="panel-group" id="VendorDetails">
+    <div class="col-md-12" style="padding: 0;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th width="174">&nbsp;Vendor Name</th>
+                    <th width="160">&nbsp;Vendor Address</th>
+                    <th width="160">&nbsp;City</th>
+                    <th width="80" class="textalgncenter"> Nature Of Service</th>
+                    <th width="90" class="textalgncenter"> Email Address</th>
+                    <th width="50" class="textalgncenter"> Total ByPrice</th>
+                    <th width="50" class="textalgncenter"> Total Sale Price</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="panel panel-default">
+        @foreach (CLayer.OfflineBooking dt in VendorList)
+        {
+            Console.Write(dt.vendorname);
+            if (VendorList.Count > 0)
+            {
+                <div class="panel-heading padding0 panelheadbackimagenone">
+                    <a data-toggle="collapse" class="blacktext " data-parent="#VendorDetails" href="#iAcc_@dt.VendorpaymentsId">
+                        <div class="row">
+                            <table class="table ">
+                                <tbody>
+                                    <tr>
+
+                                        <td width="174">@dt.vendorname</td>
+                                        <td width="160">@dt.vendoraddress</td>
+                                        <td width="160">@dt.City</td>
+                                        <td width="80" class="textalgncenter">@dt.natureofservice</td>
+                                        <td width="90" class="textalgncenter">@dt.emailaddress</td>
+                                        <td width="50" class="textalgncenter">@dt.ByPriceTotal</td>
+                                        <td width="50" class="textalgncenter">@dt.SalePriceTotal</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </a>
+                </div>
+                <div id="iAcc_@dt.VendorpaymentsId" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                ByPriceBeforeTax:
+                                            </td>
+                                            <td align="right">
+                                                @dt.ByPriceBeforeTax
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                SalePriceGST:
+                                            </td>
+                                            <td align="right">
+                                                @dt.StaxForBuyPrice
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                ByPriceGST :
+                                            </td>
+                                            <td align="right">
+                                                @dt.ByPriceGST
+
+                                            </td>
+                                        </tr>
+
+
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                SalePriceBeforeTax:
+                                            </td>
+                                            <td align="right">
+                                                @dt.SalePriceBeforeTax
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                ByPriceGST :
+                                            </td>
+                                            <td align="right">
+                                                @dt.ByPriceGST
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                SalePriceTotal :
+                                            </td>
+                                            <td align="right">
+                                                @dt.SalePriceTotal
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+                        <br />
+
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+}
+<form id="form_otheramount" method="post" >
+    <div class="row">
+        <div class="col-md-4">
+            <h4 class="bold">Other Amounts</h4>
+            <div class="col-md-12" id="OtherAmounts" style="display:inline-block">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ReimbursementsAmount)
+                    @Html.TextBoxFor(m => m.ReimbursementsAmount, new { @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.natureofreimbursements)
+                    @Html.TextAreaFor(m => m.natureofreimbursements, new { @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DiscountAmount)
+                    @Html.TextBoxFor(m => m.DiscountAmount, new { @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.OthersAmount)
+                    @Html.TextBoxFor(m => m.OthersAmount, new { @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AdvanceReceived)
+                    @Html.TextBoxFor(m => m.AdvanceReceived, new { @class = "form-control input-sm" })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <h4 class="bold">Supplier Payment</h4>
+            <div class="col-md-12" id="SupplierPayment" style="vertical-align:top;">
+                @*@if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+                          <strong>Success!</strong> Indicates a successful or positive action.
+                      </div>
+                    }
+                      @if (TempData["Error"] != null)
+                      {
+                               <div class="alert alert-danger">
+                                  <strong>Danger!</strong> Indicates a dangerous or potentially negative action.
+                              </div>
+                      }*@
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.SupplierPaymentMode)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.SupplierPaymentMode, Model.SupplierPaymentMode_Manage,"select", new { @class = "form-control input-sm" })
+                    @*<span id="CustomerPaymentMode1Span" data-val="CustomerPaymentMode1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="CustomerPaymentMode1" data-valmsg-replace="true"><span for="CustomerPaymentMode1" class="">Select Customer Payment Mode</span></span>*@
+                </div>
+
+
+    
+            <div id="dvSupplierPayment">
+        
+                @if (SupplierPaymentSchedule.Count > 0)
+                {
+
+                    var SupplierPaymentMode = SupplierPaymentSchedule[0].SupplierPaymentMode;
+                    if (SupplierPaymentMode == 4)
+                    {
+                        var i = 1;
+                        foreach (CLayer.SupplierPaymentSchedule dt in SupplierPaymentSchedule)
+                        {
+                            var SupplierPaymentDateID = "dtSupplierPaymentDate" + i;
+                            var SupplierPaymentAmountID = "txtSupplierPaymentAmount" + i;
+                            var formGroupClass = "form-group" + i;
+                            var SupplierPaymentModeDateTitle = "Payment Date " + i;
+                            var SupplierPaymentAmountTitle = "Payment Amount " + i;
+                            string SupplierPaymentDefaultDate = Convert.ToDateTime(DateTime.Now).ToShortDateString();
+
+
+                            <div class="@formGroupClass">
+                                <div style="display:inline-block;width:50% " class="spDate">
+                                    <label>@SupplierPaymentModeDateTitle</label>
+                                    <input type="text" class="form-control input-sm" value="@dt.SupplierPaymentModeDate.ToShortDateString()" name="@SupplierPaymentDateID" id="@SupplierPaymentDateID" onchange="SupplierPaymentDate(@SupplierPaymentDateID)" />
+                                </div>
+                                <div style="display:inline-block;width:48%;padding-left:5px">
+                                    <label>@SupplierPaymentAmountTitle</label>
+                                    <input type="text" class="form-control input-sm" value="@dt.SupplierPaymentAmount" id="@SupplierPaymentAmountID" />
+                                </div>
+                            </div>
+                            i = i + 1;
+                        }
+                    }
+                    else
+                    {
+                        for (var i = 1; i <= 3; i++)
+                        {
+                            var SupplierPaymentDateID = "dtSupplierPaymentDate" + i;
+                            var SupplierPaymentAmountID = "txtSupplierPaymentAmount" + i;
+                            var formGroupClass = "form-group" + i;
+                            var SupplierPaymentModeDateTitle = "Payment Date " + i;
+                            var SupplierPaymentAmountTitle = "Payment Amount " + i;
+                            string SupplierPaymentDefaultDate = Convert.ToDateTime(DateTime.Now).ToShortDateString();
+
+
+                            <div class="@formGroupClass">
+                                <div style="display:inline-block;width:50% " class="spDate">
+                                    <label>@SupplierPaymentModeDateTitle</label>
+                                    <input type="text" class="form-control input-sm" value="@SupplierPaymentDefaultDate" name="@SupplierPaymentDateID" id="@SupplierPaymentDateID"  />
+                                </div>
+                                <div style="display:inline-block;width:48%;padding-left:5px">
+                                    <label>@SupplierPaymentAmountTitle</label>
+                                    <input type="text" class="form-control input-sm" id="@SupplierPaymentAmountID" />
+                                </div>
+                            </div>
+                        }
+                    }
+
+
+                }
+                else
+                {
+                    <div >
+                        @for (var i = 1; i <= 3; i++)
+                        {
+                            var SupplierPaymentDateID = "dtSupplierPaymentDate" + i;
+                            var SupplierPaymentAmountID = "txtSupplierPaymentAmount" + i;
+                            var formGroupClass = "form-group" + i;
+                            var SupplierPaymentModeDateTitle = "Payment Date " + i;
+                            var SupplierPaymentAmountTitle = "Payment Amount " + i;
+                            string SupplierPaymentDefaultDate = Convert.ToDateTime(DateTime.Now).ToShortDateString();
+
+
+                                  <div class="@formGroupClass">
+                                        <div style="display:inline-block;width:50% " class="spDate">
+                                            <label>@SupplierPaymentModeDateTitle</label>
+                                            <input type="text" class="form-control input-sm" value="@SupplierPaymentDefaultDate" name="@SupplierPaymentDateID" id="@SupplierPaymentDateID"  />
+                                        </div>
+                                        <div style="display:inline-block;width:48%;padding-left:5px">
+                                            <label>@SupplierPaymentAmountTitle</label>
+                                            <input type="text" class="form-control input-sm" id="@SupplierPaymentAmountID" />
+                                        </div>
+                                    </div>
+                          }
+                      </div>
+                }
+
+                  </div>
+
+        <div class="form-group" id="dvCreditDays">
+            @Html.LabelFor(m => m.SupplierPaymentCreditDays)
+            @Html.TextBoxFor(m => m.SupplierPaymentCreditDays, "{0:0.#}", new { @class = "form-control input-sm" })
+        </div>
+        @Html.ValidationMessage("SupplierPaymentMode")
+
+
+
+
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="col-md-12">
+    
+    </div>
+
+    <div class="col-md-12">
+        <div class="col-md-4">
+            <a id="btnReset" onclick="Submit(@Model.OfflineBookingId)" class="btn btn-success" tabindex="24">Submit</a>
+        </div>
+    </div>
+
+    <div id="GrossmarginconfirmBoxlast" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-md">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        The margin in this booking is negative/too less. This requires approval and being sent for acceptance of approving authority.
+                        It will be accepted as booking in the system only after approval. No confirmation communication would go to customer & supplier until approved.
+                    </h5>
+                </div>
+                <div class="modal-footer">
+                    <button id="GrossmarginbtnConfirmBoxNolast" type="button" class="btn btn-primary" data-dismiss="modal">NO</button>
+                    <button id="GrossmarginbtnConfirmBoxYeslast" type="button" class="btn btn-primary" data-dismiss="modal">YES</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <style>
+        .AddressBar {
+            position: relative;
+            width: 100%;
+        }
+
+            .AddressBar:before {
+                content: ":";
+                position: absolute;
+                right: -15px;
+                top: 0px;
+            }
+
+        td {
+            padding: 0px 5px 0px 0px;
+        }
+
+        .textalgncenter {
+            text-align: center !important;
+        }
+
+        .panelheadbackimagenone {
+            background-image: none !important;
+        }
+    </style>
+
+    <script>
+        function Submit(OffId) {
+            $.get("/Admin/OfflineBookingGST/CheckGrossmarginless?OfflineBookingId=" + OffId, $('#form_otheramount').serialize(), function (data) {
+                if (data == 'True' || data == 'true') {
+                    $('#GrossmarginconfirmBoxlast').modal({
+                        backdrop: 'static',
+                        keyboard: false
+                    }).one('click', '#GrossmarginbtnConfirmBoxYeslast', function (e) {
+
+                        $.get("/Admin/OfflineBookingGST/OverollSubmit?OfflineBookingId=" + OffId,+ $('#form_otheramount').serialize(), function (data) {
+                            window.location = '/Admin/OfflineBookingGST/OfflineBooking';
+                        });
+
+                    //    var models = $('#form_otheramount').serialize();
+                    //debugger
+                    //    $.ajax({
+                    //        type: "POST",
+                    //        url: "/Admin/OfflineBookingGST/OverollSubmit",
+                    //        data: {  models ,OfflineBookingId: OffId },
+                    //        dataType: "json",
+                    //        success: function(data) {
+                    //            window.location = '/Admin/OfflineBookingGST/OfflineBooking';
+                    //        }
+                    //    });
+
+                    //$.get("/Admin/OfflineBookingGST/OverollSubmit?OfflineBookingId=" + OffId,+"SID=0",+ $('#form_otheramount').serialize(), function (data) {
+                    //    window.location = '/Admin/OfflineBookingGST/OfflineBooking';
+                    //});
+                    });
+                }
+                else {
+
+
+
+                    var SupplierPaymentID = $("#SupplierPaymentMode").val();
+                    var SupplierPaymentDate1 = $("#dtSupplierPaymentDate1").val();
+                    var SupplierPaymentAmt1 = ($("#txtSupplierPaymentAmount1").val() == "") ? 0 : $("#txtSupplierPaymentAmount1").val();
+                    var SupplierPaymentDate2 = $("#dtSupplierPaymentDate2").val();
+                    var SupplierPaymentAmt2 = ($("#txtSupplierPaymentAmount2").val() == "") ? 0 : $("#txtSupplierPaymentAmount2").val();;
+                    var SupplierPaymentDate3 = $("#dtSupplierPaymentDate3").val();
+                    var SupplierPaymentAmt3 = ($("#txtSupplierPaymentAmount3").val() == "") ? 0 : $("#txtSupplierPaymentAmount3").val();
+                    var SupplierCreditDays = $("#SupplierPaymentCreditDays").val();
+
+                    if (SupplierPaymentID == 0) {
+                        alert('Enter supplier payment mode');
+                        return false;
+                    }
+
+                    if (SupplierPaymentID == 4) {
+                        if (IsValidSupplierAmount()) {
+                            $("#btnReset").attr("disabled", "disabled");
+                            $.get("/Admin/OfflineBookingGST/OverollSubmitWithSupplier?OfflineBookingId=" + OffId + "&SupplierPaymentMode=" + SupplierPaymentID + "&SupplierPaymentDate1=" + SupplierPaymentDate1 + "&SupplierPaymentAmt1=" + SupplierPaymentAmt1 + "&SupplierPaymentDate2=" + SupplierPaymentDate2 + "&SupplierPaymentAmt2=" + SupplierPaymentAmt2 + "&SupplierPaymentDate3=" + SupplierPaymentDate3 + "&SupplierPaymentAmt3=" + SupplierPaymentAmt3 + "", $('#form_otheramount').serialize(), function (data) {
+                                if (data == "Supplier payment mode updated") {
+                                    window.location = '/Admin/OfflineBookingGST/OfflineBooking';
+                                }
+                                else {
+                                    alert(data);
+                                    $('#btnReset').removeAttr('disabled');
+                                }
+                            });
+                        }
+                    }
+                    else {
+                        if (IsValidSupplierAmount()) {
+                            $("#btnReset").attr("disabled", "disabled");
+                            $.get("/Admin/OfflineBookingGST/OverollSubmitWithSupplierPaymentID?OfflineBookingId=" + OffId + "&SupplierPaymentMode=" + SupplierPaymentID + "&SupplierCreditDays=" + SupplierCreditDays + "", $('#form_otheramount').serialize(), function (data, Status) {
+                                if (data == "Supplier payment mode updated") {
+
+                                    $.get("/Admin/OfflineBookingGST/IsApproverRequiredForOfflineBooking?OfflineBookingId=" + OffId, function (data) {
+                                        if (data == "Approver Needed") {
+                                            window.location = '/Admin/OfflineBookingGST/offlinebookingproceed?BookingID=' + OffId;
+                                        }
+                                        else {
+                                            window.location = '/Admin/OfflineBookingGST/OfflineBooking';
+
+                                        }
+
+                                    });
+
+                                    window.location = '/Admin/OfflineBookingGST/OfflineBooking';
+                                }
+                                else {
+                                    alert(data);
+                                    $('#btnReset').removeAttr('disabled');
+
+                                }
+
+
+
+
+
+
+                            });
+                        }
+                    }
+
+                }
+            });
+
+        }
+        function SupplierPaymentDate(pDate) {
+
+            re = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+            var date = $("#" + pDate).val();
+            if (date == null || date == "") {
+                var curDate = new Date();
+                curDate.setDate(curDate.getDate());
+                var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+                $("#" + pDate).val(idat);
+            }
+            else if (date != '' && !date.match(re)) {
+                var curDate = new Date();
+                curDate.setDate(curDate.getDate());
+                var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+                $("#" + pDate).val(idat);
+            }
+            else {
+                return true;
+            }
+        }
+        $(function () {
+            ValidateSupplierAmounts("txtSupplierPaymentAmount1");
+            ValidateSupplierAmounts("txtSupplierPaymentAmount2");
+            ValidateSupplierAmounts("txtSupplierPaymentAmount3");
+
+            var SupplierPaymentModeID = $("#SupplierPaymentMode").val();
+            if (SupplierPaymentModeID == 4) {
+                $("#dvSupplierPayment").show();
+            }
+            else {
+                $("#dvSupplierPayment").hide();
+            }
+            if (SupplierPaymentModeID == 1) {
+                $("#dvCreditDays").show();
+            }
+            else {
+                $("#dvCreditDays").hide();
+            }
+            if ($("#CreditDays").val() == "") {
+                $("#CreditDays").val("0");
+            }
+            if (SupplierPaymentModeID == 1) {
+                if ($("#CreditDays").val() == "0") {
+                    alert("Enter Credit days");
+                    return;
+                }
+            }
+            var SupplierPaymentDate1 = $('#dtSupplierPaymentDate1').datepicker(
+                                        {
+                                            // minDate: new Date(),
+                                            defaultDate: new Date,
+                                            numberOfMonths: 2,
+                                            dateFormat: "dd/mm/yy",
+                                            //autoclose: true
+                                        });
+
+
+            var SupplierPaymentDate2 = $('#dtSupplierPaymentDate2').datepicker(
+                               {
+                                   //minDate: new Date(),
+                                   defaultDate: new Date,
+                                   numberOfMonths: 2,
+                                   dateFormat: "dd/mm/yy",
+                                   //autoclose: true
+                               });
+            var SupplierPaymentDate3 = $('#dtSupplierPaymentDate3').datepicker(
+                      {
+                          //  minDate: new Date(),
+                          defaultDate: new Date,
+                          numberOfMonths: 2,
+                          dateFormat: "dd/mm/yy",
+                          //autoclose: true
+                      });
+
+            $(".spDate1").click(function () {
+                $("#dtSupplierPaymentDate1").datepicker('show');
+            });
+            $(".spDate2").click(function () {
+                $("#dtSupplierPaymentDate2").datepicker('show');
+            });
+            $(".spDate3").click(function () {
+                $("#dtSupplierPaymentDate3").datepicker('show');
+            });
+
+            $('#dtSupplierPaymentDate1').datepicker().on('changeDate', function (e) {
+                $('#dtSupplierPaymentDate1').datepicker('hide');
+            });
+            $('#dtSupplierPaymentDate2').datepicker().on('changeDate', function (e) {
+                $('#dtSupplierPaymentDate2').datepicker('hide');
+            });
+            $('#dtSupplierPaymentDate3').datepicker().on('changeDate', function (e) {
+                $('#dtSupplierPaymentDate3').datepicker('hide');
+            });
+
+
+            $('#SupplierPaymentMode').change(function () {
+                if ($("#SupplierPaymentMode").val() == 4) {
+                    $("#dvSupplierPayment").show();
+                }
+                else {
+                    $("#dvSupplierPayment").hide();
+                }
+                if ($("#SupplierPaymentMode").val() == 1) {
+                    $("#dvCreditDays").show();
+                }
+                else {
+                    $("#dvCreditDays").hide();
+                }
+            });
+            $('#SupplierPaymentCreditDays').keypress(function (e) {
+                var a = [];
+                var k = e.which;
+
+                var KeystoInclude = [0, 8, 31, 190];
+                for (i = 0; i < KeystoInclude.length; i++) {
+                    a.push(KeystoInclude[i]);
+                }
+                for (i = 48; i < 58; i++) {
+                    a.push(i);
+                }
+                var numValue = $(this).val();
+                if (e.which == 46) {
+                    if ((numValue) && (numValue.indexOf('.') >= 0))
+                        e.preventDefault();
+                }
+                if (!(a.indexOf(k) >= 0))
+                    e.preventDefault();
+            });
+
+            $("#txtSupplierPaymentAmount1").change(function () {
+                SetSupplierAmountStyles("txtSupplierPaymentAmount1");
+            });
+            $("#txtSupplierPaymentAmount2").change(function () {
+                SetSupplierAmountStyles("txtSupplierPaymentAmount2");
+            });
+            $("#txtSupplierPaymentAmount3").change(function () {
+                SetSupplierAmountStyles("txtSupplierPaymentAmount3");
+
+            });
+        }
+        )
+        function SplitDate(date) {
+            var dates = date.split('/');
+            var day = dates[0];
+            var month = dates[1];
+            var year = dates[2];
+            return month + "/" + day + "/" + year
+        }
+        function CheckBookingdateValid(pSpDateID) {
+            var SupplierPaymentDate = new Date(SplitDate($("#" + pSpDateID).val()));
+            var CurrentDate = new Date()
+            if (BookingDate > CurrentDate) {
+                alert("Supplier Date cannot be greater than current date");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        function ValidateSupplierAmounts(ID) {
+            var inputID = "#" + ID;
+            $(inputID).keypress(function (e) {
+                var a = [];
+                var k = e.which;
+
+                var KeystoInclude = [0, 8, 31, 46, 190];
+                for (i = 0; i < KeystoInclude.length; i++) {
+                    a.push(KeystoInclude[i]);
+                }
+                for (i = 48; i < 58; i++) {
+                    a.push(i);
+                }
+                var numValue = $(this).val();
+                if (e.which == 46) {
+                    if ((numValue) && (numValue.indexOf('.') >= 0))
+                        e.preventDefault();
+                }
+                if (!(a.indexOf(k) >= 0))
+                    e.preventDefault();
+            });
+            $(inputID).blur(function (e) {
+                var dec = 0;
+                if ($(this).val() != "") {
+                    dec = parseFloat($(this).val(), 10).toFixed(1);
+                }
+                $(this).val(dec);
+            })
+        }
+        function IsValidSupplierAmount() {
+            var result = true;
+            var SupplierPaymentID = $("#SupplierPaymentMode").val();
+            var SupplierPaymentAmount1 = $("#txtSupplierPaymentAmount1").val();
+            var SupplierPaymentAmount2 = $("#txtSupplierPaymentAmount2").val();
+            var SupplierPaymentAmount3 = $("#txtSupplierPaymentAmount3").val();
+            if (SupplierPaymentID == 4) {
+                if ((SupplierPaymentAmount1 == 0) || (SupplierPaymentAmount2 == 0) || (SupplierPaymentAmount3 == 0)) {
+                    alert('Enter Supplier amount as 3 instalments');
+
+                    for (var i = 1; i <= 3; i++) {
+                        SetSupplierAmountStyles("txtSupplierPaymentAmount" + i.toString());
+                    }
+
+                    result = false;
+                }
+            }
+            else if (SupplierPaymentID == 1) {
+                SupplierCreditDays = $("#SupplierPaymentCreditDays").val();
+                if ((SupplierCreditDays == "") || (SupplierCreditDays == 0)) {
+                    alert('Enter valid supplier credit days');
+                    result = false;
+                }
+
+            }
+            return result;
+        }
+
+        function SetSupplierAmountStyles(ID) {
+            var Value = $("#" + ID).val();
+            if ((Value == "") || (Value == 0)) {
+                $("#" + ID).removeAttr("style");
+                $("#" + ID).attr("style", "border:1px solid red;");
+            }
+            else {
+                $("#" + ID).removeAttr("style");
+                $("#" + ID).attr("style", "border:''");
+            }
+        }
+
+
+
+        $(window).load(function () {
+            debugger
+                $.ajax({
+                    type: "Get",
+                    url: "/OfflineBookingGST/GetInvoiceIDByOfflineBookingID?OfflineBookingId=" + @Model.OfflineBookingId,
+                    success: function (data) {
+                        if(data!=null && data!="" && data!=0 && data.trim() != "0" )
+                        {
+                            $("#SupplierPaymentMode").prop("disabled", true);
+                            $('#ReimbursementsAmount').attr('readonly', true);
+                            $('#DiscountAmount').attr('readonly', true);
+                            $('#OthersAmount').attr('readonly', true);
+                            $('#AdvanceReceived').attr('readonly', true);
+                        }
+                    }
+                })
+        })
+
+
+
+    </script>
+
+
+
+
+
+

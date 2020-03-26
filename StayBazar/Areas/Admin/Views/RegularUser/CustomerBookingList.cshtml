@@ -1,0 +1,9 @@
+﻿@model StayBazar.Areas.Admin.Models.CustomerDetailModel 
+@{
+    ViewBag.Title = "Customer | " + Model.FirstName + " " + Model.LastName;
+    
+}
+<div id="content">
+    <a href="/Admin/PaymentListToCustomer" class="btn btn-sm btn-default" title="back to list"><span class="glyphicon glyphicon-arrow-left"></span></a>&nbsp;@ViewBag.Title
+</div>
+

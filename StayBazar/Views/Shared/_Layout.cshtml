@@ -1,0 +1,933 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    string extensions = System.Configuration.ConfigurationManager.AppSettings.Get("NonImageDocumentFileTypes");
+    string[] allowedFileExtensions = extensions.Split(',');
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    @{
+        List<CLayer.Currency> currencies = BLayer.Currency.GetForListing();
+        System.Text.StringBuilder curcodes = new System.Text.StringBuilder();
+        System.Text.StringBuilder curarray = new System.Text.StringBuilder();
+        foreach (CLayer.Currency item in currencies)
+        {
+            curcodes.Append(",");
+            curcodes.Append(item.Title);
+
+            curarray.Append("['");
+            curarray.Append(item.Title);
+            curarray.Append("','");
+            curarray.Append(item.Symbol);
+            curarray.Append("','");
+            curarray.Append(item.ConversionRate);
+            curarray.Append("'],");
+        }
+        if (curarray.Length > 0)
+        {
+            curarray.Remove(curarray.Length - 1, 1);
+        }
+        string defaultCurCode = "";
+        if (Request.Cookies.Get("CurCode") != null)
+        { defaultCurCode = Request.Cookies.Get("CurCode").Value; }
+        string fname = "";
+        bool IsForStaticPage = false;
+        if (ViewBag.IsForStaticPage != null)
+        { IsForStaticPage = (bool)ViewBag.IsForStaticPage; }
+
+    }
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-control" content="no-cache,no-store,must-revalidate,private">
+    <meta http-equiv="Pragma" content="no-cache">
+    @*<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">*@
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="expires" content="0">
+    <meta name="robots" content="all">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
+    <!-- Meta Description -->
+    @*<meta name="description" content="">*@
+
+    @if (ViewBag.MetaDescription != null && ViewBag.MetaDescription != "")
+    {
+        <meta name="description" content="@ViewBag.MetaDescription" />
+    }
+
+    <meta name="author" content="Staybazar">
+    <link rel="shortcut icon" href="/images/favicon.png">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <!-- Meta Keyword -->
+    <meta name="keywords" content="">
+    <!-- meta character set -->
+    @*<meta charset="UTF-8">*@
+    <!-- Site Title -->
+    @*<title>Staybazar</title>*@
+    <title>@ViewBag.Title</title>
+
+    <!-- Custom styles for this template -->
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/bootcss")
+
+    <link href="~/Content/owl.theme.css" rel="stylesheet" />
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="~/Content/jquery.dpNumberPicker-holoLight-1.0.1.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery.dpNumberPicker-1.0.1.js" type="text/javascript"></script>
+    @*<link href="~/Content/styles.css" rel="stylesheet" />*@
+
+
+    <script src="~/Scripts/bootstrap-formhelpers.js" type="text/javascript"></script>
+    <script src="~/Scripts/default.js" type="text/javascript"></script>
+    <script src="~/Scripts/placeholder.js" type="text/javascript"></script>
+    <!-- CSS Files -->
+    @*<link href="~/Content/cssform-control/bootstrap.min.css" rel="stylesheet" />*@
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.css" integrity="sha256-3h45mwconzsKjTUULjY+EoEkoRhXcOIU4l5YAw2tSOU=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css" integrity="sha256-4hqlsNP9KM6+2eA8VUT0kk4RsMRTeS7QGHIM+MZ5sLY=" crossorigin="anonymous" />
+    <!-- Main Stylesheet File -->
+    <link rel="stylesheet" href="~/Content/main.css">
+
+    <!-- JS Files -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.1.0/jquery-migrate.min.js" integrity="sha256-91c9XEM8yFH2Mn9fn8yQaNRvJsEruL7Hctr6JiIY7Uw=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script type="application/ld+json">
+        {
+        "@@context": "http://schema.org",
+        "@@type": "WebSite",
+        "url": "https://www.staybazar.com/",
+        "name" : "Staybazar",
+
+        "potentialAction":
+        {
+        "@@type": "SearchAction",
+        "target": "https://www.staybazar.com/search/sitewide?destination={search_term_string}",
+        "query-input": "required name=search_term_string"
+        }
+        }
+    </script>
+
+    @RenderSection("scripts", required: false)
+
+
+    @*@Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryui")
+        @Scripts.Render("~/bundles/jqueryval")*@
+    @*  @Scripts.Render("~/bundles/bootstrap")
+        @Styles.Render("~/Content/css")
+        @Styles.Render("~/Content/bootcss")
+
+        <link href="~/Content/owl.theme.css" rel="stylesheet" />
+
+    *@
+    <script src="~/Scripts/bootstrap-formhelpers.js" type="text/javascript"></script>
+    <script src="~/Scripts/default.js" type="text/javascript"></script>
+    <script src="~/Scripts/placeholder.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+    <!-- Google Tag Manager -->
+    <noscript>
+        <iframe src="//www.googletagmanager.com/ns.html?id=GTM-W3QCF5"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    '//www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-W3QCF5');</script>
+    <!-- End Google Tag Manager -->
+    <!--Header Starts Here-->
+
+    <nav class="navbar navbar-light navbar-expand-md fixed-top">
+        <a class="navbar-brand abs" href="~/Home/index"><img src="~/img/logo.png" alt="Staybazar"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsingNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse navbar-right" id="collapsingNavbar">
+            <ul class="navbar-nav ml-auto">
+                @if (Request.IsAuthenticated)
+                {
+                    //string email = User.Identity.GetUserName();
+                    //CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+
+                    ////if (User.IsInRole("Administrator") || User.IsInRole("Staff"))
+                    //if (role == CLayer.Role.Roles.Administrator || role == CLayer.Role.Roles.Staff || role == CLayer.Role.Roles.SalesPerson)
+                    string email = User.Identity.GetUserName();
+                    int roleId = BLayer.User.GetRole(email);
+                    List<CLayer.Role> perm = BLayer.RolePermissions.GetAllAdminSide();
+
+                    if (perm.Exists(m => m.Id == roleId))
+                    {
+                        <li class="nav-item">@Html.ActionLink("Administration", "index", "home", new { area = "Admin" }, htmlAttributes: new { @class = "nav-link" })</li>
+                    }
+                }
+
+                @if (Request.IsAuthenticated && (!IsForStaticPage))
+                {
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="../account/register" style="color:#000000;font:20px FreigSanProBook_0;padding:15px 5px;">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../account/login" style="color:#000000;font:20px FreigSanProBook_0;padding:15px 5px;">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="~/Query" style="color:#000000;font:20px FreigSanProBook_0;padding:15px 5px;">Request a Demo</a>
+                    </li>
+                }
+
+
+            </ul>
+            <ul class="nav navbar-nav pull-right">
+                @if (Request.IsAuthenticated && (!IsForStaticPage))
+                {
+                    string email = User.Identity.GetUserName();
+                    CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+                    bool IsApprover = BLayer.User.GetApproverStatus(email);
+
+                    long id = 0;
+                    if (role == CLayer.Role.Roles.Corporate || role == CLayer.Role.Roles.CorporateUser || role == CLayer.Role.Roles.Supplier || role == CLayer.Role.Roles.Agent || role == CLayer.Role.Roles.Affiliate)
+                    {
+                        if (long.TryParse(User.Identity.GetUserId(), out id))
+                        {
+                            if (role == CLayer.Role.Roles.CorporateUser)
+                            {
+                                id = BLayer.B2B.GetCorporateIdOfUser(id);
+                            }
+                            fname = BLayer.B2B.GetBusinessName(id);
+                        }
+
+                    }
+                    else
+                    {
+                        if (long.TryParse(User.Identity.GetUserId(), out id))
+                        {
+                            CLayer.User u = BLayer.User.Get(id);
+                            if (u != null)
+                            {
+                                fname = u.FirstName;
+                            }
+                        }
+                    }
+                    <li><a href="/Account/Logoff" style="color:black">Log off</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color:black">@fname (My Account)</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="~/account/profile">My Profile</a></li>
+                            @*?userid=@(User.Identity.GetUserId().ToString())*@
+                            <li><a href="~/bookinghistory/">My Stays</a></li>
+                            @if (role == CLayer.Role.Roles.Corporate)
+                            {
+                                <li><a href="~/corporateusers/">Users</a></li>
+                            }
+                            else if (role == CLayer.Role.Roles.Supplier)
+                            {
+                                <li><a href="~/propertylist/">My Properties</a></li>
+                                <li><a href="~/bookingchart/">Bookings</a></li>
+                            }
+                            else if (role == CLayer.Role.Roles.Affiliate)
+                            {
+                                @*<li><a href="~/PropertyList/">My Properties</a></li>*@
+                                @*<li><a href="~/BookingChart/">Bookings</a></li>*@
+                                <li><a href="~/supplierlist/">My Supplier</a></li>
+                            }
+                            <li><a href="~/review/">My Reviews</a></li>
+                            @if ((role == CLayer.Role.Roles.Corporate) || (IsApprover))
+                            {
+                                <li><a href="~/BookingApproval">Booking Approvals </a></li>
+                            }
+                            @if (role == CLayer.Role.Roles.Corporate)
+                            {
+                                <li><a href="~/CorporateEmployeeGrades">Employee Grade </a></li>
+                                <li><a href="~/CorporateCityClass">City Class </a></li>
+                                <li><a href="~/CorporateCityEntitlement">City Class Entitlement</a></li>
+                                <li><a href="~/CostCentre">Cost Centre</a></li>
+                                <li>@Html.ActionLink("New Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
+                                <li><a href="~/assistedbooking/">Assisted Booking</a></li>
+                            }
+                            @if (role == CLayer.Role.Roles.CorporateUser)
+                            {
+                                <li>@Html.ActionLink("New Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
+
+                            }
+                            @*@if (role == CLayer.Role.Roles.Corporate)CorporateCityEntitlement
+                                {
+                                    <li><a href="~/BookingApproval/">Ready for Booking</a></li>
+                                }*@
+
+                        </ul>
+                    </li>
+                }
+                @*else
+                    {
+                        <li>
+                            @Html.ActionLink("Create an account", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })
+                        </li>
+                    }*@
+                <li style="display:none">
+
+                    <div class="bfh-selectbox bfh-currencies" id="curPick" onchange="onCurChange()" data-currency="INR" data-flags="true" data-available="INR@(curcodes)" data-blank="false"></div>
+                </li>
+                @*<li>
+                        <div class="bfh-selectbox bfh-countries" data-country="IN" data-flags="true" data-available="IN,US,GB" data-blank="false"></div>
+                    </li>*@
+                @*<li class="icpad0">
+                        <a class="icopad0" href="https://www.facebook.com/staybazar?fref=ts" target="_blank"><img src="/images/facebook.jpg" alt="Facebook" /></a>
+                    </li>
+                    <li class="icpad0">
+                        <a class="icopad0" href="https://www.linkedin.com/company/staybazar?trk=biz-companies-cym" target="_blank"><img src="/images/in.jpg" alt="LinkedIn" /></a>
+                    </li>
+                    <li class="icpad0">
+                        <a class="icopad0" href="https://plus.google.com/u/2/b/109244162119027634578/109244162119027634578/about" target="_blank"><img src="/images/gplus.jpg" alt="Google+" /></a>
+                    </li>
+                    <li class="icpad0">
+                        <a class="icopad0" href="https://twitter.com/Staybazar" target="_blank"><img src="/images/twitter.jpg" alt="Twitter" /></a>
+                    </li>
+                    <li class="icpad0">
+                        <a class="icopad0" href="https://www.instagram.com/staybazar/" target="_blank"><img src="~/images/instagram.jpg" alt="instagram" /></a>
+                    </li>*@
+            </ul>
+        </div>
+    </nav>
+
+
+
+
+    <script type="text/javascript">
+        $('#curPick').on('change.bfhselectbox', function () {
+            onCurChange();
+        });
+
+        function onCurChange() {
+            var v = $("#curPick").val();
+            cx_ChangeCurRate(v);
+            $.cookie("CurCode", v, { path: '/' });
+            if ($("#srchcur").length) {
+                $("#srchcur").val(v);
+            }
+            if ($(".bkacc").length) {
+                $(".bkacc").change();
+            }
+            if ($("#inrGrandTotal").length) {
+                showGrandTotal();
+            }
+        }
+    </script>
+    <!--Header Ends Here-->
+
+    @RenderBody()
+    <!--  Insights Ends Here -->
+    <!--  Footer Starts Here -->
+
+    <footer>
+        <div class="container-fluid footer-contact" style="height: 298px;padding-top:17PX;">
+            @*<div class="footer-logo">
+                    <img src="/img/footer-logo.png" alt="">
+                </div>*@
+            <div class="row">
+
+                <div class="col-md-5">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="footer-heading">Our Company</p>
+                            <a href="~/Home/about">About Us</a>
+                            <a href="~/Home/howstaybazarworks">How Staybazar works</a>
+                            @*<a href="~/Home/Vision">Vision & Values</a>*@
+                            @*<a href="~/Home/purposeandstandards">Purpose and Standards</a>*@
+                            <a href="~/Home/careers">Careers</a>
+                            <a href="~/Home/contactus">Contact Us</a>
+
+                        </div>
+                        <div class="col-md-6">
+                            <p class="footer-heading">Staybazar for Business</p>
+                            @*<a href="~/Join/corporate">Corporate - Register</a>
+                                <a href="~/Join/travelagent">Travel Agent - Register</a>*@
+                            <a href="~/account/register">Corporate - Register</a>
+                            <a href="~/account/register">Travel Agent - Register</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!--  <p class="footer-heading pt-2">Send us a Message</p> -->
+                            <!--    <form>
+                              <div class="form-row">
+                                <div class="form-group col">
+                                  <input type="text" class="form-control" placeholder="Name">
+                                </div>
+                                <div class="form-group col">
+                                  <input type="mail" class="form-control" placeholder="Email ID">
+                                </div>
+                              </div>
+                              <div class="form-row">
+                                <div class="form-group col">
+                                  <textarea class="form-control" placeholder="Message" rows="4"></textarea>
+                                </div>
+                              </div>
+
+                            </form> -->
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <p class="footer-heading">Property Owners</p>
+                    @*<a href="#">List property</a>*@
+                    @*<a href="~/Query/index/">Send Query</a>*@
+                    <a href="~/Home/propertylistingterms">Property Listing Terms</a>
+                    @*<a href="~/Home/Terms">Terms and Conditions</a>*@
+                    @*<a href="#">FAQs</a>*@
+                </div>
+
+                <div class="col-md-2">
+                    <p class="footer-heading">More About Us</p>
+                    <a href="~/FAQ/index">FAQs</a>
+                    <a href="~/Home/sitemap">Sitemap</a>
+                    <a href="~/Offlinepayment/index">Make a Payment</a>
+
+                </div>
+
+                <div class="col-md-3">
+                    <p class="footer-heading">Stay Connected</p>
+                    <div class="contact-deatails">
+                        <i class="fa fa-phone"></i>
+                        <a href="tel:080 25722898">080 25722898</a><br>
+                        <a href="tel:080 40916686">080 40916686</a>
+                    </div>
+                    <div class="contact-deatails">
+                        <i class="fa fa-envelope"></i>
+                        <a href="mailto:info@staybazar.com?Subject=Hello%20again" target="_top">info@staybazar.com</a>
+                    </div>
+                </div>
+
+
+            </div>  @*<a href="#">*@
+            <div class="btn-center text-center" style="padding: 33px 0 70px 0;">
+                @*<button type="submit" class="btn btn-contact">Send us a message</button>*@
+                <div class="row">
+                    <div class="col-md-6 text-left">
+                        <span id="siteseal">
+                            <script type="text/javascript" src="https://seal.godaddy.com/getSeal?sealID=niRAy4qLE8S1eIUCauMprsuhZlzpoQQOupCRDc5zQNdyNBHNXm1r6SE"></script>
+                        </span>
+                        <span class=" logo">
+                            <img src="@Url.Content("/images/visa.png")" alt="Visa">
+                            <img src="@Url.Content("/images/mastercard.png")" alt="Master Card">
+                            <img src="@Url.Content("/images/jcb.png")" alt="JCB">
+                            <img src="@Url.Content("/images/amex.png")" alt="American Express">
+                            <img src="@Url.Content("/images/dinners_club.png")" alt="Dinners Club">
+                            <img src="~/images/paypal.png" alt="Paypal" style="border-radius: 5px;" />
+                        </span>
+                    </div>
+                    <div class="col-md-4" align="left">
+                        <a href="~/Query" class="btn btn-contact" style="width:49%;border-radius:22px;">Send us a message</a>
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                </div>
+
+            </div>
+            @*</a>*@
+        </div>
+
+
+
+        <div class="container-fluid footer-copyright" style="height: 47px;padding: 12px 10px;">
+            @*<div class="row">
+                    <div class="col-md-6 text-white">
+                        We accept Net banking (from most banks), credit cards and more
+                    </div>
+                </div>*@
+            @*<div class="row">
+                    <div class="col-md-12">
+
+
+                    </div>
+
+                </div>*@
+            <div class="row">
+                <div class="col-md-4 copyright text-left" style="color:#AFAFAF;font:16px FreigSanProBook_0;padding:0px 15px;">
+                    Copyright &copy; 2019. All rights reserved Staybazar.com
+                </div>
+                <div class="col-md-3 text-left">
+                    <div class="social-icons">
+                        <a href="http://www.facebook.com" target="_blank"><img src="/img/fb-icon.png"></a>
+                        <a href="http://www.twitter.com" target="_blank"><img src="/img/twitter-icon.png"></a>
+                        <a href="http://www.whatsapp.com" target="_blank"><img src="/img/whatsapp-icon.png"></a>
+                        <a href="http://www.instagram.com" target="_blank"><img src="/img/insta-icon.png"></a>
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="color:#AFAFAF;font:16px FreigSanProBook_0;">
+                    <div class="terms-policy text-left">
+                        <a href="~/Home/termsofuse">Terms of Use</a> |
+                        <a href="~/home/privacy">Privacy Policy</a>
+                    </div>
+                </div>
+
+                <div class="col-md-2 copyright text-left" style="color:#AFAFAF;font:16px FreigSanProBook_0;">
+                    <a href="#">Powered by ViaMagus</a>
+                </div>
+            </div>
+        </div>
+
+    </footer>
+
+    <!--  Footer Ends Here -->
+
+    <script>
+        $(document).ready(function () {
+
+            var owl = $("#special-offers"),
+                owl1 = $("#why-staybazar"),
+                owl2 = $("#testimonials"),
+                owl3 = $("#most-popular"),
+                owl4 = $("#ads"),
+                owl5 = $("#StaticPage"),
+                owl6 = $("#new-properties")
+
+
+            owl.owlCarousel({
+                pagination: false,
+                items: 4,
+                itemsDesktop: [1199, 3]
+            });
+
+            owl1.owlCarousel({
+                singleItem: true
+                //autoPlay: 12000
+            });
+
+            owl2.owlCarousel({
+                singleItem: true,
+                pagination: false
+                //,autoPlay: 7000
+            });
+
+            owl3.owlCarousel({
+                items: 3,
+                itemsDesktop: [1199, 2],
+                pagination: false,
+                autoPlay: 7000
+            });
+
+            owl4.owlCarousel({
+                singleItem: true,
+                pagination: true
+                //,autoPlay: true,
+            });
+            owl5.owlCarousel({
+                pagination: false,
+                items: 4,
+                itemsDesktop: [1199, 3],
+                autoPlay: 5000
+            });
+            owl6.owlCarousel({
+                pagination: false,
+                items: 5,
+                itemsDesktop: [1199, 3]
+            });
+            // Custom Navigation Events
+            $(".spl.prev").click(function () {
+                $("#special-offers").trigger('owl.prev');
+            })
+            $(".pplr.prev").click(function () {
+                $("#most-popular").trigger('owl.prev');
+            })
+            $(".ppty.prev").click(function () {
+                $("#new-properties").trigger('owl.prev');
+            })
+            $(".spty.prev").click(function () {
+                $("#StaticPage").trigger('owl.prev');
+            })
+            $(".spl.next").click(function () {
+                $("#special-offers").trigger('owl.next');
+            })
+            $(".pplr.next").click(function () {
+                $("#most-popular").trigger('owl.next');
+            })
+            $(".ppty.next").click(function () {
+                $("#new-properties").trigger('owl.next');
+            })
+            $(".spty.next").click(function () {
+                $("#StaticPage").trigger('owl.next');
+            })
+        });
+        //$(document).ready(function () {
+
+        //    var owl = $("#special-offers"),
+        //        owl1 = $("#why-staybazar"),
+        //        owl2 = $("#testimonials"),
+        //        owl3 = $("#most-popular"),
+        //        owl4 = $("#ads"),
+        //        owl5 = $("#StaticPage"),
+        //        owl6 = $("#new-properties")
+
+
+        //    owl.owlCarousel({
+        //        pagination: false,
+        //        items: 4,
+        //        itemsDesktop: [1199, 3],
+        //        loop: true,
+        //        dots: false,
+        //        margin: 10,
+        //        navigation: false,
+        //        autoplay: 6000,
+
+        //    });
+
+        //    owl1.owlCarousel({
+        //        singleItem: true,
+        //        loop: true,
+        //        items: 1,
+        //        margin: 10,
+        //        dots: true,
+        //        paginationSpeed: 400,
+        //        pagination: true,
+        //        autoplay: false,
+        //        dotsClass: 'owl-dots',
+
+
+        //    });
+
+        //    owl2.owlCarousel({
+        //        singleItem: true,
+        //        pagination: true,
+        //        loop: true,
+        //        dots: false,
+        //        margin: 10,
+        //        navigation: true,
+        //        autoplay: false,
+        //        items: 1
+        //        //,autoPlay: 7000
+        //    });
+
+        //    owl3.owlCarousel({
+        //        items: 3,
+        //        itemsDesktop: [1199, 2],
+        //        pagination: false,
+        //        loop: true,
+        //        dots: false,
+        //        margin: 10,
+        //        navigation: false,
+        //        autoplay: 7000
+
+        //    });
+
+        //    owl4.owlCarousel({
+        //        singleItem: true,
+        //        pagination: true,
+        //        loop: true,
+        //        dots: true,
+        //        margin: 10,
+        //        navigation: false,
+        //        pagination: true,
+        //        autoplay: false,
+        //        items: 1
+        //        //,autoPlay: true,
+        //    });
+        //    owl5.owlCarousel({
+        //        pagination: false,
+        //        items: 4,
+        //        itemsDesktop: [1199, 3],
+        //        loop: true,
+        //        margin: 10,
+        //        dots: false,
+        //        navigation: false,
+        //        autoplay: 7000
+
+        //    });
+        //    owl6.owlCarousel({
+        //        pagination: false,
+        //        items: 5,
+        //        dots: false,
+        //        itemsDesktop: [1199, 3],
+        //        loop: true,
+        //        margin: 10,
+        //        navigation: false,
+        //        autoplay: 6000
+
+        //    });
+        //    // Custom Navigation Events
+
+
+
+        //    $(".spl.prev").click(function () {
+        //        $("#special-offers").trigger('prev.owl.carousel');
+        //    })
+        //    $(".pplr.prev").click(function () {
+        //        $("#most-popular").trigger('prev.owl.carousel');
+        //    })
+        //    $(".ppty.prev").click(function () {
+        //        $("#new-properties").trigger('prev.owl.carousel');
+        //    })
+        //    $(".spty.prev").click(function () {
+        //        $("#StaticPage").trigger('prev.owl.carousel');
+        //    })
+        //    $(".spl.next").click(function () {
+        //        $("#special-offers").trigger('next.owl.carousel');
+        //    })
+        //    $(".pplr.next").click(function () {
+        //        $("#most-popular").trigger('next.owl.carousel');
+        //    })
+        //    $(".ppty.next").click(function () {
+        //        $("#new-properties").trigger('next.owl.carousel');
+        //    })
+        //    $(".spty.next").click(function () {
+        //        $("#StaticPage").trigger('next.owl.carousel');
+        //    })
+        //});
+    </script>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js" integrity="sha256-NXRS8qVcmZ3dOv3LziwznUHPegFhPZ1F/4inU7uC8h0=" crossorigin="anonymous"></script>
+
+    <script>
+
+        $(document).on('ready', function () {
+            $(".slider").slick({
+                dots: false,
+                infinite: true,
+                slidesToShow: 5,
+                slidesToScroll: 1,
+                autoplay: true,
+                autoplaySpeed: 2000,
+                variableWidth: true,
+                responsive: [
+
+                    {
+                        breakpoint: 768,
+                        settings: {
+                            centerPadding: '10px',
+                            slidesToShow: 2
+                        }
+                    }
+                ]
+
+            });
+
+        });
+
+        $(window).scroll(function () {
+            if ($('#facts').is(':visible')) {
+                animateNumbers('.count');
+            }
+
+            var scroll = $(window).scrollTop();
+
+            if (scroll >= 100) {
+                $(".navbar").addClass("navbar-bg");
+            } else {
+                $(".navbar").removeClass("navbar-bg");
+            }
+
+        });
+
+
+        function animateNumbers(cls) {
+            $(cls).each(function () {
+
+                if ($(this).attr("data-animated") == "false") {
+                    $(this).prop('Counter', 0).animate({
+                        Counter: $(this).text()
+                    }, {
+                            duration: 4000,
+                            easing: 'swing',
+                            step: function (now) {
+                                $(this).text(Math.ceil(now));
+                            }
+                        });
+                }
+                $(this).attr("data-animated", "true");
+            });
+
+        }
+
+    </script>
+    <script type="text/javascript">
+            $(function () {
+                cx_LoadCurrency();
+                @if (defaultCurCode != "") { <text>$("#curPick").val('@defaultCurCode'); onCurChange();</text>}
+            });
+
+            // cx_ChangeCurrency(1);
+            function seraConv() {
+
+                cx_ChangeCurRate($("#srchcur").val());
+                $("#curPick").val($("#srchcur").val());
+            }
+            var curarray = [@(Html.Raw(curarray))];
+    </script>
+    <script type="text/javascript">
+            function Mailsave() {
+                var mail = $("#emiltextbox").val();
+
+                if (mail != "") {
+                    var filter = /^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+                    if (!filter.test(mail)) {
+                        alert('Please provide a valid email address');
+                        $("#emiltextbox").focus();
+                    }
+                    else {
+                        var url = '/Mail/MailSubmit'; @*'@Url.Action("MailSubmit", "Mail")';*@
+                        $.post(url, { Mailadd: mail });
+                        $("#emiltextbox").val("");
+                        alert('Your email has been added to subscription list successfully !');
+                        //$("#validEmail").html("Your email has been added to subscription list successfully !");
+                    }
+                }
+                else {
+                    $("#validEmail").html("Please enter your email !");
+                }
+            }
+            $.ajaxSetup({
+                cache: false
+            });
+    </script>
+
+
+
+
+    @*livserv chat section*@
+
+    @{
+        //format of assign day --- (dayname)_(time1)-(time2)
+
+        string assigndayforzopim = System.Configuration.ConfigurationManager.AppSettings.Get("assigndayforzopim");
+
+        int ChatEnable = 2;
+        string ChatScript = "";
+
+        ChatEnable = Convert.ToInt32(BLayer.Settings.GetValue(CLayer.Settings.CHAT));
+
+
+        string corpemail = User.Identity.GetUserName();
+        CLayer.Role.Roles corprole = (CLayer.Role.Roles)BLayer.User.GetRole(corpemail);
+
+        if (corprole == CLayer.Role.Roles.Corporate || corprole == CLayer.Role.Roles.CorporateUser)
+        {
+            ChatScript = "";
+        }
+        else
+        {
+
+            if (ChatEnable == (int)StayBazar.Areas.Admin.Models.SettingsModel.chatset.Off)
+            {
+                ChatScript = "";
+
+            }
+            else if (ChatEnable == (int)StayBazar.Areas.Admin.Models.SettingsModel.chatset.Livserve)
+            {
+
+                ChatScript = BLayer.Settings.GetValue(CLayer.Settings.LIVSERV);
+
+            }
+            else if (ChatEnable == (int)StayBazar.Areas.Admin.Models.SettingsModel.chatset.Zopim)
+            {
+                ChatScript = BLayer.Settings.GetValue(CLayer.Settings.ZOPIM);
+
+            }
+            else if (ChatEnable == (int)StayBazar.Areas.Admin.Models.SettingsModel.chatset.TimeBased)
+            {
+                string[] days = assigndayforzopim.Split(',');
+                DateTime today = DateTime.Now;
+                string todayname = today.DayOfWeek.ToString();
+                int todayhh = (int)today.Hour;
+                int todaymm = (int)today.Minute;
+                DateTime todaytime = Convert.ToDateTime(DateTime.Now.ToString("HH:mm"));
+
+                ChatScript = BLayer.Settings.GetValue(CLayer.Settings.LIVSERV);
+                foreach (string day in days)
+                {
+                    string[] day2 = day.Split('_');
+
+                    if (day2[0] == todayname)
+                    {
+                        string[] time1 = day2[1].Split('-');
+
+                        // check hour in between day time hour
+                        DateTime timestart = Convert.ToDateTime(time1[0] + ":00");
+                        DateTime timeend = Convert.ToDateTime(time1[1] + ":00");
+                        if (todaytime >= timestart && todaytime <= timeend)
+                        {
+                            ChatScript = BLayer.Settings.GetValue(CLayer.Settings.ZOPIM);
+                        }
+
+
+                    }
+
+                }
+            }
+        }
+
+
+
+    }
+
+
+
+    @Html.Raw(HttpUtility.HtmlDecode(ChatScript))
+
+
+
+
+    <!-- Google Code for Remarketing Tag -->
+    <!--------------------------------------------------
+
+    Remarketing tags may not be associated with personally identifiable information or placed
+
+    on pages related to sensitive categories. See more information and instructions on how to
+
+    setup the tag on: http://google.com/ads/remarketingsetup
+
+    --------------------------------------------------->
+
+    <script type="text/javascript">
+
+        /* <![CDATA[ */
+
+        var google_conversion_id = 962412488;
+
+        var google_custom_params = window.google_tag_params;
+
+        var google_remarketing_only = true;
+
+/* ]]> */
+
+    </script>
+
+    <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+
+    </script>
+
+    <noscript>
+        <div style="display:inline;">
+            <img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/962412488/?value=0&amp;guid=ON&amp;script=0" />
+        </div>
+    </noscript>
+
+
+    <script src="https://cwc.livserv.in/chat.js?lid=9737" id="lp_cwc_xqzyihjdskw"></script>
+    <script src="https://cw1.livserv.in?did=9737&amp;pid=1"></script>
+
+
+</body>
+
+</html>

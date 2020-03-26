@@ -1,0 +1,196 @@
+﻿@model StayBazar.Models.ExternalLoginConfirmationViewModel
+@{
+    ViewBag.Title = "Register";
+
+    var exloginemail = ViewBag.exloginemail;
+}
+<div class="container">
+    <h2>@ViewBag.Title.</h2>
+    @*<h3>Associate your @ViewBag.LoginProvider account.</h3>*@
+
+    @using (Html.BeginForm("ExternalLoginConfirmation", "Account", new { ReturnUrl = ViewBag.ReturnUrl, forbooking = ViewBag.ReturnUrl1 }, FormMethod.Post, new { id = "form1", @class = "form-horizontal", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @*<h4>Association Form</h4>*@
+        <hr />
+        @Html.ValidationSummary(true)
+        @*<p class="text-info">
+                You've successfully authenticated with <strong>@ViewBag.LoginProvider</strong>.
+                Please enter a user name,address for this site below and click the Register button to finish
+                logging in.
+            </p>*@
+        <div class="col-md-12 col-md-offset-1">
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(m => m.UserName)<span style="color:red">*</span>
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.UserName)
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(m => m.Email)<span style="color:red">*</span>
+                    <input id="Email" name="Email" value="@Model.Email" @if (exloginemail != null) { <text> readonly </text>           } class="form-control" />
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                    @Html.TextAreaFor(m => m.Address, new { @tabindex = "5", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Address)
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "5", @class = "form-control" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(m => m.State)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "6", @class = "form-control" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(m => m.CityId)<span style="color:red">*</span>
+                    <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                    @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "7", @class = "form-control" })
+                    <div id="other_city" style="display:none;">
+                        @Html.TextBoxFor(m => m.City, new { @tabindex = "8", @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(m => m.ZipCode)<span style="color:red">*</span>
+                    @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "9", @class = "form-control", @maxlength = "10", @onkeypress = "return isINNumbers(event)" })
+                    @Html.ValidationMessageFor(m => m.ZipCode)
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(m => m.Moblie)<span style="color:red">*</span>
+                    @Html.TextBoxFor(m => m.Moblie, new { @tabindex = "9", @class = "form-control", @maxlength = "15", @onkeypress = "return isINNumbers(event)" })
+                    @Html.ValidationMessageFor(m => m.Moblie)
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-4 col-md-10">
+                <input type="button" onclick="existemail()" class="btn btn-danger whitetext" value="Register" />
+            </div>
+        </div>
+    }
+</div>
+    <script>
+
+
+    </script>
+
+    <script type="text/javascript">
+
+        function existemail() {
+            var Email = $('#Email').val();
+            var emailfrmt = /\w+([-+.']\w+)*@@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+            $.get("/Common/ExistEmail?email=" + $('#Email').val(), function (data) {
+                if (data > 0) {
+                    alert("This email is already exist");
+                }
+                else {
+                    if ($('#Email').val() != "") {
+                        if (emailfrmt.test(Email)) {
+                            if ($('#Address').val() != "" && $('#Moblie').val() != "" && $('#UserName').val() != "")
+                                document.forms["form1"].submit();
+                            else {
+                                alert("Fill all required fields");
+                            }
+                        }
+                        else {
+                            alert("Enter valid email");
+                            return;
+                        }
+                    }
+                    else {
+                        alert("Enter email");
+                        return;
+                    }
+                }
+            });
+        }
+        $(function () {
+
+            if ($('#CityId').val() == -1) {
+                $('#CityId').empty().html('<option selected="selected" value="0">not available...</option>');
+            }
+            $('#CountryId').change(function () {
+                $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                    if (data != "")
+                        $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                    else
+                        $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                    LoadCity();
+                });
+            });
+
+            $('#State').change(function () {
+                $("#CityId").show();
+                $("#City").val("");
+                $("#other_city").hide();
+                $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                    if (data != "") {
+                        $('#CityId').empty().append(data);
+                        if ($("select#CityId option").length == 1) {
+                            $("#CityId").hide();
+                            $("#City").val("");
+                            $("#other_city").show();
+                        }
+                    }
+                    else {
+                        $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                    }
+                });
+
+            });
+            $('#CityId').change(function () {
+                if ($(this).val() == -1) {
+                    $(this).hide();
+                    $("#City").val("");
+                    $("#other_city").show();
+                    $("#close_other_city").show();
+                }
+            });
+            $('#close_other_city').click(function () {
+                $("#CityId").show();
+                $("#City").val("");
+                $("#other_city").hide();
+                $("#close_other_city").hide();
+            });
+        });
+
+        function LoadCity() {
+
+            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                if (data != "") {
+                    $('#CityId').empty().append(data);
+                    if ($("select#CityId option").length == 1) {
+                        $("#CityId").hide();
+                        $("#City").val("");
+                        $("#other_city").show();
+                    }
+                }
+                else {
+                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        }
+    </script>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }

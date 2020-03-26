@@ -1,0 +1,175 @@
+﻿
+@model IEnumerable<CLayer.SupplierPaymentReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+    string type = "";
+    string mtype = "";
+    decimal tNoofofAccomodations=0, tNoofNights=0, tSupplierValuePayable=0,subtotals=0;
+    decimal gNoofofAccomodations = 0, gNoofNights = 0, gSupplierValuePayable = 0, gsubtotals = 0, grandtotal = 0;
+    }
+<div class="row">
+    <div class="col-md-12  margin10px">
+        @{
+            StayBazar.Areas.Admin.Models.SupplierPaymentReportModel filterform = (StayBazar.Areas.Admin.Models.SupplierPaymentReportModel)ViewBag.Filter;
+            using (Html.BeginForm("Pager", "SupplierPaymentReport", FormMethod.Post, new { @id = "frmPagersa" }))
+            {
+                <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+                <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                <input type="hidden" id="FromDate" name="FromDate" value="@filterform.FromDate" />
+                <input type="hidden" id="ToDate" name="ToDate" value="@filterform.ToDate" />
+                <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+        }
+        @if (Model != null && Model.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+        }
+        <div>
+            <div style="text-align:left">@*<h4>Supplier Payment Report </h4>*@</div>
+            <table class="table table-custom table-bordered table-hover table-striped" border="1">
+                <thead style="background-color:whitesmoke">
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Booking Date</th>
+                        <th>Booking Ref No</th>
+                        <th>Property Name</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Accomodation Type</th>
+                        <th>No of Accomodations</th>
+                        <th>Period of Stay</th>
+                        <th>No of Nights</th>
+                        <th>Additional Guests</th>
+                        <th>CustomerType</th>
+                        <th>Customer Name</th>
+                        <th>Supplier Rate (Pre-tax)</th>
+                        <th>Supplier Value Payable (Pre-tax)</th>
+                        <th>Tax Type</th>
+                        <th>Tax</th>
+                        <th>Total Supplier Value Payable</th>
+                        <th>Amount Paid</th>
+                        <th>Mode of payment	</th>
+                        <th>Date of Payment	</th>
+                        <th>Balance Payable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (CLayer.SupplierPaymentReport reportList in Model)
+                    {
+                        i = i + 1;
+
+                        DateTime checkin = reportList.CheckIn;
+                        DateTime checkout = reportList.CheckOut;
+                        TimeSpan ts = checkout - checkin;
+                        int differenceInDays = ts.Days;
+                        string differenceAsString = differenceInDays.ToString();
+
+                        mtype = reportList.CustomeType;
+                        if (type != mtype)
+                        {
+
+
+                            if (type != "")
+                            {
+                                <tr class="info">
+                                    <td colspan="7"><b>@type Totals</b></td>
+                                    <td align="right"><b>@tNoofofAccomodations</b></td>
+                                    <td>&nbsp;</td>
+                                    <td align="right"><b>@tNoofNights </b></td>
+                                    <td colspan="7">&nbsp;</td>
+                                    <td align="right"><b>@tSupplierValuePayable.ToString("N0")</b></td>
+                                    <td colspan="4">&nbsp;</td>
+                                </tr>
+                                tNoofofAccomodations = 0;
+                                tNoofNights = 0;
+                                tSupplierValuePayable = 0;
+
+
+
+
+                            }
+                            type = reportList.CustomeType;
+                        }
+                        <tr>
+                            <td>@i</td>
+                            <td>@reportList.BookingDate.ToShortDateString()</td>
+                            <td>@reportList.BookingId</td>
+                            <td>@reportList.PropertyName</td>
+                            <td>@reportList.City</td>
+                            <td>@reportList.State</td>
+                            <td>@reportList.AccomodationType</td>
+                            <td>@reportList.NumberofAccomodation</td>
+                            <td>
+                                @reportList.CheckIn.ToShortDateString() - @reportList.CheckOut.ToShortDateString()
+
+                            </td>
+                            <td>@differenceAsString</td>
+                            <td>@reportList.NoOfGuests</td>
+                            <td>@reportList.CustomeType</td>
+                            <td>@reportList.CustomerName</td>
+                            <td align="right">@reportList.SupplierRate</td>
+                            <td align="right">@reportList.SupplierRatePayable</td>
+                            <td>@reportList.TaxType</td>
+                            <td align="right">@reportList.TaxRate</td>
+                            <td align="right">@reportList.TotalSupplierValue</td>
+                            <td>&nbsp;@*@reportList.AmountPaid*@</td>
+                            <td>&nbsp;@*@reportList.Modeofpayment*@</td>
+                            <td>&nbsp;@*@reportList.BookingDate.ToShortDateString()*@</td>
+                            <td>&nbsp;</td>
+                        </tr>
+
+
+
+                        tNoofofAccomodations = tNoofofAccomodations + reportList.NumberofAccomodation;
+                        tNoofNights = tNoofNights + differenceInDays;
+                        tSupplierValuePayable = tSupplierValuePayable + reportList.SupplierRatePayable;
+
+                        gNoofofAccomodations += reportList.NumberofAccomodation;
+                        gNoofNights += differenceInDays;
+                        gSupplierValuePayable += reportList.SupplierRatePayable;
+
+                
+                    }
+
+                    <tr class="info">
+                        <td colspan="7"><b>@type Totals</b></td>
+                        <td align="right"><b>@tNoofofAccomodations</b></td>
+                        <td>&nbsp;</td>
+                        <td align="right"><b>@tNoofNights </b></td>
+                        <td colspan="7">&nbsp;</td>
+                        <td align="right"><b>@tSupplierValuePayable.ToString("N0")</b></td>
+                        <td colspan="4">&nbsp;</td>
+                    </tr>
+                    <tr class="success">
+                        <td colspan="7"><b>Grand Totals</b></td>
+                        <td align="right"><b>@gNoofofAccomodations</b></td>
+                        <td>&nbsp;</td>
+                        <td align="right"><b>@gNoofNights </b></td>
+                        <td colspan="7">&nbsp;</td>
+                        <td align="right"><b>@gSupplierValuePayable.ToString("N0")</b></td>
+                        <td colspan="4">&nbsp;</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+        // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "SupplierPaymentReport", new { area = "Admin" })';
+        $.post(url, $("#frmPagersa").serialize(), function (data) {
+            $("#SupplierPaymentList").html(data);
+        });
+    }
+</script>

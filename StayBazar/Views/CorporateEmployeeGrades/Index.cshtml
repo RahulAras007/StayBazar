@@ -1,0 +1,52 @@
+﻿
+@{
+    ViewBag.Title = "Employee Grade";
+    try
+    {
+        var grid = new WebGrid(Model, defaultSort: "Name", canPage: true, rowsPerPage: 25,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Models.CorporateEmployeeGradeModel CorporateEmployeeGrades = (StayBazar.Models.CorporateEmployeeGradeModel)ViewBag.EmployeeGradeTitle;
+        <text>
+            <div id="bodycontent" class="container">
+                <div id="divEdit">
+                    @{
+                        Html.RenderPartial("~/Views/CorporateEmployeeGrades/_Edit.cshtml", CorporateEmployeeGrades, ViewData);
+                    }
+                </div>
+
+                <div id="gridContent">
+                    @grid.GetHtml(tableStyle: "webGrid table table-striped table-hover table-condensed",
+            headerStyle: "header",
+            alternatingRowStyle: "alt",
+            selectedRowStyle: "select",
+            columns: grid.Columns(grid.Column("GradeCode", "Grade Code"), grid.Column("GradeDescription", "Grade Description"),
+            grid.Column("Edit", format: @<text><a href="#" onclick="EditCorporateEmployeeGrades(@item.GradeID)" title="Edit"><span class="glyphicon glyphicon-edit"></span></a></text>),
+grid.Column("Delete", format: (item) =>
+{
+
+ 
+     return Html.Raw("<a title='Delete' class='lnk' href='/CorporateEmployeeGrades/Delete?id=" + item.GradeID + "' onclick=\"return confirm('Are you sure you want to delete?')\"><span class='glyphicon glyphicon-remove'></span></a>");
+ 
+
+})
+))
+                </div>
+            </div>
+            <script type="text/javascript">
+                function EditCorporateEmployeeGrades(id) {
+                    $.get("CorporateEmployeeGrades/Edit?id=" + id, function (data) {
+                        $("#divEdit").html(data);
+                    });
+                }
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+    }
+}
+
+
+

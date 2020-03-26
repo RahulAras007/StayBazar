@@ -1,0 +1,125 @@
+﻿
+@model StayBazar.Models.OfflinePaymentModel 
+
+
+<table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+    <tr>
+        <td align="center">
+            <table width="700">
+                <thead>
+                    <tr>
+                        <th style="padding-top: 2%;" colspan="3">
+                            <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                        </th>
+                        <th width="400" align="right" style="font-size:12px;">
+                            Phone: @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                            Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)<br />
+                            Toll Free Number: 1800-425- 2393
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" align="center">
+                            <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">Staybazar Payment Confirmation</h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <p style="line-height: 35px; font-size: 12px; color: #666;">
+
+                                Dear @Model.Name,<br />
+
+                                @Model.CustomerCity <br />
+
+                                We confirm receipt of below payment from you:
+
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table>
+                                <thead>
+                                    <tr style="background-color: #a51e22;color:white; height:30px; font-size:12px;">
+                                        <th>Booking Id</th>
+                                        <th>Property Name</th>
+                                        <th>Property City</th>
+                                        <th>Check In</th>
+                                        <th>Check Out</th>
+                                        <th>Guest Name</th>
+                                        <th>No of Rooms</th>
+                                        <th align="right" style="padding-right: 5px;"><span class="bold">Total Amount</span></th>
+                                        <th align="right" style="padding-right: 5px;"><span class="bold">Advance Received</span></th>
+                                        <th align="right" style="padding-right: 5px;"><span class="bold">Balance Payable</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (CLayer.OfflinePayment usr in Model.Bookinglist)
+                                    {
+                                        <tr>
+                                            @*<td>@usr.CustomerName</td>*@
+                                            @*<td>
+                                                    @usr.OfflineBookingId
+                                                </td>*@
+                                            <td>
+                                                @usr.ConfirmationNumber
+                                            </td>
+                                            <td>
+                                                @usr.PropertyName
+                                            </td>
+                                            <td>
+                                                @usr.PropertyCityname
+                                            </td>
+                                            <td>
+                                                @usr.CheckIn.ToShortDateString()
+                                            </td>
+                                            <td>
+                                                @usr.CheckOut.ToShortDateString()
+                                            </td>
+                                            <td>
+                                                @usr.GuestName
+                                            </td>
+                                            <td align="right">
+                                                @usr.NoOfRooms
+                                            </td>
+                                            <td align="right">
+                                                @*@usr.TotalSalePrice*@
+                                                @String.Format("{0:f0}", usr.TotalSalePrice)
+                                            </td>
+                                            <td align="right">
+                                                @*@usr.AdvanceReceived*@
+                                                @String.Format("{0:f0}", usr.AdvanceReceived)
+                                            </td>
+                                            <td align="right">
+                                                @String.Format("{0:f0}", usr.PayableSalePrice)
+                                            </td>
+                                            @*PayableSalePrice = Connection.ToDecimal(dr["TotalSalePrice"]) - Connection.ToDecimal(dr["AdvanceReceived"])*@
+                                        </tr>
+                                    }
+                                    <tr style="border-top: 1px solid #a51e22;  ">
+                                        <td colspan="8">&nbsp;</td>
+                                        <td align="right" style="padding-right: 5px;">
+                                            <b>
+                                                Total:
+
+                                            </b>
+                                        </td>
+                                        <td align="right" style="padding-right: 5px;">
+                                            <b>
+                                                @(Math.Round(Model.OfflineBookingList.First().SumTotalSalePrice))
+
+                                            </b>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+</table>
+

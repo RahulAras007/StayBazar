@@ -1,0 +1,18 @@
+﻿@model long
+@{
+    List<CLayer.Tax> taxrates = BLayer.Tax.GetAllTypeTaxRate(Model);
+}
+<p>
+    @if (taxrates.Count > 0)
+    {
+        foreach (CLayer.Tax ttx in taxrates)
+        {
+            string taxtitle = ttx.Title;
+            decimal Rateper = ttx.Rate;
+            if (Rateper > 0)
+            {
+                <text>@taxtitle: <b>@Rateper %</b></text> <br />
+            }
+        }
+    }
+</p>

@@ -1,0 +1,22 @@
+﻿@model IEnumerable<CLayer.Address>
+@{
+    Layout = null;   
+}
+    @if (Model != null)
+{
+    foreach (CLayer.Address usr2 in Model)
+    {
+        <td align="justify">
+            <b>Guest Details</b>  <br />
+            Name:  @usr2.Firstname<br />
+            @*Last Name: @usr2.Lastname<br />*@
+            Address:@usr2.AddressText<br />
+            City:@usr2.City <br />
+            State: @usr2.StateName <br />
+            Country:@usr2.Country<br />
+            Phone:@usr2.Phone ,@usr2.Mobile
+        </td>
+    }
+}
+
+

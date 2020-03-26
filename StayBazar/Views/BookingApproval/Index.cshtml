@@ -1,0 +1,215 @@
+﻿@model StayBazar.Models.BookingApprovalModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Booking Approvals";
+}
+@section scripts{
+    <script src="~/Scripts/custom_pager.js"></script>
+}
+
+<script src="~/Scripts/jquery.bootpag.min.js"></script>
+<link href="~/Content/styles.css" rel="stylesheet" />
+<div class="container bdy_min_height">
+    @*@Styles.Render("~/Content/css")*@
+    @*@Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/jqueryui")
+        @Scripts.Render("~/bundles/jqueryval")*@
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/bootcss")
+
+    @{
+        long cid = 0;
+        long.TryParse(User.Identity.GetUserId(), out cid);
+        CLayer.Role.Roles a = BLayer.User.GetRole(cid);
+
+        if (a == CLayer.Role.Roles.CorporateUser || a == CLayer.Role.Roles.Corporate || a == CLayer.Role.Roles.Agent)
+        {
+            if ((int)a == (int)CLayer.Role.Roles.CorporateUser)
+            {
+                long corpid = BLayer.B2B.GetCorporateIdOfUser(cid);
+                string b2bnameC = BLayer.B2BUser.Getb2bname(corpid);
+                <h2>Corporate Booking - @b2bnameC</h2>
+            }
+            else
+            {
+                if (a == CLayer.Role.Roles.Corporate)
+                {
+                    string b2bname = BLayer.B2BUser.Getb2bname(cid);
+                    <h2>Corporate Booking - @b2bname</h2>
+                }
+                else if (a == CLayer.Role.Roles.Agent)
+                {
+                    string b2bname = BLayer.B2BUser.Getb2bname(cid);
+                    <h2>Travel agent - @b2bname</h2>
+                }
+            }
+        }
+        else
+        {
+            <h2>@ViewBag.Title</h2>
+            <br />
+        }
+    }
+    <script type="text/javascript">
+        $(function () { validateRq(); });
+    </script>
+
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active"><a href="#BookingApproval" data-toggle="tab">Booking Approvals</a></li>
+        <li><a href="#BookingApprovalHistory" data-toggle="tab">Booking Approval History</a></li>
+
+    </ul>
+    <div class="tab-content">
+
+        <div class="tab-pane active" id="BookingApproval">
+            <div class="row">
+                <div class="col-md-12">
+                    @using (Html.BeginForm("FilterBookingApproval", "BookingApproval", FormMethod.Post, new { @id = "frmFilters", onsubmit = "return false;" }))
+                    {
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                                    <span class="input-group-btn">
+                                        <button id="btnSearchBookingApproval" class="btn btn-default" type="button" tabindex="3">
+                                            <span class="glyphicon glyphicon-search"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-control">
+                                    @foreach (StayBazar.Areas.Admin.Models.TransactionsModel.TransactionsSearchValue ruv in (StayBazar.Areas.Admin.Models.TransactionsModel.TransactionsSearchValue[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.TransactionsModel.TransactionsSearchValue)))
+                                    {
+                                        <input type="radio" name="ruv" class="css-radiobutton rdbtnBookingApproval" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text> } />
+                                        <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                                        <text>&nbsp;&nbsp;</text>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @Html.HiddenFor(m => m.SearchValue, new { @id = "txtSearchValueBookingApproval" })
+                    }
+                </div>
+            </div>
+            <hr />
+            <div class="row" id="OtherList">
+                @Html.Partial("~/Views/BookingApproval/_List.cshtml", Model)
+            </div>
+        </div>
+
+        <div class="tab-pane" id="BookingApprovalHistory">
+            <div class="row">
+                <div class="col-md-12">
+                    @using (Html.BeginForm("FilterBookingApprovalHistory", "BookingApproval", FormMethod.Post, new { @id = "frmFilterBookingApprovalHistory", onsubmit = "return false;" }))
+                    {
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                                    <span class="input-group-btn">
+                                        <button id="btnSearchBookingApprovalHistory" class="btn btn-default" type="button" tabindex="3">
+                                            <span class="glyphicon glyphicon-search"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-control">
+                                    @foreach (StayBazar.Areas.Admin.Models.TransactionsModel.TransactionsSearchValue ruvv in (StayBazar.Areas.Admin.Models.TransactionsModel.TransactionsSearchValue[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.TransactionsModel.TransactionsSearchValue)))
+                                    {
+                                        <input type="radio" name="ruvv" class="css-radiobutton rdbtn" id="@((int)ruvv)" @if ((int)ruvv == 1) { <text> checked </text> } />
+                                        <label for="@((int)ruvv)" class="css-label">@ruvv.ToString()</label>
+                                        <text>&nbsp;&nbsp;</text>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @Html.HiddenFor(m => m.SearchValue, new { @id = "txtSearchValueBookingApprovalHistory" })
+                    }
+                </div>
+            </div>
+            <hr />
+            <div class="row" id="ReadyForBookingsList">
+                @Html.Partial("~/Views/BookingApproval/BookingApprovalHistory.cshtml", Model.BookingApprovalHistory)
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var status = '@ViewBag.Status';
+        if (status == "Approved")
+        {
+            $("#dvAlert").show();
+        }
+        showPager2(1);
+        showPagerBookingApprovalHistory(1);
+    });
+
+    function showPager2(num) {
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "BookingApproval")';
+        $.post(url, data = { Type: $("#Type").val(), currentPage: $("#currentPage").val(), Limit: 25, Day: 90 }, function (data) {
+            $("#OtherList").html(data);
+        });
+    }
+
+    function showPagerBookingApprovalHistory(num) {
+        $("#currentPage").val(num);
+        var url = '@Url.Action("PagerBookingApprovalHistory", "BookingApproval")';
+        $.post(url, data = { Type: $("#Type").val(), currentPage: $("#currentPage").val(), Limit: 25, Day: 90 }, function (data) {
+            $("#ReadyForBookingsList").html(data);
+        });
+    }
+
+                $(function () {
+                    $("#txtSearchValueBookingApproval").val("1");
+                    $(".rdbtnBookingApproval").change(function () {
+                        $("#txtSearchValueBookingApproval").val("1");
+                        $(".rdbtnBookingApproval").each(function () {
+                            if (this.checked) {
+                                $("#txtSearchValueBookingApproval").val($(this).attr("id"));
+                            }
+                        });
+                    });
+                        //Search Booking Approvals
+                    $("#btnSearchBookingApproval").click(function () {
+                        var url = '@Url.Action("FilterBookingApproval", "BookingApproval")';
+                            $.post(url, $("#frmFilters").serialize(),
+                                    function (data) {
+                                        $("#OtherList").html(data);
+                                    });
+                        });
+
+
+                });
+
+    $(function () {
+        $("#txtSearchValueBookingApprovalHistory").val("1");
+
+        $(".rdbtn").change(function () {
+            $("#txtSearchValueBookingApprovalHistory").val("1");
+            $(".rdbtn").each(function () {
+                if (this.checked) {
+                    $("#txtSearchValueBookingApprovalHistory").val($(this).attr("id"));
+                }
+            });
+        });
+          //Search Booking Approval History
+        $("#btnSearchBookingApprovalHistory").click(function () {
+
+                        var url = '@Url.Action("FilterBookingApprovalHistory", "BookingApproval")';
+                            $.post(url, $("#frmFilterBookingApprovalHistory").serialize(),
+                                    function (data) {
+                                        $("#ReadyForBookingsList").html(data);
+                                    });
+                            });
+
+    });
+</script>

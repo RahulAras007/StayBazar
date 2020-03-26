@@ -1,0 +1,283 @@
+﻿@model List<CLayer.Booking>
+@using Microsoft.AspNet.Identity
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager4";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+}
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="panel-group" id="accordion">
+        @{
+    long i = 0;
+        }
+        @{
+    StayBazar.Models.BookingHistoryModel filterform = (StayBazar.Models.BookingHistoryModel)ViewBag.Filter;
+    using (Html.BeginForm("PagerforCreditbook", "BookingHistory", FormMethod.Post, new { @id = "frmPagers" }))
+    {
+            <input type="hidden" id="Type" name="type" value="@filterform.Type" />
+            <input type="hidden" id="currentPagec" name="currentPage" value="@filterform.currentPage" />
+            <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+            <input type="hidden" id="Day" name="Day" value="@filterform.Day" />
+    }
+    gp.RowsInAPage = filterform.Limit;
+        }
+
+        @if (Model != null && Model.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+        }
+
+        @foreach (CLayer.Booking usr in Model)
+        {
+
+            long Paymentoption = BLayer.Bookings.GetPaymentoption(usr.BookingId);
+            CLayer.ObjectStatus.PartialPaymentStatus PartialPayStatus = BLayer.Bookings.GetPartialPaymentStatus(usr.BookingId);
+
+
+            if (i != usr.BookingId)
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#icr_@usr.BookingId">
+                            <div class="row">
+                                <div class="col-md-2 ">
+                                    <span></span>Date: @usr.BookingDate.ToShortDateString()
+                                </div>
+                                <div class="col-md-2 ">Cnf. No: @usr.OrderNo </div>
+                                <div class="col-md-4">@usr.PropertyTitle  Location: @usr.propertyLocation </div>
+                            </div>
+                        </a>
+
+                    </div>
+
+                    <div id="icr_@usr.BookingId" class="panel-collapse collapse ">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <dl>
+                                        <dt>Confirmation Details</dt>
+                                        <dd>@usr.OrderNo</dd>
+                                        <dt>Booking Date:</dt>
+                                        <dd>@usr.BookingDate.ToShortDateString()</dd>
+                                    </dl>
+
+                                </div>
+                                <div class="col-md-3">
+                                    <dl>
+                                        <dt>Property Details</dt>
+                                        <dd>@usr.PropertyTitle</dd>
+                                        <dd>@usr.propertyAddress</dd>
+                                        <dd>@usr.propertyLocation</dd>
+                                        <dd>@usr.propertyCity</dd>
+                                        <dd>@usr.propertyPin</dd>
+                                        @*<dd>@usr.propertyEmail</dd>*@
+                                    </dl>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <dl>
+                                        <dt>Status</dt>
+                                        <dd>
+                                            @{
+                int id = usr.BookingStatus;
+                if (id == (int)CLayer.ObjectStatus.BookingStatus.Success)
+                {
+                    <text>Booked</text>
+                }
+                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Cancelled)
+                {
+                    <text>Cancelled</text>
+                }
+                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Cart)
+                {
+                    <text>Cart</text>
+                }
+                else if (id == (int)CLayer.ObjectStatus.BookingStatus.CheckOut)
+                {
+                    <text>CheckOut</text>
+                }
+                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Failed)
+                {
+                    <text>Failure</text>
+                }
+                                            }
+                                        </dd>
+                                        <dt>Total Amount</dt>
+                                        <dd>@Math.Round(usr.bookingTotalAmount)</dd>
+                                    </dl>
+                                </div>
+                                @{List<CLayer.Address> usersFor1 = BLayer.Bookings.GetBookedForUser(usr.BookingId);
+                                foreach (CLayer.Address usr2 in usersFor1)
+                                {
+                                    <div class=" col-lg-4">
+
+                                        <b>Guest Details</b>  <br />
+                                        @usr2.Firstname,
+                                        @usr2.AddressText,
+                                        @usr2.City ,
+                                        @usr2.StateName ,
+                                        @usr2.Country ,@usr2.ZipCode.
+                                        Phone:@usr2.Phone    @usr2.Mobile.
+                                        Email:@usr2.Email
+                                    </div>
+                                }
+                                }
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 col-md-offset-2  rightalign">
+
+                                    @if (DateTime.Today >= usr.CheckIn)
+                                    {
+                                        <a href="@Url.Action("IndexSave","Review")?idb=@usr.BookingId&idp=@usr.PropertyId" id="reviewadd" title="Review" class="btn btn-default ordhist_btn">Add Review</a>
+                                    }
+
+                                    <a href="@Url.Action("ViewBill","Booking")?id=@usr.BookingId" title="Print" class="btn btn-info"> View Reservation </a>
+                                    <a href="#" class="btn btn-info" onclick="showInvoice(@usr.BookingId)">Invoice</a>
+
+                                    @if (Paymentoption == (int)CLayer.ObjectStatus.PaymentOption.FullPayment)
+                                    {
+                                        if (usr.CheckIn > DateTime.Today && (usr.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success))
+                                        {
+                                            <a href="#" id="Modify@(usr.BookingItemId)" title="Modify" class="btn  btn-default ordhist_btn" onclick="callModify(@usr.BookingId)"> Modify </a>
+                                            <a href="#" id="status@(usr.BookingItemId)" title="Edit" class="btn btn-danger ordhist_btn" onclick="callCancel(@usr.BookingId)"> Cancel</a>
+                                        }
+                                    }
+                                    @if (Paymentoption == (int)CLayer.ObjectStatus.PaymentOption.PartialPayment)
+                                    {
+                                        if (usr.CheckIn > DateTime.Today && (PartialPayStatus == CLayer.ObjectStatus.PartialPaymentStatus.SecondPaymentSuccess) && (usr.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success))
+                                        {
+                                            <a href="#" id="Modify@(usr.BookingItemId)" title="Modify" class="btn  btn-default ordhist_btn" onclick="callModify(@usr.BookingId)"> Modify </a>
+                                            <a href="#" id="status@(usr.BookingItemId)" title="Edit" class="btn btn-danger ordhist_btn" onclick="callCancel(@usr.BookingId)"> Cancel</a>
+                                        }
+                                        if (usr.CheckIn > DateTime.Today && (PartialPayStatus == CLayer.ObjectStatus.PartialPaymentStatus.InitialPaymentSuccess && (usr.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success)))
+                                        {
+                                            <a href="#" id="status@(usr.BookingItemId)" title="Edit" class="btn btn-danger ordhist_btn" onclick="callCancel(@usr.BookingId)"> Cancel</a>
+                                        }
+                                    }
+
+
+                                    @if (Paymentoption == (int)CLayer.ObjectStatus.PaymentOption.PartialPayment && (usr.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success))
+                                    {
+
+                                        if (PartialPayStatus == CLayer.ObjectStatus.PartialPaymentStatus.InitialPaymentSuccess || PartialPayStatus == CLayer.ObjectStatus.PartialPaymentStatus.SecondPaymentFailed)
+                                        {
+                                            <a class="btn btn-danger ordhist_btn" title="Make Pending Payment" href="@Url.Action("PartialPayment", "Booking", new { bookingId = usr.BookingId })">Pending Payment</a>
+                                        }
+                                    }
+
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                                   
+                                     <thead>
+                                        <tr>
+                                            <th>Accommodation</th>
+                                            <th>CheckIn</th>
+                                            <th>Check out</th>
+                                            <th>Quantity</th>
+                                            <th>Adults</th>
+                                            <th>Children</th>
+                                            <th>Guests</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @{
+                List<CLayer.BookingItem> Acdt = BLayer.BookingItem.GetAllDetailsForPartialPay(usr.BookingId);
+
+                                        }
+                                        @foreach (CLayer.BookingItem dt in Acdt)
+                                        {
+                                            <tr>
+                                                <td>@dt.AccommodationTitle</td>
+                                                <td>@dt.CheckIn.ToShortDateString()</td>
+                                                <td>@dt.CheckOut.ToShortDateString()</td>
+                                                <td>@dt.quantity</td>
+                                                <td>@dt.NoOfAdults</td>
+                                                <td>@dt.NoOfChildren</td>
+                                                <td>@dt.NoOfGuests</td>
+                                                <td>@Math.Round(dt.TotalAmount)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+
+
+                                @if (Paymentoption == (int)CLayer.ObjectStatus.PaymentOption.CorporateCreditBooking)
+                                {
+                                    long BuserId = BLayer.Bookings.GetBookedByUserId(usr.BookingId);
+                                    CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(BuserId);
+                                    if (role == CLayer.Role.Roles.CorporateUser)
+                                    {
+                                        BuserId = BLayer.B2B.GetCorporateIdOfUser(BuserId);
+                                    }
+                                    CLayer.B2B Creditbookingdata = BLayer.B2B.GetbookingcreditforCorte(BuserId);
+                                    decimal amt = BLayer.Bookings.GetTotalcreditbookamount(BuserId);
+                                    decimal creditbalceAmt = Creditbookingdata.TotalCreditAmount - amt;
+                                    <h4 class="bold">Corporate Credit Booking Details</h4>
+                                    <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                                        <thead>
+                                            <tr>
+                                                <th>Total Amount booked by Corporate</th>
+                                                <th>Credit Limit Total</th>
+                                                <th>Credit Limit Balance</th>
+                                                <th>Payments Due</th>
+                                                <th>Date Due</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>@usr.bookingTotalAmount</td>
+                                                <td>@Creditbookingdata.TotalCreditAmount</td>
+                                                <td>@creditbalceAmt</td>
+                                                <td>
+                                                    @if (creditbalceAmt < 0)
+                                                    { <text> YES </text> }
+                                                    else
+                                                    { <text> NO </text> }
+                                                </td>
+                                                <td>@usr.BookingDate.AddDays(Creditbookingdata.CreditDays)</td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+                                }
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+else
+{
+
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="alert alert-info">You don't have any active bookings.</div>
+        </div>
+    </div>
+
+}
+
+<script type="text/javascript">
+    function showPager4(num) {
+        $("#currentPagec").val(num);
+        var url = '@Url.Action("PagerforCreditbook", "BookingHistory")';
+        $.post(url, $("#frmPagers").serialize(), function (data) {
+            $("#CreditBookinglist").html(data);
+        });
+    }
+</script>

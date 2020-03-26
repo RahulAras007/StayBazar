@@ -1,0 +1,174 @@
+﻿@model StayBazar.Areas.Admin.Models.SupplierPaymentModel
+
+
+
+
+@{
+    Layout = null;
+    List<CLayer.SupplierPayment> sd = Model.SupplierList;
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>SupplierPaymentVoucher</title>
+</head>
+<body>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="wraparound">
+                <div class="row">
+                    <img style="width:25%" src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                </div>
+                @Html.Partial("~/Areas/Admin/Views/SupplierPayment/_InvoiceHeader.cshtml", Model.supplierPaymentId)
+                <div>
+                    <table cellpadding="5" cellspacing="0" style="width:100%;">
+                        <tr>
+                            <td style="width:70%;">
+                                Voucher No :<b> @Model.supplierPaymentId</b><br />
+                                Supplier Name :
+                                @if (sd.Count > 0)
+                                {
+                                    <text> @sd[0].SupplierName </text>
+                                }
+                            </td>
+                            <td width="30%">
+                                Date : @System.DateTime.Today.ToShortDateString() <br />
+                                Region:
+                                @if (sd.Count > 0)
+                                {
+                                    if (sd[0].Region != null)
+                                    {
+                                        <text> @sd[0].Region </text>
+                                    }
+                                }
+                            </td>
+
+                        </tr>
+
+
+                        @*<tr>
+                                <td>Voucher No:</td>
+                                <td>@Model.supplierPaymentId</td>
+                                <td>Date:</td>
+                                <td>@System.DateTime.Today.ToShortDateString()</td>
+                            </tr>
+                            <tr>
+                                <td> Supplier Name	:</td>
+                                @if (sd.Count > 0)
+                                {
+                                    <td>@sd[0].SupplierName[0], @sd[0].SupplierCity[0] </td>
+                                }
+                            </tr>*@
+
+                        @*@if (sd.Count > 0)
+                            {
+                                <tr>
+                                    <td> </td>
+                                    <td>	</td>
+                                    <td>	Region:		</td>
+                                </tr>
+                                <tr>
+                                    <td> Guest Name	:</td>
+                                    <td>	@sd[0].Guestname		</td>
+                                </tr>
+                            }*@
+                    </table>
+
+
+
+                    <div>
+                        <br />
+
+                        <table border="1" id="secondrow" cellpadding="5" cellspacing="0" style="width:100%;">
+                            <tr>
+                                <td style="width:7%">
+                                    Sl No.
+                                </td>
+                                <td style="width:60%">
+                                    Description
+                                </td>
+                                <td style="width:20%; ">Value (Rs.)</td>
+                            </tr>
+                            @{int i = 1;}
+                            @foreach (CLayer.SupplierPayment cont in sd)
+                            {
+                                if (cont != null)
+                                {
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>
+                                            <p>
+                                                Property Name : @cont.propertyname,@cont.propertycity<br />
+                                                Booking ID : @cont.OrderId<br />
+                                                Check-in date : @cont.CheckIn_date.ToShortDateString()  &nbsp;&nbsp;
+                                                Check-out date : @cont.CheckOut_date.ToShortDateString()<br />
+                                                Number of Pax :-  &nbsp;&nbsp; Adult : @cont.NoOfPaxAdult, Child : @cont.NoOfPaxChild<br />
+                                                No of Rooms : @cont.NoofRooms <br />
+                                                Total room night : @cont.NoofDays<br />
+                                                @{i = i + 1;}
+                                                Guest Name :
+                                                @if (cont.Guestname != null && cont.Guestname != "")
+                                                {
+                                                    <text> @cont.Guestname </text>
+                                                }
+                                            </p>
+                                        </td>
+                                        <td align="right">@cont.Payamount</td>
+                                    </tr>
+                                }
+                            }
+                            @if (sd.Count > 0)
+                            {
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>Gross Amount</td>
+                                    <td align="right">@sd[0].grossAmount</td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>(-) TDS</td>
+                                    <td align="right">@sd[0].tdsAmount</td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>Net Amount Paid</td>
+                                    <td align="right">@sd[0].netAmtPaid</td>
+                                </tr>
+                            }
+                        </table>
+
+                        <table cellpadding="5" cellspacing="0" style="width:100%;">
+                            <tr>
+                                <td style=" text-align:center;">
+                                    <p style=" text-align:left;margin:0px;padding:0px;">
+
+                                        @if (sd.Count > 0)
+                                        {
+                                            <text>    (Rupees….......(@StayBazar.Common.Utils.NumberToWords((int)@sd[0].netAmtPaid)) Only.........................................................)</text>
+                                            <br />
+                                            <text>   Mode of Payment:</text>@sd[0].modeofPayment<br />
+                                            <text>   Payer Bank	:</text>     @sd[0].BAnk<br />}
+
+                                    </p>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p style="float:left;">     Requested by</p>
+                                    <p style="float:right;">    Authorized Signatory</p>
+                                    @Html.Partial("_InvoiceFooter")
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

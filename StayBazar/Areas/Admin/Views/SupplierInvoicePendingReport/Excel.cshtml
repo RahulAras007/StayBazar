@@ -1,0 +1,65 @@
+﻿
+@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    Layout = null;
+}
+
+
+
+<?xml version="1.0"?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <ss:Styles>
+     <ss:Style ss:ID="1">
+        <ss:Font ss:Bold="1" /> 
+     </ss:Style>
+  </ss:Styles>
+    <ss:Worksheet ss:Name="CollectionReport">
+                <ss:Table>
+                    <ss:Row ss:StyleID="1">
+                        <ss:Cell><ss:Data ss:Type="String">Booking Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking ID</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Property City</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Customer Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check-in Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check-out Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">No of Rooms</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Guest Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Supplier value</ss:Data></ss:Cell>
+                    </ss:Row>
+                    @foreach (var item in Model.OfflineBookingList)
+                    {
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">
+                        @if (item.BookingDate != null && item.BookingDate != DateTime.MinValue.ToShortDateString())
+                        {
+                            @Convert.ToDateTime(item.BookingDate).ToShortDateString()
+                        }
+                        </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.ConfirmationNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.SupplierName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.PropertyName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.CustomerName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">
+                        @if (item.CheckIn != null && item.CheckIn != DateTime.MinValue)
+                        {
+                            @Convert.ToDateTime(item.CheckIn).ToShortDateString()
+                        }
+                        </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">
+                        @if (item.CheckIn != null && item.CheckIn != DateTime.MinValue)
+                        {
+                            @Convert.ToDateTime(item.CheckIn).ToShortDateString()
+                        }
+                        </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.NoOfRooms</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.GuestName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@item.TotalBuyPrice</ss:Data></ss:Cell>
+                    </ss:Row>
+                    }
+              </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>
+

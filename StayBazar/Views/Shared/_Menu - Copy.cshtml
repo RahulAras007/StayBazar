@@ -1,0 +1,116 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    string extensions = System.Configuration.ConfigurationManager.AppSettings.Get("NonImageDocumentFileTypes");
+    string[] allowedFileExtensions = extensions.Split(',');
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    @{
+        List<CLayer.Currency> currencies = BLayer.Currency.GetForListing();
+        System.Text.StringBuilder curcodes = new System.Text.StringBuilder();
+        System.Text.StringBuilder curarray = new System.Text.StringBuilder();
+        foreach (CLayer.Currency item in currencies)
+        {
+            curcodes.Append(",");
+            curcodes.Append(item.Title);
+
+            curarray.Append("['");
+            curarray.Append(item.Title);
+            curarray.Append("','");
+            curarray.Append(item.Symbol);
+            curarray.Append("','");
+            curarray.Append(item.ConversionRate);
+            curarray.Append("'],");
+        }
+        if (curarray.Length > 0)
+        {
+            curarray.Remove(curarray.Length - 1, 1);
+        }
+        string defaultCurCode = "";
+        if (Request.Cookies.Get("CurCode") != null)
+        { defaultCurCode = Request.Cookies.Get("CurCode").Value; }
+        string fname = "";
+        bool IsForStaticPage = false;
+        if (ViewBag.IsForStaticPage != null)
+        { IsForStaticPage = (bool)ViewBag.IsForStaticPage; }
+
+    }
+</head>
+<body>
+    <ul class="menu">
+        @if (Request.IsAuthenticated && (!IsForStaticPage))
+        {
+            string email = User.Identity.GetUserName();
+            CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+            bool IsApprover = BLayer.User.GetApproverStatus(email);
+
+            long id = 0;
+            if (role == CLayer.Role.Roles.Corporate || role == CLayer.Role.Roles.CorporateUser || role == CLayer.Role.Roles.Supplier || role == CLayer.Role.Roles.Agent || role == CLayer.Role.Roles.Affiliate)
+            {
+                if (long.TryParse(User.Identity.GetUserId(), out id))
+                {
+                    if (role == CLayer.Role.Roles.CorporateUser)
+                    {
+                        id = BLayer.B2B.GetCorporateIdOfUser(id);
+                    }
+                    fname = BLayer.B2B.GetBusinessName(id);
+                }
+
+            }
+            else
+            {
+                if (long.TryParse(User.Identity.GetUserId(), out id))
+                {
+                    CLayer.User u = BLayer.User.Get(id);
+                    if (u != null)
+                    {
+                        fname = u.FirstName;
+                    }
+                }
+            }
+        <li class="menu-item-has-children">
+            <a href="#">@fname (My Account)</a>
+            <ul>
+                <li><a href="~/account/profile">My Profile</a></li>
+                <li><a href="~/bookinghistory/">My Stays</a></li>
+                @if (role == CLayer.Role.Roles.Corporate)
+                {
+                    <li><a href="~/corporateusers/">Users</a></li>
+                }
+                else if (role == CLayer.Role.Roles.Supplier)
+                {
+                    <li><a href="~/propertylist/">My Properties</a></li>
+                    <li><a href="~/bookingchart/">Bookings</a></li>
+                }
+                else if (role == CLayer.Role.Roles.Affiliate)
+                {
+                    <li><a href="~/supplierlist/">My Supplier</a></li>
+                }
+                <li><a href="~/review/">My Reviews</a></li>
+                @if ((role == CLayer.Role.Roles.Corporate) || (IsApprover))
+                {
+                    <li><a href="~/BookingApproval">Booking Approvals </a></li>
+                }
+                @if (role == CLayer.Role.Roles.Corporate)
+                {
+                    <li><a href="~/CorporateEmployeeGrades">Employee Grade </a></li>
+                    <li><a href="~/CorporateCityClass">City Class </a></li>
+                    <li><a href="~/CorporateCityEntitlement">City Class Entitlement</a></li>
+                    <li><a href="~/CostCentre">Cost Centre</a></li>
+                    <li>@Html.ActionLink("New Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
+                    <li><a href="~/assistedbooking/">Assisted Booking</a></li>
+                }
+                @if (role == CLayer.Role.Roles.CorporateUser)
+                {
+                    <li>@Html.ActionLink("New Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
+
+                }
+            </ul>
+        </li>
+        }
+    </ul>
+</body>
+</html>

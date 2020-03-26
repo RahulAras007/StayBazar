@@ -1,0 +1,159 @@
+﻿@model IEnumerable<CLayer.ReportForFailedTransactions>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+    long j = 0;
+
+}
+
+<div class="row">
+    <div class="col-md-12  margin10px">
+        @{
+            StayBazar.Areas.Admin.Models.ReportForFailedTransactionsModel filterform = (StayBazar.Areas.Admin.Models.ReportForFailedTransactionsModel)ViewBag.Filter;
+            using (Html.BeginForm("Pager", "ReportForFailedTransactions", FormMethod.Post, new { @id = "frmPagers" }))
+            {
+                <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+                <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                <input type="hidden" id="CurrentDate" name="CurrentDate" value="@filterform.CurrentDate" />
+                <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+        }
+        
+        @if (Model != null && Model.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+        }
+        <div>
+            @if (Model.Count() == 0)
+            {
+                <div style="text-align:center;">
+                    Failed Transactions not found.
+                </div>
+            }
+            else
+            {
+            <!--START-->
+                <div style="text-align:left"><h4>Booking With Failed Transaction Report</h4></div>
+                <table class="table table-bordered table-hover table-striped">
+                    <thead style="background-color:whitesmoke">
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Supplier Name</th>
+                            <th>Property Name</th>
+                            <th>Property City</th>
+                            <th>Accomodation Type</th>
+                            <th>Check-In Date</th>
+                            <th>Check-Out Date</th>
+                            <th>Customer Name</th>
+                            <th>Customer Mobile No</th>
+                            <th>Booking Category</th>
+                            <th>Rate type</th>
+                            <th>Total booking Amount</th>
+                            <th>Stay Bazar Commission</th>
+                            <th>Current Status</th>
+                            <th>Booking Date & Time</th>
+                            <th>Issue</th>
+                            <th>Resolution Time</th>
+                            <th>Resolution</th>
+                            <th>Assigned to Customer Service (Y/N)</th>
+                            <th>Customer Service Person Assigned</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (CLayer.ReportForFailedTransactions reportList in Model)
+                        {
+
+                            j = j + 1;
+
+                            <tr>
+                                <td>@j</td>
+                                <td>@reportList.SupplierName</td>
+                                <td>@reportList.PropertyName</td>
+                                <td>@reportList.PropertyCity</td>
+                                <td>@reportList.AccomodationType</td>
+                                <td>@reportList.Checkindate.ToShortDateString() </td>
+                                <td>@reportList.CheckoutDate.ToShortDateString()</td>
+                                <td>@reportList.CustomerName</td>
+                                <td>@reportList.CustomerMobile</td>
+                                <td>@reportList.BookingCategory</td>
+                                <td>@reportList.Ratetype </td>
+                                <td align="right">@reportList.TotalbookingAmount</td>
+                                <td align="right">@reportList.StayBazarCommission</td>
+                                <td>
+                                    &nbsp;
+                                    @*@if (@reportList.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Active)
+                                        {
+                                            <text>Active </text>
+                                        }
+                                        else if (@reportList.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Blocked)
+                                        {
+                                            <text>Blocked </text>
+                                        }
+                                        else if (@reportList.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Deleted)
+                                        {
+                                             <text>Delete </text>
+                                        }
+                                        else if (@reportList.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.NotVerified)
+                                        {
+                                            <text>NotVerified </text>
+                                        }
+                                        else if (@reportList.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Rejected)
+                                        {
+                                            <text>Rejected </text>
+                                        }*@
+                                </td>
+                                <td>
+                                    @{DateTime getdate = reportList.BookingDateTime;
+                                    DateTime currentdate = DateTime.Now;
+                                    }
+                                    @if (getdate.ToShortDateString() == currentdate.ToShortDateString())
+                                    {
+                                        @getdate.ToShortDateString();
+                                    }
+                                    else
+                                    {
+                                        @getdate.ToShortDateString();
+                                    }
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;@*@reportList.Resolution*@ </td>
+                                <td>&nbsp; </td>
+                                <td>
+                                    &nbsp;
+                                    @*@if(reportList.AssignedtoCustomerService==true)
+                                        {
+                                            <text>Yeas</text>
+                                        }
+                                        else
+                                            {
+                                             <text>No</text>
+                                            }*@
+                                </td>
+                                <td>&nbsp; </td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+                <div><h4>“List of customers who went up to Payment page and exited without payment completion”</h4></div>
+            <!--END-->
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+        // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "ReportForFailedTransactions", new { area = "Admin" })';
+        $.post(url, $("#frmPagers").serialize(), function (data) {
+            $("#TransactionList").html(data);
+        });
+    }
+</script>

@@ -1,0 +1,76 @@
+﻿@using StayBazar.Models
+@model IEnumerable<StayBazar.Areas.Admin.Models.SupplierMasterImportData>
+
+@{
+    ViewBag.Title = "Supplier Master Data from excel";
+}
+
+<style>
+    .jumbotron {
+        background-color: white;
+    }
+</style>
+
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-1">
+            @Html.ActionLink("Back", "Import_SupplierMasterData", "SupplierMasterImport", new { area = "Admin" }, new { @class = "btn btn-primary" })
+        </div>
+        <div class="col-sm-6">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+    </div>
+</div>
+@*<div>
+    <h2></h2>
+    <p></p>
+</div>*@
+<div class="container-fluid">
+    <h5>This data is not yet saved in the master tables.  Click on Back button and Click on Save Data to update the master tables</h5><br />
+    <table class="table table-bordered table-hover" cellpadding="0" cellspacing="0">
+
+        <tr>
+            <th style="width:100px">Supplier Name</th>
+            <th style="width:100px">Property Name</th>
+            <th style="width:100px">Supplier PAN</th>
+            <th style="width:100px">Full Address</th>
+            <th style="width:100px">City</th>
+            <th style="width:100px">State</th>
+            <th style="width:100px">Country</th>
+            <th style="width:100px">GST Number</th>
+            <th style="width:100px">Contact Person</th>
+            <th style="width:100px">Contact Number</th>
+            <th style="width:100px">Email Address</th>
+            <th style="width:100px">Code</th>
+            <th style="width:100px">User ID</th>
+            <th style="width:100px">Import Status</th>
+
+        </tr>
+
+
+        @foreach (StayBazar.Areas.Admin.Models.SupplierMasterImportData data in Model)
+        {
+            <tr>
+
+                <td>@data.supplier_name</td>
+                <td>@data.property_name</td>
+                <td>@data.supplier_PAN</td>
+                <td>@data.full_address</td>
+                <td>@data.supplier_city</td>
+                <td>@data.supplier_state</td>
+                <td>@data.supplier_country</td>
+                <td>@data.supplier_gst_no</td>
+                <td>@data.supplier_contact_person</td>
+                <td>@data.supplier_contact_number</td>
+                <td>@data.supplier_email_address</td>
+                <td>@data.supplier_master_code</td>
+                <td>@data.UserID</td>
+                <td>@data.import_status</td>
+
+            </tr>
+        }
+
+
+    </table>
+</div>
+

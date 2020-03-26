@@ -1,0 +1,59 @@
+﻿@model List<CLayer.B2B>
+@{
+    ViewBag.Title = "Supplier List";
+    int SupplierList = Model.Count;
+}
+<div class="container bdy_min_height">
+    <script type="text/javascript">
+        $(function () { validateRq(); });
+    </script>
+    <div class="row top_space_10">
+        <div class="col-md-10">
+
+            <h2>
+                &nbsp; <a href="~/Account/Profile" class="btn btn-sm btn-default" title="back to list"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                <a href="~/Account/Profile" title="back to list">My Profile</a>/@ViewBag.Title
+            </h2>      
+        </div>
+        <div class="col-md-1"><div class="height_adjust"></div><a href="/SearchSupplier" title="Add New" class="create_new">Add New</a></div>
+    </div>
+    <div class="row"><hr /></div>
+    @if (SupplierList > 0)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <table border="0" class="table table-condensed table-responsive table-custom">
+                    <thead>
+                        <tr>
+                            <th>Buisiness Name</th>
+                            <th>Email</th>
+                            <th>View</th>
+                            @*<th>Edit</th>*@
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (CLayer.B2B pr in Model)
+                        {
+                            <tr>
+                                <td>@pr.Name</td>
+                                <td>@pr.Email</td>  
+                                <td><a href="/SupplierEdit/Details/@pr.B2BId" title="Details"><span class="glyphicon glyphicon-arrow-right"></span></a></td>                          
+                                @*<td><a href="/SupplierEdit/Index/@pr.B2BId" title="Edit"><span class="glyphicon glyphicon-edit"></span></a></td>*@
+                                <th><a href="/SupplierEdit/Delete?Userid=@pr.B2BId" onclick="return confirm('Are you sure you want to Remove this Supplier?')"><span class="glyphicon glyphicon-remove"></span></a></th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row margin-top-10">
+            <div class="col-md-4 col-md-offset-4 margin-top-10">
+                <div class="alert alert-info">You haven't chosen any suppliers yet.</div>
+            </div>
+        </div>
+    }
+</div>

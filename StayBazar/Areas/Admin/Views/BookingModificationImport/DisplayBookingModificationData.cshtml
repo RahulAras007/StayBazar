@@ -1,0 +1,108 @@
+﻿
+@{
+    ViewBag.Title = "Display Booking Modification Import Data";
+}
+
+@using StayBazar.Models
+@model IEnumerable<StayBazar.Areas.Admin.Models.BookingModificationImportData>
+@*@{
+        Layout = null;
+    }
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>*@
+<style>
+    .jumbotron {
+        background-color: white;
+    }
+</style>
+
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-1">
+            @Html.ActionLink("Back", "Import_BookingModificationData", "BookingModificationImport", new { area = "Admin" }, new { @class = "btn btn-primary" })
+
+        </div>
+        <div class="col-md-6">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+
+    </div>
+</div><br />
+
+
+    
+      <div class="container-fluid">
+
+
+          <table class="table table-bordered table-hover" cellpadding="0" cellspacing="0">
+
+              <tr>
+                  <th style="width:100px">Date_of_Modification</th>
+                  <th style="width:100px">Customer Name</th>
+                  <th style="width:100px">Customer State</th>
+                  <th style="width:100px">Property Name</th>
+                  <th style="width:100px">Property City</th>
+                  <th style="width:100px">Property State</th>
+                  <th style="width:100px">Accomodation Type</th>
+                  <th style="width:100px">Room Category Type</th>
+                  <th style="width:100px">Check In</th>
+                  <th style="width:100px">Check Out</th>
+                  <th style="width:100px">Guest Name</th>
+                  <th style="width:100px">Number Of Room</th>
+                  <th style="width:100px">Number Of Nights</th>
+                  <th style="width:100px">Total Number Of Nights</th>
+                  <th style="width:100px">Base Buy rate INR</th>
+                  <th style="width:100px">Input SGST</th>
+                  <th style="width:100px">Input CGST</th>
+                  <th style="width:100px">Input IGST</th>
+                  <th style="width:100px">Total  Buy Value</th>
+                  <th style="width:100px">Base Sell Rate</th>
+                  <th style="width:100px">Output SGST</th>
+                  <th style="width:100px">Output CGST</th>
+                  <th style="width:100px">Output IGST</th>
+                  <th style="width:100px">Customer State</th>
+                  <th style="width:100px">Hotel Confirmation Number</th>
+                  <th style="width:100px">BookingModification Code</th>
+                  <th style="width:100px">User ID</th>
+                  <th style="width:100px">Itilite Booking ID</th>
+              </tr>
+
+
+              @foreach (StayBazar.Areas.Admin.Models.BookingModificationImportData data in Model)
+              {
+                  <tr>
+                      <td>@data.date_of_modification</td>
+                      <td>@data.customer_name</td>
+                      <td>@data.customer_state</td>
+                      <td>@data.property_name</td>
+                      <td>@data.property_city</td>
+                      <td>@data.property_state</td>
+                      <td>@data.accomodation_type</td>
+                      <td>@data.room_category_type</td>
+                      <td>@data.check_in</td>
+                      <td>@data.check_out</td>
+                      <td>@data.guest_name</td>
+                      <td>@data.no_of_room</td>
+                      <td>@data.no_of_nights</td>
+                      <td>@data.total_room_nights</td>
+                      <td>@data.base_buy_rate_INR</td>
+                      <td>@data.input_sgst</td>
+                      <td>@data.input_cgst</td>
+                      <td>@data.input_igst</td>
+                      <td>@data.total_buy_value</td>
+                      <td>@data.base_sell_rate</td>
+                      <td>@data.output_sgst</td>
+                      <td>@data.output_cgst</td>
+                      <td>@data.output_igst</td>
+                      <td>@data.customer_state</td>
+                      <td>@data.hotel_confirmation_number</td>
+                      <td>@data.bookingmodification_code</td>
+                      <td>@data.UserID</td>
+                      <td>@data.Itilite_booking_ID</td>
+                  </tr>
+              }
+
+
+          </table>
+      </div>

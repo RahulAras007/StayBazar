@@ -1,0 +1,409 @@
+﻿@model StayBazar.Models.B2BModel
+@using System.Configuration;
+@using CaptchaMvc.HtmlHelpers
+@{
+    ViewBag.Title = "Start a Corporate Account";
+    ViewBag.BreadCrumb = " <p style='margin-top: -29px; margin-left: 38px;'> > </p> <div id='breads' style='margin-top: -30px; margin-left: 50px;'> <div itemscope itemtype='http://data-vocabulary.org/Breadcrumb'> <a href=''  itemprop='url'  class=' whitetext breadhvr' > <span class=' whitetext breadhvr'  itemprop='title'>Corporate Account</span></a>  </div> </div>";
+
+}
+<div class="parent-div">
+    <!--Landing Starts Here -->
+    <div class="landing-img">
+        <div class="landing-heading">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2> Hassel-free </h2>
+                        <h3 class="landing-caption">
+                            travel booking
+                        </h3>
+                    </div>
+                    <!-- <div class="col-6">
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ABout us heading section-->
+    <section class="about-section text-left">
+        <div class="title-heading">
+            <h3> START A CORPORATE ACCOUNT</h3>
+        </div>
+        
+
+        @try
+        {
+            @*<div class="row">
+                <div class="col-md-12">
+                    <h2 class="form-header">
+                        @ViewBag.Title
+                    </h2>
+                </div>
+            </div>*@
+            <div class="row">
+                <div class="col-md-6 sidesplash">
+                    <img src="/images/imac.jpg" />
+                </div>
+                <div class="col-md-6">
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger">
+                            @ViewBag.Message
+                        </div>
+                    }
+                    @using (Html.BeginForm("CorporateSave", "Join", FormMethod.Post, new { enctype = "multipart/form-data", id = "upload" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="formcontainer border-radius">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Name)
+                                <span style="color:red">*</span>@Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.Name)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Email)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.Email, new { @tabindex = "2", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.Email)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                                @Html.TextAreaFor(m => m.Address, new { @tabindex = "3", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.Address)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+                                @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "4", @class = "form-control input-sm" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.State)<span style="color:red">*</span>
+                                @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "5", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.State)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.CityId)<span style="color:red">*</span>
+                                <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "6", @class = "form-control input-sm" })
+                                <div id="other_city" style="display:none;">
+                                    @Html.TextBoxFor(m => m.City, new { @tabindex = "6", @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ZipCode)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "7", @class = "form-control input-sm", @MaxLength = "12", @onkeypress = "return isINNumbers(event)" })
+                                @Html.ValidationMessageFor(m => m.ZipCode)
+                            </div>
+                            <hr />
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ContactName)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.ContactName, new { @tabindex = "9", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.ContactName)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Phone)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.Phone, new { @tabindex = "8", @class = "form-control input-sm", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
+                                @Html.ValidationMessageFor(m => m.Phone)
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Mobile)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "10", @class = "form-control input-sm", @MaxLength = "13", @onkeypress = "return isINNumbers(event)" })
+                                @Html.ValidationMessageFor(m => m.Mobile)
+                            </div>
+                            <hr />
+                            <div class="form-group">
+                                <label for="CorporateLogo">Corporate Logo</label>
+                                <input type="file" id="CorporateLogo" name="CorporateLogo" style="border: 0px;" />
+                            </div>
+                            <hr />
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.PANNo)
+                                @Html.TextBoxFor(m => m.PANNo, new { @tabindex = "10", @MaxLength = "12", @class = "form-control input-sm", @onkeypress = "return isINNumbersletters(event)" })
+                                @*@Html.ValidationMessageFor(m => m.PANNo)*@
+                            </div>
+
+                            <div class="form-group">
+                                <label for="PANCard">Copy of PAN Card</label>
+                                <input type="file" id="PANCard" name="PANCard" tabindex="10" style="border: 0px;" />
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ContactDesignation)
+                                @Html.TextBoxFor(m => m.ContactDesignation, new { @tabindex = "10", @class = "form-control input-sm" })
+                                @*@Html.ValidationMessageFor(m => m.ContactDesignation)*@
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.ServiceTaxRegNo)@*<span style="color:red">*</span>*@
+                                @Html.TextBoxFor(m => m.ServiceTaxRegNo, new { @tabindex = "11", @class = "form-control input-sm", @onkeypress = "return isINNumbersletters(event)", @MaxLength = "15" })
+                                <div><span class="smtext">[Supported file types .jpg,.gif,.png,.pdf,.doc,.xlsx,.docx,.xls]</span></div>
+                                <label for="ServiceTaxReg">Copy of Service Tax Registration Document</label>@*<span style="color:red">*</span>*@
+                                <input type="file" id="ServiceTaxReg" name="ServiceTaxReg" tabindex="12" style="border:0px;" />
+                            </div>
+                            <h3>Billing Address [Optional]</h3>
+                            <div class="form-group">
+
+                                <input type="checkbox" id="IsClicked" checked="checked" onclick="Addrsame()" name="IsClicked" />
+                                Same address as given above
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.BillingAddress)
+                                @Html.TextAreaFor(m => m.BillingAddress, new { disabled = "disabled", @tabindex = "13", @class = "form-control input-sm" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.BillingCountryId)
+                                @Html.DropDownListFor(m => m.BillingCountryId, Model.BillingCountryList, new { disabled = "disabled", @tabindex = "14", @class = "form-control input-sm" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.BillingState)
+                                @Html.DropDownListFor(m => m.BillingState, Model.BillingStateList, new { disabled = "disabled", @tabindex = "15", @class = "form-control input-sm" })
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.BillingCityId) &nbsp;
+                                <a href="#" id="close_other_billing_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                @Html.DropDownListFor(m => m.BillingCityId, Model.BillingCityList, new { disabled = "disabled", @tabindex = "16", @class = "form-control input-sm" })
+                                <div id="other_billing_city" style="display:none;">
+                                    @Html.TextBoxFor(m => m.BillingCity, new { @class = "form-control input-sm" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.BillingZipCode)
+                                @Html.TextBoxFor(m => m.BillingZipCode, new { disabled = "disabled", @tabindex = "7", @class = "form-control input-sm", @MaxLength = "12", @onkeypress = "return isINNumbers(event)" })
+                            </div>
+                            <div class="form-group">
+                                @Html.Captcha("try another", "enter the text you see above:", 5, "is required field", true)
+                            </div>
+                        </div>
+                        <div class="btn-toolbar">
+                            <div class="submitctr">
+                                <input type="submit" id="btnSave" onclick="abc()" value="Save" class="btn btn-default" tabindex="23" />
+
+                                <a href="~/Join/Corporate" id="btnReset" class="btn btn-danger" tabindex="19">Cancel</a>
+                            </div>
+                        </div>
+                        <br />
+                        <script type="text/javascript">
+                            $(function () {
+                                $("#Name").focus();
+                                $("#CaptchaInputText").attr("tabindex", "17");
+                            });
+                            function abc() {
+
+                                if ($('#IsClicked').prop('checked') == true) {
+                                    $('#IsClicked').val(true);
+                                }
+                                else {
+                                    $('#IsClicked').val(false);
+                                }
+                            }
+                            function Addrsame() {
+                                var enb = !$('#IsClicked').prop('checked');
+
+                                if (enb = "true") {
+                                    $('#BillingAddress').prop("disabled", false);
+                                    $("#BillingCountryId").prop("disabled", false);
+                                    $("#BillingState").prop("disabled", false);
+                                    $("#BillingCityId").prop("disabled", false);
+                                    $("#BillingZipCode").prop("disabled", false);
+                                }
+                                if ($('#IsClicked').prop('checked') == true) {
+                                    $('#BillingAddress').prop("disabled", true);
+                                    $("#BillingCountryId").prop("disabled", true);
+                                    $("#BillingState").prop("disabled", true);
+                                    $("#BillingCityId").prop("disabled", true);
+                                    $("#BillingZipCode").prop("disabled", true);
+                                }
+                            }
+                        </script>
+
+                        <script type="text/javascript">
+                        $(function () {
+
+                            if ($('#CityId').val() == -1) {
+                                //$('#CityId').empty().html('<option selected="selected" value="0">not available...</option>');
+                                $("#CityId").hide();
+                                $("#City").val("");
+                                $("#other_city").show();
+                            }
+
+                            $('#CountryId').change(function () {
+                                $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                                    if (data != "")
+                                        $('#State').empty().append(data);
+                                    else
+                                        $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                                    Loadcity();
+                                });
+                            });
+                            $('#State').change(function () {
+                                $("#CityId").show();
+                                $("#City").val("");
+                                $("#other_city").hide();
+                                $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                                    if (data != "") {
+                                        $('#CityId').empty().append(data);
+                                        if ($("select#CityId option").length == -1) {
+                                            $("#CityId").hide();
+                                            $("#City").val("");
+                                            $("#other_city").show();
+                                        }
+                                    }
+                                    else {
+                                        $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                                    }
+                                });
+                            });
+                            @{
+                    int fi= Convert.ToInt32(ConfigurationManager.AppSettings.Get("FileUploadSizeInMB"));
+                                long by = fi * 1024 * 1024;
+                            }
+
+                            $('#ServiceTaxReg').bind('change', function (){
+                                var filesizeget = this.files[0].size;
+                                //alert(filesizeget + "bytes");
+                                if (filesizeget > @by) {
+                                    alert("Please Upload below @(fi)MB file size");
+                                $('#ServiceTaxReg').val("");
+                                return false;
+                            }
+                            });
+
+                        $('#CityId').change(function () {
+                            if ($(this).val() == -1) {
+                                $(this).hide();
+                                $("#City").val("");
+                                $("#other_city").show();
+                                $("#close_other_city").show();
+                            }
+                        });
+
+                        $('#close_other_city').click(function () {
+                            $("#CityId").show();
+                            $("#City").val("");
+                            $("#other_city").hide();
+                            $("#close_other_city").hide();
+                        });
+                        //if ($('#BillingCountryId').val() == -1)
+                        //{
+                        //    $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+                        //}
+                        //else {
+                        //    BillingstateLoad();
+
+                        //}
+
+                        //if ($('#BillingState').val() ==-1)
+                        //{
+                        //    $('#BillingCityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                        //}
+                        //else {
+                        //    BillingCityLoad();
+                        //}
+
+                        $('#BillingCountryId').change(function () {
+                            $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
+                                if (data != "") {
+                                    // $('#BillingState').empty().append('<option selected="selected" value="-1">Other</option>');
+                                    $('#BillingState').html(data).append('<option selected="selected" value="-1">Select</option>');
+                                }
+                                else {
+                                    $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                }
+                                BillingCityLoad();
+                            });
+                        });
+                        $('#BillingState').change(function () {
+                            $("#BillingCityId").show();
+                            $("#BillingCity").val("");
+                            $("#other_billing_city").hide();
+                            BillingCityLoad();
+                            //$.get("/Common/GetCity?id=" + $('#BillingState').val(), function (data) {
+                            //    if (data != "") {
+                            //        $('#BillingCityId').html(data);
+                            //        if ($("select#BillingCityId option").length == 1) {
+                            //            $("#BillingCityId").hide();
+                            //            $("#BillingCity").val("");
+                            //            $("#other_billing_city").show();
+                            //        }
+                            //    }
+                            //    else {
+                            //        $('#BillingCityId').html('<option selected="selected" value="0">not available...</option>');
+                            //    }
+                            //});
+                        });
+                        $('#BillingCityId').change(function () {
+                            if ($(this).val() == -1) {
+                                $(this).hide();
+                                $("#BillingCity").val("");
+                                $("#other_billing_city").show();
+                                $("#close_other_billing_city").show();
+                            }
+                        });
+                        $('#close_other_billing_city').click(function () {
+                            $("#BillingCityId").show();
+                            $("#BillingCity").val("");
+                            $("#other_billing_city").hide();
+                            $("#close_other_billing_city").hide();
+                        });
+                        });
+                        //function
+                        function Loadcity() {
+                            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                                if (data != "") {
+                                    $('#CityId').html(data).append('<option selected="selected" value="0">Select</option>');
+                                }
+                                else {
+                                    $('#CityId').html('<option selected="selected" value="0">not available...</option>');
+                                }
+                            });
+                        }
+                        //function
+                        function LoadState() {
+                            $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                                if (data != "") {
+                                    $('#State').empty().append(data);
+                                }
+                                else {
+                                    $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                                }
+                            });
+                        }
+                        //function
+                        function BillingstateLoad()
+                        {
+                            $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
+                                if (data != "") {
+                                    $('#BillingState').empty().append(data);
+                                }
+                                else {
+                                    $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                }
+                            });
+                        }
+                        //function
+                        function BillingCityLoad()
+                        {
+                            $.get("/Common/GetCity?id="+ $('#BillingState').val(), function (data) {
+                                if (data !="") {
+                                    $('#BillingCityId').html(data).append('<option selected="selected" value="0">Select</option>');
+                                    if ($("select#BillingCityId option").length == 1) {
+                                        $("#BillingCityId").hide();
+                                        $("#BillingCity").val("");
+                                        $("#other_billing_city").show();
+                                    }
+                                }
+                                else {
+                                    $('#BillingCityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                                }
+                            });
+                        }
+                        </script>
+                    }
+                </div>
+            </div>
+        }
+        catch (Exception ex)
+        {
+            StayBazar.Common.LogHandler.HandleError(ex);
+            Response.Redirect("~/ErrorPage");
+        }
+    </section>
+</div>

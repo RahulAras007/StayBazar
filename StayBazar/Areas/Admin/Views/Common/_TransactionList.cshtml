@@ -1,0 +1,141 @@
+﻿@model StayBazar.Areas.Admin.Models.TransactionListModel
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+
+}
+@if (Model.Bookinglist.Count() == 0)
+{
+    <div class="bottom">&nbsp;</div>
+    <div class="alert alert-info">Is Empty Transaction</div>
+}
+else
+{
+   <!-- Accordion Start -->
+    <div class="panel-group" id="accordion">
+        @{
+      long i = 0;
+        }
+        @{
+    using (Html.BeginForm("Pager", "Corporate", FormMethod.Post, new { @id = "frmPagers" }))
+    {
+        <input type="hidden" id="currentPage" name="currentPage" value="@Model.currentPage" />
+            <input type="hidden" id="Limit" name="Limit" value="@Model.Limit" />
+    }
+    gp.RowsInAPage = @Model.Limit;
+        }
+        @if (Model.Bookinglist != null && Model.Bookinglist.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)@Model.TotalRows, @Model.currentPage))
+        }
+        @foreach (CLayer.Booking usr in Model.Bookinglist)
+        {
+            if (i != usr.BookingId)
+            {
+
+                i = usr.BookingId;
+                <text>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#i_@usr.BookingId">
+                                <div class="row">
+                                    <div class="col-md-2 ">
+                                        Date:@usr.BookingDate.ToShortDateString()
+                                    </div>
+                                    <div class="col-md-4 ">Confirmation No:@usr.OrderNo </div>
+                                    <div class="col-md-4">  Location: @usr.propertyLocation </div>
+                                    <div class="col-md-2">
+                                        Status:
+                                        @{
+                                        int id = usr.BookingStatus;
+                                        if (id == (int)CLayer.ObjectStatus.BookingStatus.Success)
+                                        {
+                                                <text>Success</text>
+                                        }
+                                        else if (id == (int)CLayer.ObjectStatus.BookingStatus.Cancelled)
+                                        {
+                                                <text>Cancelled</text>
+                                        }
+                                        else if (id == (int)CLayer.ObjectStatus.BookingStatus.Cart)
+                                        {
+                                                <text>Cart</text>
+                                        }
+                                        else if (id == (int)CLayer.ObjectStatus.BookingStatus.CheckOut)
+                                        {
+                                                <text>CheckOut</text>
+                                        }
+                                        else if (id == (int)CLayer.ObjectStatus.BookingStatus.Failed)
+                                        {
+                                                <text>Failure</text>
+                                        }
+                                        }
+                                    </div>
+                                </div>
+                            </a>
+
+                        </div>
+                        <div id="i_@usr.BookingId" class="panel-collapse collapse ">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+
+                                        Supplier:<br />
+                                        Title:@usr.PropertyTitle<br />
+                                        Name:  @usr.FirstName <br />
+                                        Last Name: @usr.LastName<br />
+                                        Address:@usr.Address<br />
+                                        City:@usr.City<br />
+                                        State: @usr.StateName<br />
+                                        Country:@usr.CountryName<br />
+                                        Phone:@usr.Phone,@usr.Mobile<br />
+                                        Email:@usr.Email<br />
+
+                                    </div>
+                                    <div class="col-md-3">
+                                        @{
+
+                             CLayer.Address data = BLayer.Bookings.GetBookedByUser(usr.BookingId);
+
+                                        }
+                                        Customer:<br />
+                                        Name: @data.Firstname<br />
+                                        Address: @data.AddressText<br />
+                                        City: @data.City<br />
+                                        State: @data.StateName<br />
+                                        Country: @data.Country<br />
+                                        Phone: @data.Phone, @usr.Mobile<br />
+                                        Email: @data.Email<br />
+
+                                    </div>
+                                    <div class="col-md-3">
+                                        @*Booking  Id:@usr.BookingId<br />*@
+                                        Booking Date:  @usr.BookingDate.ToShortDateString()<br />
+                                        Property Address: @usr.propertyAddress<br />
+
+                                        <br />
+                                        Total  Amount: @usr.bookingTotalAmount<br />
+                                    </div>
+                                    <div class="col-md-3" id="DataFor_@usr.BookingId">
+                                        Type:  @usr.AccommodationTypeTitle<br />
+                                        CheckIn Date  @usr.CheckIn.ToShortDateString()<br />
+                                        Checkout Date:  @usr.CheckOut.ToShortDateString()<br />
+                                        Quantity:   @usr.Quantity<br />
+                                        Adults:   @usr.NoOfAdults<br />
+                                        Children:  @usr.NoOfChildren<br />
+                                        Guests @usr.NoOfGuests<br />
+                                        Booking Item Total Amount:  @usr.bookingitemsTotalAmount
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </text>
+            }          
+        }
+    </div>
+}
+

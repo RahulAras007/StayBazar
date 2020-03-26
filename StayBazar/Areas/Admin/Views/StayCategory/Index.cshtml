@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "Stay Category";
+    try
+    {
+        var grid = new WebGrid(Model, defaultSort: "Name", canPage: true, rowsPerPage: 25,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Areas.Admin.Models.StayCategoryModels staycategory = (StayBazar.Areas.Admin.Models.StayCategoryModels)ViewBag.StayCategory;
+        <text>
+            <div id="bodycontent">
+                <div id="divEdit">
+                    @{
+                    Html.RenderPartial("~/Areas/Admin/Views/StayCategory/_Edit.cshtml", staycategory, ViewData);
+                    }
+                </div>
+
+                <div id="gridContent">
+                    <div class="container-fluid">
+                        @grid.GetHtml(tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered",
+                headerStyle: "header",
+                alternatingRowStyle: "alt",
+                selectedRowStyle: "select",
+                columns: grid.Columns(grid.Column("Title", "Title"),
+                grid.Column("Edit", format: @<text><a href="#" onclick="EditStayCategory(@item.CategoryId)" title="Edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>),
+ grid.Column("Delete", format: (item) =>
+ {
+     if (item.CanDelete)
+     {
+         return Html.Raw("<a title='Delete' class='lnk' href='/Admin/StayCategory/Delete?id=" + item.CategoryId + "' onclick=\"return confirm('Are you sure you want to delete?')\"><span class='glyphicon glyphicon-remove red-color fa-2x'></span></a>");
+     }
+     else
+     {
+         return Html.Raw("<a title='Delete' href=\"#\" onclick=\"alert('Cannot delete, already in use.')\"><span class='glyphicon glyphicon-remove red-color fa-2x'></span></a>");
+     }
+ })
+ ))
+                    </div>
+                    </div>
+                </div>
+            <script type="text/javascript">
+                function EditStayCategory(id) {
+                    $.get("StayCategory/Edit?id=" + id, function (data) {
+                        $("#divEdit").html(data);
+                    });
+                }
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}

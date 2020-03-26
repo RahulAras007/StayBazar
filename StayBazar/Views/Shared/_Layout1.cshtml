@@ -1,0 +1,1027 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    string extensions = System.Configuration.ConfigurationManager.AppSettings.Get("NonImageDocumentFileTypes");
+    string[] allowedFileExtensions = extensions.Split(',');
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    @{
+        List<CLayer.Currency> currencies = BLayer.Currency.GetForListing();
+        System.Text.StringBuilder curcodes = new System.Text.StringBuilder();
+        System.Text.StringBuilder curarray = new System.Text.StringBuilder();
+        foreach (CLayer.Currency item in currencies)
+        {
+            curcodes.Append(",");
+            curcodes.Append(item.Title);
+
+            curarray.Append("['");
+            curarray.Append(item.Title);
+            curarray.Append("','");
+            curarray.Append(item.Symbol);
+            curarray.Append("','");
+            curarray.Append(item.ConversionRate);
+            curarray.Append("'],");
+        }
+        if (curarray.Length > 0)
+        {
+            curarray.Remove(curarray.Length - 1, 1);
+        }
+        string defaultCurCode = "";
+        if (Request.Cookies.Get("CurCode") != null)
+        { defaultCurCode = Request.Cookies.Get("CurCode").Value; }
+        string fname = "";
+        bool IsForStaticPage = false;
+        if (ViewBag.IsForStaticPage != null)
+        { IsForStaticPage = (bool)ViewBag.IsForStaticPage; }
+
+    }
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-control" content="no-cache,no-store,must-revalidate,private">
+    <meta http-equiv="Pragma" content="no-cache">
+    @*<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">*@
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="expires" content="0">
+    <meta name="robots" content="all">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
+    @*@if (ViewBag.MetaTitle != null && ViewBag.MetaTitle != "")
+        {
+            <meta name="title" content="@ViewBag.MetaTitle" />
+        }*@
+    @if (ViewBag.MetaDescription != null && ViewBag.MetaDescription != "")
+    {
+        <meta name="description" content="@ViewBag.MetaDescription" />
+    }
+    <meta name="author" content="Staybazar">
+    <link rel="shortcut icon" href="/images/favicon.png">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <title>@ViewBag.Title</title>
+    <!-- Bootstrap core CSS -->
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- Custom styles for this template -->
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/bootcss")
+
+    <link href="~/Content/owl.theme.css" rel="stylesheet" />
+
+    <link href="~/Content/jquery.dpNumberPicker-holoLight-1.0.1.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery.dpNumberPicker-1.0.1.js" type="text/javascript"></script>
+    @*<script src="~/Scripts/numlettvalid.js" type="text/javascript"></script>*@
+    <link href="~/Content/styles.css" rel="stylesheet" />
+    @*<script src="/Content/css3-mediaqueries.js" ></script>*@
+    @RenderSection("scripts", required: false)
+    @*<script src="~/Scripts/jquery.dpNumberPicker-1.0.1.js"></script>*@
+    <!--[if lt IE 9]>
+      <script src="/Content/html5shiv.js"></script>
+      <script src="/Content/respond.min.js"></script>
+        <script src="/Scripts/html5-3.6-respond-1.1.0.min.js"></script>
+        <link href="/Content/styles-ie.css" rel="stylesheet" />
+    <![endif]-->
+    <script src="~/Scripts/bootstrap-formhelpers.js" type="text/javascript"></script>
+    <script src="~/Scripts/default.js" type="text/javascript"></script>
+    <script src="~/Scripts/placeholder.js" type="text/javascript"></script>
+    @*<script type="text/javascript" src="~/Scripts/date.js"></script>*@
+
+
+    @*Sitelinks Search Box,Social Profile Links,Corporate Contacts*@
+    <script type="application/ld+json">
+        {
+        "@@context": "http://schema.org",
+        "@@type": "WebSite",
+        "url": "https://www.staybazar.com/",
+        "name" : "Staybazar",
+
+        "potentialAction":
+        {
+        "@@type": "SearchAction",
+        "target": "https://www.staybazar.com/search/sitewide?destination={search_term_string}",
+        "query-input": "required name=search_term_string"
+        }
+        }
+    </script>
+
+
+</head>
+
+<!-- NAVBAR
+"target": "https://www.staybazar.com/search?q={search_term_string}",
+================================================== -->
+<body class="lightgreybg">
+    <!-- Google Tag Manager -->
+    <noscript>
+        <iframe src="//www.googletagmanager.com/ns.html?id=GTM-W3QCF5"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    '//www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-W3QCF5');</script>
+    <!-- End Google Tag Manager -->
+    <div id="wtopbar" class="navbar-wrapper  whitebg">
+        <div class="navbar navbar-inverse bluebg" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse short_nav pad0 navf">
+                    <ul class="nav navbar-nav">
+                        @if (Request.IsAuthenticated)
+                        {
+                            //string email = User.Identity.GetUserName();
+                            //CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+
+                            ////if (User.IsInRole("Administrator") || User.IsInRole("Staff"))
+                            //if (role == CLayer.Role.Roles.Administrator || role == CLayer.Role.Roles.Staff || role == CLayer.Role.Roles.SalesPerson)
+                            string email = User.Identity.GetUserName();
+                            int roleId = BLayer.User.GetRole(email);
+                            List<CLayer.Role> perm = BLayer.RolePermissions.GetAllAdminSide();
+
+                            if (perm.Exists(m => m.Id == roleId))
+                            {
+                                <li>@Html.ActionLink("Administration", "index", "home", new { area = "Admin" }, null)</li>
+                            }
+                        }
+                        @*@if (Request.IsAuthenticated)
+                            {
+                                string email = User.Identity.GetUserName();
+                                CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+                            if (role != CLayer.Role.Roles.Affiliate || role == CLayer.Role.Roles.Affiliate)
+                            {*@
+
+                        @*<li id="breadcrumbs">
+
+                                <p> <a href="" class="whitetext breadhvr">Home</a></p>
+
+                            </li>*@
+
+
+                        <li id="breadcrumbs">
+                            <div itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+
+                                <a class="whitetext breadhvr" href="@Url.Action("index", "home")" itemprop="url">
+                                    <p>
+                                        <span itemprop="title">Home</span>
+                                    </p>
+
+                                </a>
+                            </div>
+
+                            @if (ViewBag.BreadCrumb != null && ViewBag.BreadCrumb != "")
+                            {
+
+                                @Html.Raw(ViewBag.BreadCrumb)
+
+                            }
+                        </li>
+
+
+                    </ul>
+
+                    @*<li>
+                            @Html.ActionLink("New Account", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })
+                        </li>*@
+                    @*}
+                        }*@
+
+                    @*<li>
+                            @Html.ActionLink("Need help?", "Index", "FAQ")
+                        </li>
+                        <li>
+                            <a href="/Query/Index/1">Report an Issue</a>
+                            @Html.ActionLink("Report an issue", "Index", "Query")
+                        </li>*@
+                    <ul class="nav navbar-nav pull-right">
+                        @if (Request.IsAuthenticated && (!IsForStaticPage))
+                        {
+                            string email = User.Identity.GetUserName();
+                            CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+                            bool IsApprover = BLayer.User.GetApproverStatus(email);
+
+                            long id = 0;
+                            if (role == CLayer.Role.Roles.Corporate || role == CLayer.Role.Roles.CorporateUser || role == CLayer.Role.Roles.Supplier || role == CLayer.Role.Roles.Agent || role == CLayer.Role.Roles.Affiliate)
+                            {
+                                if (long.TryParse(User.Identity.GetUserId(), out id))
+                                {
+                                    if (role == CLayer.Role.Roles.CorporateUser)
+                                    {
+                                        id = BLayer.B2B.GetCorporateIdOfUser(id);
+                                    }
+                                    fname = BLayer.B2B.GetBusinessName(id);
+                                }
+
+                            }
+                            else
+                            {
+                                if (long.TryParse(User.Identity.GetUserId(), out id))
+                                {
+                                    CLayer.User u = BLayer.User.Get(id);
+                                    if (u != null)
+                                    {
+                                        fname = u.FirstName;
+                                    }
+                                }
+                            }
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">@fname (My Account)<b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="~/account/profile">My Profile</a></li>
+                                    @*?userid=@(User.Identity.GetUserId().ToString())*@
+                                    <li><a href="~/bookinghistory/">My Stays</a></li>
+                                    @if (role == CLayer.Role.Roles.Corporate)
+                                    {
+                                        <li><a href="~/corporateusers/">Users</a></li>
+                                    }
+                                    else if (role == CLayer.Role.Roles.Supplier)
+                                    {
+                                        <li><a href="~/propertylist/">My Properties</a></li>
+                                        <li><a href="~/bookingchart/">Bookings</a></li>
+                                    }
+                                    else if (role == CLayer.Role.Roles.Affiliate)
+                                    {
+                                        @*<li><a href="~/PropertyList/">My Properties</a></li>*@
+                                        @*<li><a href="~/BookingChart/">Bookings</a></li>*@
+                                        <li><a href="~/supplierlist/">My Supplier</a></li>
+                                    }
+                                    <li><a href="~/review/">My Reviews</a></li>
+                                    @if ((role == CLayer.Role.Roles.Corporate) || (IsApprover))
+                                    {
+                                        <li><a href="~/BookingApproval">Booking Approvals </a></li>
+                                    }
+                                    @if (role == CLayer.Role.Roles.Corporate)
+                                    {
+                                        <li><a href="~/CorporateEmployeeGrades">Employee Grade </a></li>
+                                        <li><a href="~/CorporateCityClass">City Class </a></li>
+                                        <li><a href="~/CorporateCityEntitlement">City Class Entitlement</a></li>
+                                    }
+
+                                    @*@if (role == CLayer.Role.Roles.Corporate)CorporateCityEntitlement
+                                        {
+                                            <li><a href="~/BookingApproval/">Ready for Booking</a></li>
+                                        }*@
+
+                                </ul>
+                            </li>
+                        }
+                        @*else
+                            {
+                                <li>
+                                    @Html.ActionLink("Create an account", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })
+                                </li>
+                            }*@
+                        <li style="display:none">
+
+                            <div class="bfh-selectbox bfh-currencies" id="curPick" onchange="onCurChange()" data-currency="INR" data-flags="true" data-available="INR@(curcodes)" data-blank="false"></div>
+                        </li>
+                        @*<li>
+                                <div class="bfh-selectbox bfh-countries" data-country="IN" data-flags="true" data-available="IN,US,GB" data-blank="false"></div>
+                            </li>*@
+                        <li class="icpad0">
+                            <a class="icopad0" href="https://www.facebook.com/staybazar?fref=ts" target="_blank"><img src="/images/facebook.jpg" alt="Facebook" /></a>
+                        </li>
+                        <li class="icpad0">
+                            <a class="icopad0" href="https://www.linkedin.com/company/staybazar?trk=biz-companies-cym" target="_blank"><img src="/images/in.jpg" alt="LinkedIn" /></a>
+                        </li>
+                        <li class="icpad0">
+                            <a class="icopad0" href="https://plus.google.com/u/2/b/109244162119027634578/109244162119027634578/about" target="_blank"><img src="/images/gplus.jpg" alt="Google+" /></a>
+                        </li>
+                        <li class="icpad0">
+                            <a class="icopad0" href="https://twitter.com/Staybazar" target="_blank"><img src="/images/twitter.jpg" alt="Twitter" /></a>
+                        </li>
+                        <li class="icpad0">
+                            <a class="icopad0" href="https://www.instagram.com/staybazar/" target="_blank"><img src="~/images/instagram.jpg" alt="instagram" /></a>
+                        </li>
+                    </ul>
+                </div>
+                <script type="text/javascript">
+                    $('#curPick').on('change.bfhselectbox', function () {
+                        onCurChange();
+                    });
+
+                    function onCurChange() {
+                        var v = $("#curPick").val();
+                        cx_ChangeCurRate(v);
+                        $.cookie("CurCode", v, { path: '/' });
+                        if ($("#srchcur").length) {
+                            $("#srchcur").val(v);
+                        }
+                        if ($(".bkacc").length) {
+                            $(".bkacc").change();
+                        }
+                        if ($("#inrGrandTotal").length) {
+                            showGrandTotal();
+                        }
+                    }
+                </script>
+            </div>
+        </div>
+        <div class="container">
+            <div class="col-sm-3 sblogo">
+
+                <a href="~/"><img src="@Url.Content("/images/logo.png")" alt="Staybazar Logo" height="66"></a>
+                <span class="users">
+                    @if ((!Request.IsAuthenticated) && !IsForStaticPage)
+                    {
+                        <a href="~/" id="formelnk" class="redtext forme">for me</a>
+                        @Html.ActionLink("for business", "Home", "Account", new { }, null)
+                    }
+                </span>
+            </div>
+            <div class="col-sm-3 sblogo" style="left:40%;">
+                @if (Request.IsAuthenticated && (!IsForStaticPage))
+                {
+                    string email = User.Identity.GetUserName();
+                    CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+                    bool IsApprover = BLayer.User.GetApproverStatus(email);
+
+                    long id = 0;
+                    if (role == CLayer.Role.Roles.Corporate || role == CLayer.Role.Roles.CorporateUser)
+                    {
+                        if (long.TryParse(User.Identity.GetUserId(), out id))
+                        {
+                            if (role == CLayer.Role.Roles.CorporateUser)
+                            {
+                                id = BLayer.B2B.GetCorporateIdOfUser(id);
+                            }
+                            CLayer.UserFiles corporatelogo = BLayer.UserFiles.GetOnUserAndType(id, 6);
+
+                            if (corporatelogo != null)
+                            {
+                                if (corporatelogo.FileName != "0")
+                                {
+                                    if (allowedFileExtensions.Contains(corporatelogo.FileName.Substring(corporatelogo.FileName.LastIndexOf('.'))))
+                                    {
+                                        if (File.Exists(Server.MapPath("~/Files/Users/" + id + "/" + corporatelogo.FileName)))
+                                        {
+                                            <a href="~/Files/Users/@id/@corporatelogo.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="danger"></span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (File.Exists(Server.MapPath("~/Files/Users/" + id + "/" + corporatelogo.FileName)))
+                                        {
+                                            <div>
+                                                <a href="~/Files/Users/@id/@corporatelogo.FileName" target="_blank">
+                                                    <img src="~/Files/Users/@id/@corporatelogo.FileName" alt="Corporate Logo" style="border: 1px solid #ffffff;border-radius: 4px;padding: 5px;height:66px;width: 248px;" class="img img-responsive" />
+                                                </a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="danger"></span>
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            </div>
+            <div class="col-sm-6 sbtn">
+                @if (!Request.IsAuthenticated && (!IsForStaticPage))
+                {
+                    var currentAction = "";
+                    HtmlHelper htmlHelper = this.Html;
+                    var routeData = htmlHelper.ViewContext.RouteData;
+                    currentAction = routeData.GetRequiredString("Action").ToLower();
+                    if (currentAction == "home")
+                    {
+
+                        <div class="dropdown">
+                            <a class="btn btn-default" data-toggle="dropdown" href="#" role="button">
+                                <div class="text-left">LOGIN</div>
+                                <div class="greytext text-left">My account</div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dLabel">
+                                <li @if (Request.QueryString["type"] != null && Request.QueryString["type"].ToString() == "1") { <text> class="active" </text> }>  @Html.ActionLink("Corporate", "BusinessLogin", "Account", new { type = 1 }, null)          @*<a href="/Account/BusinessLogin?type=1" title="Corporate">Corporate</a>*@</li>
+                                <li @if (Request.QueryString["type"] != null && Request.QueryString["type"].ToString() == "2") { <text> class="active" </text> }>  @Html.ActionLink("Supplier", "BusinessLogin", "Account", new { type = 2 }, null)          @*<a href="/Account/BusinessLogin?type=2" title="Supplier">Supplier</a>*@</li>
+                                <li @if (Request.QueryString["type"] != null && Request.QueryString["type"].ToString() == "3") { <text> class="active" </text> }>  @Html.ActionLink("Travel Agent", "BusinessLogin", "Account", new { type = 3 }, null)          @*<a href="/Account/BusinessLogin?type=3" title="Travel Agent">Travel Agent</a>*@</li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        if (!IsForStaticPage)
+                        {
+                            <a class="btn btn-default" href="@Url.Action("register", "account")" role="button">
+                                <div class="text-left">REGISTRATION</div>
+                                <div class="greytext text-left">New Account</div>
+                            </a>
+                            <a class="btn btn-default" href="@Url.Action("login", "account")" role="button">
+                                <div class="text-left">LOGIN</div>
+                                <div class="greytext text-left">My account</div>
+                            </a>
+                            @*<a class="btn btn-default" href="@Url.Action("BusinessLogin", "Account")" role="button">
+                                    <div class="text-left">BUSINESS USERS</div>
+                                    <div class="greytext text-left">Business Home</div>
+                                </a>*@
+                        }
+                    }
+                }
+                else
+                {
+                    if (!IsForStaticPage)
+                    {
+                        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "form-inline" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <a class="btn btn-default" href="javascript:document.getElementById('logoutForm').submit()" role="button">
+                                <div class="text-left">LOG OFF</div>
+                                <div class="greytext text-left">My account</div>
+                            </a>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    <div class="wrapper" id="wbodycontent">
+        @RenderBody()
+    </div>
+    <div class="bluebg">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 chat">
+                    @*<div class="btn-group">
+                            <span class="btn lightbluebg">
+                                <i class="fa fa-comment"></i>
+                            </span>
+                            <button type="button" class="btn whitebg bold">
+                                LIVE CHAT
+                                <br />
+                                <span class="greentext">ONLINE</span>
+                            </button>
+                        </div>*@
+                    @*<div class="btn-group">
+                            <span class="btn lightbluebg">
+                                <i class="fa fa-comment"></i>
+                            </span>
+                            <a class="btn whitebg bold foot_conblock" href="@Url.Action("Index","Query")">
+                                <span>CONTACT US</span>
+                            </a>
+                        </div>*@
+                    <div class="btn-group chatbx">
+                        <span class="btn lightbluebg">
+                            <i class="fa fa-mobile-phone"></i>
+                        </span>@{ string phoneno = BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO); phoneno = phoneno.Trim(); phoneno.Replace(' ', '.');}
+                        <button type="button" class="btn whitebg bold phfnt">@phoneno<br />080 40916686</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="container ftrpaddless">
+            @Html.Partial("~/Views/Widget/_PopularCities.cshtml")
+        </div>
+        <div class="container ftrpadding">
+
+            <div class="row">
+                <div class="col-md-2">
+                    <p class="greyborderbottom">Our Company</p>
+                    <a href="/home/about">About Us</a>
+                    <a href="/home/howstaybazarworks">How Staybazar works</a>
+                    <a href="/home/purposeandstandards">Purpose and Standards</a>
+                    <a href="/home/careers">Careers</a>
+                    <a href="/home/contactus">Contact Us</a>
+                    @*@Html.ActionLink("About Us", "About", "Home")
+                        @Html.ActionLink("How Staybazar works", "HowStaybazarworks", "Home")
+                        @Html.ActionLink("Purpose and Standards", "PurposeAndStandards", "Home")
+                        @Html.ActionLink("Careers", "Careers", "Home")
+                        @Html.ActionLink("Contact Us", "ContactUs", "Home")*@
+                </div>
+                <div class="col-md-2">
+                    <p class="greyborderbottom">Property Owners</p>
+                    @if (Request.IsAuthenticated)
+                    {
+                        int uId = Convert.ToInt32(User.Identity.GetUserId());
+                        CLayer.User usr = BLayer.User.Get(uId);
+
+                        int userType = (int)CLayer.Role.Roles.Customer;
+                        if (usr != null)
+                        {
+                            userType = usr.UserTypeId;
+                        }
+                        if (userType == (int)CLayer.Role.Roles.Supplier || userType == (int)CLayer.Role.Roles.Administrator)
+                        {
+
+                            <a href="~/propertylist/index">List property</a>
+                            @*@Html.ActionLink("List property", "Index", "PropertyList")*@
+                        }
+                        else
+                        {
+                            <a href="~/join/supplier">List property</a>
+                            @*@Html.ActionLink("List property", "Supplier", "Join")*@
+                        }
+                    }
+                    else
+                    {
+                        <a href="~/join/supplier">List property</a>
+                        @*@Html.ActionLink("List property", "Supplier", "Join")*@
+                    }
+
+                    @*@Html.ActionLink("Send Query", "Index", "Query")*@
+                    <a href="~/query/index/@((int)CLayer.ObjectStatus.MsgType.Query)">Send Query</a>
+                    <a href="~/home/propertylistingterms">Property Listing Terms</a>
+                    @*@Html.ActionLink("Property Listing Terms", "propertylistingterms", "Home")*@
+                    <a href="~/faq/serviceapartment">FAQs</a>
+                    @*@Html.ActionLink("FAQs", "ServiceApartment", "FAQ")*@
+                </div>
+                <div class="col-md-2">
+                    <p class="greyborderbottom">Staybazar for Business</p>
+                    <a href="/join/corporate">Corporate - Register</a>
+                    <a href="/join/travelagent">Travel Agent - Register</a>
+                    <a href="/join/affiliates">Partners/Affiliates Signup</a>
+                    <a href="/home/specialrequirements">Special Requirements</a>
+
+                    @*@Html.ActionLink("Corporate - Register", "Corporate", "Join")
+                        @Html.ActionLink("Travel Agent - Register", "TravelAgent", "Join")
+                        @Html.ActionLink("Partners/Affiliates Signup", "Affiliates", "Join")
+                        @Html.ActionLink("Special Requirements", "SpecialRequirements", "Home")*@
+                </div>
+                <div class="col-md-2">
+                    <p class="greyborderbottom">About Site</p>
+                    <a href="/faq/index">FAQs</a>
+                    <a href="/home/paymentguidelines">Payments Guidelines</a>
+                    <a href="/home/termsofuse">Terms of Use</a>
+                    <a href="/home/privacy">Privacy Policy</a>
+
+                    @*@Html.ActionLink("FAQs", "Index", "FAQ")
+                        @Html.ActionLink("Payments Guidelines", "PaymentGuidelines", "Home")
+                        @Html.ActionLink("Terms of Use", "TermsOfUse", "Home")
+                        @Html.ActionLink("Privacy Policy", "Privacy", "Home")*@
+
+                    <a href="/query/index/@((int)CLayer.ObjectStatus.MsgType.Feedback)">Feedback</a>
+                    @*@Html.ActionLink("Complaints", "Index", "Query")*@
+                    <a href="/query/index/@((int)CLayer.ObjectStatus.MsgType.Complaint)">Complaints</a>
+                    <a href="/home/sitemap">Sitemap</a>
+                    <a href="@Url.Action("index", "offlinepayment")">Make a Payment</a>
+                    @*@Html.ActionLink("Sitemap", "Sitemap", "Home")*@
+                </div>
+                <div class="col-md-4">
+                    <p class="greyborderbottom">Stay Updated</p>
+                    <p class="greytext">Signup for our monthly newsletter, and stay updated, please add the e-mail address below.</p>
+                    @using (Html.BeginForm("MailSubmit", "Mail", FormMethod.Post, new
+                    {
+                        id = "MailForm",
+                        onsubmit = "return false;"@*@class = "form-inline"*@ }))
+                    {
+                        <div class="input-group">
+                            <input type="text" id="emiltextbox" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default redbg whitetext" onclick="Mailsave()" id="btnsavemail" type="button">Submit</button>
+                            </span>
+                        </div>
+                        <span id="validEmail" class="greytext"></span>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 whitetext ">
+                    We accept Net banking (from most banks), credit cards and more
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <span id="siteseal">
+                        <script type="text/javascript" src="https://seal.godaddy.com/getSeal?sealID=niRAy4qLE8S1eIUCauMprsuhZlzpoQQOupCRDc5zQNdyNBHNXm1r6SE"></script>
+                    </span>
+                    @*<img src="@Url.Content("/images/verisign.png")" alt="Verisign">*@
+                    <span class=" logo">
+                        <img src="@Url.Content("/images/visa.png")" alt="Visa">
+                        <img src="@Url.Content("/images/mastercard.png")" alt="Master Card">
+                        <img src="@Url.Content("/images/jcb.png")" alt="JCB">
+                        <img src="@Url.Content("/images/amex.png")" alt="American Express">
+                        <img src="@Url.Content("/images/dinners_club.png")" alt="Dinners Club">
+                        <img src="~/images/paypal.png" alt="Paypal" style="border-radius: 5px;" />
+                    </span>
+                </div>
+                <div class="col-md-4 copyright">
+                    <p>
+                        <i class="glyphicon glyphicon-copyright-mark"></i>Copyright @(DateTime.Today.Year.ToString()). All rights reserved Staybazar.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>-->
+    @*<script src="js/jquery-1.10.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/owl.carousel.js"></script>
+        <script src="js/bootstrap-datepicker.js"></script>
+        <script src="js/bootstrap-formhelpers.min.js"></script>*@
+    <script>
+        $('input, textarea').placeholder();
+        //$(window).resize(function () {
+        //    wrapperadj();
+        //});
+
+        //wrapperadj();
+
+        //function wrapperadj() {
+        //    $("#wbodycontent").css("margin-top","133px" ); //$("#wtopbar").innerHeight()
+        //}
+        //$(".wrapper").parent("body").addClass("lightgreybg");
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            var owl = $("#special-offers"),
+                owl1 = $("#why-staybazar"),
+                owl2 = $("#testimonials"),
+                owl3 = $("#most-popular"),
+                owl4 = $("#ads"),
+                owl5 = $("#StaticPage"),
+                owl6 = $("#new-properties")
+
+
+            owl.owlCarousel({
+                pagination: false,
+                items: 4,
+                itemsDesktop: [1199, 3]
+            });
+
+            owl1.owlCarousel({
+                singleItem: true
+                //autoPlay: 12000
+            });
+
+            owl2.owlCarousel({
+                singleItem: true,
+                pagination: false
+                //,autoPlay: 7000
+            });
+
+            owl3.owlCarousel({
+                items: 3,
+                itemsDesktop: [1199, 2],
+                pagination: false,
+                autoPlay: 7000
+            });
+
+            owl4.owlCarousel({
+                singleItem: true,
+                pagination: true
+                //,autoPlay: true,
+            });
+            owl5.owlCarousel({
+                pagination: false,
+                items: 4,
+                itemsDesktop: [1199, 3],
+                autoPlay: 5000
+            });
+            owl6.owlCarousel({
+                pagination: false,
+                items: 5,
+                itemsDesktop: [1199, 3]
+            });
+            // Custom Navigation Events
+            $(".spl.prev").click(function () {
+                $("#special-offers").trigger('owl.prev');
+            })
+            $(".pplr.prev").click(function () {
+                $("#most-popular").trigger('owl.prev');
+            })
+            $(".ppty.prev").click(function () {
+                $("#new-properties").trigger('owl.prev');
+            })
+            $(".spty.prev").click(function () {
+                $("#StaticPage").trigger('owl.prev');
+            })
+            $(".spl.next").click(function () {
+                $("#special-offers").trigger('owl.next');
+            })
+            $(".pplr.next").click(function () {
+                $("#most-popular").trigger('owl.next');
+            })
+            $(".ppty.next").click(function () {
+                $("#new-properties").trigger('owl.next');
+            })
+            $(".spty.next").click(function () {
+                $("#StaticPage").trigger('owl.next');
+            })
+        });
+        //$(document).ready(function () {
+
+        //    var owl = $("#special-offers"),
+        //        owl1 = $("#why-staybazar"),
+        //        owl2 = $("#testimonials"),
+        //        owl3 = $("#most-popular"),
+        //        owl4 = $("#ads"),
+        //        owl5 = $("#StaticPage"),
+        //        owl6 = $("#new-properties")
+
+
+        //    owl.owlCarousel({
+        //        pagination: false,
+        //        items: 4,
+        //        itemsDesktop: [1199, 3],
+        //        loop: true,
+        //        dots: false,
+        //        margin: 10,
+        //        navigation: false,
+        //        autoplay: 6000,
+
+        //    });
+
+        //    owl1.owlCarousel({
+        //        singleItem: true,
+        //        loop: true,
+        //        items: 1,
+        //        margin: 10,
+        //        dots: true,
+        //        paginationSpeed: 400,
+        //        pagination: true,
+        //        autoplay: false,
+        //        dotsClass: 'owl-dots',
+
+
+        //    });
+
+        //    owl2.owlCarousel({
+        //        singleItem: true,
+        //        pagination: true,
+        //        loop: true,
+        //        dots: false,
+        //        margin: 10,
+        //        navigation: true,
+        //        autoplay: false,
+        //        items: 1
+        //        //,autoPlay: 7000
+        //    });
+
+        //    owl3.owlCarousel({
+        //        items: 3,
+        //        itemsDesktop: [1199, 2],
+        //        pagination: false,
+        //        loop: true,
+        //        dots: false,
+        //        margin: 10,
+        //        navigation: false,
+        //        autoplay: 7000
+
+        //    });
+
+        //    owl4.owlCarousel({
+        //        singleItem: true,
+        //        pagination: true,
+        //        loop: true,
+        //        dots: true,
+        //        margin: 10,
+        //        navigation: false,
+        //        pagination: true,
+        //        autoplay: false,
+        //        items: 1
+        //        //,autoPlay: true,
+        //    });
+        //    owl5.owlCarousel({
+        //        pagination: false,
+        //        items: 4,
+        //        itemsDesktop: [1199, 3],
+        //        loop: true,
+        //        margin: 10,
+        //        dots: false,
+        //        navigation: false,
+        //        autoplay: 7000
+
+        //    });
+        //    owl6.owlCarousel({
+        //        pagination: false,
+        //        items: 5,
+        //        dots: false,
+        //        itemsDesktop: [1199, 3],
+        //        loop: true,
+        //        margin: 10,
+        //        navigation: false,
+        //        autoplay: 6000
+
+        //    });
+        //    // Custom Navigation Events
+
+
+
+        //    $(".spl.prev").click(function () {
+        //        $("#special-offers").trigger('prev.owl.carousel');
+        //    })
+        //    $(".pplr.prev").click(function () {
+        //        $("#most-popular").trigger('prev.owl.carousel');
+        //    })
+        //    $(".ppty.prev").click(function () {
+        //        $("#new-properties").trigger('prev.owl.carousel');
+        //    })
+        //    $(".spty.prev").click(function () {
+        //        $("#StaticPage").trigger('prev.owl.carousel');
+        //    })
+        //    $(".spl.next").click(function () {
+        //        $("#special-offers").trigger('next.owl.carousel');
+        //    })
+        //    $(".pplr.next").click(function () {
+        //        $("#most-popular").trigger('next.owl.carousel');
+        //    })
+        //    $(".ppty.next").click(function () {
+        //        $("#new-properties").trigger('next.owl.carousel');
+        //    })
+        //    $(".spty.next").click(function () {
+        //        $("#StaticPage").trigger('next.owl.carousel');
+        //    })
+        //});
+    </script>
+    <script src="/Scripts/currency_conv.js" type="text/javascript"></script>
+    <script type="text/javascript">
+            $(function () {
+                cx_LoadCurrency();
+                @if (defaultCurCode != "") { <text>$("#curPick").val('@defaultCurCode'); onCurChange();</text>}
+            });
+
+            // cx_ChangeCurrency(1);
+            function seraConv() {
+
+                cx_ChangeCurRate($("#srchcur").val());
+                $("#curPick").val($("#srchcur").val());
+            }
+            var curarray = [@(Html.Raw(curarray))];
+    </script>
+    <script type="text/javascript">
+            function Mailsave() {
+                var mail = $("#emiltextbox").val();
+
+                if (mail != "") {
+                    var filter = /^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+                    if (!filter.test(mail)) {
+                        alert('Please provide a valid email address');
+                        $("#emiltextbox").focus();
+                    }
+                    else {
+                        var url = '/Mail/MailSubmit'; @*'@Url.Action("MailSubmit", "Mail")';*@
+                        $.post(url, { Mailadd: mail });
+                        $("#emiltextbox").val("");
+                        alert('Your email has been added to subscription list successfully !');
+                        //$("#validEmail").html("Your email has been added to subscription list successfully !");
+                    }
+                }
+                else {
+                    $("#validEmail").html("Please enter your email !");
+                }
+            }
+            $.ajaxSetup({
+                cache: false
+            });
+    </script>
+
+    @*livserv chat section*@
+
+    @{
+        //format of assign day --- (dayname)_(time1)-(time2)
+
+        string assigndayforzopim = System.Configuration.ConfigurationManager.AppSettings.Get("assigndayforzopim");
+
+        int ChatEnable = 2;
+        string ChatScript = "";
+
+        ChatEnable = Convert.ToInt32(BLayer.Settings.GetValue(CLayer.Settings.CHAT));
+
+
+        string corpemail = User.Identity.GetUserName();
+        CLayer.Role.Roles corprole = (CLayer.Role.Roles)BLayer.User.GetRole(corpemail);
+
+        if (corprole == CLayer.Role.Roles.Corporate || corprole == CLayer.Role.Roles.CorporateUser)
+        {
+            ChatScript = "";
+        }
+        else
+        {
+
+            if (ChatEnable == (int)StayBazar.Areas.Admin.Models.SettingsModel.chatset.Off)
+            {
+                ChatScript = "";
+
+            }
+            else if (ChatEnable == (int)StayBazar.Areas.Admin.Models.SettingsModel.chatset.Livserve)
+            {
+
+                ChatScript = BLayer.Settings.GetValue(CLayer.Settings.LIVSERV);
+
+            }
+            else if (ChatEnable == (int)StayBazar.Areas.Admin.Models.SettingsModel.chatset.Zopim)
+            {
+                ChatScript = BLayer.Settings.GetValue(CLayer.Settings.ZOPIM);
+
+            }
+            else if (ChatEnable == (int)StayBazar.Areas.Admin.Models.SettingsModel.chatset.TimeBased)
+            {
+                string[] days = assigndayforzopim.Split(',');
+                DateTime today = DateTime.Now;
+                string todayname = today.DayOfWeek.ToString();
+                int todayhh = (int)today.Hour;
+                int todaymm = (int)today.Minute;
+                DateTime todaytime = Convert.ToDateTime(DateTime.Now.ToString("HH:mm"));
+
+                ChatScript = BLayer.Settings.GetValue(CLayer.Settings.LIVSERV);
+                foreach (string day in days)
+                {
+                    string[] day2 = day.Split('_');
+
+                    if (day2[0] == todayname)
+                    {
+                        string[] time1 = day2[1].Split('-');
+
+                        // check hour in between day time hour
+                        DateTime timestart = Convert.ToDateTime(time1[0] + ":00");
+                        DateTime timeend = Convert.ToDateTime(time1[1] + ":00");
+                        if (todaytime >= timestart && todaytime <= timeend)
+                        {
+                            ChatScript = BLayer.Settings.GetValue(CLayer.Settings.ZOPIM);
+                        }
+
+
+                    }
+
+                }
+            }
+        }
+
+
+
+    }
+
+
+
+    @Html.Raw(HttpUtility.HtmlDecode(ChatScript))
+
+
+
+
+    <!-- Google Code for Remarketing Tag -->
+    <!--------------------------------------------------
+
+    Remarketing tags may not be associated with personally identifiable information or placed
+
+    on pages related to sensitive categories. See more information and instructions on how to
+
+    setup the tag on: http://google.com/ads/remarketingsetup
+
+    --------------------------------------------------->
+
+    <script type="text/javascript">
+
+        /* <![CDATA[ */
+
+        var google_conversion_id = 962412488;
+
+        var google_custom_params = window.google_tag_params;
+
+        var google_remarketing_only = true;
+
+/* ]]> */
+
+    </script>
+
+    <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+
+    </script>
+
+    <noscript>
+
+        <div style="display:inline;">
+
+            <img height="1" width="1" style="border-style:none;" alt=""
+                 src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/962412488/?value=0&
+
+amp;guid=ON&amp;script=0" />
+
+        </div>
+
+    </noscript>
+
+</body>
+
+
+
+
+
+</html>
+

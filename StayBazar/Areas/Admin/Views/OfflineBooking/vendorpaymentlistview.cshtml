@@ -1,0 +1,110 @@
+﻿@model List<CLayer.OfflineBooking>
+@{ Layout = null; }
+<div class="col-lg-12">
+
+
+    @if (Model.Count > 0)
+    {
+
+        <div class="height-popup" id="OfflineBookinglist">
+            <table class="table">
+
+                <thead>
+                    <tr>
+
+                        <th>Vendor Name</th>
+
+                        <th>vendor address</th>
+                        <th>address1</th>
+                        <th>address2</th>
+                        <th>City</th>
+                        <th>pin</th>
+                        <th>
+                            contactperson
+                        </th>
+                        <th>
+                            contactno
+                        </th>
+                        <th>
+                            emailaddress
+                        </th>
+                     
+                        <th>
+                            Nature Of Service
+                        </th>
+                        <th>
+                            Value before servicetax
+                        </th>
+                        <th>
+                             Service Tax Amount
+                        </th>
+                        <th>
+                           Total Amount Payable
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (CLayer.OfflineBooking item in Model)
+                    {
+
+
+
+
+
+                        <tr>
+
+                            <td>@item.vendorname</td>
+                            <td>@item.vendoraddress</td>
+                            <td>@item.address1</td>
+                            <td>@item.address2</td>
+                            <td>@item.City</td>
+                            <td>@item.pin</td>
+                            <td>@item.contactperson</td>
+                            <td>@item.contactno</td>
+                            <td>@item.emailaddress</td>
+
+                            
+                            <td>@item.natureofservice</td>
+                            
+                            <td>
+                               
+                                @item.valuebeforeservicetax
+
+                            </td>
+                            <td>
+
+                                @item.servicetaxamount
+
+                            </td>
+                            <td>
+
+                                @item.totalamountpayable
+
+                            </td>
+                        </tr>
+
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>
+
+<script>
+    function EditVendorDetails(id, id1) {
+        $.get("/Admin/OfflineBooking/GetofflineVendordetails?offlinebookingid=" + id1, "&vendorid=" + id, function (data) {
+            $("#VendorPayment").html(data);
+        });
+    }
+    function deleteVendorDetails(id, id1) {
+        $.get("/Admin/OfflineBooking/DeleteVendorDetails?OfflineBookingId=" + id1, "&vendorid=" + id, function (data) {
+            $("#VendorPaymentList").html(data);
+        });
+    }
+</script>
+
+
+

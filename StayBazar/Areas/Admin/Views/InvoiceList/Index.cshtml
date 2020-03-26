@@ -1,0 +1,112 @@
+﻿@model StayBazar.Areas.Admin.Models.InvoiceListModel
+@using Microsoft.AspNet.Identity
+@using System.Collections.Generic
+@{
+    ViewBag.Title = "Booking with Invoice";
+    
+}
+@*<div id="content">
+    <h2>@ViewBag.Title</h2>
+    <div class="row">*@
+<div class="page-title-container style3">
+       <div class="row">
+        <div class="col-md-2">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        @*<div class="col-md-12">*@
+            @using (Html.BeginForm("Filter", "InvoiceList", FormMethod.Post, new { @id = "frmFilters" }))
+            {
+                @*<div class="row">*@
+                    <div class="col-md-2">
+                        <label>Status </label>
+                        @Html.DropDownListFor(m => m.Status, Model.ListTypes, new { @class = "form-control" })
+                        <input type="hidden" id="SearchItem" name="SearchItem" value="@Model.SearchItem" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Booking No. / Invoice No.</label>
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                            <span class="input-group-btn">
+                                <button id="btnSearch" class="btn btn-default" type="submit" tabindex="3">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-2"><div id="prgmsg" class="marginleft10 margin-top40">Loading..</div></div>
+                    <div class="col-md-2 col-md-offset-2 text-right margin-top-10"><br /><input type="button" class="btn btn-success" value="Refresh List" onclick="OfflineshowPager(1)" /></div>
+                @*</div>*@
+                @Html.HiddenFor(m => m.SearchValue)
+                @Html.HiddenFor(m => m.SearchStatus)
+                @Html.HiddenFor(m => m.ItemSearch)
+                @Html.HiddenFor(m => m.Start)
+            }
+        </div>
+    @*</div>*@
+    </div>
+    @*<hr />*@
+    <div class="container-fluid">
+        <div class="row">
+            @*<div class="col-md-12">*@
+            <div id="List" class="row">
+                @{
+                    Html.RenderPartial("~/Areas/Admin/Views/InvoiceList/_List.cshtml", Model);
+                }
+            </div>
+        </div>
+    </div>
+    @*</div>*@
+    <script type="text/javascript" language="javascript">
+    $(function () {
+        hideProgress();
+        $('#Status').on('change', function (event) {
+
+            var form = $(event.target).parents('form');
+            form.submit();
+        });
+
+    });
+
+    function showInvoicewithoutsign(obid) {
+        var p1 = 'scrollbars=yes,resizable=yes,status=yes,location=no,menubar=no';
+        var p2 = 'width=500,height=400';
+        window.open('/Admin/Invoice/InvoicePDFNoSign?obid=' + obid);
+    }
+
+
+
+    function showInvoice(obid) {
+        var p1 = 'scrollbars=yes,resizable=yes,status=yes,location=no,menubar=no';
+        var p2 = 'width=1050,height=800';
+        // window.open('Invoice/Preview?obid=' + obid, 'test', p1 + p2);
+        window.open('/Admin/Invoice/Preview?obid=' + obid, "resizable=no", "width=1000,height=800");
+    }
+    function showInvoicePreviewonly(obid) {
+        var p1 = 'scrollbars=yes,resizable=yes,status=yes,location=no,menubar=no';
+        var p2 = 'width=1050,height=800';
+        // window.open('Invoice/Preview?obid=' + obid, 'test', p1 + p2);
+        window.open('/Admin/Invoice/showInvoicePreviewonly?obid=' + obid, "resizable=no", "width=1000,height=800");
+    }
+
+
+    function showProforma(obid) {
+        var p1 = 'scrollbars=yes,resizable=yes,status=yes,location=no,menubar=no';
+        var p2 = 'width=1500,height=800';
+        window.open('/Admin/Proforma/Preview?obid=' + obid, "resizable=no", "width=1037,height=800");
+    }
+    function showProgress()
+    { $("#prgmsg").show();}
+    function hideProgress()
+    { $("#prgmsg").hide(); }
+
+    function OfflineshowPager(num) {
+        $("#Start").val(num);
+        var url = '@Url.Action("Pager", "InvoiceList", new { area = "Admin" })';
+        $("#SearchStatus").val($("#Status").val());
+        showProgress();
+        $.post(url, $("#frmFilters").serialize(), function (data) {
+            $("#List").html(data);
+            hideProgress();
+        });
+    }
+    </script>

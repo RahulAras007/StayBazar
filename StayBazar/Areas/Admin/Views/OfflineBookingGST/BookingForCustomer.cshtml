@@ -1,0 +1,436 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+
+@{
+
+}
+
+<style>
+
+    
+.popup{
+   width:100%;
+    margin:0 auto;
+    border-radius: 7px;
+    background:#6b6a63;
+    margin:30px auto 0;
+    padding:6px;
+    left:0;
+    top:0px; 
+}
+</style>
+
+
+    <div id="divCoustmerBookingfor" class="col-md-12 margin-bot-10" style="padding-top: 21px;">
+        <div id="customerDivBookingFor">
+            <div class="col-md-5">
+                <div id="cus1">
+                    @*Customer Details*@
+                    
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DirectNameNew)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.DirectNameNew, new { @class = "form-control input-sm" })
+                        <span id="CustomerName1Span" data-val="DirectNameNew" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="DirectNameNew" data-valmsg-replace="true"><span for="DirectNameNew" class="">Enter Customer Name</span></span>
+                        @*  @Html.ValidationMessageFor(m => m.CustomerName)*@
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DirectEmailnew)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.DirectEmailnew, new { @class = "form-control input-sm", })
+                        <span id="CustomerEmail1Span" data-val="DirectEmailnew" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="DirectEmailnew" data-valmsg-replace="true"><span for="DirectEmailnew" class="">Enter Property Email</span></span>
+                        @* @Html.ValidationMessageFor(m => m.CustomerEmail)*@
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DirectMobileNew)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.DirectMobileNew, new { @class = "form-control input-sm" })
+                        <span id="CustomerMobile1Span" data-val="DirectMobileNew" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="DirectMobileNew" data-valmsg-replace="true"><span for="DirectMobileNew" class="">Enter Customer Contact Number</span></span>
+                        @* @Html.ValidationMessageFor(m => m.CustomerMobile)*@
+                    </div>
+              
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.DirectAddressNew)<span style="color:red">*</span>
+                        @Html.TextAreaFor(m => m.DirectAddressNew, new { @class = "form-control input-sm" })
+                        <span id="CustomerAddress1Span" data-val="DirectAddressNew" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="DirectAddressNew" data-valmsg-replace="true"><span for="DirectAddressNew" class="">Select Customer City</span></span>
+                        @*@Html.ValidationMessageFor(m => m.CustomerAddress)*@
+                    </div>
+                  
+                </div>
+            </div>
+            <div class="col-md-5 ">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DirectCountryNew)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.DirectCountryNew, Model.DirectCountryList, new { @class = "form-control input-sm" })
+                    <span id="CustomerCountry1Span" data-val="DirectCountryNew" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="DirectCountryNew" data-valmsg-replace="true"><span for="DirectCountryNew" class="">Select Customer Country</span></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DirectStateNew)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.DirectStateNew, Model.DirectStateList, new { @class = "form-control input-sm" })
+                    <span id="CustomerState1Span" data-val="DirectStateNew" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="DirectStateNew" data-valmsg-replace="true"><span for="DirectStateNew" class="">Select Customer State</span></span>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DirectCityNew)<span style="color:red">*</span> &nbsp;
+                    <a href="#" id="close_other_citycuBOKFOR" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                    @Html.DropDownListFor(m => m.DirectCityNew, Model.DirectCityList, "select", new { @class = "form-control" })
+
+
+                    <div id="other_citycuBOKFOR" style="display:none;">
+                        @Html.TextBoxFor(m => m.DirectCitynameNew, new { @class = "form-control input-sm", @id = "DirectCitynameNew" })
+                    </div>
+
+                    <span id="CustomerCity1Span" data-val="DirectCitynameNew" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="DirectCitynameNew" data-valmsg-replace="true"><span for="DirectCitynameNew" class="">Select Customer City</span></span>
+                    @* @Html.ValidationMessageFor(m => m.CustomerCity)*@
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DirectpinCodeNew)
+                    @Html.TextBoxFor(m => m.DirectpinCodeNew, new { @class = "form-control input-sm" })
+
+                </div>
+
+              
+                @*<div class="form-group">
+                        @Html.CheckBoxFor(m => m.NoInvoiceMail1)
+                        @Html.LabelFor(m => m.NoInvoiceMail)
+                    </div>*@
+
+
+
+            </div>
+        </div>
+
+
+    </div>
+    <div class="btn-toolbar margin-bot-10 col-lg-offset-1  margin-top-10">
+        <div class="submitctr marginleft30px">
+            @*<input type="submit" id="btnSave" value="Save" class="btn btn-success marginleft30px" tabindex="23" />*@
+            <input type="button" id="btnSave1" onclick="SaveCoustmerSaveBookingFor()" value="Save" class="btn btn-success marginleft30px" tabindex="23" />
+            <a style="cursor:pointer;" onclick="onCancelCustomPropSave()" class="btn btn-danger" tabindex="24">Cancel</a>
+        </div>
+    </div>
+
+
+<div id="OfflineBoohingForChecking" class="modal fade popup" role="dialog">
+    <div class="modal-dialog modal-md">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h5 class="modal-title">Cusromer Already Exist Please Choose the Customer</h5>
+            </div>
+
+            <div class="modal-footer">
+
+                <button id="OfflineBoohingForCheckingClose" type="button" class="btn btn-danger" >Close</button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script>
+
+
+    $("#BookingForBillingAddres").hide();
+    $("#ReqCustomerType").hide();
+
+
+
+    //if ($('#PropertyCity').val() == -1) {
+    //    $("#PropertyCity").hide();
+    //    //$("#PropertyCityname").val("");
+    //    $("#other_citycus").show();
+    //}
+
+    $('#BookingForCustomerType').change(function () {
+
+        if ($("#BookingForCustomerType").val() == 5) {
+            $("#DirectBillingCity").val(0);
+
+
+            $('#BillingMobile').val("");
+            $('#ContactPerson').val("");
+            $('#OfficeNO').val("");
+            $('#BillingAddress').val("");
+            $('#PinCode').val("");
+            $("#BookingForBillingAddres").show();
+        }
+        else {
+
+
+            $("#BookingForBillingAddres").hide();
+            $("#DirectBillingCity").val(0);
+
+
+            $('#BillingMobile').val("");
+            $('#ContactPerson').val("");
+            $('#OfficeNO').val("");
+            $('#BillingAddress').val("");
+            $('#PinCode').val("");
+        }
+
+    });
+
+    $('#DirectCityNew').change(function () {
+        $("#CustomerCityname").val($("#DirectCityNew").find('option:selected').text());
+        if ($(this).val() == -1) {
+            $(this).hide();
+
+            $("#DirectCityNew").val("");
+
+            $("#other_citycuBOKFOR").show();
+            $("#close_other_citycuBOKFOR").show();
+        }
+    });
+    $('#close_other_citycuBOKFOR').click(function () {
+        $("#DirectCityNew").show();
+        $("#CustomerCityname").val("");
+        $("#other_citycuBOKFOR").hide();
+        $("#close_other_citycuBOKFOR").hide();
+    });
+
+
+
+
+
+
+
+    $('#DirectBillingCity').change(function () {
+        $("#CustomerCityname").val($("#DirectBillingCity").find('option:selected').text());
+        if ($(this).val() == -1) {
+            $(this).hide();
+
+            $("#CustomerCityname").val("");
+
+            $("#other_citycussBOOKBILLING").show();
+            $("#close_other_citycussBOOKBILLING").show();
+        }
+    });
+    $('#close_other_citycussBOOKBILLING').click(function () {
+        $("#DirectBillingCity").show();
+        $("#BillingCityname").val("");
+        $("#other_citycussBOOKBILLING").hide();
+        $("#close_other_citycussBOOKBILLING").hide();
+    });
+
+    $('#DirectCountryNew').change(function () {
+        $.get("/Common/GetState?id=" + $('#DirectCountryNew').val(), function (data) {
+            if (data != "") {
+                $('#DirectStateNew').empty().append(data);
+                //$("#costmstateid").val(cs);
+                //$("#costmstateid option[value= '" + cs + "' ]").attr("selected", "selected");
+            }
+            else {
+                $('#DirectStateNew').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+            customCustomerLoadcity1();
+        });
+    });
+
+    function customCustomerLoadcity1() {
+        $.get("/Common/GetCity?id=" + $('#DirectStateNew').val(), function (data) {
+            if (data != "") {
+                $('#DirectCityNew').html(data);
+            }
+            else {
+                $('#DirectCityNew').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+
+    //billing country change
+    $('#DirectBillingCountry').change(function () {
+        $.get("/Common/GetState?id=" + $('#DirectBillingCountry').val(), function (data) {
+            if (data != "") {
+                $('#DirectBillingState').empty().append(data);
+
+            }
+            else {
+                $('#DirectBillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+            customCustomerBillingLoadcity1();
+        });
+    });
+
+    function customCustomerBillingLoadcity1() {
+        $.get("/Common/GetCity?id=" + $('#DirectBillingState').val(), function (data) {
+            if (data != "") {
+                $('#DirectBillingCity').html(data);
+            }
+            else {
+                $('#DirectBillingCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+    // billing state chane
+    $('#DirectBillingState').change(function () {
+        $("#DirectBillingCity").show();
+        $("#DirectBillingCity").val("");
+        //$("#other_cityprop").hide();
+        $.get("/Common/GetCity?id=" + $('#DirectBillingState').val(), function (data) {
+            if (data != "") {
+                $('#DirectBillingCity').empty().append(data);
+             
+            }
+            else {
+                $('#DirectBillingCity').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+    });
+
+    // costomr state chane
+    $('#DirectStateNew').change(function () {
+        $("#DirectCityNew").show();
+        $("#DirectCityNew").val("");
+        //$("#other_cityprop").hide();
+        $.get("/Common/GetCity?id=" + $('#DirectStateNew').val(), function (data) {
+            if (data != "") {
+                $('#DirectCityNew').empty().append(data);
+            }
+            else {
+                $('#DirectCityNew').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+    });
+    //billing state change
+    $('#costmstateid').change(function () {
+        $("#costmrcityid").show();
+        $("#costmrcityid").val("");
+        $("#other_citycus").hide();
+        $.get("/Common/GetCity?id=" + $('#costmstateid').val(), function (data) {
+            if (data != "") {
+                $('#costmrcityid').empty().append(data);
+                // $("#costmrcityid").val($("#costmrcityid").find('option:selected').text());
+                //if ($("select#costmrcityid option").length == 1) {
+                //    $("#costmrcityid").hide();
+                //    $("#costmrcityid").val("");
+                //    $("#other_citycus").show();
+                //}
+            }
+            else {
+                $('#costmrcityid').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+    });
+
+    $('#PropertyCity').change(function () {
+        $("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+        if ($(this).val() == -1) {
+            $(this).hide();
+            $("#PropertyCityname").val("");
+            $("#other_cityprop").show();
+            $("#close_other_cityprop").show();
+        }
+    });
+    $('#close_other_cityprop').click(function () {
+        $("#PropertyCity").show();
+        $("#PropertyCityname").val("");
+        $("#other_cityprop").hide();
+        $("#close_other_cityprop").hide();
+    });
+
+
+    function propLoadcity() {
+        $.get("/Common/GetCity?id=" + $('#PropertyState').val(), function (data) {
+            if (data != "") {
+                $('#PropertyCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+            }
+            else {
+                $('#PropertyCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    function propLoadState() {
+        $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+            if (data != "") {
+                $('#PropertyState').empty().append(data);
+            }
+            else {
+                $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+    
+    $('#OfflineBoohingForCheckingClose').click(function () {
+        $("#OfflineBoohingForChecking").hide();
+    });
+
+    function SaveCoustmerSaveBookingFor() {
+      
+       
+        var actionPath = '@Url.Action("SaveCustomerBookingfor", "OfflineBookingGST", new { area = "Admin" })?' + $('#divCoustmerBookingfor :input').serialize();
+       
+        $.get(actionPath, function (data) {
+            if (data == -1) {
+                
+                alert("Cusromer Already Exist Please Choose the Customer");
+                //$('#OfflineBoohingForChecking').modal({
+                //    backdrop: 'static',
+                //    keyboard: false
+                //})
+                //.one('click', '#OfflineBoohingForCheckingClose', function(e) {
+                //    $("#OfflineBoohingForChecking").hide();
+                //        });
+            }
+            else {
+                $("#BookingForID").val(data);
+                $("#DirectName").val($("#DirectNameNew").val());
+                $("#DirectAddress").val($("#DirectAddressNew").val());
+                $("#DirectpinCode").val($("#DirectpinCodeNew").val());
+                $("#DirectMobile").val($("#DirectMobileNew").val());
+                $("#DirectEmail").val($("#DirectEmailnew").val());
+                   
+                var cntry = $("#DirectCountryNew").val();
+                var state = $("#DirectStateNew").val();
+                var city = $("#DirectCityNew").val();
+
+                $("#DirectCountry").val(cntry);
+                
+
+                $.get("/Common/GetState?id=" + $('#DirectCountry').val(), function (data) {
+                    if (data != "") {
+                        $('#DirectState').empty().append(data);
+                        $("#DirectState").val(state);
+                        $("#DirectState option[value= '" + state + "' ]").attr("selected", "selected");
+                    }
+                    else {
+                        $('#DirectState').empty().append('<option selected="selected" value="0">not available...</option>');
+                    }
+                });
+
+                if (city > 0) {
+                    $.get("/Common/GetCity?id=" + state, function (data) {
+                        if (data != "") {
+                            $('#DirectCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                            $("#DirectCity").val(city);
+
+                            $("#DirectCity option[value= '" + city + "' ]").attr("selected", "selected");
+
+                        }
+                        else {
+                            $('#DirectCity').html('<option selected="selected" value="0">not available...</option>');
+                        }
+                    });
+                }
+                else {
+                    var newcityname = $("#DirectCitynameNew").val();
+                    $('#DirectCity').hide();
+                    $('#bookingforCityTXT').show();
+                    $("#DirectCitynames").val(newcityname);
+                }
+
+                $('#chooseBookingFor').modal('hide');
+            }
+      
+
+        });
+
+    }
+</script>

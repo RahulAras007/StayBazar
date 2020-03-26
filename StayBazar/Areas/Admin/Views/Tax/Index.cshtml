@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "Tax Rate";
+    try
+    {
+        var grid = new WebGrid(Model, canSort: false, canPage: true, rowsPerPage: 20,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Areas.Admin.Models.TaxModel data = (StayBazar.Areas.Admin.Models.TaxModel)ViewBag.Tax;
+        <text>
+            <div id="bodycontent">
+                <div id="divedit">
+                    @{
+        Html.RenderPartial("~/Areas/Admin/Views/Tax/_Edit.cshtml", data, ViewData);
+                    }
+                </div>              
+
+@if (Model.Count > 0)
+                {
+                <div id="gridContent">
+                    @grid.GetHtml(
+         tableStyle: "webGrid table table-striped table-hover table-condensed",
+                headerStyle: "header",
+                alternatingRowStyle: "alt",
+                selectedRowStyle: "select",
+                columns: grid.Columns(grid.Column("Title", "Title"),
+                grid.Column("Rate", "Rate %"),
+                        grid.Column("PriceUpto","Price Slab"),
+                     grid.Column("Status", format: (item) =>
+                   {
+                       int i = item.Status;
+                       if (i < 2)
+                       {
+                           return Html.Raw("Active");
+                       }
+                       else
+                       {
+                           return Html.Raw("Inactive");
+                       }
+                   }),
+                grid.Column("Country", "Country"),
+                grid.Column("State", "State"),
+                grid.Column("City","City"),
+                grid.Column("Edit", format: @<text><a href="#"  title="Edit" onclick="EditBT(@item.TaxId)"><span class="glyphicon glyphicon-edit"></span></a></text>, style: "btnclm"),
+                grid.Column("Delete", format:@<text><a title='Delete' class='lnk' href="/Admin/Tax/Delete/@item.TaxId" onclick="return confirm('Are you sure you want to Delete?')"><span class='glyphicon glyphicon-remove'></span></a></text>, style: "btnclm")
+))
+                </div>
+}
+else
+{
+    <div class="bottom">&nbsp;</div>
+                    <div class="alert alert-info">Is Empty</div>
+}
+            </div>
+            <script type="text/javascript">
+                function EditBT(id) {
+                    
+                    $('#CityId').val("");
+                    $('#StateId').val("");
+                    $.get("/Tax/Edit?id="+id, function (data) {
+                        $("#divedit").html(data);
+                    });                                   
+                }
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}

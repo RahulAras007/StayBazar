@@ -1,0 +1,812 @@
+﻿@model List<CLayer.Booking>
+@using Microsoft.AspNet.Identity
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager2";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+
+    string userid = User.Identity.GetUserId();
+    string email = User.Identity.GetUserName();
+    CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+    
+
+
+}
+<link href="~/Content/loader.css" rel="stylesheet" />
+<style>
+
+
+</style>
+
+<div class="alert alert-danger" id="dvAlert" style="display:none">
+    <strong><p id="pError"></p></strong>
+</div>
+<div class="alert alert-danger" id="dvMessage" style="display:none">
+    <strong><p id="pMessage"></p></strong>
+</div>
+<div id="loadingheader" style="display:none;" data-backdrop="static" data-keyboard="false" data-toggle="modal">
+    <div class="loader-box" style="display:none">
+        <span class="loader"><span class="loader-inner"></span></span>
+    </div>
+    <div class="submit-progress"  >
+        <i class="fa fa-2x fa-spinner fa-spin"></i>
+        <label class="Progress-size">Processing the booking approval....</label>
+    </div>
+</div>
+<style>
+   
+    
+</style>
+
+
+@if (Model != null && Model.Count() > 0)
+{
+    <div class="panel-group" id="accordion">
+        @{
+            long i = 0;
+        }
+
+        @{
+            StayBazar.Models.BookingApprovalModel filterform = (StayBazar.Models.BookingApprovalModel)ViewBag.Filter;
+            using (Html.BeginForm("Pager", "BookingApproval", FormMethod.Post, new { @id = "frmPagers" }))
+            {
+                <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                <input type="hidden" id="Day" name="Day" value="@filterform.Day" />
+                <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+                <input type="hidden" id="Type" name="type" value="@filterform.Type" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+        }
+
+        @foreach (CLayer.Booking usr in Model)
+        {
+
+            long Paymentoption = BLayer.Bookings.GetPaymentoption(usr.BookingId);
+            CLayer.ObjectStatus.PartialPaymentStatus PartialPayStatus = BLayer.Bookings.GetPartialPaymentStatus(usr.BookingId);
+
+
+            if (i != usr.BookingId)
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#i_@usr.BookingId">
+                            <div class="row">
+                                <div class="col-md-2 ">
+                                    <span></span>Date: @usr.BookingDate.ToShortDateString()
+                                </div>
+                                <div class="col-md-2 ">Cnf. No: @usr.OrderNo </div>
+                                <div class="col-md-4">@usr.PropertyTitle  Location: @usr.propertyLocation </div>
+                            </div>
+                        </a>
+
+                    </div>
+
+                    <div id="i_@usr.BookingId" class="panel-collapse collapse ">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <dl>
+                                        @*<dt>Confirmation Details</dt>
+                                            <dd>@usr.OrderNo</dd>*@
+                                        <dt>Booking Date:</dt>
+                                        <dd>@usr.BookingDate.ToShortDateString()</dd>
+                                    </dl>
+
+                                </div>
+                                <div class="col-md-3">
+                                    <dl>
+                                        <dt>Property Details</dt>
+                                        <dd>@usr.PropertyTitle</dd>
+                                        <dd>@usr.propertyAddress</dd>
+                                        <dd>@usr.propertyLocation</dd>
+                                        <dd>@usr.propertyCity</dd>
+                                        <dd>@usr.propertyPin</dd>
+                                        @*<dd>@usr.propertyEmail</dd>*@
+                                    </dl>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <dl>
+                                        <dt>Status</dt>
+                                        <dd>
+                                            @{
+                                                int id = usr.BookingStatus;
+                                                if (id == (int)CLayer.ObjectStatus.BookingStatus.Success)
+                                                {
+                                                    <text>Booked</text>
+                                                }
+                                                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Cancelled)
+                                                {
+                                                    <text>Cancelled</text>
+                                                }
+                                                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Cart)
+                                                {
+                                                    <text>Cart</text>
+                                                }
+                                                else if (id == (int)CLayer.ObjectStatus.BookingStatus.CheckOut)
+                                                {
+                                                    <text>CheckOut</text>
+                                                }
+                                                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Failed)
+                                                {
+                                                    <text>Failure</text>
+                                                }
+                                                else if (id == (int)CLayer.ObjectStatus.BookingStatus.WaitingForApproval)
+                                                {
+                                                    <text>Waiting for Approval</text>
+                                                }
+                                                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Approved)
+                                                {
+                                                    <text>Approved</text>
+                                                }
+                                            }
+                                        </dd>
+                                        <dt>Approval Status</dt>
+                                        <dd>
+                                            @{
+                                                int ApprovalStatusid = usr.approval_status;
+                                                if (ApprovalStatusid == (int)CLayer.ObjectStatus.BookingApprovalStatus.WaitingForApproval)
+                                                {
+                                                    <text>Waiting for approval</text>
+                                                }
+                                                else if (ApprovalStatusid == (int)CLayer.ObjectStatus.BookingApprovalStatus.Approved)
+                                                {
+                                                    <text>Approval in progress</text>
+                                                }
+                                                else if (ApprovalStatusid == (int)CLayer.ObjectStatus.BookingApprovalStatus.ConfirmedforBooking)
+                                                {
+                                                    <text>Approved</text>
+                                                }
+                                                else if (ApprovalStatusid == (int)CLayer.ObjectStatus.BookingApprovalStatus.Rejected)
+                                                {
+                                                    <text>Rejected</text>
+                                                }
+
+                                            }
+                                        </dd>
+                                        <dt>Total Amount</dt>
+                                        <dd>@Math.Round(usr.bookingTotalAmount)</dd>
+                                    </dl>
+                                </div>
+                                @{List<CLayer.Address> usersFor1 = BLayer.Bookings.GetBookedForUser(usr.BookingId);
+                                    foreach (CLayer.Address usr2 in usersFor1)
+                                    {
+                                        <div class=" col-lg-4">
+
+                                            <b>Guest Details</b>  <br />
+                                            @usr2.Firstname,
+                                            @usr2.AddressText,
+                                            @usr2.City ,
+                                            @usr2.StateName ,
+                                            @usr2.Country ,@usr2.ZipCode.
+                                            Phone:@usr2.Phone    @usr2.Mobile.
+                                            Email:@usr2.Email
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 col-md-offset-2  rightalign">
+
+                                    @if (DateTime.Today >= usr.CheckOut)
+                                    {
+                                        <a href="@Url.Action("IndexSave","Review")?idb=@usr.BookingId&idp=@usr.PropertyId" id="reviewadd" title="Review" class="btn btn-default ordhist_btn" style="display:none">Add Review</a>
+                                    }
+                                    @{ 
+                                        bool IsCreditBooking = BLayer.B2B.IsCreditBookingNeeded(usr.Approver_id);
+                                        var CreditBooking = IsCreditBooking ? "1" : "0";
+                                        long ByUserID = BLayer.Bookings.GetBookedByUserId(usr.BookingId);
+                                        long LastApproverID = BLayer.B2B.LastApproverID(ByUserID, usr.BookingId);
+
+                                    }
+
+                                    @*<a href="@Url.Action("ViewBill","Booking")?id=@usr.BookingId" title="Print" class="btn btn-info"> View Reservation </a>
+                                        <a href="#" class="btn btn-info" onclick="showInvoice(@usr.BookingId)">Invoice</a>*@
+                                    <a href="javascript:void(0)" id="lnkApprove" title="Approve" class="btn btn-info" onclick="ApproveBookings(@usr.booking_approval_id,@usr.BookingId ,@usr.Approver_id  ,'','@usr.CreatedDate',@usr.approval_order,@usr.approval_status,'@usr.approvalstatus',@LastApproverID,@CreditBooking )"> Approve </a>
+                                    @*<a href="javascript:void(0)" class="btn btn-info" title="Reject" onclick="return ApplyReasonForRejection(@usr.booking_approval_id,@usr.BookingId ,@usr.Approver_id  ,'','@usr.CreatedDate',@usr.approval_order,3,3)">Reject</a>*@
+                                    <a href="javascript:void(0)" class="btn btn-info" title="Reject" onclick="return ConfirmDelete(@usr.booking_approval_id,@usr.BookingId ,@usr.Approver_id  ,'','@usr.CreatedDate',@usr.approval_order,3,3)">Reject</a>
+
+                                    @{
+                                        int gateway = BLayer.Transaction.getGatewaytypebybookid(usr.BookingId);
+                                    }
+
+                                    @if (gateway != (int)CLayer.ObjectStatus.Gateway.PayPal)
+                                    {
+
+                                        if (Paymentoption == (int)CLayer.ObjectStatus.PaymentOption.FullPayment)
+                                        {
+                                            if (usr.CheckIn > DateTime.Today && (usr.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success))
+                                            {
+                                                <a href="#" id="Modify@(usr.BookingItemId)" title="Modify" class="btn  btn-default ordhist_btn" onclick="callModify(@usr.BookingId)"> Modify </a>
+                                                <a href="#" id="status@(usr.BookingItemId)" title="Edit" class="btn btn-danger ordhist_btn" onclick="callCancel(@usr.BookingId)"> Cancel</a>
+                                            }
+                                        }
+                                        if (Paymentoption == (int)CLayer.ObjectStatus.PaymentOption.PartialPayment)
+                                        {
+                                            if (usr.CheckIn > DateTime.Today && (PartialPayStatus == CLayer.ObjectStatus.PartialPaymentStatus.SecondPaymentSuccess) && (usr.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success))
+                                            {
+                                                <a href="#" id="Modify@(usr.BookingItemId)" title="Modify" class="btn  btn-default ordhist_btn" onclick="callModify(@usr.BookingId)"> Modify </a>
+                                                <a href="#" id="status@(usr.BookingItemId)" title="Edit" class="btn btn-danger ordhist_btn" onclick="callCancel(@usr.BookingId)"> Cancel</a>
+                                            }
+                                            if (usr.CheckIn > DateTime.Today && (PartialPayStatus == CLayer.ObjectStatus.PartialPaymentStatus.InitialPaymentSuccess && (usr.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success)))
+                                            {
+                                                <a href="#" id="status@(usr.BookingItemId)" title="Edit" class="btn btn-danger ordhist_btn" onclick="callCancel(@usr.BookingId)"> Cancel</a>
+                                            }
+                                        }
+                                    }
+
+
+
+                                    @if (Paymentoption == (int)CLayer.ObjectStatus.PaymentOption.PartialPayment && (usr.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success))
+                                    {
+
+                                        if (PartialPayStatus == CLayer.ObjectStatus.PartialPaymentStatus.InitialPaymentSuccess || PartialPayStatus == CLayer.ObjectStatus.PartialPaymentStatus.SecondPaymentFailed)
+                                        {
+                                            <a class="btn btn-danger ordhist_btn" title="Make Pending Payment" href="@Url.Action("PartialPayment", "Booking", new { bookingId = usr.BookingId })">Pending Payment</a>
+                                        }
+                                    }
+
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                                    <thead>
+                                        <tr>
+                                            <th>Accommodation</th>
+                                            <th>CheckIn</th>
+                                            <th>Check out</th>
+                                            <th>Quantity</th>
+                                            <th>Adults</th>
+                                            <th>Children</th>
+                                            <th>Guests</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            //List<CLayer.BookingItem> Acdt = BLayer.BookingItem.GetAllDetailsForPartialPay(usr.BookingId);
+                                            List<CLayer.BookingItem> Acdt = new List<CLayer.BookingItem>();
+                                            long PropertyId = BLayer.Bookings.GetPropertyId(usr.BookingId);
+                                            int InventoryAPIType = BLayer.Property.GetInventoryAPITypeId(PropertyId);
+                                            if (InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+                                            {
+                                                Acdt = BLayer.BookingItem.GetAllDetails(usr.BookingId, true);
+                                            }
+
+                                        }
+                                        @foreach (CLayer.BookingItem dt in Acdt)
+                                        {
+                                            <tr>
+                                                <td>@dt.AccommodationTitle</td>
+                                                <td>@dt.CheckIn.ToShortDateString()</td>
+                                                <td>@dt.CheckOut.ToShortDateString()</td>
+                                                <td>@dt.quantity</td>
+                                                <td>@dt.NoOfAdults</td>
+                                                <td>@dt.NoOfChildren</td>
+                                                <td>@dt.NoOfGuests</td>
+                                                <td>@Math.Round(dt.TotalAmount)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+
+                                @if (Paymentoption == (int)CLayer.ObjectStatus.PaymentOption.PartialPayment)
+                                {
+                                    <h4 class="bold">Partial Payment Details</h4>
+                                    <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                                        <thead>
+                                            <tr>
+                                                <th>Partial Payment Percentage</th>
+                                                <th>Partial Payment First Installment</th>
+                                                <th>Partial Payment Second Installment</th>
+                                                <th>Partial Payment Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>@usr.PartialPaymentPercentage</td>
+                                                <td>@usr.PaymentFirstinstallment</td>
+                                                <td>@usr.PaymentSecondinstallment</td>
+                                                <td>
+                                                    @{
+                                                        int statusid = usr.PartialPaymentStatus;
+                                                        if (statusid == (int)CLayer.ObjectStatus.PartialPaymentStatus.Cart)
+                                                        {
+                                                            <text>Cart</text>
+                                                        }
+                                                        else if (statusid == (int)CLayer.ObjectStatus.PartialPaymentStatus.CheckOut)
+                                                        {
+                                                            <text>CheckOut</text>
+                                                        }
+                                                        else if (statusid == (int)CLayer.ObjectStatus.PartialPaymentStatus.InitialPaymentFailed)
+                                                        {
+                                                            <text>First Installment Payment Failed</text>
+                                                        }
+                                                        else if (statusid == (int)CLayer.ObjectStatus.PartialPaymentStatus.InitialPaymentSuccess)
+                                                        {
+                                                            <text>First Installment  Paid</text>
+                                                        }
+                                                        else if (statusid == (int)CLayer.ObjectStatus.PartialPaymentStatus.SecondPaymentFailed)
+                                                        {
+                                                            <text>Second Installment Payment Failed</text>
+                                                        }
+                                                        else if (statusid == (int)CLayer.ObjectStatus.PartialPaymentStatus.SecondPaymentSuccess)
+                                                        {
+                                                            <text>Fully Paid</text>
+                                                        }
+                                                        else if (statusid == (int)CLayer.ObjectStatus.PartialPaymentStatus.BookingCancel)
+                                                        {
+                                                            <text>Booking Cancelled</text>
+                                                        }
+                                                    }
+
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+                                                        }
+
+
+                                @if (Paymentoption == (int)CLayer.ObjectStatus.PaymentOption.CorporateCreditBooking)
+                                {
+                                    long BuserId = BLayer.Bookings.GetBookedByUserId(usr.BookingId);
+                                    CLayer.B2B Creditbookingdata = new CLayer.B2B();
+                                    if (role == CLayer.Role.Roles.Corporate)
+                                    {
+                                        Creditbookingdata = BLayer.B2B.GetbookingcreditforCorte(BuserId);
+                                    }
+                                    else
+                                    {
+                                        Creditbookingdata = BLayer.B2B.GetbookingcreditforCorporateUser(BuserId);
+                                    }
+                                   
+                                    <h4 class="bold">Corporate Credit Booking Details</h4>
+                                    <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                                        <thead>
+                                            <tr>
+                                                <th>Total Amount booked by Corporate</th>
+                                                <th>Credit Limit Total</th>
+                                                <th>Credit Limit Balance</th>
+                                                <th>Payments Due</th>
+                                                <th>Date Due</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>@usr.bookingTotalAmount</td>
+                                                <td>@Creditbookingdata.TotalCreditAmount</td>
+                                                <td>@Creditbookingdata.CreditAmount</td>
+                                                <td>
+                                                    @if (Creditbookingdata.CreditAmount < 0)
+                                                    {<text> YES </text> }
+                                                    else
+                                                    { <text> NO </text>}
+                                                </td>
+                                                <td>@usr.BookingDate.AddDays(Creditbookingdata.CreditDays)</td>
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+                                }
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                                            }
+                                                        }
+
+        @if (Model != null && Model.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+        }
+    </div>
+                                                        }
+                                                        else
+                                                        {
+
+                                                            <div class="row">
+                                                                <div class="col-md-4 col-md-offset-4">
+                                                                    <div class="alert alert-info">You don't have any active booking approvals.</div>
+                                                                </div>
+                                                            </div>
+
+                                                        }
+<!-- Modal -->
+<div class="modal fade" id="ReasonForRejection" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Booking approval rejection</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="input-group">
+                            <div id="divReasonForRejection" class="col-md-12 margin-bot-10" style="padding-top: 21px;">
+                                <div class="form-group">
+                                    <label>Reason for rejection</label>
+                                    <textarea id="txtReason" name="txtReason" class="form-control input-sm"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                     
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="button" id="btnSave1" onclick="ApplyRejectionNote()" value="Save" class="btn btn-success marginleft30px" tabindex="23" />
+                <a style="cursor:pointer;" onclick="onCancelCustomPropSave()" class="btn btn-danger" tabindex="24">Cancel</a>
+            </div>
+
+            <input type="hidden" id="hdRejectionNote" name="hdRejectionNote" />
+            <input type="hidden" id="hdBooking_Approval_Id" name="hdBooking_Approval_Id" />
+            <input type="hidden" id="hdBookingId" name="hdBookingId" />
+            <input type="hidden" id="hdapprover_id" name="hdapprover_id" />
+            <input type="hidden" id="hdapprover" name="hdapprover" />
+            <input type="hidden" id="hdCreatedDate" name="hdCreatedDate" />
+            <input type="hidden" id="hdapproval_order" name="hdapproval_order" />
+            <input type="hidden" id="hdapproval_status" name="hdapproval_status" />
+            <input type="hidden" id="hdapprovalstatus" name="hdapprovalstatus" />
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="RejectionConfirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Booking approval rejection</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="input-group">
+                            <div id="divReasonForRejection" class="col-lg-12 margin-bot-10" style="padding-top: 11px;">
+                                <div class="form-group">
+                                    <label>Are you sure do you want to reject current booking?</label>
+                                </div>
+                            </div>
+
+                        </div>
+                     </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="button" id="btnYes" onclick="SetRejectStatus(1)" value="Yes" class="btn btn-success marginleft30px" tabindex="23" />
+                <input type="button" id="btnNo" onclick="SetRejectStatus(0)" value="No" class="btn btn-danger marginleft30px" tabindex="23" />
+                <input type="hidden" value="0" id="hdRejectionStatus" name="hdRejectionStatus" />
+            </div>
+            <input type="hidden" id="hdRejectionNote" name="hdRejection" />
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ApprovalMessage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Booking Approval</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="input-group">
+                            <div id="divReasonForRejection" class="col-md-12 margin-bot-10" style="padding-top: 21px;">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <i  aria-hidden="true" id="faIcon"></i>
+
+                                        <label id="lblApprovalMessage" class="ApprovalMsg"></label>
+                                        <label id="lblApprovalMessagePart1" class="ApprovalMsg"></label>
+                                        <label id="lblApprovalMessagePart2" class="ApprovalMsg"></label>
+                                        </div>
+                                    </div>
+                            </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0)" class="btn btn-success marginleft30px" onclick="ResetApprovalList()">OK</a>
+            </div>
+     </div>
+    </div>
+</div>
+
+
+
+        <script type="text/javascript">
+    var IsRejected = false;
+
+    function showInvoice(obid) {
+        var p1 = 'scrollbars=yes,resizable=yes,status=yes,location=no,menubar=no';
+        var p2 = 'width=1050,height=800';
+        // window.open('Invoice/Preview?obid=' + obid, 'test', p1 + p2);
+        window.open('/GDSInvoice/Preview?obid=' + obid, "resizable=no", "width=1000,height=800");
+    }
+
+    function SetRejectStatus(value)
+    {
+        $("#hdRejectionStatus").val(value);
+        if ($("#hdRejectionStatus").val() == "1")
+        {
+            $('#ReasonForRejection').modal('show');
+            $('#RejectionConfirm').modal('hide');
+        }
+        else {
+            $('#ReasonForRejection').modal('hide');
+            $('#RejectionConfirm').modal('hide');
+        }
+
+    }
+
+    function ApproveBookings(Booking_Approval_Id, BookingId, approver_id, approver, CreatedDate, approval_order, approval_status, approvalstatus,LastApproverID,IsCreditBooking) {
+       debugger;
+
+        $("#dvAlert").hide();
+            $("#dvMessage").hide();
+       //     alert(IsCreditBooking);
+         
+            if ((approver_id == LastApproverID) && (IsCreditBooking == "1"))
+            {
+                $("#loadingheader").fadeIn(1000);
+                $('#loadingheader').modal({ backdrop: 'static', keyboard: false })  
+              
+                $("body").addClass("submit-progress-bg");
+             
+            }
+            else {
+                $("#loadingheader").fadeOut(1000);
+                $("body").removeClass("submit-progress-bg");
+            }
+
+           
+
+
+        var BookingApprovals = { 'Booking_Approval_Id': Booking_Approval_Id, 'BookingId': BookingId, 'approver_id': approver_id, 'approver': approver, 'CreatedDate': CreatedDate, 'approval_order': approval_order, 'approval_status': approval_status, 'approvalstatus': approvalstatus };
+
+        $.ajax({
+            url: '@Url.Action("Approve", "BookingApproval")',
+            type: 'POST',
+            data: JSON.stringify(BookingApprovals),
+            dataType: 'json',
+            processData: false,
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+     //         debugger;
+                if (response.success) {
+                 //   alert(response.responseText);
+                    if ((approver_id == LastApproverID) && (IsCreditBooking = true)) {
+                        $("#loadingheader").fadeOut(1000);
+                        
+                    }
+                    debugger;
+                    var resText = response.responseText.split("-");
+             //       alert(resText[0]);
+                //    alert(resText[1]);
+
+                    $("#lblApprovalMessage").text(resText[0]);
+
+                    if (resText[1]!=undefined)
+                    {
+                        $("#lblApprovalMessagePart1").text(resText[1]);
+                    }
+
+                    if (resText[2] != undefined) {
+                        $("#lblApprovalMessagePart2").text(resText[2]);
+                    }
+                    //if ($("#faIcon").hasClass("fa-check")) {
+                    //    $("#faIcon").removeClass("fa-check");
+                    //    $("#faIcon").addClass("fa-cross");
+                    //}
+                 
+                    $("#faIcon").addClass("fa fa-check padbtm10px isize");
+                   
+
+                  $("#ApprovalMessage").modal('show');
+                 
+                //   window.location = '@Url.Action("Index", "BookingApproval", ViewBag.BookingID)';
+                 
+                }
+                else {
+                    $("#dvAlert").show();
+                    $("#pError").html("Error in confirm bookings.Please try again..");
+                }
+            },
+            error: function (response) {
+
+            }
+
+            });
+           
+    }
+ function RejectBookings(Booking_Approval_Id, BookingId, approver_id, approver, CreatedDate, approval_order, approval_status, approvalstatus) {
+     //   debugger;
+        var IsRejected = true;
+        var RejectionNote;
+        $("#dvAlert").hide();
+        $("#dvMessage").hide();
+
+        if (approvalstatus == 3)
+        {
+
+             RejectionNote = $("#hdRejectionNote").val();
+            if (RejectionNote == "")
+            {
+                IsRejected = true;
+            }
+
+        }
+
+        if (IsRejected == true)
+        {
+            var BookingApprovals = { 'Booking_Approval_Id': Booking_Approval_Id, 'BookingId': BookingId, 'approver_id': approver_id, 'approver': approver, 'CreatedDate': CreatedDate, 'approval_order': approval_order, 'approval_status': approval_status, 'approvalstatus': approvalstatus, 'rejectionnote': RejectionNote };
+        $.ajax({
+            url: '@Url.Action("Approve", "BookingApproval")',
+            type: 'POST',
+            data: JSON.stringify(BookingApprovals),
+            dataType: 'json',
+            processData: false,
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+             //   debugger;
+                if (response.success) {
+                  //  alert(response.responseText);
+                    $("#lblApprovalMessage").text(response.responseText);
+                    if ($("#faIcon").hasClass("fa-check"))
+                    {
+                        $("#faIcon").removeClass("fa-check");
+                        $("#faIcon").addClass("fa-cross");
+                    }
+                    //if ($("#faIcon").hasClass("fa-cross")) {
+                    //    $("#faIcon").addClass("fa-check");
+                    //    $("#faIcon").removeClass("fa-cross");
+                    //}
+
+                    $("#ApprovalMessage").modal('show');
+                   //    window.location = '@Url.Action("Index", "BookingApproval", ViewBag.BookingID)';
+                      }
+                else {
+                    $("#dvAlert").show();
+                    $("#pError").html("Error in confirm bookings.Please try again..");
+                }
+            },
+            error: function (response) {
+
+            }
+
+        });
+        }
+
+        return IsRejected;
+    }
+
+    function ApplyReasonForRejection(Booking_Approval_Id, BookingId, approver_id, approver, CreatedDate, approval_order, approval_status, approvalstatus) {
+     //   debugger;
+        var deleteStatus = false;
+
+        if (confirm("Are you sure.Do you want to delete the current booking?")) {
+            // your deletion code
+            deleteStatus = true;
+            if (IsRejected == false) {
+                $('#ReasonForRejection').modal('show');
+            }
+        }
+        else {
+            deleteStatus = false;
+
+        }
+
+      //  var RejectionNote = $("#hdRejectionNote").val();
+
+        return deleteStatus;
+
+    }
+
+    // Set Rejection note
+    function ApplyRejectionNote()
+    {
+     //   debugger;
+        var Reason = $("#txtReason").val();
+        $("#hdRejectionNote").val(Reason);
+
+        $('#ReasonForRejection').modal('hide');
+        RejectionNote = $("#hdRejectionNote").val();
+        if (RejectionNote == "") {
+
+            IsRejected = false;
+        }
+        else {
+            IsRejected = true;
+         if (IsRejected == true)
+         {
+
+             Booking_Approval_Id =Number($("#hdBooking_Approval_Id").val());
+             BookingId =Number($("#hdBookingId").val());
+             approver_id =Number($("#hdapprover_id").val());
+             approver = $("#hdapprover").val();
+             CreatedDate =Date($("#hdCreatedDate").val());
+             approval_order =Number($("#hdapproval_order").val());
+             approval_status =Number($("#hdapproval_status").val());
+             approvalstatus = $("#hdapprovalstatus").val();
+
+
+
+             var BookingApprovals = { 'Booking_Approval_Id': Booking_Approval_Id, 'BookingId': BookingId, 'approver_id': approver_id, 'approver': approver, 'CreatedDate': CreatedDate, 'approval_order': approval_order, 'approval_status': approval_status, 'approvalstatus': approvalstatus, 'RejectionNote': RejectionNote };
+        $.ajax({
+            url: '@Url.Action("Approve", "BookingApproval")',
+            type: 'POST',
+            data: JSON.stringify(BookingApprovals),
+            dataType: 'json',
+            processData: false,
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+             //   debugger;
+                if (response.success) {
+                    $("#txtReason").val('');
+                    $("#hdRejectionNote").val('');
+                //    alert(response.responseText);
+                    $("#lblApprovalMessage").text(response.responseText);
+                    $("#faIcon").addClass("fa fa-close padbtm10px isize");
+                    $("#ApprovalMessage").modal('show');
+                  //  window.location = '@Url.Action("Index", "BookingApproval", ViewBag.BookingID)';
+
+                    var IsRejected = false;
+                }
+                else {
+                    $("#dvAlert").show();
+                    $("#pError").html("Error in confirm bookings.Please try again..");
+                }
+            },
+            error: function (response) {
+
+            }
+
+        });
+        }
+        }
+    }
+    function ConfirmDelete(Booking_Approval_Id, BookingId, approver_id, approver, CreatedDate, approval_order, approval_status, approvalstatus) {
+
+        $("#hdBooking_Approval_Id").val(Booking_Approval_Id);
+        $("#hdBookingId").val(BookingId);
+        $("#hdapprover_id").val(approver_id);
+        $("#hdapprover").val(approver);
+        $("#hdCreatedDate").val(CreatedDate);
+        $("#hdapproval_order").val(approval_order);
+        $("#hdapproval_status").val(approval_status);
+        $("#hdapprovalstatus").val(approvalstatus);
+
+        $('#RejectionConfirm').modal('show');
+    }
+    function onCancelCustomPropSave()
+    {
+        $("#txtReason").val('');
+        $("#hdRejectionNote").val('');
+            }
+    function ResetApprovalList()
+    {
+        $("#ApprovalMessage").hide();
+         window.location = "/BookingApproval";
+            }
+
+            function DisplayProgressMessage(ctl, msg) {
+            
+            }
+
+        </script>
+
+
+

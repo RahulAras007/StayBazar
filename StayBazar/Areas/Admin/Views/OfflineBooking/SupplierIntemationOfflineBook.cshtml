@@ -1,0 +1,493 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    Layout = null;
+
+    CLayer.OfflineBooking Offlinedata = BLayer.OfflineBooking.GetAllDetailsById(Model.OfflineBookingId);
+
+    //   CLayer.Property PropertyData = BLayer.Property.Get(Offlinedata.PropertyId);
+    //  CLayer.B2B SupplierData = BLayer.B2B.Get(Offlinedata.SupplierId);
+    //CLayer.Address SupplierAddressId = BLayer.Address.GetOnUserId(Offlinedata.SupplierId, 1);
+    //   CLayer.Address SupplierAddress = BLayer.Address.GetAddressOnUserId(Offlinedata.SupplierId);
+
+    CLayer.Property dttime = BLayer.Property.GetCheckTime(Offlinedata.PropertyId);
+
+    CLayer.OfflineBooking OfflinePropertydata = BLayer.OfflineBooking.GetAllpropertyDetails(Model.OfflineBookingId);
+
+    int noOfDays = 0;
+
+    CLayer.StayCategory Staycategorydetails = BLayer.StayCategory.Get(Convert.ToInt32(Offlinedata.StayCategoryid));
+    //CLayer.AccommodationType AccommodationTypedetails = BLayer.AccommodationType.Get(Convert.ToInt32(Offlinedata.Accommodationtypeid));
+
+    CLayer.AccommodationType AccommodationTypedetails = new CLayer.AccommodationType();
+    string AccommodationTypeTitle = "";
+
+    if (Offlinedata.Accommodationtypeid != -1)
+    {
+        AccommodationTypedetails = BLayer.AccommodationType.Get(Convert.ToInt32(Offlinedata.Accommodationtypeid));
+        AccommodationTypeTitle = AccommodationTypedetails.Title;
+    }
+    else
+    {
+
+        AccommodationTypeTitle = Offlinedata.AccommodatoinTypename;
+    }
+
+    CLayer.OfflineBooking CustomerDetails = BLayer.OfflineBooking.GetAllCustomerDetails(Model.OfflineBookingId);
+
+
+    decimal amountacc = Offlinedata.AvgDailyRateBefreStaxForBuyPrice * Offlinedata.NoOfNight * Offlinedata.NoOfRooms;
+    decimal tstax = Math.Round((Offlinedata.AvgDailyRateBefreStaxForBuyPrice * Offlinedata.StaxForBuyPrice / 100) * Offlinedata.NoOfNight * Offlinedata.NoOfRooms, 2);
+    decimal tothertax = Math.Round((Offlinedata.StaxForotherBuyPrice * Offlinedata.BuyPriceforotherservicesForBuyprice) / 100, 2);
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>BConfirmation</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <tr>
+            <td align="center">
+                <table width="700">
+                    <thead>
+                        <tr>
+                            <th align="left" style="padding-top: 2%;" colspan="2">
+                                <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                            </th>
+                            <th width="400" align="right" style="font-size:12px;" colspan="2">
+                                Phone: +91 80 25722898 @*@BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)*@<br />
+                                Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" align="center">
+                                <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">BOOKING CONFIRMATION</h5>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <p style="line-height: 35px; font-size: 12px; color: #666;">
+
+                                    Attn:
+                                    @if (OfflinePropertydata.SupplierName != "" && OfflinePropertydata.SupplierName != null)
+                                    {
+                                        <text> @OfflinePropertydata.SupplierName,</text><br />
+
+                                    }
+                                    else
+                                    {
+                                        @OfflinePropertydata.PropertyCaretakerName                            <br />
+                                    }
+
+                                    Following booking has been made in your property. Customer and booking details are as given below. Please ensure the accommodation is available during the date period for the guest.
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><h5 style="font-size: 12px; margin: 10px 0px; display: inline-block;">Customer Details</h5></td>
+                            <td colspan="2">&nbsp;</td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Guest Name</td>
+                            <td>@Offlinedata.GuestName</td>
+                            <td>Booking Date</td>
+                            <td>
+                                @Offlinedata.CreatedTime.ToShortDateString()
+                            </td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td valign="top">Phone</td>
+                            <td valign="top">@CustomerDetails.CustomerMobile</td>
+                            <td valign="top">Booking Id</td>
+                            <td valign="top">
+                                @Offlinedata.ConfirmationNumber
+                            </td>
+                        </tr>
+                        @*<tr style="font-size:12px;">
+                                <td>Email</td>
+                                <td>@CustomerDetails.CustomerEmail</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                            </tr>*@
+                        <tr style="font-size:12px;">
+                            <td></td>
+                            <td></td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+
+
+                        <tr>
+                            <td colspan="2"><h5 style="font-size: 12px; margin: 10px 0px; display: inline-block;">Property Details</h5></td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+
+                        <tr style="font-size:12px;"><td>Name</td><td>@OfflinePropertydata.PropertyName</td><td>&nbsp;</td><td>@OfflinePropertydata.SupplierName</td></tr>
+                        <tr style="font-size:12px;">
+                            <td valign="top">Address</td>
+                            <td valign="top">
+                                @OfflinePropertydata.PropertyAddress<br />
+                                @{
+
+                                    <text>
+                                        @OfflinePropertydata.PropertyCityname
+                                        <br /> @OfflinePropertydata.PropertyStatename <br /> @OfflinePropertydata.PropertyCountryname
+                                    </text>
+                                }
+                            </td>
+                            <td valign="top">Contact No</td>
+                            <td valign="top">
+                                @if (OfflinePropertydata.PropertyContactNo != null)
+                                {
+                                    @OfflinePropertydata.PropertyContactNo<br />
+                                }
+
+                            </td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td></td>
+                            <td></td>
+                            <td valign="top">Email</td>
+                            <td valign="top">
+                                @if (OfflinePropertydata.PropertyEmail != null)
+                                {
+                                    @OfflinePropertydata.PropertyEmail
+                                }
+                            </td>
+
+                        </tr>
+
+
+
+
+
+
+
+                        @*<tr>
+                                <td align="left" colspan="4" style="font-size:14px;">
+                                    <table width="100%" cellpadding="5" border="1" cellspacing="0" title="Booking and Payment Details">
+                                        <thead>
+                                            <tr style=" height:30px; font-size:12px;">
+                                                <th>Average Daily Rate Before Service tax</th>
+                                                <th>Service tax</th>
+                                                <th>Total Amount - Accommodation</th>
+                                                <th>Check Out</th>
+                                                <th>Quantity</th>
+                                                <th style="padding-right: 5px;">No. of nights</th>
+                                                <th>Value Payable</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="font-size: 12px; height: 35px;">
+                                                <td style="padding: 10px;">@Staycategorydetails.Title</td>
+                                                <td colspan="1">@AccommodationTypeTitle</td>
+                                                <td>@Offlinedata.CheckIn.ToShortDateString()</td>
+                                                <td>@Offlinedata.CheckOut.ToShortDateString()</td>
+                                                <td>1</td>
+                                                <td>@noOfDays</td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>*@
+
+
+                        <tr>
+
+                            <td colspan="2"><b style="font-size: 13px; margin: 10px 0px; display: inline-block;">Pricing Details</b></td>
+                        </tr>
+
+                        <tr style="font-size:12px;">
+
+                            <td>
+                                Average Daily Rate Before Service tax :
+
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.AvgDailyRateBefreStaxForBuyPrice
+
+
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+
+                            <td>
+                                Price for other services :
+
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.BuyPriceforotherservicesForBuyprice
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+
+                        </tr>
+
+                        <tr style="font-size:12px;">
+
+                            <td>
+
+                                Amount - Accommodation :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @amountacc
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+
+                            </td>
+                            <td>
+                                Service tax Amount - other services :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @tothertax
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+
+                            </td>
+                        </tr>
+
+
+                        <tr style="font-size:12px;">
+
+                            <td>
+
+                                Total Service tax Amount :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">@tstax</td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+
+                            </td>
+                            <td>
+                                Total Amount - other services :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.TotalAmtotherForBuyPrice
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+
+                            </td>
+                        </tr>
+
+                        <tr style="font-size:12px;">
+
+                            <td>
+
+                                Total Amount - Accommodation :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.TotalAmtForBuyPrice
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+                            <td></td>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td align="right"></td>
+                                        <td></td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+                        </tr>
+                        <tr style="font-size:12px;">
+
+                            <td style="font-weight:bold;">
+                                Total Buy Price :
+                            </td>
+                            <td style="font-weight:bold;">
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.TotalBuyPrice
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+
+                        <tr></tr>
+
+                        <tr>
+                            <td align="left" colspan="4" style="font-size:14px;">
+
+
+
+                                <table width="100%" cellpadding="5" border="1" cellspacing="0" title="Booking and Payment Details">
+                                    <thead>
+                                        <tr style="background-color: #a51e22;color:white; height:30px; font-size:12px;">
+                                            <th style="background-color: #a51e22; padding: 10px;">Stay Category</th>
+                                            <th>Accommodation Type</th>
+                                            <th>Check In</th>
+                                            <th>Check Out</th>
+                                            <th>No Of rooms</th>
+                                            <th style="padding-right: 5px;">No. of nights</th>
+                                            <th>Value Payable</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            if (noOfDays == 0) { noOfDays = (Offlinedata.CheckOut - Offlinedata.CheckIn).Days; }
+                                            var valuepayable = Math.Round(Offlinedata.TotalBuyPrice);//) - (Math.Round(item.CommissionSB)) + (Math.Round(item.CorporateDiscountAmount));
+
+                                            <tr style="font-size: 12px; height: 35px;">
+                                                <td align="center" style="padding: 10px;">@Staycategorydetails.Title</td>
+                                                <td align="center" colspan="1">@Offlinedata.AccommodatoinTypename</td>
+                                                <td align="center">@Offlinedata.CheckIn.ToShortDateString()</td>
+                                                <td align="center">@Offlinedata.CheckOut.ToShortDateString()</td>
+                                                <td align="center">@Offlinedata.NoOfRooms</td>
+                                                <td align="center">@noOfDays</td>
+                                                <td align="right">@valuepayable</td>
+                                            </tr>
+                                            <tr style="font-size: 12px; height: 30px; border-bottom: 1px solid #CCC;">
+                                                <td colspan="7">
+                                                    Adults: @if (Offlinedata.NoOfPaxAdult > 0)
+                                                    { @Offlinedata.NoOfPaxAdult }
+                                                    else
+                                                    {<text>None</text>},
+                                                    Children: @if (Offlinedata.NoOfPaxChild > 0)
+                                                    { @Offlinedata.NoOfPaxChild }
+                                                    else
+                                                    {<text>None</text>}
+                                                    @*Guest Name: @Offlinedata.GuestName*@
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+
+
+
+
+
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td align="center" colspan="4">
+                                <p style="margin-top: 20px; margin-bottom: 10px;font-size:12px;">
+                                    Thank you for choosing Staybazar!<br />
+                                    <a href="https://www.staybazar.com/Home/TermsOfUse">Terms & Conditions</a>
+                                    | <a href="https://www.staybazar.com/Home/Privacy">Privacy Policy</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr style="font-size:12px !important">
+                            <td align="center" colspan="4">
+                                <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold; text-align: left;">
+                                    Important Information, please note:-
+                                </p>
+                                <ul>
+                                    <li style="text-align:left">Value given above are inclusive of taxes, Staybazar will not be responsible for any additional payment to your property</li>
+                                    <li style="text-align:left">Any additional service availed by guest other than the ones mentioned above, to be directly collected from guest</li>
+                                    <li style="text-align:left">Payment against this booking will be done by Staybazar to the property as per agreed terms. No payment against above service should be collected from guest.</li>
+                                    <li style="text-align:left">Invoice against this booking to be issued to:  “Southern E-Commerce Solutions Pvt Ltd, No. 993, 9th Main, Sector – 7, HSR Layout, Bangalore – 560 102”.</li>
+                                    <li style="text-align:left">The invoice should carry your PAN & Service Tax registration numbers, and should show the Service Tax value separately on the invoice.</li>
+                                </ul>
+                                <p style="border-top: 1px solid #CCC; padding:1% 0;">
+                                    In case of any query on above booking, please feel free to contact us at +91 80 25722898 / 40916686 OR Toll free number 1800-425-2393. You can also mail us at info@staybazar.com
+                                </p>
+                                <p>
+                                    Staybazar.com, No. 993, 9th Main, Sector – 7, HSR Layout, Bangalore – 560 102, India<br />
+                                    <span style="font-weight:bold;">Phone: </span>+91 80 25722898 , <span style="font-weight:bold;">Toll Free No: </span> 1800-425-2393
+                                </p>
+                                <p style="font-size:13px;">
+                                    <span style="font-weight:bold;">www.staybazar.com</span>
+                                </p>
+                            </td>
+                        </tr>
+
+                        @*<tr>
+                                <td align="center" colspan="4">
+                                    <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px;">
+                                        Access your supplier account online for additional information on booking
+                                    </p>
+                                    <p style="font-size:14px;">
+                                        Please call us  on clarifications at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                                    </p>
+                                    <p style="font-size:14px;">
+                                        Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                                    </p>
+                                    <p style="font-size:14px;">
+                                        www.staybazar.com
+                                    </p>
+                                    <p style="font-size:14px;">
+
+                                        <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                                        <span style="font-weight:bold;">Phone: </span>080-2572-2898 / 4091 - 6686
+                                    </p>
+                                </td>
+                            </tr>*@
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,24 @@
+﻿@{
+    ViewBag.Title = "Documents";
+}
+<div class="container">
+    <script type="text/javascript">
+        $(function () { validateRq(); });
+    </script>
+    <h2>Documents</h2>
+    @if (ViewBag.SuccessMessage != null)
+    {
+        <div class="alert alert-info">
+            @ViewBag.SuccessMessage
+        </div>
+    }
+    <div class=" row">
+        <div class="col-md-12">
+            @{
+                StayBazar.Models.UserDocumentsModel dc = new StayBazar.Models.UserDocumentsModel();
+                @Html.Partial("~/Views/Account/_UserDocuments.cshtml", dc)
+            }
+        </div>
+    </div>
+    <div class="height10px"></div>
+</div>

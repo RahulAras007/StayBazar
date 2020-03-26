@@ -1,0 +1,65 @@
+﻿@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-lg-12">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#oldBookingFor" aria-controls="oldBookingFor" role="tab" data-toggle="tab">Browse Customer</a></li>
+            <li role="presentation"><a href="#newBookingFor" aria-controls="newBookingFor" role="tab" data-toggle="tab">New Customer</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="oldBookingFor">
+                <div class="input-group">
+
+                    <input type="text" id="searchBookingFor" class="form-control" onkeyup="findBookingFor()" style="width:312px;">
+                    <span class="input-group-btn" id="goid">
+                        @*<button class="btn btn-default" onclick="findcustomer()" type="button">Go!</button>*@
+                    </span>
+                </div><!-- /input-group -->
+
+                <div class="row top-margin-10px" id="browsebookingFOr">
+                    @*@Html.Partial("_PropertyList", new List<CLayer.Property>())*@
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="newBookingFor">
+                @Html.Partial("~/Areas/Admin/Views/OfflineBookingGST/BookingForCustomer.cshtml", new StayBazar.Areas.Admin.Models.OfflineBookingModel())
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("input[id=Defaultcheck]").is(":checked") == true;
+    });
+
+    function findBookingFor() {
+        var custid = 0;
+        if ($("#searchBookingFor").val().trim() == "") {
+            $("#browsebookingFOr").html("");
+            return;
+        }
+        if ($("#MasterCustomerID").val() != 0) {
+
+            custid = $("#MasterCustomerID").val()
+        }
+        else {
+            custid = $("#CustomerId").val()
+        }
+        
+        
+         
+        var cname2 = $("#searchBookingFor").val();
+        $.post('@Url.Action("SearchforBookingFor", "OfflineBookingGST", new { area = "Admin" })', { name: cname2.trim(), custid: custid }, function (data) {
+            $("#browsebookingFOr").html("");
+            $("#browsebookingFOr").html(data);
+        });
+
+    }
+    function selectCorporate() {
+    }
+</script>

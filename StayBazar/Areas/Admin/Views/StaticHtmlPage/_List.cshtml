@@ -1,0 +1,176 @@
+﻿@model StayBazar.Areas.Admin.Models.StaticHtmlPageModel
+@{
+    Layout = null;
+    double km;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+}
+<script type="text/javascript">
+    $(function () {
+        cx_reloadRates();
+        var v = $("#curPick").val();
+        $("#srchcur").val(v);
+        cx_removeDefault();
+        cx_ChangeCurRate(v);
+    });
+</script>
+@foreach (CLayer.SearchResult rst in Model.PropertyList)
+{
+    <div class="col-md-12 listingbox">
+        <div class="listing">
+            <div class="col-md-4 pad0">
+                <a href="~/serviced-apartments/@rst.City/@rst.Location/@rst.PropertyId">
+                    <div class="img-thumb">
+                        @if (rst.ImageFile == "Empty" || rst.ImageFile =="")
+                        {<img alt="no_image" src="~/@no_image" class="img img-responsive" /> }
+                        else
+                        {<img alt="@rst.Title,@rst.Location,serviced apartments in @rst.City" src="~/Files/Property/@rst.PropertyId/@rst.ImageFile" class="img img-responsive" />}
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6 listingctr">
+
+                <a href="~/serviced-apartments/@rst.City/@rst.Location/@rst.PropertyId"> <span class="name">@rst.Title</span></a>
+
+                @Html.Raw(StayBazar.Common.Utils.GetStarRating(rst.StarRate))
+                <div class="clear">@rst.Location, @rst.City</div>
+                <div class="mapnreview">
+                    <a href="~/serviced-apartments/@rst.City/@rst.Location/@rst.PropertyId" class="redtext">
+                        <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                    </a>
+                    <a href="~/serviced-apartments/@rst.City/@rst.Location/@rst.PropertyId" class=" redtext review">
+                        <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                    </a>
+                    @*@if (rst.IsDistanceFromCity)
+                        {
+                            <text>&nbsp;<a class="maxpinfo" href="#" data-toggle="popover" data-placement="left" data-content="If you are searching with property name, distance shown is from nearest main city"><span class="glyphicon glyphicon-info-sign"></span></a></text>
+                        }*@
+                </div>
+                <div>
+                    <span class="trunc">
+                        @rst.Description
+                    </span>
+                    <a href="~/serviced-apartments/@rst.City/@rst.Location/@rst.PropertyId" class="redtext">more...</a>
+                </div>
+            </div>
+            <div class="col-md-2 morebook">
+                @if (rst.Distance >= 0)
+                {
+                    if (rst.Distance > 0) { km = (double)rst.Distance; } else { km = 0; }
+                    <div class="km bold">@km</div>
+                }
+                @*<a href="#" onclick="getBooking(@rst.PropertyId)">
+                        <img src="images/more.jpg" alt="More details">
+                    </a>
+                    <a href="#" onclick="getBooking(@rst.PropertyId)">
+                        <img src="images/booknow.jpg" alt="Book now">
+                    </a>*@
+            </div>
+        </div>
+    </div>
+}
+@if (Model.PropertyList.Count > 0)
+{
+    <script type='text/javascript'>
+        //$("#mapview").one("click", function () {
+        ////    $.getScript("");
+        //});
+    @*var gkey = "key=@(BLayer.Settings.GetValue(CLayer.Settings.GOOGLE_API_KEY))";*@
+        $("#mapview").one("click", function () {
+            $.getScript("https://maps.google.com/maps/api/js?sensor=false&callback=MapApiLoaded");
+        });
+        function MapApiLoaded() {
+
+            var richmarker_url = "Scripts/richmarker-compiled.js";
+            $.getScript(richmarker_url, function () {
+
+                var map;
+                var bounds = new google.maps.LatLngBounds();
+                var mapOptions = {
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                };
+
+                // Display a map on the page
+                map = new google.maps.Map($('.map_canvas').get(0), mapOptions);
+
+                // Multiple Markers
+                var markers = [
+                   //[Title/Name, Address, Latitude, Longitude, URL to listing, Price, Star Rating]
+                  @foreach (CLayer.SearchResult rst in Model.PropertyList)
+              {
+                  if (rst.Lattitude == "0" || rst.Lattitude == "") { continue; }
+            <text>[
+               "@rst.Title", "@rst.Location",@rst.Lattitude,@rst.Longitude, "/Property/Index/@rst.PropertyId",@(Math.Round(rst.Amount)),@rst.StarRate
+                  ],</text>
+            }
+                ];
+
+
+                // Display multiple markers on a map
+                var marker, i;
+
+                // Loop through our array of markers & place each one on the map
+                for (i = 0; i < markers.length; i++) {
+                    var position = new google.maps.LatLng(markers[i][2], markers[i][3]),
+                        star;
+                    bounds.extend(position);
+
+                    switch (markers[i][6]) {
+                        case 1:
+                            star = '@Html.Raw(StayBazar.Common.Utils.GetStarRating(1))';
+                            break;
+                        case 2:
+                            star = '@Html.Raw(StayBazar.Common.Utils.GetStarRating(2))';
+                            break;
+                        case 3:
+                            star = '@Html.Raw(StayBazar.Common.Utils.GetStarRating(3))';
+                            break;
+                        case 4:
+                            star = '@Html.Raw(StayBazar.Common.Utils.GetStarRating(4))';
+                            break;
+                        case 5:
+                            star = '@Html.Raw(StayBazar.Common.Utils.GetStarRating(5))';
+                            break;
+                        default:
+                            star = '@Html.Raw(StayBazar.Common.Utils.GetStarRating(0))';
+                    }
+
+                    marker = new RichMarker({
+                        position: position,
+                        map: map,
+                        title: markers[i][0],
+                        content: '<div class="marker text-center">' +
+                            '<a href="' + markers[i][4] + '" target="_blank" class="border-radius">' +
+                            '<div class="tilt"><div class="whitetext number">' + (i + 1) + '</div></div>' +
+                            '<div class="whitetext price"><i class="fa cxprice fa-rupee"></i><span class="cxcurele">' + markers[i][5] + '</span></div>' +
+                            '<span class="star">' + star + '</span>' +
+                            '<div class="info_content">' +
+                            '<h4>' + markers[i][0] + '</h4>' +
+                            '<p>' + markers[i][1] + '</p>' +
+                            '</div>' +
+                            '</a>' +
+                            '<div class="indicator"></div>' +
+                            '</div>',
+                        shadow: false
+                    });
+
+                    // Automatically center the map fitting all markers on the screen
+                    map.fitBounds(bounds);
+                }
+
+                // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+                var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function (event) {
+                    this.setZoom(10);
+                    google.maps.event.removeListener(boundsListener);
+                    cx_reloadRates();
+                    cx_removeDefault();
+                    cx_changeAllRates();
+                });
+
+                // Enable the visual refresh
+                google.maps.visualRefresh = true;
+            });
+        }
+        $(function () { $(".maxpinfo").popover({ trigger: "hover" }); });
+    </script>
+
+}

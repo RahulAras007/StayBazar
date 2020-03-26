@@ -1,0 +1,379 @@
+﻿@model  IEnumerable<CLayer.BookingStatusReport>
+@using System.Data;
+@using StayBazar.Common;
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 2;
+    long i = 1;
+    string invoicedate = "";
+    string SupplierInvoiceDate = "";
+    string type = "";
+    string mtype = "";
+    decimal buycost = 0, salevalue = 0, grossmargin = 0, commissionpayable = 0, netmargin = 0, gbuycost = 0, gsalevalue = 0, ggrossmargin = 0, gcommissionpayable = 0, gnetmargin = 0, grandtotal = 0;
+    long nonights, noaccs, gnonights, gnoaccs;
+    nonights = noaccs = gnonights = gnoaccs = 0;
+
+
+    int totalnights = 0;
+    double avgbuy, avgobuy, avgsale, avgosale;
+    double tamount;
+    double sgst, cgst, igst;
+    double tsgst, tcgst, tigst;
+    int bookingType = 0;
+    double total = 0;
+
+
+    double otamount;
+    double osgst, ocgst, oigst;
+    double otsgst, otcgst, otigst;
+
+    double TotalCustomerValue = 0;
+    double TotalSupplierValue = 0;
+	double grossamount = 0;
+	
+	double VBuyPriceBeforeTax = 0;
+    double VSalePriceBeforeTax =0;
+    double VBuyPriceTotal = 0;
+    double vSalePriceTotal = 0;
+    double vBuyTax = 0;
+    double vSaleGST = 0;
+}
+<?xml version="1.0"?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <ss:Styles>
+     <ss:Style ss:ID="1">
+        <ss:Font ss:Bold="1" /> 
+     </ss:Style>
+  </ss:Styles>
+    <ss:Worksheet ss:Name="BookingStatusReport">
+                <ss:Table>
+                    <ss:Row ss:StyleID="1">
+                        <ss:Cell><ss:Data ss:Type="String">Sl No</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking Id</ss:Data></ss:Cell>
+						<ss:Cell><ss:Data ss:Type="String">Booking Category</ss:Data></ss:Cell>
+						<ss:Cell><ss:Data ss:Type="String">SB Booking Entity</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">SB Billing Entity</ss:Data></ss:Cell>
+                       
+                        <ss:Cell><ss:Data ss:Type="String">Customer Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">City</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Accommodation Type</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Guest name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check In</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check Out</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">NO of Pax</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">No of rooms</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">No of nights</ss:Data></ss:Cell>
+                          <ss:Cell><ss:Data ss:Type="String">Total room nights</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                         <ss:Cell><ss:Data ss:Type="String">SAC Code</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Supplier value before Tax</ss:Data></ss:Cell>
+
+                        <ss:Cell><ss:Data ss:Type="String">Input SGST</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Input SGST Value</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Input CGST</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Input CGST Value</ss:Data></ss:Cell>
+
+                        <ss:Cell><ss:Data ss:Type="String">Total GST Value</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Total Supplier Value </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Supplier Invoice Number</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Supplier Invoice Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Customer Value Before Tax</ss:Data></ss:Cell>
+                        
+                        
+                        
+                        
+                         <ss:Cell><ss:Data ss:Type="String">SGST</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">SGST Value</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">CGST</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">CGST Value</ss:Data></ss:Cell>
+                          <ss:Cell><ss:Data ss:Type="String">Total GST Value</ss:Data></ss:Cell>
+                        @*<ss:Cell><ss:Data ss:Type="String">Tax Amounts</ss:Data></ss:Cell>*@
+                        <ss:Cell><ss:Data ss:Type="String">Total Customer Value</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Gross Margin</ss:Data></ss:Cell>
+						<ss:Cell><ss:Data ss:Type="String">ORC Amount</ss:Data></ss:Cell>
+						<ss:Cell><ss:Data ss:Type="String">Net Margin</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">SB Invoice Number</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">SB Invoice Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Total Invoice Value</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Total Payment to Supplier</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Sale Region</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Sale Person</ss:Data></ss:Cell>
+
+                    </ss:Row>
+                    @foreach (CLayer.BookingStatusReport reportList in Model)
+                    {
+                        invoicedate = " ";
+                        SupplierInvoiceDate = "";
+                        DateTime checkin = reportList.CheckIn;
+                        DateTime checkout = reportList.CheckOut;
+                        TimeSpan ts = checkout - checkin;
+                        int differenceInDays = ts.Days;
+                        int NoOfPaxAdultS = reportList.NoOfPaxAdult;
+
+                        int NoOfPaxChild = reportList.NoOfPaxChild;
+                        int NOofPax = (NoOfPaxAdultS + NoOfPaxChild);
+
+						totalnights = reportList.TotalNights; // Converter.ToInteger(reportList.NumberofNights) * Converter.ToInteger(reportList.NumberofRooms);
+						
+                        //amount
+                        decimal TotalAmountBeforeServiceTax = ((reportList.AvgDailyRateBefreStaxForSalePrice * totalnights));
+                        decimal ServiceTaxAmount = Decimal.Round((((TotalAmountBeforeServiceTax) * reportList.StaxForSalePrice) / 100), 2);
+                        decimal TotalAmountwithServicetax = (TotalAmountBeforeServiceTax + ServiceTaxAmount);
+
+                        //other amount
+                        decimal Otherservicesamount = Math.Round(reportList.BuyPriceforotherservicesForSalePrice, 2);
+                        decimal OtherServiceTaxAmount = Decimal.Round((((Otherservicesamount) * reportList.StaxForotherForSalePrice) / 100), 2);
+                        decimal OtherTotalAmountwithServicetax = (OtherServiceTaxAmount + Otherservicesamount);
+                        decimal TotalAmountBeforeServiceTaxANDOtherservicesamount = TotalAmountBeforeServiceTax + Otherservicesamount;
+                        decimal ServiceTaxAmountANDOtherServiceTaxAmount = ServiceTaxAmount + OtherServiceTaxAmount;
+                        ////////
+                        //amount
+                        decimal TotalAmountBeforeServiceTaxSupplier = ((reportList.AvgDailyRateBefreStaxForBuyPrice * totalnights));
+                        decimal ServiceTaxAmountSupplier = Decimal.Round((((TotalAmountBeforeServiceTaxSupplier) * reportList.StaxForBuyPrice) / 100), 2);
+                        decimal TotalAmountwithServicetaxSupplier = (TotalAmountBeforeServiceTaxSupplier + ServiceTaxAmount);
+                        //other amount
+                        decimal OtherservicesamountSupplier = Math.Round(reportList.BuyPriceforotherservicesForBuyprice, 2);
+                        decimal OtherServiceTaxAmountSupplier = Decimal.Round((((OtherservicesamountSupplier) * reportList.StaxForotherBuyPrice) / 100), 2);
+                        decimal OtherTotalAmountwithServicetaxSupplier = (OtherServiceTaxAmount + OtherservicesamountSupplier);
+                        decimal TotalAmountBeforeServiceTaxSupplierandOtherservicesamountSupplier = TotalAmountBeforeServiceTaxSupplier + OtherservicesamountSupplier;
+                        decimal ServiceTaxAmountSupplierandOtherServiceTaxAmountSupplier = ServiceTaxAmountSupplier + OtherServiceTaxAmountSupplier;
+                        long netmarpercent = (long)Math.Round((double)(((double)(reportList.GrossMargin - reportList.AgentCommissionPayable) / reportList.TotalSupplierBuyCost)) * 100);
+                        decimal Grossmargin = (TotalAmountBeforeServiceTaxANDOtherservicesamount - TotalAmountBeforeServiceTaxSupplierandOtherservicesamountSupplier);
+
+
+						VBuyPriceBeforeTax = reportList.VBuyPriceBeforeTax;
+                        VSalePriceBeforeTax = reportList.VSalePriceBeforeTax;
+                        VBuyPriceTotal = reportList.VBuyPriceTotal;
+                        vSalePriceTotal = reportList.vSalePriceTotal;
+                        vBuyTax = reportList.vBuyTax;
+                        vSaleGST = reportList.vSaleGST;
+
+                        //New Changes
+                        
+                        avgbuy = Math.Round(Converter.ToDouble(reportList.AvgDailyRateBefreStaxForBuyPrice) * totalnights, 2);
+                        avgobuy = Math.Round(Converter.ToDouble(reportList.BuyPriceforotherservicesForBuyprice), 2);
+
+                        avgsale = Math.Round(Converter.ToDouble(reportList.AvgDailyRateBefreStaxForSalePrice) * totalnights, 2);
+                        avgosale = Math.Round(Converter.ToDouble(reportList.BuyPriceforotherservicesForSalePrice), 2);
+
+                        bookingType = reportList.BookingType;
+                        
+                        
+                        
+                        if (reportList.InvoiceDate == DateTime.MinValue || reportList.InvoiceDate == null || reportList.InvoiceDate== default(DateTime))
+                        {
+                            // invoicedate = " ";
+
+                        }
+                        else
+                        {
+                            invoicedate = @reportList.InvoiceDate.ToShortDateString();
+                        }
+
+                        if (reportList.SupplierInvoiceDate == DateTime.MinValue || reportList.SupplierInvoiceDate == null || reportList.SupplierInvoiceDate == default(DateTime))
+                        {
+                            // SupplierInvoiceDate = " ";
+
+                        }
+                        else
+                        {
+                            SupplierInvoiceDate = @reportList.SupplierInvoiceDate.ToShortDateString();
+                        }
+                        mtype = reportList.CustomeType;
+                        if (type != mtype)
+                        {
+                            if (type != "")
+                            {
+                        <ss:Row>
+                            <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">@type Totals</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@noaccs</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@nonights</ss:Data></ss:Cell>
+                            <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@buycost.ToString("N0")</ss:Data></ss:Cell>
+                            <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@salevalue.ToString("N0")</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@grossmargin.ToString("N0")</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@commissionpayable.ToString("N0")</ss:Data></ss:Cell>
+                            <ss:Cell ss:MergeAcross="1"><ss:Data ss:Type="String">@netmargin.ToString("N0")</ss:Data></ss:Cell>
+                        </ss:Row>
+                        buycost = 0;
+                                salevalue = 0;
+                                grossmargin = 0;
+                                commissionpayable = 0;
+                                netmargin = 0;
+                                nonights = 0;
+                                noaccs = 0;
+                            }
+                            type = reportList.CustomeType;
+                        }
+                <ss:Row>
+                 <ss:Cell><ss:Data ss:Type="Number">@i</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingDate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.orderno</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@BLayer.OfflineBooking.GetCategoryName(reportList.BookingType)</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="String">@reportList.SBBookingEntity</ss:Data></ss:Cell>
+                     <ss:Cell><ss:Data ss:Type="String">@reportList.SBBillingEntity</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CustomerName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.AccomodationType</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.GuestName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CheckIn.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CheckOut.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@NOofPax</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@reportList.NumberofRooms</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@reportList.NumberofNights</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@(totalnights)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierName</ss:Data></ss:Cell>
+                     <ss:Cell><ss:Data ss:Type="String">@reportList.SACCode</ss:Data></ss:Cell>
+                    
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round((avgbuy + avgobuy + VBuyPriceBeforeTax), 0)</ss:Data></ss:Cell>
+                    @{
+					grossamount = avgbuy + avgobuy + VBuyPriceBeforeTax;
+                      /*  if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                        {
+                            tsgst = 0; tcgst = 0; tigst = 0; avgbuy = 0; total = 0; tamount = 0;
+                            sgst = 0; cgst = 0; igst = 0;
+                        }
+                        else
+                        {*/
+                            sgst = Convert.ToDouble(reportList.bSGST);
+                            cgst = Convert.ToDouble(reportList.bCGST);
+                            igst = Convert.ToDouble(reportList.bIGST);
+							if (sgst == 0 && cgst == 0)
+                                {
+                                    sgst =igst;
+                                }
+                            tsgst = (avgbuy * sgst * 0.01);
+                            tcgst = (avgbuy * cgst * 0.01);
+                            //  tigst = (avgbuy * igst * 0.01);
+                            tamount = tsgst + tcgst;
+                            total = tamount;
+                     //   }
+
+
+                    /*    if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                        {
+                            otsgst = 0; otcgst = 0; otigst = 0; avgobuy = 0; total = 0;
+                        }
+                        else
+                        {*/
+
+                            osgst = Convert.ToDouble(reportList.obSGST);
+                            ocgst = Convert.ToDouble(reportList.obCGST);
+                            //    oigst = Convert.ToDouble(reportList.obIGST);
+                            otsgst = (avgobuy * osgst * 0.01);
+                            otcgst = (avgobuy * ocgst * 0.01);
+                            //     otigst = (avgobuy * oigst * 0.01);
+                            otamount = otsgst + otcgst;
+                            total = total + otamount;
+                    //    }
+                    }
+                    <ss:Cell><ss:Data ss:Type="String">@sgst.ToString("G") %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:data ss:type="Number">@(Math.Round(tsgst, 2) + Math.Round(otsgst, 2))</ss:data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@cgst.ToString("G") %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@(Math.Round(tcgst, 2) + Math.Round(otcgst, 2))</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="Number">@Math.Round(total, 2)</ss:Data></ss:Cell>
+                    @{
+                        TotalSupplierValue = Math.Round(total + avgbuy + avgobuy+VBuyPriceTotal, 0);
+                    }
+                     <ss:Cell><ss:Data ss:Type="Number">@Math.Round(total + avgbuy + avgobuy+VBuyPriceTotal, 0)</ss:Data></ss:Cell>
+
+
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierInvoiceNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@SupplierInvoiceDate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round((avgsale + avgosale + VSalePriceBeforeTax), 2)</ss:Data></ss:Cell>
+                    @{
+					grossamount =(avgsale + avgosale + VSalePriceBeforeTax)-grossamount;
+                      /*  if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                        {
+                            tsgst = 0; tcgst = 0; tigst = 0; avgsale = 0; total = 0; tamount = 0;
+                            sgst = 0; cgst = 0; igst = 0;
+                        }
+                        else
+                        {*/
+                            sgst = Convert.ToDouble(reportList.SGST);
+                            cgst = Convert.ToDouble(reportList.CGST);
+                            igst = Convert.ToDouble(reportList.IGST);
+							if (sgst == 0 && cgst == 0)
+							{
+								sgst = igst;
+							}
+                            tsgst = (avgsale * sgst * 0.01);
+                            tcgst = (avgsale * cgst * 0.01);
+                            //   tigst = (avgsale * igst * 0.01);
+                            tamount = tsgst + tcgst;
+                    //    }
+
+                     /*   if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                        {
+                            osgst = Convert.ToDouble(reportList.btSGST);
+                            ocgst = Convert.ToDouble(reportList.btCGST);
+                            oigst = Convert.ToDouble(reportList.btIGST);
+                            avgosale = Math.Round(Converter.ToDouble(reportList.DirectAmount), 2);
+                            otsgst = 0;
+                            otcgst = 0;
+                            // otigst = 0;
+                        }
+                        else
+                        {*/
+                            osgst = Convert.ToDouble(reportList.oSGST);
+                            ocgst = Convert.ToDouble(reportList.oCGST);
+                            //   oigst = Convert.ToDouble(reportList.oIGST);
+                      //  }
+
+                        otsgst = tsgst + (avgosale * osgst * 0.01);
+                        otcgst = tcgst + (avgosale * ocgst * 0.01);
+                        // otigst = tigst + (avgosale * oigst * 0.01);
+                        otamount = (avgosale * osgst * 0.01) + (avgosale * ocgst * 0.01);
+                    }
+
+                      <ss:Cell><ss:Data ss:Type="String">@sgst.ToString("G") %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@(Math.Round(tsgst, 2) + Math.Round((avgosale * osgst * 0.01), 2))</ss:Data></ss:Cell>
+                      <ss:Cell><ss:Data ss:Type="String">@cgst.ToString("G") %</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@(Math.Round(tcgst, 2) + Math.Round((avgosale * ocgst * 0.01), 2))</ss:Data></ss:Cell>
+                      <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tamount + otamount, 2)</ss:Data></ss:Cell>
+                    @{
+                        TotalCustomerValue = Math.Round(avgsale + avgosale + otcgst + otsgst + vSalePriceTotal, 0);
+						if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+						{
+							grossamount = reportList.DirectAmount;
+						}
+                    }
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(avgsale + avgosale + otcgst + otsgst + vSalePriceTotal, 0)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(grossamount,2)</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="Number">@Math.Round(reportList.ORCAmount,2)</ss:Data></ss:Cell>
+					<ss:Cell><ss:Data ss:Type="Number">@Math.Round(grossamount-reportList.ORCAmount,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@reportList.InvoiceNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@invoicedate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@TotalCustomerValue</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@reportList.amount</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.SalesRegion</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.SalesPerson</ss:Data></ss:Cell>
+                </ss:Row>
+                i = i + 1;
+                buycost = buycost + reportList.TotalSupplierBuyCost;
+                salevalue = salevalue + reportList.TotalBookingValue;
+                grossmargin = grossmargin + reportList.GrossMargin;
+                commissionpayable = commissionpayable + reportList.AgentCommissionPayable;
+                netmargin = netmargin + reportList.NetMargin;
+                nonights += differenceInDays;
+                noaccs += reportList.NumberofAccomodation;
+                gnonights += differenceInDays;
+                gnoaccs += reportList.NumberofAccomodation;
+                gbuycost = gbuycost + reportList.TotalSupplierBuyCost;
+                gsalevalue = gsalevalue + reportList.TotalBookingValue;
+                ggrossmargin = ggrossmargin + reportList.GrossMargin;
+                gcommissionpayable = gcommissionpayable + reportList.AgentCommissionPayable;
+                gnetmargin = gnetmargin + reportList.NetMargin;
+            }
+              </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>
+

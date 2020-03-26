@@ -1,0 +1,81 @@
+﻿@model StayBazar.Models.ResponseModel
+@{
+    string Message = "";
+    if (ViewBag.BookingSuccess != null)
+    {
+
+        Message = ViewBag.BookingSuccess;
+
+    }
+}
+<div class="container" style="padding-top:100px; padding-bottom:100px;">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="margin10px">
+                @switch (Model.PaymentResponse)
+                {
+                    case CLayer.ObjectStatus.GateWayResponse.Invalid:
+                        <div class="alert alert-danger">We could not process the request.Please contact our Helpdesk @Html.ActionLink("Contact Us", "Contact", "Home")</div>
+                        break;
+                    case CLayer.ObjectStatus.GateWayResponse.Flagged:
+                    <div class="alert alert-warning">You have made the payment, your registration will be finished once the payment is confirmed.</div>
+                        break;
+                        @*case CLayer.ObjectStatus.GateWayResponse.Success:
+                            <div class="alert alert-success">Thanks for your booking request and confirmation will be sent shortly</div>
+                                break;*@
+                    case CLayer.ObjectStatus.GateWayResponse.Failed:
+                    <div class="alert alert-danger">Your payment is failed.</div>
+                        break;
+                }
+            </div>
+        </div>
+    </div>
+    @*@if(Model.PaymentResponse == CLayer.ObjectStatus.GateWayResponse.Success)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    @Html.Partial("~/Views/Booking/_BillIntegration.cshtml",Model.BookingId)
+                </div>
+            </div>
+        }*@
+    @if (Message == "Success")
+    {
+        if (Model.PaymentResponse == CLayer.ObjectStatus.GateWayResponse.Success)
+        {
+            <div class="row">
+                <div class="col-md-6 col-lg-offset-3">
+                    <div class="panel panel-body panel-default margin10px " style="width:535px;">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <span class="fa fa-check-circle greentext" style="font-size:37px;"></span>
+                            </div>
+                            <div class="col-md-11">
+                                <h4>Thanks for your booking</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        if (Model.PaymentResponse == CLayer.ObjectStatus.GateWayResponse.Success)
+        {
+            <div class="row">
+                <div class="col-md-6 col-lg-offset-3">
+                    <div class="panel panel-body panel-default margin10px " style="width:535px;">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <span class="fa fa-check-circle greentext" style="font-size:37px;"></span>
+                            </div>
+                            <div class="col-md-11">
+                                <h4>Thanks for your booking request and confirmation will be sent shortly</h4>                              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

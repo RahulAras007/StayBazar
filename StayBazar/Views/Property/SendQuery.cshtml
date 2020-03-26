@@ -1,0 +1,134 @@
+﻿@{
+    Layout = null;
+    long PId = 0;
+    if (ViewBag.PId != null)
+    {
+        PId = ViewBag.PId;
+    }
+}
+<div class="modal" id="Sendquerypop" tabindex="-1" role="dialog" aria-labelledby="Feedback" aria-hidden="true">
+    <div class="modal-dialog enquirebox">
+        <div class="modal-content">
+            <div class="modal-header border-radius btn-danger padd5">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-4">
+                        <button type="button" class="close enqireclosebtn" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove-circle"></span></button>
+                        <h4 class="modal-title bold" id="myModalLabel">Send Query</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body" id="viewtable">
+                <div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <span style="color:red">*</span> <label>Name</label>
+                                </div>
+                                <div class="col-md-12">
+                                    <input type="text" id="txtName" class="form-control" />
+                                </div>
+                                <div class="col-md-12 topmargin5">
+                                    <span style="color:red">*</span> <label>Email</label>
+                                </div>
+                                <div class="col-md-12">
+                                    <input type="text" onchange="chkemail()" id="txtSendEmail" class="form-control" />
+                                </div>
+
+                                <div class="col-md-12 topmargin5">
+                                    <span style="color:red">*</span> <label>Phone</label>
+                                </div>
+                                <div class="col-md-12">
+                                    <input type="text" id="txtSendPhone" class="form-control" />
+                                </div>
+                                <div class="col-md-12 topmargin5">
+                                    <span style="color:red">*</span> <label>Message</label>
+                                </div>
+                                <div class="col-md-12">
+                                    <textarea id="txtSendQuery" class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer padd5">
+                    <input type="submit" id="btnSave" onclick="Sendnow(@PId)" value="Send" class="btn btn-success whitetext topmargin10 equiresendbtn" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<div class="row">
+        <input type="submit" id="btnSave" onclick="Savenow()" value="Ok" class="btn bluebg marginleft100px" style="color:white;" tabindex="7" />
+    </div>*@
+
+<script  type="text/javascript">
+
+
+    function Sendnow(PId) {
+
+        var Name = $("#txtName").val();
+        var SendEmail = $("#txtSendEmail").val();
+        var SendPhone = $("#txtSendPhone").val();
+        var SendQuery = $("#txtSendQuery").val();
+
+        if (Name == "") {
+            alert("Enter your name");
+            $("#txtName").focus();
+            return;
+        }
+
+        if (SendEmail == "") {
+            alert("Enter your email");
+            $("#txtSendEmail").focus();
+            return;
+        }
+
+        var emailfrmt = /\w+([-+.']\w+)*@@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+        if (emailfrmt.test(SendEmail)) {
+
+        }
+        else {
+            alert("Enter valid email");
+            return;
+        }
+
+        if (SendPhone == "") {
+            alert("Enter your phone no:");
+            $("#txtSendPhone").focus();
+            return;
+        }
+        var phonenofrmt = /\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+        if (phonenofrmt.test(SendPhone)) {
+
+        }
+        else {
+            alert("Enter valid phone number");
+            return;
+        }
+
+
+        if (SendQuery == "") {
+            alert("Enter your message");
+            $("#SendQuery").focus();
+            return;
+        }
+
+        var url = "@Url.Action("SendQuery", "Common")";
+        var url = url + "?name=" + Name + '&' + "email=" + SendEmail + '&' + "phone=" + SendPhone + '&' + "body=" + SendQuery + '&' + "PropertyId=" + PId;
+
+        $.post(url, function (data) {
+            if (data = "true") {
+                $("#txtName").val("");
+                $("#txtSendEmail").val("");
+                $("#txtSendPhone").val("");
+                $("#txtSendQuery").val("");
+            }
+        });
+        $('#Sendquerypop').modal('hide');
+        alert("Thank you for your Enquiry");
+    }
+
+</script>

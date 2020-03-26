@@ -1,0 +1,63 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    Layout = null;
+    string GSTRegistrationNo = "";
+}
+
+
+    <table border="0" class="table table-condensed table-responsive table-custom">
+        <thead>
+            <tr>
+                <th>GSTRegistrationNo</th>
+                <th>StateOfRegistration</th>
+                <th align="center">Remove</th>
+            </tr>
+        </thead>
+        <tbody>
+          @if (Model.CustomCustomerList != null)
+          {
+              foreach (CLayer.OfflineBooking pr in Model.CustomCustomerList)
+              {
+                <tr>
+                    <td>@pr.GSTRegistrationNo</td>
+                    <td>@pr.StateOfRegistration</td>
+                    <td>
+                        <a class="showhand" onclick="propedit(@pr.OffGSTId,@pr.GSTstateid)" title="Edit"><span class="glyphicon glyphicon-edit"></span> </a>
+                        <a class="showhand" onclick="propdelete(@pr.OffGSTId)" title="Delete"><span class="glyphicon glyphicon-trash"></span> </a>
+
+                    </td>
+                </tr>
+              }
+          }
+
+
+
+
+        </tbody>
+    </table>
+
+        <script type="text/javascript">
+                function propdelete(pid)
+                {
+                    var url = '@Url.Action("GSTDelete", "OfflineBookingCustomerList")' + "?OFFGSTID=" + pid;
+                    $.get(url, function () {
+                        var CustID = $('#HiddenCustID').val();
+                        if (CustID == 0 || CustID==""||CustID==null)
+                        {
+                             CustID = $('#CustomerId').val();
+                        }
+                        
+                        var url = '@Url.Action("GSTList", "OfflineBookingCustomerList")' + "?custid=" + CustID;
+                        $.get(url, function (data) {
+                            $('#GSTListOfflineCustomer').html(data);
+                        });
+                    });
+                }
+
+          
+
+
+
+    </script>
+
+

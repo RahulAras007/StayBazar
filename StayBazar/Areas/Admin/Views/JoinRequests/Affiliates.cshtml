@@ -1,0 +1,60 @@
+﻿@{
+    ViewBag.Title = "Join Requests/Affiliates";
+}
+
+<div class="h1">
+    Join Requests
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            Affiliates
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="/Admin/JoinRequests/Corporate@{if(Request.QueryString["rejected"] != null) {<text>?rejected=true </text>}}">Corporate</a></li>
+            <li>
+                <a href="/Admin/JoinRequests/Supplier@{if (Request.QueryString["rejected"] != null)
+                                                       {<text>?rejected=true </text>}}">Supplier/Owner</a>
+            </li>
+            <li>
+                <a href="/Admin/JoinRequests/TravelAgent@{if (Request.QueryString["rejected"] != null)
+                                                          {<text>?rejected=true </text>}}">Travel Agent</a>
+            </li>
+            <li class="active" style="cursor:pointer;"><a>Affiliates</a></li>
+        </ul>
+    </div>
+</div>
+<ul class="nav nav-tabs">
+    <li @if (Request.QueryString["rejected"] == null) { <text> class="active" </text>      }><a href="/Admin/JoinRequests/Affiliates">Pending</a></li>
+    <li @if (Request.QueryString["rejected"] != null) { <text> class="active" </text>      }><a href="/Admin/JoinRequests/Affiliates?rejected=true">Rejected</a></li>
+</ul>
+<table border="0" class="table table-condensed table-striped table-hover table-responsive">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            @if (Request.QueryString["rejected"] != null && Request.QueryString["rejected"].ToLower() == "true")
+            {
+                <th>Delete</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (CLayer.B2B dr in Model)
+            {
+                <text>
+                    <tr @if (dr.RequestStatus < (int)CLayer.ObjectStatus.StatusType.Read) { <text> style="font-weight:bold;" </text>       }>
+                        <td style="padding:0px;"><a href="/Admin/JoinRequests/AffiliateDetails/@dr.B2BId" style="text-decoration: none; width: 100%; display: block;padding:4px;">@dr.Name</a></td>
+                        <td style="padding:0px;"><a href="/Admin/JoinRequests/AffiliateDetails/@dr.B2BId" style="text-decoration: none; width: 100%; display: block; padding:4px;">@dr.Email</a></td>
+                        <td style="padding:0px;">@(((CLayer.ObjectStatus.StatusType)dr.RequestStatus).ToString())</td>
+                        @if (Request.QueryString["rejected"] != null && Request.QueryString["rejected"].ToLower() == "true")
+                        {
+                            <td style="padding:0px;"><a href="/Admin/JoinRequests/Delete/@dr.B2BId" title="delete" onclick="return confirm('Are you sure you want to delete this request?')"><span class="glyphicon glyphicon-remove"></span></a></td>
+                        }
+                    </tr>
+                </text>
+            }
+        }
+    </tbody>
+</table>

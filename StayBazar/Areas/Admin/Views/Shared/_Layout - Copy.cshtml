@@ -1,0 +1,104 @@
+﻿@using Microsoft.AspNet.Identity
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Cache-control" content="public">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="expires" content="0">
+    <meta name="robots" content="all">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="Staybazar">
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="dns-prefetch" href="http://fonts.googleapis.com" />
+    <title>@ViewBag.Title - StayBazar Admin</title>
+    <!-- Bootstrap core CSS -->
+    @*<link href="css/bootstrap.min.css" rel="stylesheet">*@
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Custom styles for this template -->
+    @*<link href="css/bootstrap-theme.css" rel="stylesheet">
+        <link href="css/owl.carousel.css" rel="stylesheet">
+        <link href="css/owl.theme.css" rel="stylesheet">
+        <link href="css/owl.transitions.css" rel="stylesheet">
+        <link href="css/datepicker.css" rel="stylesheet">
+        <link href="css/bootstrap-formhelpers.min.css" rel="stylesheet">
+        <link href="css/font-awesome.min.css" rel="stylesheet">
+        <link href="css/styles.css" rel="stylesheet">*@
+    @Styles.Render("~/Content/css")
+    @*@Scripts.Render("~/bundles/modernizr")*@
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/bootcss")
+    @RenderSection("scripts", required: false)
+    <link href="/Content/styles.css" rel="stylesheet" />
+
+    <!--karthikms added on 06-11-2019 45-46 -->
+    <link href="~/Content/jquery.dpNumberPicker-holoLight-1.0.1.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery.dpNumberPicker-1.0.1.js" type="text/javascript"></script>
+</head>
+<body class="lightgreybg">
+    <div id="wtopbar" class="navbar-wrapper whitebg">
+        <div class="navbar navbar-inverse bluebg" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse">
+                    @Html.Partial("_Menu")
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="col-sm-6 sblogo">
+                <a href="@Url.Action("Index", "Home", new { area = "" })"><img class="img-responsive" src="~/images/logo.png" alt="Staybazar Logo"></a>
+            </div>
+            @using (Html.BeginForm("LogOff", "Account", new { area = "" }, FormMethod.Post, new { id = "logoutForm", @class = "form-inline" }))
+            {
+                
+               //  @Html.AntiForgeryToken()
+                <div class="col-sm-6 sbtn">
+                    <a class="btn btn-default" href="javascript:document.getElementById('logoutForm').submit()" role="button">
+                        <div class="text-left">LOG OFF</div>
+                        <div class="greytext text-left">My account</div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="wrapper" id="wbodycontent">
+        <div id="bdycontar" class="container ">
+            @RenderBody()
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(window).resize(function () {
+            wrapperadj();
+        });
+
+        wrapperadj();
+
+        function wrapperadj() {
+            //$(".wrapper").css("margin-top", $(".navbar-wrapper").innerHeight());
+            $("#wbodycontent").css("margin-top", "0px");
+        }
+        $.ajaxSetup({
+            cache: false
+        });
+    </script>
+</body>
+</html>

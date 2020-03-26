@@ -1,0 +1,347 @@
+﻿@model StayBazar.Models.CorporateUserModel
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("SaveCorporateSettings", "CorporateUsers", FormMethod.Post, new { role = "form", id = "cuserSettingsform", name = "cuserSettingsform" }))
+{
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="form-group col-lg-6">
+            @Html.LabelFor(m => m.CountryId)<span style="color:red"></span>
+            @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @id = "ddlCountryID", @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.CountryId)
+        </div>
+
+        <div class="form-group col-lg-6">
+            @Html.LabelFor(m => m.State)<span style="color:red"></span>
+            @Html.DropDownListFor(m => m.State, Model.StateList, new { @id = "ddlStateID", @tabindex = "5", @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.State)
+        </div>
+
+        <div class="form-group  col-lg-6">
+            @Html.LabelFor(m => m.CityId)<span style="color:red"></span>
+            <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+            @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @id = "ddlApproverCityID", @tabindex = "6", @class = "form-control input-sm" })
+            <div id="other_city" style="display:none;">
+                @Html.TextBoxFor(m => m.City, new { @id = "txtApproverCityID", @tabindex = "6", @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group  col-lg-6">
+            @Html.LabelFor(m => m.HotelName)<span style="color:red"></span>
+            <a href="#" id="close_other_Hotel" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+            @Html.DropDownListFor(m => m.HotelName, Model.HotelList, new { @id = "ddlHotelNames", @tabindex = "6", @class = "form-control" })
+            <div id="other_Hotel" style="display:none;">
+                @Html.TextBoxFor(m => m.HotelName, new { @tabindex = "6", @class = "form-control input-sm" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group  col-lg-6">
+            <input class="btn btn-default" type="button" value="Add" onclick="AddDefaultHotels()" />
+        </div>
+    </div>
+
+    <div class="row hidden">
+        <div class="form-group col-lg-4">
+            <span><strong>Order</strong> </span>
+            <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+            <input class="form-control" type="text" id="txtHotelOrder" />
+        </div>
+
+        <div class="form-group  col-lg-1">
+            <span style="opacity:0; overflow:hidden; visibility: hidden; height:0;">fff</span>
+            <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+        </div>
+
+        <label style="color:red;font-family:'Times New Roman', Times, serif;font-weight:normal;" id="errorMsg"></label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12" id="div_tblAddHotels">
+            <table id="tblAprovalHotelList" class="table table-striped" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Hotels</th>
+                        <th class="text-center"><span id="thCity">City</span>&nbsp;</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody id="tableHotelGridAppr">
+                    <tr>
+                        <td>Hotels</td>
+                        <td class="text-center"><span id="thCity">City</span>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+@{
+    string ids, names, orders, cities;
+    ids = "";
+    names = "";
+    orders = "";
+    cities = "";
+    foreach (CLayer.B2BHotels PropertyOrder in Model.B2BHotelsList)
+    {
+        if (ids != "") { ids = ids + ","; }
+        ids = ids + PropertyOrder.PropertyID.ToString();
+        if (names != "") { names = names + ","; }
+        names = names + "'" + PropertyOrder.Title + "'";
+        if (orders != "") { orders = orders + ","; }
+        orders = orders + PropertyOrder.HotelOrder.ToString();
+        if (cities != "") { cities = cities + ","; }
+        cities = cities + "'" + PropertyOrder.City + "'";
+    }
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+     
+        InitialiseHotels();
+
+        $('#ddlCountryID').change(function () {
+            $.get("/Common/GetState?id=" + $('#ddlCountryID').val(), function (data) {
+                if (data != "")
+                    $('#ddlStateID').html(data).append('<option selected="selected" value="0">Select</option>');
+                else
+                    $('#ddlStateID').empty().append('<option selected="selected" value="0">not available...</option>');
+                CityLoad();
+            });
+        });
+
+        $('#ddlStateID').change(function () {
+            $("#ddlApproverCityID").show();
+            $.get("/Common/GetCity?id=" + $('#ddlStateID').val(), function (data) {
+                if (data != "") {
+                    $('#ddlApproverCityID').empty().append(data);
+                    if ($("select#ddlApproverCityID option").length == 1) {
+                        $("#ddlApproverCityID").hide();
+                    }
+                }
+                else {
+                    $('#ddlApproverCityID').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+
+            });
+            $.get("/Common/GetHotels?id=" + $('#ddlApproverCityID').val(), function (data) {
+                if (data != "")
+                    $('#ddlHotelNames').html(data).append('<option selected="selected" value="0">Select</option>');
+                else
+                    $('#ddlHotelNames').empty().append('<option selected="selected" value="0">not available...</option>');
+            });
+        });
+
+        $('#ddlApproverCityID').change(function () {
+
+            $.get("/Common/GetHotels?id=" + $('#ddlApproverCityID').val(), function (data) {
+     
+                if (data != "")
+                    $('#ddlHotelNames').html(data).append('<option selected="selected" value="0">Select</option>');
+                else
+                    $('#ddlHotelNames').empty().append('<option selected="selected" value="0">not available...</option>');
+            });
+        });     
+        
+    });
+
+</script>
+
+<script type="text/javascript">
+    var HotelIds = new Array();
+    var HotelOrder = new Array();
+    var HotelName = new Array();
+    var HotelCities = new Array();
+
+     HotelIds = [@(ids) ];
+     HotelOrder = [@(orders)];
+     HotelName = [@Html.Raw(names)];
+     HotelCities = [@Html.Raw(cities)];
+        // To display saved hotels list at pageload /.start
+    if (HotelIds.length > 0) {
+        refreshHotelGrid();
+    } else {
+        $("#div_tblAddHotels").hide();
+    }
+        //  ./end
+    function refreshHotelGrid() {
+
+        fixHotelOrder();
+        rowCount = HotelIds.length;
+        trv = '';
+        for (i = 0; i < rowCount; i++) {
+            trv = trv + '<tr><td>' + HotelName[i] + '</td><td class="text-center"><span id="thCity">' + HotelCities[i] + '</span>&nbsp;</td><td><input type="button" class="btn btn-danger btnRemove" onclick="removeHotels(this)" value="Remove" data-val="' + HotelIds[i] + '" /></td></tr>';
+        }
+
+        $("#tableHotelGridAppr").html(trv);
+        if (rowCount > 0) {
+            $("#div_tblAddHotels").show();
+        } else {
+            $("#div_tblAddHotels").hide();
+        }
+    }
+
+    function AddDefaultHotels() {
+
+        var ddlHotels = $("#ddlHotelNames");
+
+        if (ddlHotels.val() > 0) {
+
+            var ddlHotelID = $('#ddlHotelNames').find('option:selected').val();
+            var ddlHotelName = $("#ddlHotelNames").find('option:selected').text();
+            var ddlHotelCity = $("#ddlApproverCityID").find('option:selected').text();
+
+            if (hasHotelDuplicate(ddlHotelID)) { alert("Already added"); return; } //dont add - it is a duplicate
+            rowCount = HotelIds.length;
+            orderNo = $("#txtHotelOrder").val();
+            if (isNaN(orderNo)) { alert("Please enter valid number"); return; }
+            ono = parseInt(orderNo);
+            if (ono < 1) { orderNo = 1; }
+            if (ono > rowCount) { orderNo = rowCount + 1; }
+            HotelIds.push(ddlHotelID);
+            HotelName.push(ddlHotelName);
+            HotelCities.push(ddlHotelCity);
+            addHotelOrder(orderNo);
+
+            refreshHotelGrid();
+
+        }
+        else {
+            alert("Please Select Hotel Name");
+        }
+    }
+
+    function addHotelOrder(orderNo) {
+        l = HotelOrder.length;
+        for (i = 0; i < l; i++) {
+            if (HotelOrder[i] >= orderNo) { HotelOrder[i] = HotelOrder[i] + 1; }
+        }
+        HotelOrder.push(orderNo);
+    }
+
+    function hasHotelDuplicate(id) {
+        l = HotelIds.length;
+        for (i = 0; i < l; i++) {
+            if (HotelIds[i] == id) { return true; }
+        }
+        return false;
+    }
+
+    function removeHotels(btn) {
+
+        deletedId = $(btn).attr("data-val");
+            idx = -1;
+            rowCount = HotelIds.length;
+            for (i = 0; i < rowCount; i++) {
+                if (HotelIds[i] == deletedId) { idx = i; break; }
+            }
+
+            if (idx == -1) {
+                return; //do nothing- could not find the element to delete
+            }
+            HotelIds.splice(idx, 1);
+            HotelOrder.splice(idx, 1);
+            HotelName.splice(idx, 1);
+            HotelCities.splice(idx, 1);
+
+            refreshHotelGrid();
+    }
+
+    function fixHotelOrder() {
+        var lastVal = '';
+        len = HotelIds.length;
+        for (i = 0; i < len; i++) {
+            for (j = i + 1; j < len; j++) {
+                if (HotelCities[i] > HotelCities[j]) {
+                    //swap order nos
+                    lastVal = HotelOrder[i];
+                    HotelOrder[i] = HotelOrder[j];
+                    HotelOrder[j] = lastVal;
+                    //swap ids
+                    lastVal = HotelIds[i];
+                    HotelIds[i] = HotelIds[j];
+                    HotelIds[j] = lastVal;
+                    //name
+                    lastVal = HotelName[i];
+                    HotelName[i] = HotelName[j];
+                    HotelName[j] = lastVal;
+
+                    lastVal = HotelCities[i];
+                    HotelCities[i] = HotelCities[j];
+                    HotelCities[j] = lastVal;
+                }
+            }
+        }
+        //fixing orders
+
+        for (i = 0; i < len; i++) {
+            HotelOrder[i] = i + 1;
+        }
+    }
+
+    function InitialiseHotels()
+    {
+  
+        //States
+        $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+            if (data != "") {
+                $('#ddlStateID').html(data).append('<option selected="selected" value="0">Select</option>');
+            }
+            else {
+                $('#ddlStateID').html(data).append('<option selected="selected" value="0">Select</option>');
+            }
+            loadcity();
+        });
+
+        //Cities
+        $.get("/Common/GetCity?id=" + $('#ddlStateID').val(), function (data) {
+            if (data != "") {
+                $('#ddlApproverCityID').empty().append(data);
+                if ($("select#ddlApproverCityID option").length == 1) {
+                    $("#ddlApproverCityID").hide();
+                }
+            }
+            else {
+                $('#ddlApproverCityID').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+
+        });
+
+     
+        //Hotels
+        if ($('#ddlApproverCityID').val().length > 0)
+        {
+            $.get("/Common/GetHotels?id=" + $('#ddlApproverCityID').val(), function (data) {
+                if (data != "")
+                    $('#ddlHotelNames').html(data).append('<option selected="selected" value="0">Select</option>');
+                else
+                    $('#ddlHotelNames').empty().append('<option selected="selected" value="0">not available...</option>');
+                // loadcity();
+            });
+        }
+     
+    }
+
+    function CityLoad() {
+        $.get("/Common/GetCity?id=" + $('#ddlStateID').val(), function (data) {
+            if (data != "") {
+                $('#ddlApproverCityID').empty().append(data);
+                if ($("select#ddlApproverCityID option").length == 1) {
+                    $("#ddlApproverCityID").hide();
+                    $("#City").val("");
+                    $("#other_city").show();
+                }
+            }
+            else {
+                $('#ddlApproverCityID').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+</script>
+

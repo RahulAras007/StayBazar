@@ -1,0 +1,15 @@
+Thank you for purchasing jQuery Final Tiles Grid Gallery.
+
+Please note: the version 2.x brings a completely new grid layout algorithm. There are many improvements I'm sure you'll appreciate. But you have to consider that your existing galleries could slightly change, so ...
+
+
+==== IMPORTANT ====
+test the plugin before updating a live site.
+
+
+If this is your first time with jQuery Final Tiles Grid Gallery then just enjoy it!
+
+Cheers
+Diego - GreenTreeLabs
+
+http://www.greentreelabs.net

@@ -1,0 +1,30 @@
+﻿@model StayBazar.Models.CostCentreModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Edit", "CostCentre"))
+{
+    <h2> Cost Centre</h2>
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="incontainer">
+        <div class="form-group">
+            <div>
+                @Html.DisplayNameFor(m => m.CostCentreName)
+                @Html.TextBoxFor(m => m.CostCentreName, new { @tabindex = "1", @class = "form-control input-sm" })
+            </div>
+        </div>
+        <div class="btn-toolbar">
+            <div class="btn-group">
+                <input type="submit" id="btnSave" value="Save" class="btn btn-sm btn-default" tabindex="3" />
+                <a href="~/CostCentre" id="btnReset" class="btn btn-sm btn-danger" tabindex="4">Cancel</a>
+            </div>
+        </div>
+    </div>
+    @Html.HiddenFor(m => m.CostCentreCode)
+    <script type="text/javascript">
+        $(function () {
+            $("#Title").focus();
+        });
+    </script>
+}

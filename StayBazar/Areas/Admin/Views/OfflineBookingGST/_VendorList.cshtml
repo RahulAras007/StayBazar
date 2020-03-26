@@ -1,0 +1,55 @@
+﻿@model List<CLayer.OfflineBooking>
+@{
+    Layout = null;
+}
+
+<script src="~/Scripts/jquery-1.10.1.min.js"></script>
+
+<div class="col-md-5">
+    <div style="width:595px">
+        <div>
+            <table border="0" class="table table-condensed table-responsive table-custom">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Nature Of Servise</th>
+                        <th>Total Sale Amt.</th>
+                        <th>Total By amt.</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (CLayer.OfflineBooking item in Model)
+                    {
+                        <tr>
+                            <td>@item.vendorname</td>
+                            <td>@item.Natureofservice</td>
+                            <td>@item.SalePriceTotal</td>
+                            <td>@item.ByPriceTotal</td>
+                            <td><a href="/Admin/OfflineBookingGST/EditVendorDetails?BookingId=@item.VendorpaymentsId"><span class="glyphicon glyphicon-edit"></span></a></td>
+                           
+                            
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+<script type="text/javascript">
+
+
+    function EditBookedDetails(num) {
+        var url = '@Url.Action("EditVendorDetails", "OfflineBookingGST")' + "?BookingId=" + num;
+            $.post(url,function (data) {
+
+                    });
+
+
+    }
+
+
+</script>

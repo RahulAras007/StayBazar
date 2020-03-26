@@ -1,0 +1,194 @@
+﻿@model List<CLayer.ReportDailyPropertyBooking>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+    long accBookedNo = 0;
+    // long accCancelledNo=0;
+    long invbal = 0;
+}
+
+
+<div class="row margin10px">
+    <div class="col-md-12">
+        @{
+           // StayBazar.Areas.Admin.Models.ReportDailyPropertyBookingModel filterform = (StayBazar.Areas.Admin.Models.ReportDailyPropertyBookingModel)ViewBag.Filter;
+            @*using (Html.BeginForm("Pager", "ReportDailyInventoryAndBooking", FormMethod.Post, new { @id = "frmPagersDailyInventoryAndBooking" }))
+            {
+                <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                <input type="hidden" id="FromDate" name="FromDate" value="@filterform.FromDate" />
+            <input type="hidden" id="ToDate" name="ToDate" value="@filterform.ToDate" />
+                <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+                <input type="hidden" id="SupplierId" name="SupplierId" value="@filterform.SupplierId" />
+    <input type="hidden" id="PropertyId" name="PropertyId" value="@filterform.PropertyId" />
+            }*@
+            gp.RowsInAPage = 2000; // filterform.Limit;
+}
+        @*@if (Model != null && Model.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+        }*@
+        <div>
+
+            @if (Model.Count > 0)
+            {
+    <!--START-->
+                <div><h4>Daily Property Booking Report</h4></div>
+
+                <table width="100%" border="0">
+                    <tr>
+                        <td>
+
+                            @{
+                CLayer.Address usr3 = new CLayer.Address();
+                if (Model.Count > 0)
+                {
+                    usr3 = BLayer.Address.GetAddressOnUserId(Model[0].SupplierId);
+                    string SName = BLayer.B2B.GetBusinessName(Model[0].SupplierId);
+                    if (SName == null)
+                    {
+                        SName = "";
+                    }
+                    <div class="col-lg-6" style="font-weight:normal;">
+                        Attn:<br />
+                        @SName<br />
+                        @usr3.Firstname<br />
+                        @*Last Name: @usr1.Lastname<br />*@
+                        @usr3.AddressText,
+                        @usr3.City ,
+                        @usr3.StateName ,
+                        @usr3.Country,@usr3.ZipCode.<br />
+                        Contact:@usr3.Phone   @usr3.Mobile.
+                        Email:@usr3.Email.
+                    </div>
+                }
+                            }
+
+
+
+                        </td>
+                        <td width="30%" align="right" style="text-align:right;">
+                            <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    StayBazar has made bookings on your properties inventory as below. Please ensure accomodations booked are available for the guests on dates of stay. Also kindly
+                    check inventory balances for the dates and make replenishments/changes to inventory (as needed) by accessing your supplier account in StayBazar and using Inventory Management function.
+                </p>
+                <table class="table table-bordered table-hover table-striped" cellspacing="0" border="1">
+                    @foreach (CLayer.ReportDailyPropertyBooking reportList in Model)
+                    {
+                        
+                        if (reportList.BookingId == 0)
+                        {
+                            <tr>
+                                <td colspan="6">
+                                    <div class="alert alert-info">Records not found.</div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+
+                            if (i != reportList.AccomodationId)
+                            {
+                                <thead style="text-align:left">
+                                    <tr>
+                                        <th colspan="6">
+                                            
+                                            @reportList.PropertyName, @reportList.PropertyLocation @*<br />
+                                                @reportList.PropertyAddress*@
+                                        </th>
+                                    </tr>
+                                </thead>
+                            }
+                            <thead>
+                                <tr>
+                                    <th>Accomodation Type</th>
+                                    <th>Date Booked</th>
+                                    <th>No of Accomodations  Booked</th>
+                                    <th>No of Accomodations Cancelled</th>
+                                    <th>Inventory Allocated to StayBazar</th>
+                                    <th>Inventory Balance</th>
+                                </tr>
+                            </thead>
+                            i = reportList.AccomodationId;
+
+
+                            <tbody>
+                                <tr>
+                                    <td>@reportList.AccomodationType</td>
+                                    <td>@reportList.BookingDate.ToShortDateString()</td>
+                                    <td>@reportList.NoofaccomodationsBooked  @*accBookedNo=BLayer.Accommodation.getAccommodationCountByStatus((int)CLayer.ObjectStatus.BookingStatus.Success, @reportList.BookingId); }@accBookedNo*@ </td>
+                                    <td>@reportList.NoofAccomodationsCancelled @*@{ accCancelledNo = BLayer.Accommodation.getAccommodationCountByStatus((int)CLayer.ObjectStatus.BookingStatus.Cancelled, @reportList.BookingId); }@accCancelledNo*@ </td>
+                                    <td>@reportList.InventoryAllocatedtoStayBazar</td>
+                                    <td>
+                                        @{
+                            accBookedNo = reportList.NoofaccomodationsBooked - reportList.NoofAccomodationsCancelled;
+                            if (accBookedNo < 0) { accBookedNo = 0; }
+                            invbal = reportList.InventoryAllocatedtoStayBazar - accBookedNo;
+                            if (invbal < 0) { invbal = 0; }
+                                        }@invbal
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+
+                        }
+                    }
+                </table>
+
+
+
+                <div>
+
+                    <p>For any issues/changes to be made aware to StayBazar please contact StayBazar supplier support contact ASAP.</p>
+
+                    <p>
+                        StayBazar<br />
+                        Email:	info@staybazar.com<br />
+                        Phone:	080-4123 6677<br />
+                        Subisidiary of Southern Ecommerce
+                    </p>
+                    <p>
+                        Flat # S-2,<br />EXSULTARE,	No. 38-A, 2nd Avenue,<br />
+                        Shubh Enclave,	Haralur Road, Off Sarjpur Road,<br />
+                        Bangalore – 560102
+                    </p>
+
+                </div>
+    <!--END-->
+            }
+            else
+            {
+                if (ViewBag.NotFound == null || ViewBag.NotFound == false) { 
+                <text><div class="row" ><div class="col-md-4 col-md-offset-3">@*<div class="alert alert-info">*@Please search for Supplier/Property@*</div>*@ </div></div></text>
+                }
+                else
+                {
+                    <text><div class="row" ><div class="col-md-4 col-md-offset-3">@*<div class="alert alert-info">*@No bookings for the selected property for date period@*</div>*@ </div></div></text>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function showPager(num) {
+        // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "ReportDailyPropertyBookings", new { area = "Admin" })';
+        $.post(url, $("#frmPagersDailyInventoryAndBooking").serialize(), function (data) {
+            $("#DailyInventoryAndBookingList").html(data);
+        });
+    }
+</script>
+
+

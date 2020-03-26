@@ -1,0 +1,203 @@
+﻿@model StayBazar.Models.BookingHistoryModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "My Stays";
+    string firstid = "";
+}
+<div class="container bdy_min_height">
+    @{
+        long cid = 0;
+        long.TryParse(User.Identity.GetUserId(), out cid);
+        CLayer.Role.Roles a = BLayer.User.GetRole(cid);
+
+        if (a == CLayer.Role.Roles.CorporateUser || a == CLayer.Role.Roles.Corporate || a == CLayer.Role.Roles.Agent)
+        {
+            if ((a == CLayer.Role.Roles.Corporate) || (a == CLayer.Role.Roles.CorporateUser))
+            {
+                long corpid = BLayer.B2B.GetCorporateIdOfUser(cid);
+                string b2bnameC = BLayer.B2BUser.Getb2bname(corpid);
+                <h2>Corporate Booking - @b2bnameC</h2>
+            }
+            else
+            {
+                if (a == CLayer.Role.Roles.Corporate)
+                {
+                    string b2bname = BLayer.B2BUser.Getb2bname(cid);
+                    <h2>Corporate Booking - @b2bname</h2>
+                }
+                else if (a == CLayer.Role.Roles.Agent)
+                {
+                    string b2bname = BLayer.B2BUser.Getb2bname(cid);
+                    <h2>Travel agent - @b2bname</h2>
+                }
+            }
+        }
+        else
+        {
+            <h2>@ViewBag.Title</h2>
+        }
+    }
+    <script type="text/javascript">
+        $(function () { validateRq(); });
+    </script>
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active"><a href="#Recent" data-toggle="tab">Recent</a></li>
+        @if ((a == CLayer.Role.Roles.Corporate)|| (a == CLayer.Role.Roles.CorporateUser))
+        {
+            <li><a href="#CreditBook" data-toggle="tab">Credit Bookings</a></li>
+        }
+        <li><a href="#History" data-toggle="tab" >My Bookings</a></li>
+        <li><a href="#Other" data-toggle="tab">Booking Queries</a></li>
+     @if(Model.OtherofflineBookinglist.Count>0  && Model.OtherofflineBookinglist!=null){   <li><a href="#offlineOthers" data-toggle="tab">Others</a></li>}
+     
+     @if (Model.ReadyForBookinglist.Count > 0 && Model.ReadyForBookinglist != null)  { <li><a href="#ReadyForBookings" data-toggle="tab" style="display:none">Ready for Booking</a></li>}
+    @if (Model.RejectedBookinglist.Count > 0 && Model.RejectedBookinglist != null)   { <li><a href="#RejectedBookings" data-toggle="tab">Failed/Rejected Bookings</a></li> }
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="Recent">
+            @if (ViewBag.Message != null)
+            {
+            <div class="alert alert-danger">
+                @ViewBag.Message
+            </div>
+            }
+            <div class="row" id="ResentList">
+                @Html.Partial("~/Views/BookingHistory/_Recent.cshtml", Model.Bookinglist)
+            </div>
+        </div>
+        <div class="tab-pane " id="History" >
+            @if (ViewBag.Message != null)
+            {
+            <div class="alert alert-danger">
+                @ViewBag.Message.
+            </div>
+            }
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-control ">
+                        <div class="row">
+                            <div class="col-md-12">
+                                Months :  @foreach (StayBazar.Models.BookingHistoryModel.searchingperiod ruv in (StayBazar.Models.BookingHistoryModel.searchingperiod[])Enum.GetValues(typeof(StayBazar.Models.BookingHistoryModel.searchingperiod)))
+                                          {
+                                           if (firstid == "") { firstid =((int) ruv).ToString(); }
+                                <input type="radio" name="ruv" onclick="FillHistory(@((int)ruv))" class="css-radiobutton12" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text>                   } />
+                                <label for="@((int)ruv)" class="css-label">@ruv.ToString() </label>
+                                <text>&nbsp;&nbsp;</text>
+                                }
+                                @Html.HiddenFor(m => m.Searchvalue)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row" id="HistoryList">
+                @Html.Partial("~/Views/BookingHistory/_History.cshtml", Model.Bookinglist)
+            </div>
+        </div>
+        @if ((a == CLayer.Role.Roles.Corporate) || (a == CLayer.Role.Roles.CorporateUser))
+        {
+            <div class="tab-pane" id="CreditBook">
+
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger">
+                        @ViewBag.Message
+                    </div>
+                }
+                <div class="row" id="CreditBookinglist">
+                    @Html.Partial("~/Views/BookingHistory/CorporateCreditBookings.cshtml", Model.CreditBookinglist)
+                </div>
+            </div>
+                }
+                <div class="tab-pane" id="Other">
+                    <div class="row" id="OtherList">
+                        @Html.Partial("~/Views/BookingHistory/_Other.cshtml", Model.OtherBookinglist)
+                    </div>
+                </div>
+                @if (Model.OtherofflineBookinglist.Count > 0 && Model.OtherofflineBookinglist != null)
+                {
+                    <div class="tab-pane" id="offlineOthers">
+                        <div class="row" id="offlineOthersList">
+                            @Html.Partial("~/Views/BookingHistory/offlineIndex.cshtml", Model.OtherofflineBookinglist)
+                        </div>
+                    </div>
+                }
+
+        <div class="tab-pane" id="ReadyForBookings" style="display:none">
+            <div class="row" id="ReadyForBookingsList">
+                @Html.Partial("~/Views/BookingApproval/ReadyForBookingList.cshtml", Model.ReadyForBookinglist)
+            </div>
+        </div>
+        <div class="tab-pane" id="RejectedBookings">
+            <div class="row" id="RejectedBookingsList">
+                @Html.Partial("~/Views/BookingApproval/BookingRejectedList.cshtml", Model.RejectedBookinglist)
+            </div>
+        </div>
+
+            </div>
+</div>
+@Html.Partial("~/Views/Cancellation/_CancelBox.cshtml")
+@Html.Partial("~/Views/Cancellation/_Policy.cshtml")
+@Html.Partial("~/Views/Cancellation/_Modify.cshtml")
+<script type="text/javascript">
+    $(function () {
+        $(".css-radiobutton12").change(function () {
+
+            $(".css-radiobutton12").each(function () {
+                if (this.checked) {
+                    $("#Searchvalue").val($(this).attr("id"));
+                }
+            });
+        });
+        $("#SearchValue").val(@firstid);
+        $("#@firstid").click();
+    });
+
+    function BuyerBTR(BookingId) {
+        // add loading image to div
+        $('#loading1R_' + BookingId).html('<img src="../../Content/ajax11-loader.gif"> loading...');
+        var urls = '@Url.Action("FillBookedByAddressSearch", "BookingHistory")';
+        $.ajax({ url: urls, data: { BookingId: BookingId }, type: "POST", success: showMessageFillBookedByResent(BookingId) });
+    }
+    var showMessageFillBookedByResent = function (BookingId) {
+        return function (res) {
+            $("#databuyerR_" + BookingId).html(res);
+        };
+    }
+    function ForBuyerBTR(BookingId) {
+        // add loading image to div
+        $('#loading2R_' + BookingId).html('<img src="../../Content/ajax11-loader.gif"> loading...');
+        var urls = '@Url.Action("Booking_GetBookedFor", "BookingHistory")';
+        $.ajax({ url: urls, data: { BookingId: BookingId }, type: "POST", success: showMessageBookedForResent(BookingId) });
+    }
+    var showMessageBookedForResent = function (BookingId) {
+        return function (res) {
+            $("#DataForR_" + BookingId).html(res);
+        };
+    }
+    function BuyerBTH(BookingId) {
+        // add loading image to div
+        $('#loadingh1_' + BookingId).html('<img src="../../Content/ajax11-loader.gif"> loading...');
+        var urls = '@Url.Action("FillBookedByAddressSearch", "BookingHistory")';
+        $.ajax({ url: urls, data: { BookingId: BookingId }, type: "POST", success: showMessageFillBookedByHistory(BookingId) });
+    }
+    var showMessageFillBookedByHistory = function (BookingId) {
+        return function (res) {
+            $("#databuyerH_" + BookingId).html(res);
+        };
+    }
+    function ForBuyerBTH(BookingId) {
+        // add loading image to div
+        $('#loadingh2_' + BookingId).html('<img src="../../Content/ajax11-loader.gif"> loading...');
+
+        var urls = '@Url.Action("Booking_GetBookedFor", "BookingHistory")';
+        $.ajax({ url: urls, data: { BookingId: BookingId }, type: "POST", success: showMessageBookedForHistory(BookingId) });
+    }
+    var showMessageBookedForHistory = function (BookingId) {
+        return function (res) {
+            $("#DataForH_" + BookingId).html(res);
+        };
+    }
+
+</script>

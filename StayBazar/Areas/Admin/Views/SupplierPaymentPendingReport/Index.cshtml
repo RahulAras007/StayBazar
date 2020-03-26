@@ -1,0 +1,166 @@
+﻿@using System.Data
+@using StayBazar.Common
+@model DataTable
+@{
+    //Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+    ViewBag.Title = "Supplier Pending Payment Report";
+    int i, count, colcount;
+    if (Model != null)
+    {
+        count = Model.Rows.Count;
+        colcount = Model.Columns.Count;
+    }
+    else { count = 0; colcount = 0; }
+
+}
+
+@*<div class="col-md-12">
+        <h2 class="bold">
+           Supplier Pending Payment Report
+        </h2>
+    </div>*@
+<div class="page-title-container style3">
+    <div class="row">
+
+        <div class="col-md-4">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+
+        @*<div class="col-md-10">*@
+            @using (Html.BeginForm("Filter", "SupplierPaymentPendingReport", FormMethod.Post, new { @id = "ReportFilter" }))
+            {
+                @*<div class="row">*@
+                    <div class="col-md-2 form-group">
+                        <label>From Date</label><input type="text" id="FromDate" name="FromDate" class="form-control input-sm" />
+                    </div>
+
+
+                    <div class="col-md-2 form-group">
+                        <label>To Date</label><input type="text" id="ToDate" name="ToDate" class="form-control input-sm" />
+                    </div>
+                    <br />
+                    <div class="col-md-1 form-group margin-top-10">
+
+                        <button id="btnSearch" class="btn btn-default margin-top-10" type="submit" tabindex="3">Search</button>
+                    </div>
+                    <div class="col-md-2 form-group hidden">
+                        <input type="hidden" id="HiddenFromDate" name="HiddenFromDate" value="@ViewBag.FromDate" />
+                        <input type="hidden" id="HiddenToDate" name="HiddenToDate" value="@ViewBag.ToDate" />
+                    </div>
+
+
+                    <div class="col-md-1">
+                        <br />
+
+                        <div class="exporticons" style="TOP: -6PX;">
+                            <a title="Export" href="#" onclick="Export()" id="btnNextClick" class="fa fa-file-excel-o" tabindex="6"></a>
+                        </div>
+                    </div>
+                @*</div>*@
+            }
+
+        @*</div>*@
+        </div>
+    </div>
+<br />
+<br />
+<div class="container-fluid">
+    <div style="padding-left: 30px;">
+        <div class="row">
+            @if (count == 0)
+            {
+                <div class="alert alert-info col-md-6 col-md-offset-3 " style="margin-top:80px;">Data not found!</div>
+            }
+            else
+            {
+
+                <table border="0" class="table table-custom table-bordered table-hover table-striped" cellpadding="1">
+                    <thead>
+                        <tr>
+                            @foreach (DataColumn c in Model.Columns)
+                            {
+                                @Html.Raw("<td>" + c.ColumnName.Replace("_", " ") + "&nbsp</td>");
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (DataRow dr in Model.Rows)
+                        {
+
+                            <tr>
+
+                                <td>@Converter.ToStringDate(dr[0])</td>
+                                <td>@Converter.ToString(dr[1])</td>
+                                <td>@Converter.ToString(dr[2])</td>
+                                <td>@Converter.ToString(dr[3])</td>
+                                <td>@Converter.ToStringDate(dr[4])</td>
+                                <td>@Converter.ToStringDate(dr[5])</td>
+                                <td align="center">@Converter.ToString(dr[6])</td>
+                                <td align="center">@Converter.ToString(dr[7])</td>
+                                <td align="right">@Math.Round(Converter.ToDouble(dr[8]))</td>
+                                <td>@Converter.ToString(dr[9])</td>
+                                <td>@Converter.ToString(dr[10])</td>
+                                <td>@Converter.ToString(dr[11])</td>
+                                <td align="right">@Math.Round(Converter.ToDouble(dr[12]))</td>
+                                <td align="right">@Math.Round(Converter.ToDouble(dr[13]))</td>
+                                <td align="right">@Math.Round(Converter.ToDouble(dr[14]))</td>
+                                <td>
+                                    @if (Converter.ToInteger(dr[15]) > 0)
+                                    {@("Closed")}
+                                else
+                                {@("Open")}
+                            </td>
+                            <td>@Converter.ToString(dr[16])</td>
+                            <td>@Converter.ToString(dr[17])</td>
+                        </tr>
+                    }
+
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+
+        <script>
+
+
+  var  from=   $('#HiddenFromDate').val();
+  var to = $('#HiddenToDate').val();
+
+  //var f = new Date(from);
+  //var t = new Date(to);
+
+  //var from1 = f.ToShortDateString();
+  //var to1 = t.ToShortDateString();
+
+  $('#FromDate').val(from);
+  $('#ToDate').val(to);
+
+
+
+    $(function () {
+        $('#FromDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy"
+               // defaultDate: "+1w",
+            });
+        $('#ToDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+              //  defaultDate: "+1w",
+                beforeShow: function () {
+                    //$(this).datepicker('option', 'minDate', $('#FromDate').val());
+                    //if ($('#FromDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+    });
+
+    function Export() {
+        window.location = '@Url.Action("ExcelDownload", "SupplierPaymentPendingReport")?' +$('#ReportFilter').serialize();
+        //window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+
+        </script>
+

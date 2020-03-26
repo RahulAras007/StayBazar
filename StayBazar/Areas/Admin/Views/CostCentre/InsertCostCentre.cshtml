@@ -1,0 +1,52 @@
+﻿@model StayBazar.Areas.Admin.Models.costcentre
+@{
+    ViewBag.Title = "InsertCostCentre";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    @using (Html.BeginForm("InsertCostCentre", "CostCentre", FormMethod.Post))
+    {
+        <div class="jumbotron">
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                    <table>
+                        <tr>
+                            <td>
+                                <label>Select Cost Centre Code</label>
+                            </td>
+                            <td style="padding-left:15px;">
+                                @Html.DropDownListFor(m=>m.CostCentrecode,new List<SelectListItem>
+                           {
+                               new SelectListItem{ Text="100",Value="1"},
+                               new SelectListItem{ Text="200",Value="2"},
+                               new SelectListItem{ Text="300",Value="3"},
+                               new SelectListItem{ Text="400",Value="4"},
+                               new SelectListItem{ Text="500",Value="5"},
+                               new SelectListItem{ Text="600",Value="6"} },
+                               "--Select--")
+                            </td>
+                            <td style="padding-left:10px">
+                                <strong>%</strong>
+                            </td>
+                            <td style="padding-left:10px;">
+                                @Html.TextBoxFor(m => m.percentage, new { @style = "width:50px;" })
+                            </td>
+                            <td style="padding-left:10px">
+                                <input type="submit" value="Save" class="btn btn-primary" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+        </div>
+    }
+
+</body>
+
+</html>

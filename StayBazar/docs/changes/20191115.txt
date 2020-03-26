@@ -1,0 +1,273 @@
+DELIMITER $$
+
+
+CREATE VIEW accommodationtype_vu AS
+SELECT MAX(accommodationtypeid) accommodationtypeid, title FROM accommodationtype GROUP BY title
+$$
+ALTER TABLE `bookingimport` CHANGE COLUMN `accomodation_type` `stay_option` VARCHAR(150) NOT NULL
+$$
+ALTER TABLE `bookingimport` CHANGE COLUMN `room_category_type` `accomodation_type` VARCHAR(50) NOT NULL
+$$
+ALTER TABLE bookingimport
+ADD supplier VARCHAR(50) AFTER hotel_confirmation_number
+$$
+ALTER TABLE customermasterimport
+ADD customer_city VARCHAR(50) AFTER full_address
+$$
+ALTER TABLE customermasterimport
+ADD customer_email VARCHAR(50) AFTER customer_country
+$$
+ALTER TABLE customermasterimport
+ADD customer_mobile VARCHAR(50) AFTER customer_email
+$$
+ALTER TABLE customermasterimport
+ADD customer_type INT DEFAULT 7 AFTER customer_mobile
+$$
+ALTER TABLE customermasterimport
+ADD pincode VARCHAR(50) AFTER customer_gst_no
+$$
+ALTER TABLE `bookingimport` DROP COLUMN `Itilite_booking_ID`
+$$
+ALTER TABLE bookingimport
+ADD itilite_booking_id VARCHAR(50) AFTER date_of_booking
+$$
+ALTER TABLE `bookingimport` CHANGE COLUMN `hotel_confirmation_number` `hotel_confirmation_number` VARCHAR(50) NOT NULL
+$$
+ALTER TABLE `suppliermasterimport` ADD `import_status` CHAR(3) NOT NULL DEFAULT 'N'
+$$
+ALTER TABLE `customermasterimport` ADD `import_status` CHAR(3) NOT NULL DEFAULT 'N'
+$$
+ALTER TABLE `bookingimport` ADD `import_status` CHAR(3) NOT NULL DEFAULT 'N'
+$$
+ALTER TABLE city ADD COLUMN tamarind_flag CHAR(1)
+$$
+ALTER TABLE country ADD COLUMN tamarind_flag CHAR(1)
+$$
+ALTER TABLE currency ADD COLUMN tamarind_flag CHAR(1)
+$$
+DROP PROCEDURE Sp_Tamarind_City_Upd
+$$
+CREATE PROCEDURE Sp_Tamarind_City_Upd ( pName VARCHAR(150) )
+BEGIN
+	SET @CityID:=0;
+	
+	SELECT `CityId` INTO @CityID FROM city WHERE `Name` = pName AND 
+		`tamarind_flag` = 'Y';
+
+	IF ( @CityID = 0 ) THEN
+		INSERT INTO city(`Name`,`Keywords`,`tamarind_flag`) VALUES
+		(pName,pName,'Y');
+	END IF;
+END
+$$
+DROP PROCEDURE Sp_Tamarind_Country_Upd
+$$
+CREATE PROCEDURE Sp_Tamarind_Country_Upd ( pName VARCHAR(150) )
+BEGIN
+	SET @CountryId:=0;
+	
+	SELECT `CountryId` INTO @CountryId FROM country WHERE `Name` = pName AND 
+		`tamarind_flag` = 'Y';
+
+	IF ( @CountryId = 0 ) THEN
+		INSERT INTO country(`Name`,`Keywords`,`tamarind_flag`) VALUES
+		(pName,pName,'Y');
+	END IF;
+END
+$$
+DROP PROCEDURE Sp_Tamarind_currency_Upd
+$$
+CREATE PROCEDURE Sp_Tamarind_currency_Upd ( pName VARCHAR(150) )
+BEGIN
+	SET @CurrencyId:=0;
+	
+	SELECT `CurrencyId` INTO @CurrencyId FROM currency WHERE `Title` = pName AND 
+		`tamarind_flag` = 'Y';
+
+	IF ( @CurrencyId = 0 ) THEN
+		INSERT INTO currency(`Title`,`tamarind_flag`) VALUES
+		(pName,'Y');
+	END IF;
+END
+$$
+ALTER TABLE country ADD COLUMN tbo_flag CHAR(1)
+$$
+DROP PROCEDURE `Sp_TBO_Country_Upd`
+$$
+CREATE PROCEDURE Sp_TBO_Country_Upd(pCode VARCHAR(3),pName VARCHAR(150))
+BEGIN
+	SET @CountryId:=0;
+	SELECT `CountryId` INTO @CountryId FROM country WHERE `Name` = pName AND 
+		`tbo_flag` = 'Y';
+	IF ( @CountryId = 0 ) THEN
+		INSERT INTO country(`Name`,`code`,`tbo_flag`) VALUES
+		(pName,pCode,'Y');
+	END IF;
+END
+$$
+CREATE TABLE ggn_cost_centre(
+	CostCentreCode BIGINT PRIMARY KEY AUTO_INCREMENT,
+	CostCentreName VARCHAR(150),
+	B2B_ID BIGINT
+)
+$$
+ALTER TABLE `ggn_cost_centre` ADD CONSTRAINT `UQ_ggn_cost_centre_CostCentreName` UNIQUE (`CostCentreName`)
+$$
+DROP PROCEDURE `SP_CostcentreById_Get`
+$$
+CREATE  PROCEDURE `SP_CostcentreById_Get`(IN pCostCentreCode INT)
+BEGIN
+     SELECT * FROM ggn_cost_centre  WHERE CostCentreCode = pCostCentreCode;
+END
+$$
+DROP PROCEDURE `SP_CostCentre_Save`
+$$
+CREATE  PROCEDURE `SP_CostCentre_Save`(IN pCostCentreCode BIGINT(11),			  
+					      IN pCostCentreName VARCHAR(150),
+					      IN pB2BID BIGINT)
+BEGIN
+IF pCostCentreCode < 1 THEN
+		INSERT INTO ggn_cost_centre(CostCentreName,B2B_ID)
+			VALUES(pCostCentreName,pB2BID);
+			SELECT LAST_INSERT_ID();
+ELSE
+		UPDATE ggn_cost_centre SET
+			CostCentreName = pGradeDescription,
+			B2B_ID = pB2BID
+			WHERE 
+			CostCentreCode = pCostCentreCode;
+				SELECT pCostCentreCode;
+	END IF;
+END
+$$
+ALTER TABLE b2b_user ADD COLUMN CostCentre BIGINT
+$$
+DROP PROCEDURE `user_Get`
+$$
+CREATE  PROCEDURE `user_Get`(pUserId INT)
+BEGIN
+	SELECT 
+		DISTINCT 
+			u.UserId,
+			u.FirstName,
+			u.LastName,
+			u.Email,
+			u.SalutationId,
+			stf.SalesRegion,
+			u.DateOfBirth,
+			u.CreatedDate,
+			u.DeletedDate,
+			u.LastLoginOn,
+			u.Status,
+			u.Sex,
+			u.UserType, 
+			a.Address,
+			a.City,
+			a.Phone,
+			st.Name AS State,
+			c.Name AS Country,
+			a.`Phone`,
+			a.`Mobile`,
+			u.OPSEmail,
+			u.CustomerPaymentMode,
+			u.CustomerPaymentModeCreditDays,
+			IFNULL(bu.MaximumDailyEntitlement,0) AS MaximumDailyEntitlement,
+			IFNULL(bu.GradeID,0) AS GradeID,
+			IFNULL(u.`SbEntities`,'') AS SbEntities,
+			IFNULL(bu.CostCentre,0) AS CostCentre
+	FROM  `user` u 
+        LEFT JOIN address a ON a.UserId = u.UserId 
+        LEFT JOIN staff stf ON stf.UserId = u.UserId 
+        LEFT JOIN state st ON st.StateId = a.State
+        LEFT JOIN country c ON c.CountryId = a.Country
+        LEFT JOIN b2b_user bu ON bu.UserId = u.UserId 
+        WHERE u.UserId = pUserId;
+    END
+$$
+DROP PROCEDURE `corporate_SaveUser`
+$$
+CREATE  PROCEDURE `corporate_SaveUser`(    
+	IN pUserId BIGINT(20),
+	IN pCorporateId BIGINT,
+	IN pSalutationId INT(11),
+	IN pFirstName VARCHAR(100),
+	IN pLastName VARCHAR(100),
+	IN pDateOfBirth DATE,
+	IN pSex INT(11),
+	IN pUserType INT(11),
+	IN pStatus INT(11),
+	IN pEmail VARCHAR(150),
+	IN pCorporateUserType INT,
+	IN pMaximumDailyEntitlement BIGINT,	
+	IN pGradeID BIGINT,
+	IN pCostCentre BIGINT
+	)
+BEGIN
+DECLARE id BIGINT;
+		IF pUserId < 1 THEN
+			INSERT INTO `user`
+			(
+			SalutationId,
+			FirstName,
+			LastName,
+			DateOfBirth,
+			Sex,
+			UserType,
+			`Status`,
+			Email,
+			CreatedDate
+			)
+			VALUES
+			(
+			pSalutationId,
+			pFirstName,
+			pLastName,
+			pDateOfBirth,
+			pSex,
+			pUserType,
+			pStatus,
+			pEmail,
+			NOW()
+			);
+			SELECT LAST_INSERT_ID() INTO id;	
+			-- select id;	
+			INSERT INTO b2b_user 
+			(
+			UserId,
+			B2BId,
+			UserType,
+			MaximumDailyEntitlement,
+			GradeID,
+			CostCentre
+			) 
+			VALUES 
+			(
+			id,
+			pCorporateId,
+			pCorporateUserType,
+			pMaximumDailyEntitlement,
+			pGradeID,
+			pCostCentre
+			);
+			SET pUserId = id;
+		ELSE
+			UPDATE `user` SET
+			SalutationId = pSalutationId,
+			FirstName = pFirstName,
+			LastName = pLastName,
+			DateOfBirth = pDateOfBirth,
+			Sex = pSex,
+			UserType = pUserType,
+			`Status` = pStatus,
+			Email = pEmail
+			WHERE
+			UserId = pUserId;
+			UPDATE b2b_user SET UserType = pCorporateUserType,MaximumDailyEntitlement=pMaximumDailyEntitlement,GradeID=pGradeID,CostCentre=pCostCentre WHERE B2BId = pCorporateId AND UserId = pUserId;
+		END IF;
+		SELECT pUserId AS userId;
+    END
+$$
+
+
+
+DELIMITER ;

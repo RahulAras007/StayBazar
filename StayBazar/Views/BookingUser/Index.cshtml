@@ -1,0 +1,173 @@
+﻿@model StayBazar.Models.SaveBookingUserModel
+@{
+    ViewBag.Title = "Booking User";
+}
+<div class="container">
+    <div class="row margin10px">
+        <h2>
+            @ViewBag.Title
+        </h2>
+        <div class=" col-lg-12">
+            @using (Html.BeginForm("SaveDetails", "BookingUser", FormMethod.Post, new { role = "form" }))
+            {
+                <div class="col-lg-4 incontainer">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.FirstName)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "1", @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.FirstName)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.LastName)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.LastName, new { @tabindex = "2", @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.LastName)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                        @Html.TextAreaFor(m => m.Address, new { @tabindex = "6", @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Address)
+                    </div>
+                </div>
+                <div class="col-lg-4 incontainer">
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+                        @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "7", @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.State)<span style="color:red">*</span>
+                        @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "8", @class = "form-control" })
+                        @Html.ValidationMessageFor(m=>m.State)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.City)<span style="color:red">*</span> &nbsp;
+                        <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                        @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "9", @class = "form-control" })
+                        <div id="other_city" style="display:none;">
+                            @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                            <input type="hidden" value="@Model.City" id="hdnCity" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 incontainer">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Mobile)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "10", @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Mobile)
+
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Email)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.Email, new { @tabindex = "11", @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Email)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.ZipCode)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "7", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.ZipCode)
+                    </div>
+                </div>
+                <div class="col-md-11">
+                    <div class="form-group text-right">
+                        <button type="submit" id="saveForuser" class="btn redbg whitetext border-radius0">Save</button>
+                        @*<a href="/Index/Booking" class="btn greybg whitetext border-radius0">Cancel</a>*@
+                    </div>
+                </div>
+                @Html.HiddenFor(m => m.AddressId)
+                @Html.HiddenFor(m => m.AddressType)
+                  @Html.HiddenFor(m => m.BookingUserId)
+            }
+        </div>
+    </div>
+</div>
+
+        <script type="text/javascript">
+            $(function () {
+                $("#DateOfBirth").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-80:+0"
+
+                });
+            });
+        </script>
+        <script type="text/javascript">
+            $(function () {
+                showHideOtherCity();
+
+                $('#CountryId').change(function () {
+                    $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                        if (data != "")
+                            $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                        else
+                            $('#State').empty().append('<option selected="selected" value="0">Not Available</option>');
+                        Loadcity();
+                    });
+                });
+                $('#State').change(function () {
+                    $("#CityId").show();
+                    $("#City").val("");
+                    $("#other_city").hide();
+                    $("#close_other_city").hide();
+                    $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                        if (data != "") {
+                            $('#CityId').empty().append(data);
+                        }
+                        else {
+                            $('#CityId').empty().append('<option selected="selected" value="-1">Other</option>');
+                        }
+                        showHideOtherCity();
+                    });
+                });
+                $('#CityId').change(function () {
+                    if ($(this).val() == -1) {
+                        showOtherCity();
+                    }
+                });
+                $('#close_other_city').click(function () {
+                    hideOtherCity();
+                });
+
+                @*$("#saveForuser").click(function () {               
+                    var url = '@Url.Action("SaveDetails", "BookingUser")';
+                  
+                    });
+                });*@
+            });
+
+            function showOtherCity()
+            {
+                $("#CityId").hide();
+                $("#City").val("");
+                $("#other_city").show();
+                $("#close_other_city").show();
+            }
+            function hideOtherCity()
+            {
+                $("#City").val("");
+                $("#other_city").hide();
+                $("#close_other_city").hide();
+                $("#CityId").show();
+            }
+            function showHideOtherCity()
+            {
+                if ($("select#CityId option").length == 1) {
+                    showOtherCity();
+                }
+                else {
+                    hideOtherCity();
+                }
+            }
+
+            function Loadcity()
+            {
+                $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                    if (data != "") {
+                        $('#CityId').empty().append(data);
+                    }
+                    else {
+                        $('#CityId').empty().append('<option selected="selected" value="-1">Other</option>');
+                    }
+                    showHideOtherCity();
+                });
+            }
+        </script>

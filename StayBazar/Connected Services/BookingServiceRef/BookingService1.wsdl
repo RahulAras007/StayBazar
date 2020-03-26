@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="www.tamarindtours.in/IBookingService" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="www.tamarindtours.in/IBookingService" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="www.tamarindtours.in/IBookingService/Imports">
+      <xsd:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?xsd=xsd0" namespace="www.tamarindtours.in/IBookingService" />
+      <xsd:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" />
+      <xsd:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IBookingService_GetCartItemDetailsByCartItemID_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCartItemDetailsByCartItemID" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetCartItemDetailsByCartItemID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCartItemDetailsByCartItemIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetCartItemDetailsByCartItemID_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q1:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_InsertCartItem_InputMessage">
+    <wsdl:part name="parameters" element="tns:InsertCartItem" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_InsertCartItem_OutputMessage">
+    <wsdl:part name="parameters" element="tns:InsertCartItemResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_RemoveFromCart_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveFromCart" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_RemoveFromCart_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveFromCartResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_RemoveFromCart_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q2:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetCartDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCartDetails" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetCartDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCartDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetCartDetails_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q3:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetBookedCartDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetBookedCartDetails" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetBookedCartDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetBookedCartDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetSalutations_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSalutations" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetSalutations_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetSalutationsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetPolicies_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetPolicies" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetPolicies_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetPoliciesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_ConfirmBooking_InputMessage">
+    <wsdl:part name="parameters" element="tns:ConfirmBooking" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_ConfirmBooking_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ConfirmBookingResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_RejectApproval_InputMessage">
+    <wsdl:part name="parameters" element="tns:RejectApproval" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_RejectApproval_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RejectApprovalResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_RejectApproval_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q4:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_AcceptApproval_InputMessage">
+    <wsdl:part name="parameters" element="tns:AcceptApproval" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_AcceptApproval_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AcceptApprovalResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_AcceptApproval_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q5:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetAmendBookingDetailsbyCartItemID_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAmendBookingDetailsbyCartItemID" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetAmendBookingDetailsbyCartItemID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAmendBookingDetailsbyCartItemIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetAmendBookingDetailsbyCartItemID_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q6:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetFlightAndOtherDetailsbyCartItemID_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetFlightAndOtherDetailsbyCartItemID" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetFlightAndOtherDetailsbyCartItemID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetFlightAndOtherDetailsbyCartItemIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetFlightAndOtherDetailsbyCartItemID_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q7:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetBookingList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetBookingList" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetBookingList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetBookingListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetBookingList_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q8="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q8:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_ViewBookingHistory_InputMessage">
+    <wsdl:part name="parameters" element="tns:ViewBookingHistory" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_ViewBookingHistory_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ViewBookingHistoryResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_ViewBookingHistory_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q9="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q9:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetCancellationDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCancellationDetails" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_GetCancellationDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCancellationDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_CancelBooking_InputMessage">
+    <wsdl:part name="parameters" element="tns:CancelBooking" />
+  </wsdl:message>
+  <wsdl:message name="IBookingService_CancelBooking_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CancelBookingResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IBookingService">
+    <wsdl:operation name="GetCartItemDetailsByCartItemID">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetCartItemDetailsByCartItemID" message="tns:IBookingService_GetCartItemDetailsByCartItemID_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetCartItemDetailsByCartItemIDResponse" message="tns:IBookingService_GetCartItemDetailsByCartItemID_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetCartItemDetailsByCartItemIDInputExceptionFault" name="InputExceptionFault" message="tns:IBookingService_GetCartItemDetailsByCartItemID_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="InsertCartItem">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/InsertCartItem" message="tns:IBookingService_InsertCartItem_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/InsertCartItemResponse" message="tns:IBookingService_InsertCartItem_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveFromCart">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/RemoveFromCart" message="tns:IBookingService_RemoveFromCart_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/RemoveFromCartResponse" message="tns:IBookingService_RemoveFromCart_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/RemoveFromCartInputExceptionFault" name="InputExceptionFault" message="tns:IBookingService_RemoveFromCart_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCartDetails">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetCartDetails" message="tns:IBookingService_GetCartDetails_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetCartDetailsResponse" message="tns:IBookingService_GetCartDetails_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetCartDetailsInputExceptionFault" name="InputExceptionFault" message="tns:IBookingService_GetCartDetails_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetBookedCartDetails">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetBookedCartDetails" message="tns:IBookingService_GetBookedCartDetails_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetBookedCartDetailsResponse" message="tns:IBookingService_GetBookedCartDetails_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSalutations">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetSalutations" message="tns:IBookingService_GetSalutations_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetSalutationsResponse" message="tns:IBookingService_GetSalutations_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPolicies">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetPolicies" message="tns:IBookingService_GetPolicies_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetPoliciesResponse" message="tns:IBookingService_GetPolicies_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ConfirmBooking">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/ConfirmBooking" message="tns:IBookingService_ConfirmBooking_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/ConfirmBookingResponse" message="tns:IBookingService_ConfirmBooking_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RejectApproval">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/RejectApproval" message="tns:IBookingService_RejectApproval_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/RejectApprovalResponse" message="tns:IBookingService_RejectApproval_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/RejectApprovalInputExceptionFault" name="InputExceptionFault" message="tns:IBookingService_RejectApproval_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AcceptApproval">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/AcceptApproval" message="tns:IBookingService_AcceptApproval_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/AcceptApprovalResponse" message="tns:IBookingService_AcceptApproval_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/AcceptApprovalInputExceptionFault" name="InputExceptionFault" message="tns:IBookingService_AcceptApproval_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAmendBookingDetailsbyCartItemID">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetAmendBookingDetailsbyCartItemID" message="tns:IBookingService_GetAmendBookingDetailsbyCartItemID_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetAmendBookingDetailsbyCartItemIDResponse" message="tns:IBookingService_GetAmendBookingDetailsbyCartItemID_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetAmendBookingDetailsbyCartItemIDInputExceptionFault" name="InputExceptionFault" message="tns:IBookingService_GetAmendBookingDetailsbyCartItemID_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetFlightAndOtherDetailsbyCartItemID">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetFlightAndOtherDetailsbyCartItemID" message="tns:IBookingService_GetFlightAndOtherDetailsbyCartItemID_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetFlightAndOtherDetailsbyCartItemIDResponse" message="tns:IBookingService_GetFlightAndOtherDetailsbyCartItemID_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetFlightAndOtherDetailsbyCartItemIDInputExceptionFault" name="InputExceptionFault" message="tns:IBookingService_GetFlightAndOtherDetailsbyCartItemID_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetBookingList">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetBookingList" message="tns:IBookingService_GetBookingList_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetBookingListResponse" message="tns:IBookingService_GetBookingList_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetBookingListInputExceptionFault" name="InputExceptionFault" message="tns:IBookingService_GetBookingList_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ViewBookingHistory">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/ViewBookingHistory" message="tns:IBookingService_ViewBookingHistory_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/ViewBookingHistoryResponse" message="tns:IBookingService_ViewBookingHistory_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/ViewBookingHistoryInputExceptionFault" name="InputExceptionFault" message="tns:IBookingService_ViewBookingHistory_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCancellationDetails">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetCancellationDetails" message="tns:IBookingService_GetCancellationDetails_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/GetCancellationDetailsResponse" message="tns:IBookingService_GetCancellationDetails_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CancelBooking">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/CancelBooking" message="tns:IBookingService_CancelBooking_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBookingService/IBookingService/CancelBookingResponse" message="tns:IBookingService_CancelBooking_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

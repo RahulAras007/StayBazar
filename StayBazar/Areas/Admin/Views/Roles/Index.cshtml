@@ -1,0 +1,104 @@
+﻿@{
+    ViewBag.Title = "Roles";
+    try
+    {
+        var grid = new WebGrid(Model, defaultSort: "Name", canSort: false, canPage: true, rowsPerPage: 25,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        var currentAction = "";
+        HtmlHelper htmlHelper = this.Html;
+        var routeData = htmlHelper.ViewContext.RouteData;
+        currentAction = routeData.GetRequiredString("Action").ToLower();
+        <text>
+            <form id="frmIds" method="post">
+                <input id="data" name="data" type="hidden" value="" />
+                <input id="type" name="type" type="hidden" value="" />
+            </form>
+            <div id="bodycontent">
+
+                <div class="page-title-container style3">
+                    @*Roles&nbsp;*@
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2 style="color:white">@ViewBag.Title</h2>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="btn-group">
+                                <a href="/Admin/Roles/New" class="btn btn-primary">Add New</a>
+                            </div>
+                        </div>
+
+                        @*</div>*@
+                    </div>
+                </div>                 @*</div>*@
+
+                <br />
+                <br />
+    <div id="gridContent">
+        <div class="container-fluid">
+            @grid.GetHtml(tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered",
+headerStyle: "header",
+alternatingRowStyle: "alt",
+selectedRowStyle: "select",
+columns: grid.Columns(
+grid.Column("Name", format: @<text>@item.Name</text>),
+
+grid.Column("", format: @<text><a href="/Admin/Roles/Edit/@item.Id" class="lnk btn">Edit</a></text>)))
+        </div>
+    </div>
+
+
+                </div>
+
+            <script type="text/javascript">
+                
+                $(function () {
+                    //$(".header th").each(function () {
+                    //    if ($(this).html().trim() == "head") {
+                    //        $(this).html("<input type='checkbox' id='chkAll' />");
+                    //    }
+                    //});
+                    
+                    //$(".webGrid thead tr th a").click(function () {
+                    //    $(".header th").each(function () {
+                    //        if ($(this).html().trim() == "head") {
+                    //            $(this).html("<input type='checkbox' id='chkAll' />");
+                    //        }
+                    //    });
+                    //    $("#chkAll").prop('checked', false);
+                    //    $("#div-actions button").attr("disabled", "disabled");
+                    //    $(".chk").change(function () { checkchange(); });
+                    //    $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+                    //});
+                    //$(".webGrid tfoot tr td a").click(function () {
+                    //    $(".header th").each(function () {
+                    //        if ($(this).html().trim() == "head") {
+                    //            $(this).html("<input type='checkbox' id='chkAll' />");
+                    //        }
+                    //    });
+                    //    $("#chkAll").prop('checked', false);
+                    //    $("#div-actions button").attr("disabled", "disabled");
+                    //    $(".chk").change(function () { checkchange(); });
+                    //    $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+                    //});
+                    @*$("#div-actions button").click(function () {
+                        $("#type").val($(this).attr("data-action"));
+                        if (confirm("Are you sure you want to " + $("#type").val() + " all the selectd items?")) {
+                            var url = '@Url.Action("ActionSet", "Host")';
+                            $.post(url, $("#frmIds").serialize(),
+                                    function (data) {
+                                        window.location = location;
+                                    });
+                        }
+                });*@
+                });
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}

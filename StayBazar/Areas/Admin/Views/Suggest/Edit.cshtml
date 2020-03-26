@@ -1,0 +1,34 @@
+﻿@model CLayer.Suggest
+@{
+    ViewBag.Title = "Suggestion";
+}
+<div class="h2">
+    Suggestion&nbsp;
+    <div class="btn-group">
+        @if (Model.Status == (int)StayBazar.Models.SuggestModel.StatusTypes.Viewed)
+        {
+            <a href="/Admin/Suggest" class="btn btn-default" title="back"><span class="glyphicon glyphicon-arrow-left"></span></a>
+            <a href="/Admin/Suggest/Verify/@Model.InfoId" title="verify" onclick="return confirm('Are you sure you want to verify?')" class="btn btn-default">Verify</a>
+            <a href="/Admin/Suggest/Reject/@Model.InfoId" title="reject" onclick="return confirm('Are you sure you want to reject?')" class="btn btn-default">Reject</a>
+        }
+        else if (Model.Status == (int)StayBazar.Models.SuggestModel.StatusTypes.Verified)
+        {
+            <a href="/Admin/Suggest/Verified" class="btn  btn-info" title="back"><span class="glyphicon glyphicon-arrow-left"></span></a>
+            <a href="/Admin/Suggest/Reject/@Model.InfoId" title="reject" onclick="return confirm('Are you sure you want to reject?')" class="btn btn-default">Reject</a>
+        }
+        else
+        {
+            <a href="/Admin/Suggest/Rejected" class="btn btn-info" title="back"><span class="glyphicon glyphicon-arrow-left"></span></a>
+            <a href="/Admin/Suggest/Verify/@Model.InfoId" title="verify" onclick="return confirm('Are you sure you want to verify?')" class="btn btn-default">Verify</a>
+        }
+        <a href="/Admin/Suggest/Delete/@Model.InfoId" title="delete" onclick="return confirm('Are you sure you want to delete?')" class="btn btn-danger">Delete</a>
+    </div>
+</div>
+<hr />
+<p>@Model.Name</p>
+<p>@Model.Location</p>
+<p>@Model.City</p>
+<p>@Model.Address</p>
+<p>@Model.Phone</p>
+<p>@Model.Email</p>
+

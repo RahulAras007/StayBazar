@@ -1,0 +1,9 @@
+﻿@model StayBazar.Areas.Admin.Models.ModifyModel
+
+<div class="container bdy_min_height">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div @if (Model.Failed) { <text> class="alert alert-danger" </text>  } else { <text> class="alert alert-success" </text>  }>@Model.Msg</div>
+        </div>
+    </div>
+</div>

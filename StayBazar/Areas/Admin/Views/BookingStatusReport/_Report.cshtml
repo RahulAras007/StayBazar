@@ -1,0 +1,409 @@
+﻿@model IEnumerable<CLayer.BookingStatusReport>
+    @{
+        Layout = null;
+        StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+        gp.JavascriptFuncName = "showPager";
+        gp.ColumnsInPager = 2;
+        gp.RowsInAPage = 2;
+        long i = 1;
+        string type = "";
+        string mtype = "";
+        decimal buycost=0, salevalue=0,cbv=0,gcbv=0,stbv=0,gstbv=0,gnsupplierpayment=0, grossmargin=0,supplierpayment=0, commissionpayable=0, netmargin=0, gbuycost=0, gsalevalue=0, ggrossmargin=0, gcommissionpayable=0, gnetmargin=0,grandtotal=0;
+        long nonights, noaccs, gnonights, gnoaccs;
+        nonights = noaccs = gnonights = gnoaccs = 0;
+    }
+    <div class="">
+        <div class="topmargin10">
+            @{
+                if (ViewBag.Filter != null) {
+                    StayBazar.Areas.Admin.Models.BookingStatusReportModel filterform = (StayBazar.Areas.Admin.Models.BookingStatusReportModel)ViewBag.Filter;
+                    using (Html.BeginForm("Pager", "bookingstatusreport", FormMethod.Post, new { @id = "frmPagersa" }))
+                    {
+            <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+            <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+            <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+            <input type="hidden" id="FromDate" name="FromDate" value="@filterform.FromDate" />
+            <input type="hidden" id="ToDate" name="ToDate" value="@filterform.ToDate" />
+            <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+
+            if (Model != null && Model.Count() > 0)
+            {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+            }
+            }
+            long netmarpercent = 0;
+            }
+            <div class="" style="background:white;">
+                <div style="text-align:left">@*<h4> Booking Status Report </h4>*@</div>
+                <table cellpadding="5" border="1" class="table table-custom table-bordered table-hover table-striped">
+                    <thead style="background-color:whitesmoke">
+                        <tr>
+                            <th>Sl No</th>
+                            <th>Booking Date</th>
+                            <th>Booking Id</th>
+                            <th>Customer Name</th>
+                            <th>Property Name</th>
+                            <th>City</th>
+                        <th>Accommodation Type</th>
+                        <th>Guest name </th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>NO of Pax</th>
+                        <th>No of rooms</th>
+                        <th>No of nights</th>
+                        <th>Total room nights</th>
+                        <th>Supplier Name</th>
+                        <th>Supplier value before Tax</th>
+                        <th>Tax Amount</th>
+                        <th>Total Supplier Value</th>
+                        <th>Supplier Invoice Number</th>
+                        <th>Supplier Invoice Date</th> 
+
+                        <th>Customer Value Before Tax</th> 
+                        <th>Tax Amounts</th> 
+                        <th>Total Customer Value</th>
+                        <th>Gross Margin</th>
+                        <th>SB Invoice Number</th>
+                        <th>SB Invoice Date</th>
+                        <th>Total Invoice Value</th>
+                        <th>Total Payment to Supplier</th>
+                        <th>Sale Region</th>
+                        <th>Sale Person</th>
+
+
+
+
+                            
+                            @*<th>Customer Invoice Number</th>
+                            <th>Customer Invoice Date</th>
+                            
+                            <th>Mail Date</th>
+                            <th>Mail Status</th>
+                            <th>Customer Payment</th>
+                          
+                           
+                            
+                            <th>Supplier Payment</th>*@
+                            @*
+                            <th>No of Accomodations</th>
+                            <th>Period of Stay</th>
+                            <th>No of Nights</th>*@
+
+
+                            @*
+                            <th>Customer Name</th>
+                            <th>Supplier Rate(Pre-tax)</th>
+                            <th>Tax Type</th>
+                            <th>Tax</th>
+                            <th>Total Supplier Buy Cost</th>
+                            <th>Booking  Rate</th>
+                            <th>Booking Value(pre-tax)</th>
+                            <th>Service Tax </th>
+                            <th>Luxury Tax </th>
+                            <th>Total Booking Value  </th>
+                            <th>Gross Margin </th>
+                            <th>Agent Commission Payable  </th>
+                            <th>Net Margin</th>
+                            <th>Net Margin %</th>*@
+                        </tr><!-- 26 cols-->
+                    </thead>
+                    <tbody>
+                        @foreach (CLayer.BookingStatusReport reportList in Model)
+                        {
+                            DateTime checkin = reportList.CheckIn;
+                            DateTime checkout = reportList.CheckOut;
+                            TimeSpan ts = checkout - checkin;
+                            int differenceInDays = ts.Days;
+                            //string differenceAsString =
+
+                            int NoOfPaxAdultS = reportList.NoOfPaxAdult;
+
+                            int NoOfPaxChild = reportList.NoOfPaxChild;
+                            int NOofPax = (NoOfPaxAdultS + NoOfPaxChild);
+                            
+
+                            long roomnight = (reportList.NumberofNights * reportList.NumberofRooms);
+
+                            decimal SuppliervaluebeforeTax = (reportList.AvgDailyRateBefreStaxForBuyPrice * roomnight);
+                            decimal CustomerValueBeforeTax = (reportList.AvgDailyRateBefreStaxForSalePrice * roomnight);
+
+
+                            //amount
+                            decimal TotalAmountBeforeServiceTax = ((reportList.AvgDailyRateBefreStaxForSalePrice * (reportList.NumberofNights * reportList.NumberofRooms)));
+                            decimal ServiceTaxAmount = Decimal.Round((((TotalAmountBeforeServiceTax) * reportList.StaxForSalePrice) / 100), 2);
+                            decimal TotalAmountwithServicetax = (TotalAmountBeforeServiceTax + ServiceTaxAmount);
+
+                            //other amount
+                            decimal Otherservicesamount = Math.Round(reportList.BuyPriceforotherservicesForSalePrice, 2);
+                            decimal OtherServiceTaxAmount = Decimal.Round((((Otherservicesamount) * reportList.StaxForotherForSalePrice) / 100), 2);
+                            decimal OtherTotalAmountwithServicetax = (OtherServiceTaxAmount + Otherservicesamount);
+
+                            decimal TotalAmountBeforeServiceTaxANDOtherservicesamount = TotalAmountBeforeServiceTax + Otherservicesamount;
+                            decimal ServiceTaxAmountANDOtherServiceTaxAmount = ServiceTaxAmount + OtherServiceTaxAmount;
+
+                            //service tax amount
+
+                            //total
+
+
+
+
+                            decimal TotalAmountBeforeServiceTaxSupplier = ((reportList.AvgDailyRateBefreStaxForBuyPrice * (reportList.NumberofNights * reportList.NumberofRooms)));
+                            decimal ServiceTaxAmountSupplier = Decimal.Round((((TotalAmountBeforeServiceTaxSupplier) * reportList.StaxForBuyPrice) / 100), 2);
+                            decimal TotalAmountwithServicetaxSupplier = (TotalAmountBeforeServiceTaxSupplier + ServiceTaxAmount);
+
+                            decimal OtherservicesamountSupplier = Math.Round(reportList.BuyPriceforotherservicesForBuyprice, 2);
+                            decimal OtherServiceTaxAmountSupplier = Decimal.Round((((OtherservicesamountSupplier) * reportList.StaxForotherBuyPrice) / 100), 2);
+                            decimal OtherTotalAmountwithServicetaxSupplier = (OtherServiceTaxAmount + OtherservicesamountSupplier);
+                            decimal TotalAmountBeforeServiceTaxSupplierandOtherservicesamountSupplier = TotalAmountBeforeServiceTaxSupplier + OtherservicesamountSupplier;
+                            decimal ServiceTaxAmountSupplierandOtherServiceTaxAmountSupplier = ServiceTaxAmountSupplier + OtherServiceTaxAmountSupplier;
+
+                            decimal Grossmargin = (TotalAmountBeforeServiceTaxANDOtherservicesamount - TotalAmountBeforeServiceTaxSupplierandOtherservicesamountSupplier);
+
+                            //service tax amount
+
+                            //total other
+
+                            netmarpercent = (long)Math.Round((double)(((double)(reportList.GrossMargin - reportList.AgentCommissionPayable) / reportList.TotalSupplierBuyCost)) * 100);
+                            mtype = reportList.CustomeType;
+                            if (type != mtype)
+                            {
+                                if (type != "")
+                                {
+                        <tr class="info">
+                            <td colspan="7">@type Totals</td>
+                            <td align="right"><b>@noaccs</b></td>
+                            <td>&nbsp;</td>
+                            <td align="right"><b>@nonights</b></td>
+                            <td colspan="6">&nbsp;</td>
+                            <td align="right"><b>@buycost.ToString("N0")</b></td>
+                            <td colspan="4">&nbsp;</td>
+                            <td align="right"><b>@salevalue.ToString("N0")</b></td>
+                            <td align="right"><b>@grossmargin.ToString("N0")</b></td>
+                            <td align="right"><b>@commissionpayable.ToString("N0")</b></td>
+                            <td align="right" colspan="2"><b>@netmargin.ToString("N0")</b></td>
+                            <!--<td>&nbsp;</td>-->
+                        </tr>
+                        buycost = 0;
+                        salevalue = 0;
+                        grossmargin = 0;
+                        commissionpayable = 0;
+                        netmargin = 0;
+                        nonights = 0;
+                        noaccs = 0;
+                        }
+                        type = reportList.CustomeType;
+                        }
+                        <tr>
+                            <td align="center">@i</td>
+                            <td align="center">@reportList.BookingDate.ToShortDateString()</td>
+                            <td>@reportList.orderno</td>
+                            <td >
+
+                                @reportList.CustomerName
+                            </td>
+                            <td>@reportList.PropertyName</td>
+                            <td>@reportList.City</td>
+
+
+                            <td>@reportList.AccomodationType</td>
+                            <td>@reportList.GuestName </td>
+                            <td align="center">@reportList.CheckIn.ToShortDateString()</td>
+                            <td align="center">@reportList.CheckOut.ToShortDateString()</td>
+                            <td align="center">@NOofPax</td>
+                            <td align="center">@reportList.NumberofRooms</td>
+                            <td align="center">@reportList.NumberofNights</td>
+
+                            <td align="center">@(reportList.NumberofRooms * reportList.NumberofNights)</td>
+                            <td>
+                                @reportList.SupplierName
+                            </td>
+
+
+                            <td align="right">@TotalAmountBeforeServiceTaxSupplierandOtherservicesamountSupplier</td>
+                            <td align="right">@ServiceTaxAmountSupplierandOtherServiceTaxAmountSupplier</td>
+                            
+                            <td>@reportList.TotalBuyPrice</td>
+                            <td align="center">
+                                @reportList.SupplierInvoiceNumber
+                            </td>
+
+                            <td align="center">
+                                    @if (reportList.SupplierInvoiceDate != default(DateTime))
+                                    {
+                                        @reportList.SupplierInvoiceDate.ToShortDateString()
+                                    }
+                            </td>
+
+                            <td align="right">@TotalAmountBeforeServiceTaxANDOtherservicesamount</td>
+                            <td align="right">@ServiceTaxAmountANDOtherServiceTaxAmount</td>
+
+                            <td>@reportList.TotalSalePrice</td>
+
+                          
+
+
+                            <td align="right">@Grossmargin</td>
+                            <td align="center">@reportList.InvoiceNumber</td>
+
+                            <td align="center">@if (reportList.InvoiceDate == DateTime.MinValue || reportList.InvoiceDate == null || reportList.InvoiceDate == default(DateTime)) {
+
+
+                            }
+                            else
+                            {
+                               @reportList.InvoiceDate.ToShortDateString()
+                            }</td>
+                            
+                            @*<td align="center">@reportList.InvoiceDate.ToShortDateString()</td>*@
+                            <td align="right">@reportList.TotalBuyPrice</td>
+                            <td align="right">@reportList.amount</td>
+                            <td>@reportList.SalesRegion</td>
+                            <td>@reportList.SalesPerson</td>
+
+
+
+
+                            
+                            @*<td>@reportList.InvoiceNumber</td>
+                            <td>@reportList.InvoiceDate.ToShortDateString()</td>
+                            
+                            <td align="right">
+                                @{
+                            if (reportList.Maildate == DateTime.MinValue || reportList.Maildate == null) {
+
+
+                            }
+                            else
+                            {
+                                @reportList.Maildate
+                            }
+                                    }
+                            </td>
+                            <td align="right">
+                                @{if (reportList.Maildate == null || reportList.Maildate ==DateTime.MinValue)
+                                  {
+                                  <text>Mail not Sent</text>
+                                  }
+                                  else{
+                                      <text>Mail  send</text>
+                                  }
+}
+                                
+                            </td>
+                            <td align="right">
+                                @reportList.CustomerBillvalue
+                            </td>
+                           
+                           <td align="right">
+    @reportList.SupplierInvoiceNumber
+</td>
+                           <td align="right">
+    @reportList.SupplierRate
+</td>*@
+                            @*
+                            <td align="right">@reportList.NumberofAccomodation</td>
+                            <td>
+                                @reportList.CheckIn.ToShortDateString() - @reportList.CheckOut.ToShortDateString()
+                            </td>
+                            <td align="right">
+                                @differenceInDays
+                            </td>*@
+
+                            @*
+                            <td align="right">@reportList.NoOfGuests</td>
+                            <td>@reportList.CustomeType</td>
+                            <td>@reportList.CustomerName</td>
+                            <td align="right">@reportList.SupplierRate </td>
+                            <td>@reportList.TaxType</td>
+                            <td align="right">@reportList.TaxRate</td>
+                            <td align="right">@reportList.TotalSupplierBuyCost</td>
+                            <td align="right">@reportList.BookingRate</td>
+                            <td align="right">@reportList.BookingValue</td>
+                            <td align="right">@reportList.ServiceTax </td>
+                            <td align="right">@reportList.LuxuryTax </td>
+                            <td align="right">@reportList.TotalBookingValue  </td>
+                            <td align="right">@reportList.GrossMargin </td>
+                            <td align="right">@reportList.AgentCommissionPayable</td>
+                            <td align="right">@(reportList.GrossMargin - reportList.AgentCommissionPayable)</td>
+                            <td align="right">@(netmarpercent)</td>*@
+                        </tr>
+                        i = i + 1;
+
+                        buycost = buycost + reportList.TotalSupplierBuyCost;
+                        salevalue = salevalue + reportList.TotalBookingValue;
+                        grossmargin = grossmargin + reportList.GrossMargin;
+                        commissionpayable = commissionpayable + reportList.AgentCommissionPayable;
+                        netmargin = netmargin + reportList.NetMargin;
+                        nonights += differenceInDays;
+                        noaccs += reportList.NumberofAccomodation;
+                        supplierpayment += reportList.SupplierRate;
+                        cbv += reportList.CustomerBillvalue;
+                        gcbv+=reportList.SupplierRate;
+                        decimal stb = reportList.CustomerBillvalue - reportList.SupplierRate;
+                        stbv += stbv;
+                        gstbv+= stbv;
+                        gnonights += differenceInDays;
+                        gnoaccs += reportList.NumberofAccomodation;
+                        gnsupplierpayment += reportList.SupplierRate;
+                        gbuycost = gbuycost + reportList.TotalSupplierBuyCost;
+                        gsalevalue = gsalevalue + reportList.TotalBookingValue;
+                        ggrossmargin = ggrossmargin + reportList.GrossMargin;
+                        gcommissionpayable = gcommissionpayable + reportList.AgentCommissionPayable;
+                        gnetmargin = gnetmargin + reportList.NetMargin;
+                        }
+
+
+                        @*
+                        <tr class="info">
+                            <td colspan="6">@type Totals</td>
+                            <td align="right"><b>@cbv</b></td>
+                            <td align="right"><b>@supplierpayment</b></td>
+                            <td align="right"><b>@stbv</b></td>
+                            <td align="right"><b></b></td>
+                            <td colspan="6">&nbsp;</td>*@
+                            @*
+                            <td align="right"><b>@buycost.ToString("N0")</b></td>
+                            <td colspan="4">&nbsp;</td>
+                            <td align="right"><b>@salevalue.ToString("N0")</b></td>
+                            <td align="right"><b>@grossmargin.ToString("N0")</b></td>
+                            <td align="right"><b>@commissionpayable.ToString("N0")</b></td>
+                            <td align="right" colspan="2"><b>@netmargin.ToString("N0")</b></td>
+                        </tr>*@
+                        @*
+                        <tr class="success">
+                            <td colspan="6">Grand Totals</td>
+                            <td align="right"><b>@gcbv</b></td>
+
+                            <td align="right"><b>@gnsupplierpayment</b></td>
+                            <td align="right"><b>@gstbv</b></td>
+                            <td align="right"><b></b></td>
+                            <td colspan="6">&nbsp;</td>*@
+                            @*
+                            <td align="right"><b> </b></td>
+                            <td colspan="4">&nbsp;</td>
+                            <td align="right"><b> </b></td>
+                            <td align="right"><b></b></td>
+                            <td align="right"><b></b></td>
+                            <td align="right" colspan="2"></td>
+                            <!--<td>&nbsp;</td>-->
+                        </tr>*@
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function showPager(num) {
+            // alert('here is it ' + num);
+            $("#currentPage").val(num);
+            var url = '@Url.Action("Pager", "BookingStatusReport", new { area = "Admin" })';
+            $.post(url, $("#frmPagersa").serialize(), function (data) {
+                $("#GrossMarrginList").html(data);
+            });
+        }
+    </script>

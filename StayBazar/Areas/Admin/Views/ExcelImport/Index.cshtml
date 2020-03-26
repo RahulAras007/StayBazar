@@ -1,0 +1,55 @@
+﻿@{
+    ViewBag.Title = "Import Data";
+}
+@*<div class="container bdy_min_height">
+    <div class="row">
+        <div class="col-md-12">*@
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        <div class="col-sm-6">
+        <nav class="navbar navbar-default">
+            <ul class="nav navbar-nav">
+                <li class="active">@Html.ActionLink("ExcelImport", "Index", "ExcelImport", new { area = "Admin" }, new { })</li>
+                <li>@Html.ActionLink("Booking", "Import_BookingData", "BookingImport", new { area = "Admin" }, new { })</li>
+                <li>@Html.ActionLink("BookingModification", "Import_BookingModificationData", "BookingModificationImport", new { area = "Admin" }, new { })</li>
+                <li>@Html.ActionLink("Cancellation", "Import_CancellationData", "CancellationImport", new { area = "Admin" }, new { })</li>
+                <li>@Html.ActionLink("CustomerMaster", "Import_CustomerMasterData", "CustomerMasterImport", new { area = "Admin" }, new { })</li>
+                <li>@Html.ActionLink("SupplierMaster", "Import_SupplierMasterData", "SupplierMasterImport", new { area = "Admin" }, new { })</li>
+            </ul>
+        </nav>
+            </div>
+    </div>
+    <br />
+    @*<h2>Import Data</h2>*@
+</div>
+<div class="col-md-12">
+    <div class="row" style="height:50px;"></div>
+    @if (ViewBag.ErrorMessage != null && ViewBag.ErrorMessage != "")
+    {
+        <div class="row">
+            <div class="col-md-6 col-md-offset-6"><div class="alert alert-danger">@Html.Raw(ViewBag.ErrorMessage)</div></div>
+        </div>
+    }
+    <div class="row">
+        <h5>
+            Please use the given formatted excel sheet for uploading the data.
+        </h5>    </div>
+
+    @using (Html.BeginForm("ExcelImport", "ExcelImport", new { Area = "Admin" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+    
+        <div class="row margin-top-6">
+            <div class="col-md-1">Excel File</div>
+            <div class="col-md-5"><input type="file" id="FileUpload1" name="FileUpload1" /></div>
+        </div>
+    <br />
+        <div class="row">
+            <div class="col-md-1"><input type="submit" class="btn btn-success" id="Submit" name="Submit" value="Submit" /></div>
+            <div><a class="btn btn-danger" href="~/Admin/ExcelImport">Cancel</a></div>
+        </div>
+    }
+
+</div>

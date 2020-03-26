@@ -1,0 +1,52 @@
+﻿@model StayBazar.Areas.Admin.Models.AccommodationFeaturesModel
+@try
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="col-md-6">
+            @{
+    string idname = "";
+    foreach (CLayer.AccommodationFeature item in Model.Features)
+    {
+        idname = "af" + item.AccommodationFeatureId.ToString();
+        <div class="accdtn-icon @item.Style">
+            <input type="checkbox" class="css-checkbox accommodationchk" id="@idname" name="@idname" @if (item.IsUsed) { <text> checked="checked" </text> } />
+            <label for="@idname" class="css-label">@item.Title</label>
+        </div>
+    }
+            }
+        </div>
+    </div>
+    @*<div id="success" class="success">
+            Changes saved
+        </div>*@
+    <form id="form_features" name="form_features" method="post" action="AccommodationFeatureSave">
+        @Html.HiddenFor(m => m.AccommodationId)
+        @Html.HiddenFor(m => m.FeatureSet, new { @id = "AcFeatureSet" })
+    </form>
+    <script type="text/javascript">
+        $(function () {
+            //$('#success').hide();
+            $(".accommodationchk").change(function () {
+                //$('#success').hide();
+                $("#AcFeatureSet").val("");
+                $(".accommodationchk").each(function () {
+                    if (this.checked) {
+                        $("#AcFeatureSet").val($("#AcFeatureSet").val() + $(this).attr("id").replace("af", "") + ",");
+                    };
+                });
+                //alert($("#AcFeatureSet").val());
+                var url = '@Url.Action("AccommodationFeatureSave", "Property", new { Area = "Admin" })';
+                $.post(url, { AccommodationId: $("#AccommodationId").val(), features: $("#AcFeatureSet").val() }, function (data) {
+                    //$('#success').show("medium");
+                });
+            });
+        });
+    </script>
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+    Response.Redirect("~/ErrorPage");
+}

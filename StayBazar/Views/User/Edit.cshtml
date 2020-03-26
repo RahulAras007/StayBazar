@@ -1,0 +1,111 @@
+﻿@model StayBazar.Models.UserModel
+
+@{ ViewBag.Title = "User";}
+<div class="container bdy_min_height">
+    <div class="row  margin10px">
+      
+            <div class="col-md-12  "><h2>@ViewBag.Title</h2></div>
+        <div class="col-md-12 ">
+            @try
+            {
+                using (Html.BeginForm("Edit", "User"))
+                {
+                    <div class="alert-danger">@ViewBag.ErrorMessage</div>
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+
+                    <table border="0">
+                        <tbody>
+                            <tr>
+                                <td>@Html.DisplayNameFor(m => m.Salutations)</td>
+                                <td>@Html.DropDownListFor(m => m.SalutationId, Model.Salutations, new { @tabindex = "1", @class = "form-control input-sm" })</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.DisplayNameFor(m => m.FirstName)<span style="color:red">*</span></td>
+                                <td>@Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control input-sm" })</td>
+                                <td>@Html.ValidationMessageFor(m => m.FirstName)</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.DisplayNameFor(m => m.LastName)<span style="color:red">*</span></td>
+                                <td>@Html.TextBoxFor(m => m.LastName, new { @tabindex = "3", @class = "form-control input-sm" })</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.DisplayNameFor(m => m.DateOfBirth)<span style="color:red">*</span></td>
+                                <td>@Html.TextBoxFor(m => m.DateOfBirth, new { @tabindex = "4", @class = "form-control input-sm" })</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.DisplayNameFor(m => m.SexList)<span style="color:red">*</span></td>
+                                <td>@Html.DropDownListFor(m => m.Sex, Model.SexList, new { @tabindex = "5", @class = "form-control input-sm" })</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.DisplayNameFor(m => m.UserTypes)<span style="color:red">*</span></td>
+                                <td>@Html.DropDownListFor(m => m.UserTypeId, Model.UserTypes, new { @tabindex = "7", @class = "form-control input-sm" })</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.DisplayNameFor(m => m.StatusList)</td>
+                                <td>@Html.DropDownListFor(m => m.Status, Model.StatusList, new { @tabindex = "8", @class = "form-control input-sm" })</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>@Html.DisplayNameFor(m => m.Email)<span style="color:red">*</span></td>
+                                <td>@Html.TextBoxFor(m => m.Email, new { @tabindex = "9", @class = "form-control input-sm" })</td>
+                                <td>@Html.ValidationMessageFor(m => m.Email)</td>
+                            </tr>
+                            @if (Model.UserId > 0)
+                            {
+                                <tr>
+                                    <td>Created On</td>
+                                    <td>@Model.CreatedDate</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <input type="submit" id="btnSave" value="Save" class="btn btn-primary" tabindex="10" />
+                    if (Model.Status == (int)StayBazar.Models.UserModel.StatusTypes.Active)
+                    {
+                        if (Model.UserId > 1)
+                        {
+                            <a href="/User/Block/@Model.UserId" class="btn btn-default" onclick="return confirm('Are you sure you want to block?')">Block</a>
+                            <a href="/User/Delete/@Model.UserId" class="btn btn-primary btn-danger" onclick="return confirm('Are you sure you want to delete?')">Delete</a>
+                        }
+                        <a href="~/User" id="btnReset" class="btn btn-primary" tabindex="11">Cancel</a>
+                    }
+                    else if (Model.Status == (int)StayBazar.Models.UserModel.StatusTypes.Blocked)
+                    {
+                        <a href="/User/Restore/@Model.UserId" class="btn btn-default" onclick="return confirm('Are you sure you want to Restore?')">Restore</a>
+                        <a href="/User/Delete/@Model.UserId" class="btn btn-primary btn-danger" onclick="return confirm('Are you sure you want to delete?')">Delete</a>
+                        <a href="~/User/Blocked" id="btnReset" class="btn btn-primary" tabindex="11">Cancel</a>
+                    }
+                    else
+                    {
+                        <a href="/User/Restore/@Model.UserId" class="btn btn-default" onclick="return confirm('Are you sure you want to Restore?')">Restore</a>
+                        <a href="~/User/RecentlyDeleted" id="btnReset" class="btn btn-primary" tabindex="11">Cancel</a>
+                    }
+                    @Html.HiddenFor(m => m.UserId)
+
+
+
+                    <script type="text/javascript">
+                        $(function () {
+                            $("#SalutationId").focus();
+                            $("#DateOfBirth").datepicker({
+                                changeYear: true
+                            });
+                        });
+                    </script>
+                }
+            }
+            catch (Exception ex)
+            {
+                StayBazar.Common.LogHandler.HandleError(ex);
+                Response.Redirect("~/ErrorPage");
+            }
+        </div>
+        </div>
+</div>

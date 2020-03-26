@@ -1,0 +1,104 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+}
+<div class="col-md-12">
+    @{
+        //    StayBazar.Areas.Admin.Models.OfflineBookingModel filterform = (StayBazar.Areas.Admin.Models.OfflineBookingModel)ViewData["Filter"];
+        <div>
+            @using (Html.BeginForm("Pager", "OfflineBookingCustomerList", FormMethod.Post, new { @id = "frmPagers" }))
+            {
+                <input type="hidden" id="SearchStringCache" name="SearchStringCache" value="@Model.SearchStringCache" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@Model.currentPage" />
+                <input type="hidden" id="Limit" name="Limit" value="@Model.Limit" />
+            }
+        </div>
+        gp.RowsInAPage = Model.Limit;
+    }
+</div>
+<div class="col-md-12">
+    @if (Model.CustomCustomerList != null && Model.CustomCustomerList.Count() > 0)
+    {
+        <text>@Html.Raw(gp.GetPager((int)Model.TotalRows, Model.currentPage))</text>
+    }
+
+    @if (Model.Limit > Model.TotalRows)
+    {
+        <div class="height10px"> </div>
+    }
+</div>
+@*<br />
+<div class="col-md-1">
+    <a href="/Admin/OfflineBookingCustomerList/CreateCustomer" class="btn btn-success">Add New</a>
+</div>*@
+    <div class="col-md-12">
+        <div style="overflow:auto">
+            <table border="0" class="table table-condensed table-responsive table-custom table-bordered">
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>User Type</th>
+                        <th>Customer Email</th>
+                        <th>Customer Mobile</th>
+                        <th>Customer Address</th>
+                        <th>Customer Country</th>
+                        <th>Customer State</th>
+                        <th>Customer City</th>
+                        <th>Invoice Mail</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (CLayer.OfflineBooking pr in Model.CustomCustomerList)
+                    {
+                        <tr>
+                            <td>@pr.CustomerName</td>
+
+                            <td>
+                                @if (pr.CustomerType == 5)
+                                {
+                                    <span>Corporate</span>
+                                }
+                                else
+                                {
+                                    <span>Customer</span>
+                                }
+                            </td>
+
+                            <td>@pr.CustomerEmail</td>
+                            <td>@pr.CustomerMobile</td>
+                            <td>@pr.CustomerAddress</td>
+                            <td>@pr.CustomerCountryname</td>
+                            <td>@pr.CustomerStatename</td>
+                            <td>@pr.CustomerCityname</td>
+                            <td class="text-center">
+                                @if (@pr.NoInvoiceMail == false)
+                                {
+                                    <i class="fa fa-check green-color fa-2x" aria-hidden="true"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-times red-color fa-2x" aria-hidden="true"></i>
+                                }
+                            </td>
+                            <td class="text-center"><a href="/Admin/OfflineBookingCustomerList/EditCustomer?CustomerId=@pr.CustomerId" title="Edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @*</div>*@
+    <div class="col-md-11">
+        @if (Model.CustomCustomerList != null && Model.CustomCustomerList.Count() > 0)
+        {
+            <text>@Html.Raw(gp.GetPager((int)Model.TotalRows, Model.currentPage))</text>
+        }
+    </div>
+    <div class="col-md-1"></div>
+

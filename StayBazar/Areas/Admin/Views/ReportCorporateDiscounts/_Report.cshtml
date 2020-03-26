@@ -1,0 +1,66 @@
+﻿@model StayBazar.Areas.Admin.Models.CorporateDiscountsModel
+@{ 
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+   
+}
+@if (Model.ReportList.Count > 0)
+{ 
+
+<div class="row margin10px">
+    <div class="col-md-12">
+        <table class="table table-bordered table-hover table-striped" border="1">
+            <thead>
+                <tr>
+                    <th>Supplier Name</th>
+                    @*<th>Corporate Id</th>*@
+                    <th>Corporate Name</th>
+                    @*<th>Property Id</th>*@
+                    <th>Property Name</th>
+                    <th>Standared Short Term Discounts</th>
+                    <th>Standared Long Term Discounts</th>
+                    <th>Mark up Short Term</th>
+                    <th>Mark up Long Term</th>
+                    <th>Additional Short Term Discounts </th>
+                    <th>Additional Long Term Discounts</th>
+                    @*<th>Usercode</th>*@
+                    @*<th>Property City</th>
+                    <th>Property Location</th>*@
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (CLayer.CorporateDiscounts reportList in  Model.ReportList)
+                {
+                        <tr>
+                            <td>@Model.Suppliername</td>
+                            @*<td>@reportList.CorporateId</td>*@
+                            <td>@reportList.Corporatename</td>
+                            @*<td>@reportList.PropertyId</td>*@
+                            <td>@reportList.PropertyName</td>
+                            <td>@reportList.B2bStdShortDiscounts</td>
+                            <td>@reportList.B2bStdLongDiscounts</td>
+                            <td>@reportList.B2BMarkupShortTerm</td>
+                            <td>@reportList.B2BMarkupLongTerm</td>
+                            <td>@reportList.AddShortTerm</td>
+                            <td>@reportList.AddLongTerm</td>
+                            @*<td>@reportList.Usercode</td>*@
+                            @*<td>@reportList.PropertyCity</td>
+                            <td>@reportList.PropertyLoaction</td>*@
+                        </tr>
+         
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+}
+else
+{ 
+    <div>
+        No Data
+    </div>
+}

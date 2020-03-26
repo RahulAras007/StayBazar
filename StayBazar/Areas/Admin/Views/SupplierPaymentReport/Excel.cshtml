@@ -1,0 +1,144 @@
+﻿@model IEnumerable<CLayer.SupplierPaymentReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+    string type = "";
+    string mtype = "";
+    decimal tNoofofAccomodations = 0, tNoofNights = 0, tSupplierValuePayable = 0, subtotals = 0;
+    decimal gNoofofAccomodations = 0, gNoofNights = 0, gSupplierValuePayable = 0, gsubtotals = 0, grandtotal = 0;
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" />
+        </ss:Style>
+    </ss:Styles>
+     <ss:Worksheet ss:Name="CollectionReport">
+
+        <ss:Table>       
+            <ss:Row ss:StyleID="1">
+                <ss:Cell><ss:Data ss:Type="String">Sl No</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking Date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking Ref No</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">City</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">State</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Accomodation Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No of Accomodations</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Period of Stay</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No of Nights</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Additional Guests</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">CustomerType</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Customer Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Supplier Rate (Pre-tax)</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Supplier Value Payable (Pre-tax)</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Tax Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Tax</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Total Supplier Value Payable</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Amount Paid</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Mode of payment	</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Date of Payment	</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Balance Payable</ss:Data></ss:Cell>
+                </ss:Row>
+
+                @foreach (CLayer.SupplierPaymentReport reportList in Model)
+{
+    i = i + 1;
+
+    DateTime checkin = reportList.CheckIn;
+    DateTime checkout = reportList.CheckOut;
+    TimeSpan ts = checkout - checkin;
+    int differenceInDays = ts.Days;
+    string differenceAsString = differenceInDays.ToString();
+
+    mtype = reportList.CustomeType;
+    if (type != mtype)
+    {
+
+
+        if (type != "")
+        {
+            <ss:Row ss:StyleID="1">
+                <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">@type Totals</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@tNoofofAccomodations</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@tNoofNights </ss:Data></ss:Cell>
+                <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@tSupplierValuePayable.ToString("N0")</ss:Data></ss:Cell>
+                <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+            </ss:Row>
+            tNoofofAccomodations = 0;
+            tNoofNights = 0;
+            tSupplierValuePayable = 0;
+
+
+
+
+        }
+        type = reportList.CustomeType;
+    }
+    <ss:Row>
+        <ss:Cell><ss:Data ss:Type="String">@i</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.BookingDate.ToShortDateString()</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.BookingId</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.City</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.State</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.AccomodationType</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.NumberofAccomodation</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.CheckIn.ToShortDateString() - @reportList.CheckOut.ToShortDateString()</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@differenceAsString</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.NoOfGuests</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.CustomeType</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.CustomerName</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierRate</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierRatePayable</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.TaxType</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.TaxRate</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String">@reportList.TotalSupplierValue</ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+    </ss:Row>
+
+
+
+    tNoofofAccomodations = tNoofofAccomodations + reportList.NumberofAccomodation;
+    tNoofNights = tNoofNights + differenceInDays;
+    tSupplierValuePayable = tSupplierValuePayable + reportList.SupplierRatePayable;
+
+    gNoofofAccomodations += reportList.NumberofAccomodation;
+    gNoofNights += differenceInDays;
+    gSupplierValuePayable += reportList.SupplierRatePayable;
+
+
+}
+
+            <ss:Row ss:StyleID="1">
+                  <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">@type Totals</ss:Data></ss:Cell>
+                  <ss:Cell><ss:Data ss:Type="String">@tNoofofAccomodations</ss:Data></ss:Cell>
+                  <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                  <ss:Cell><ss:Data ss:Type="String">@tNoofNights </ss:Data></ss:Cell>
+                  <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                  <ss:Cell><ss:Data ss:Type="String">@tSupplierValuePayable.ToString("N0")</ss:Data></ss:Cell>
+                  <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>                
+           </ss:Row>
+            <ss:Row ss:StyleID="1">
+                <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">Grand Totals</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@gNoofofAccomodations</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@gNoofNights </ss:Data></ss:Cell>
+                <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@gSupplierValuePayable.ToString("N0")</ss:Data></ss:Cell>
+                <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+            </ss:Row>
+
+
+</ss:Table>
+     </ss:Worksheet>
+</ss:Workbook>

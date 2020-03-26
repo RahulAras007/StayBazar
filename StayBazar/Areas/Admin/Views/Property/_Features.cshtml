@@ -1,0 +1,106 @@
+﻿@model StayBazar.Areas.Admin.Models.PropertyFeaturesModel
+@try
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="row">
+        @*<div class="success col-md-12">
+                Changes saved
+            </div>*@
+        <div class="col-md-7 margin10px">
+            <h4>Please choose your property features.</h4>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            @{
+                List<CLayer.PropertyFeature> pfeatures = Model.Features;
+                string idname = "";
+                int flen = pfeatures.Count;
+                int fclm = flen;
+                int sclm = flen;
+                if (flen > 17)
+                {
+                    int rm = flen % 3;
+                    fclm = flen / 3;
+                    sclm = (fclm * 2) + rm;
+                    if (rm > 1) { rm = 1; }
+                    fclm = fclm + rm;
+                }
+                else
+                    if (flen > 8)
+                {
+                    fclm = flen / 2 + (flen % 2);
+                }
+                if (flen > 0)
+                {
+                    <div class="col-md-4">
+                        @for (int i = 0; i < fclm; i++)
+                        {
+                            idname = "p" + pfeatures[i].PropertyFeatureId.ToString();
+                            <div class="feat-icon @pfeatures[i].Style">
+                                <input type="checkbox" class="css-checkbox propertychk" id="@idname" name="@idname" @if (pfeatures[i].IsUsed) { <text> checked </text> } />
+                                <label for="@idname" class="css-label">@pfeatures[i].Title</label>
+                            </div>
+                        }
+                    </div>
+                    if (sclm < flen)
+                    {
+                        <div class="col-md-4">
+                            @for (int i = fclm; i < sclm; i++)
+                            {
+                                idname = "p" + pfeatures[i].PropertyFeatureId.ToString();
+                                <div class="feat-icon @pfeatures[i].Style">
+                                    <input type="checkbox" class="css-checkbox propertychk" id="@idname" name="@idname" @if (pfeatures[i].IsUsed) { <text> checked </text> } />
+                                    <label for="@idname" class="css-label">@pfeatures[i].Title</label>
+                                </div>
+                            }
+                        </div>
+                    }
+                    if (fclm < flen)
+                    {
+                        if (flen != sclm) { fclm = sclm; }
+                        <div class="col-md-4">
+                            @for (int i = fclm; i < flen; i++)
+                            {
+                                idname = "p" + pfeatures[i].PropertyFeatureId.ToString();
+                                <div class="feat-icon @pfeatures[i].Style">
+                                    <input type="checkbox" class="css-checkbox propertychk" id="@idname" name="@idname" @if (pfeatures[i].IsUsed) { <text> checked </text> } />
+                                    <label for="@idname" class="css-label">@pfeatures[i].Title</label>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+
+            }
+        </div>
+    </div>
+    <form id="form_features" name="form_features" method="post" action="FeatureSave">
+        @Html.HiddenFor(m => m.PropertyId)
+        @Html.HiddenFor(m => m.FeatureSet)
+    </form>
+    <script type="text/javascript">
+        $(function () {
+            //$('.success').hide();
+            $(".propertychk").change(function () {
+                //$('.success').hide();
+                $("#FeatureSet").val("");
+                $(".propertychk").each(function () {
+                    if (this.checked) {
+                        $("#FeatureSet").val($("#FeatureSet").val() + $(this).attr("id").replace("p", "") + ",");
+                    };
+                });
+                var url = '@Url.Action("FeatureSave", "Property")';
+                $.post(url, { PropertyId: $("#PropertyId").val(), features: $("#FeatureSet").val() }, function (data) {
+                    // $('.success').show("medium");
+                });
+            });
+        });
+    </script>
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+    Response.Redirect("~/ErrorPage");
+}

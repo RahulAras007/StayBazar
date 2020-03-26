@@ -1,0 +1,60 @@
+﻿@model StayBazar.Areas.Admin.Models.CityModel
+@{
+                /**/
+
+                Layout = null;
+}
+@{
+    CLayer.State currentState = BLayer.State.Get(Model.StateId);
+    CLayer.Country currentCountry = BLayer.Country.Get(currentState.CountryId);
+}
+@using (Html.BeginForm("Edit", "City"))
+{
+    <div class="page-title-container style3">
+         <div class="row">
+            <div class="col-md-12">
+                <h2 style="color:white"><a href="/Admin/Country" title="Back to Country List">Country</a>[@currentCountry.Name] / <a href="/Admin/State/Index/@currentCountry.CountryId" title="Back to Country List">State</a>[@currentState.Name] / Cities</h2>
+            </div>
+               @*<div class="h3">*@</div>
+        </div>
+        <br />
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    @Html.LabelFor(m => m.Name)
+                    @Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control input-sm" })
+                    @Html.ValidationMessageFor(m => m.Name)
+                </div>
+
+                <div class="col-md-6">
+                    @Html.LabelFor(m => m.Keywords)
+                    @Html.TextBoxFor(m => m.Keywords, new { @tabindex = "1", @class = "form-control input-sm" })
+
+                </div>
+            </div><br />
+            <div class="row">
+                <div class="col-lg-2">
+                    <label for="ForListing">Show as main city in Search Box</label>
+                    @Html.CheckBoxFor(m => m.ForListing, new { @tabindex = "2" })
+                </div>
+                <div class="col-lg-offset-10">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div class="btn-toolbar">
+                        <div class="btn-group">
+                            <input type="submit" id="btnSave" value="Save" class="btn btn-success" tabindex="5" />
+                            <a href="~/Admin/City/Index/@Model.StateId" id="btnReset" class="btn btn-danger" tabindex="6">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><br />
+            @Html.HiddenFor(m => m.StateId)
+            @Html.HiddenFor(m => m.CityId)
+            <script type="text/javascript">
+                $(function () {
+                    $("#Name").focus();
+                });
+            </script>
+            }

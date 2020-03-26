@@ -1,0 +1,77 @@
+﻿@using StayBazar.Models
+@model IEnumerable<StayBazar.Areas.Admin.Models.CancellationImportData>
+@*@{
+        Layout = null;
+    }
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>*@
+@{ 
+    ViewBag.Title = "Display Cancellation Import Data";
+}
+<style>
+    .jumbotron {
+        background-color: white;
+    }
+</style>
+
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-1">
+            @Html.ActionLink("Back", "Import_CancellationData", "CancellationImport", new { area = "Admin" }, new { @class = "btn btn-primary" })
+        </div>
+        <div class="col-md-6">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+
+    </div>
+</div><br />
+
+    
+      <div class="container-fluid">
+
+
+
+          <table class="table table-bordered table-hover" cellpadding="0" cellspacing="0">
+
+              <tr>
+                  <th style="width:100px">Date_of_Cancellation</th>
+                  <th style="width:100px">Customer Name</th>
+                  <th style="width:100px">Customer State</th>
+                  <th style="width:100px">Property Name</th>
+                  <th style="width:100px">Property City</th>
+                  <th style="width:100px">Property State</th>
+                  <th style="width:100px">Accomodation Type</th>
+                  <th style="width:100px">Room Category Type</th>
+                  <th style="width:100px">Check In</th>
+                  <th style="width:100px">Check Out</th>
+                  <th style="width:100px">Guest Name</th>
+                  <th style="width:100px">Cancellation Code</th>
+                  <th style="width:100px">User ID</th>
+                  <th style="width:100px">Itilite Booking ID</th>
+              </tr>
+
+
+              @foreach (StayBazar.Areas.Admin.Models.CancellationImportData data in Model)
+              {
+                  <tr>
+                      <td>@data.date_of_cancelation</td>
+                      <td>@data.customer_name</td>
+                      <td>@data.customer_state</td>
+                      <td>@data.property_name</td>
+                      <td>@data.property_city</td>
+                      <td>@data.property_state</td>
+                      <td>@data.accomodation_type</td>
+                      <td>@data.room_category_type</td>
+                      <td>@data.check_in</td>
+                      <td>@data.check_out</td>
+                      <td>@data.guest_name</td>
+                      <td>@data.cancellation_code</td>
+                      <td>@data.UserID</td>
+                      <td>@data.Itilite_booking_ID</td>
+                  </tr>
+              }
+
+
+          </table>
+      </div>

@@ -1,0 +1,256 @@
+@model DataTable
+@using System.Data;
+@using StayBazar.Common;
+@{
+    long i = 0;
+    double total = 0;
+    int totalnights = 0;
+    double avgbuy, avgobuy, avgsale, avgosale;
+    double tamount;
+    double sgst, cgst, igst;
+    double tsgst, tcgst, tigst;
+    DataRow dr;
+    int ix = 0;
+    int rowCount = Model.Rows.Count;
+    Layout = null;
+	int bookingType = 0;
+	bool TACGstTaxIncluded = false;
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" />
+        </ss:Style>
+  <ss:Style ss:ID="DateLiteral">
+         <NumberFormat ss:Format="0"/>
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="Customer Invoice Report">
+        <ss:Table>
+            <ss:Row ss:StyleID="1">
+                <ss:Cell><ss:Data ss:Type="String">Sl No</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">BookingCategory</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">SB Billing Entity</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Invoice Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Invoice No</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Booking ID</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">Customer Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Customer City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Customer State</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Customer GST No</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Property City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Property State</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Property GST No</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Check In Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Check Out Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total Room Nights</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">Room Value Before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">SGST Rate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">SGST Value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">CGST Rate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">CGST Value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">IGST Rate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">IGST Value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total GST Value</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">Other Services Before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">SGST Rate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">SGST Value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">CGST Rate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">CGST Value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">IGST Rate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">IGST Value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total GST Value</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">Invoice Total Before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total SGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total CGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total IGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Customer Invoice Total</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">Supplier room value before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Input SGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Input CGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Input IGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total supplier room value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Supplier other service value before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Input SGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Input CGST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Input IGST</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">Total supplier other service value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Supplier total value before GST</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total supplier GST value</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Supplier total including GST</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">SAC Code</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Place Of Supply</ss:Data></ss:Cell>
+            </ss:Row>
+            @for(ix=0;ix< rowCount;ix++)
+    {
+        dr = Model.Rows[ix];
+        i = i + 1;
+        totalnights = Converter.ToInteger(dr["totalnights"]);
+        avgbuy = Math.Round(Converter.ToDouble(dr["AvgDailyRateBefreStaxForBuyPrice"]) * totalnights, 2);
+        avgobuy = Math.Round(Converter.ToDouble(dr["BuyPriceforotherservicesForBuyprice"]), 2);
+        avgsale = Math.Round(Converter.ToDouble(dr["AvgDailyRateBefreStaxForSalePrice"]) * totalnights, 2);
+        avgosale = Math.Round(Converter.ToDouble(dr["BuyPriceforotherservicesForSalePrice"]), 2);
+		bookingType = Converter.ToInteger(dr["BookingType"]);
+		TACGstTaxIncluded = Converter.ToBoolean(dr["TACGSTIncluded"]);
+		
+                   <ss:Row>
+                        <ss:Cell><ss:Data ss:Type="Number">@i</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["Booking_Category"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["BillingEntity"])</ss:Data></ss:Cell>
+
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToDate(dr["InvoiceDate"]).ToShortDateString()</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["InvoiceNumber"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["orderno"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["Name"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["Customer_City"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["Customer_State"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["Customer_GST_No"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["PropertyName"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["cityname"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["PropertyState"])</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["PropertyGstRegNo"])</ss:Data></ss:Cell>
+
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToDate(dr["CheckIn_date"]).ToShortDateString()</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@Converter.ToDate(dr["CheckOut_date"]).ToShortDateString()</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@(totalnights)</ss:Data></ss:Cell>
+                        @{ 
+							if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                            {
+                                tsgst = 0; tcgst = 0; tigst = 0; avgsale = 0; total = 0; tamount = 0;
+                                sgst = 0;cgst = 0;igst = 0;
+                            }
+                            else
+                            {
+                                sgst = Convert.ToDouble(dr["SGST"]);
+                                cgst = Convert.ToDouble(dr["CGST"]);
+                                igst = Convert.ToDouble(dr["IGST"]);
+                                tsgst = (avgsale * sgst * 0.01);
+                                tcgst = (avgsale * cgst * 0.01);
+                                tigst = (avgsale * igst * 0.01);
+                                tamount = tsgst + tcgst + tigst;
+                            }
+						}
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(avgsale,2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@sgst.ToString("G") %</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tsgst,2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@cgst.ToString("G") %</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tcgst, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@igst.ToString("G") %</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tigst, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tamount, 2)</ss:Data></ss:Cell>
+                        @{ 
+						
+							if(bookingType != (int) CLayer.ObjectStatus.OfflineBookingType.Regular)
+                            {
+                                sgst = Convert.ToDouble(dr["btSGST"]);
+                                cgst = Convert.ToDouble(dr["btCGST"]);
+                                igst = Convert.ToDouble(dr["btIGST"]);
+                                avgosale = Math.Round(Converter.ToDouble(dr["DirectAmount"]), 2);
+								if (TACGstTaxIncluded)
+                                { avgosale = @Math.Round(avgosale, 2) / (1 + ((sgst + cgst + igst) / 100)); }
+                                tsgst = 0;
+                                tcgst = 0;
+                                tigst = 0;
+                                avgsale = 0;
+                            }
+                            else
+                            {
+                                sgst = Convert.ToDouble(dr["oSGST"]);
+                                cgst = Convert.ToDouble(dr["oCGST"]);
+                                igst = Convert.ToDouble(dr["oIGST"]);
+                            }
+                            tsgst = tsgst + (avgosale * sgst * 0.01);
+                            tcgst = tcgst + (avgosale * cgst * 0.01);
+                            tigst = tigst+ (avgosale * igst * 0.01);
+                            tamount = (avgosale * sgst * 0.01) + (avgosale * cgst * 0.01) + (avgosale * igst * 0.01); }
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(avgosale,2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@sgst.ToString("G") %</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round((avgosale * sgst * 0.01), 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@cgst.ToString("G") %</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round((avgosale * cgst * 0.01), 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@igst.ToString("G") %</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round((avgosale * igst * 0.01), 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tamount, 2)</ss:Data></ss:Cell>
+
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(avgsale + avgosale, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tsgst, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tcgst, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tigst, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(avgsale + avgosale + tigst +tcgst + tsgst, 0)</ss:Data></ss:Cell>
+                        @{ 
+							
+							if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                            {
+                                tsgst = 0;tcgst = 0;tigst = 0;avgbuy = 0;total = 0;tamount = 0;
+                            }
+                            else
+                            {
+                                sgst = Convert.ToDouble(dr["bSGST"]);
+                                cgst = Convert.ToDouble(dr["bCGST"]);
+                                igst = Convert.ToDouble(dr["bIGST"]);
+                                tsgst = (avgbuy * sgst * 0.01);
+                                tcgst = (avgbuy * cgst * 0.01);
+                                tigst = (avgbuy * igst * 0.01);
+                                tamount = tsgst + tcgst + tigst;	
+                                total = tamount;
+                            }
+						 }
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(avgbuy,0)</ss:Data></ss:Cell>
+                        @*<ss:Cell><ss:Data ss:Type="String">@sgst.ToString("G") %</ss:Data></ss:Cell>*@
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tsgst, 2)</ss:Data></ss:Cell>
+                        @*<ss:Cell><ss:Data ss:Type="String">@cgst.ToString("G") %</ss:Data></ss:Cell>*@
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tcgst, 2)</ss:Data></ss:Cell>
+                        @*<ss:Cell><ss:Data ss:Type="String">@igst.ToString("G") %</ss:Data></ss:Cell>*@
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tigst, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(avgbuy + tamount, 2)</ss:Data></ss:Cell>
+                        @{ 
+                            if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                            {
+                              tsgst = 0; tcgst = 0; tigst = 0; avgobuy = 0; total = 0;
+                            }
+                            else
+                            {
+
+                              sgst = Convert.ToDouble(dr["obSGST"]);
+                              cgst = Convert.ToDouble(dr["obCGST"]);
+                              igst = Convert.ToDouble(dr["obIGST"]);
+                           /*   tsgst = (avgobuy * sgst * 0.01);
+                              tcgst = (avgobuy * cgst * 0.01);
+                              tigst = (avgobuy * igst * 0.01);*/
+
+                              double totalBuyPriceOther = Math.Round(Converter.ToDouble(dr["BuyPriceforotherservicesTotalTax"]), 2);
+                              tsgst = (totalBuyPriceOther / 2);
+                              tcgst = tsgst;
+                              tigst = (igst > 0) ? totalBuyPriceOther : 0;
+
+                              tamount = tsgst + tcgst + tigst;
+                              total = total + tamount;
+                            }
+
+						}
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(avgobuy,2)</ss:Data></ss:Cell>
+                        @*<ss:Cell><ss:Data ss:Type="String">@sgst.ToString("G") %</ss:Data></ss:Cell>*@
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tsgst, 2)</ss:Data></ss:Cell>
+                    @*<ss:Cell><ss:Data ss:Type="String">@cgst.ToString("G") %</ss:Data></ss:Cell>*@
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tcgst, 2)</ss:Data></ss:Cell>
+                    @*<ss:Cell><ss:Data ss:Type="String">@igst.ToString("G") %</ss:Data></ss:Cell>*@
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tigst, 2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(tamount + avgobuy, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(avgbuy + avgobuy, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(total, 2)</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="Number">@Math.Round(total+ avgbuy + avgobuy, 0)</ss:Data></ss:Cell>
+                       <ss:Cell><ss:Data ss:Type="Number">@Converter.ToString(dr["HSNCode"])</ss:Data></ss:Cell>
+                       <ss:Cell><ss:Data ss:Type="String">@Converter.ToString(dr["Place_Of_Supply"])</ss:Data></ss:Cell>
+                   </ss:Row>
+                   }
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

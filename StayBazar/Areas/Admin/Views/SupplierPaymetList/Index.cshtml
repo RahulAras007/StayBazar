@@ -1,0 +1,104 @@
+﻿@model StayBazar.Areas.Admin.Models.SupplierPaymetListModel
+@{
+    ViewBag.Title = "Supplier Payment";
+    
+}
+
+@*<div>
+
+    <h2>@ViewBag.Title</h2>*@
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-3">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+
+        @*<div class="row">
+            <div class="col-md-12">*@
+                @using (Html.BeginForm("Filter", "SupplierPaymetList", FormMethod.Post, new { @id = "frmFiltersSupplierPayment" }))
+                {
+                    @*<div class="row">*@
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                @Html.HiddenFor(m => m.searchType)
+                                @Html.TextBoxFor(m => m.searchText, new { @class = "form-control" })
+                                <span class="input-group-btn">
+                                    <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="input-group ">
+                                <div class="form-control">
+                                    <input name="ruv" class="css-radiobutton" value="1" id="Search1" checked="" type="radio">
+                                    <label for="Search1" class="css-label">Property</label>
+                                    &nbsp;&nbsp;
+                                    <input name="ruv" class="css-radiobutton" value="2" id="Search2" type="radio">
+                                    <label for="Search2" class="css-label">Supplier</label>
+                                    &nbsp;&nbsp;
+                                    <input name="ruv" class="css-radiobutton" value="3" id="Search3" type="radio">
+                                    <label for="Search3" class="css-label">Email</label>
+                                    &nbsp;&nbsp;
+                                    <input name="ruv" class="css-radiobutton" value="4" id="Search4" type="radio">
+                                    <label for="Search4" class="css-label">Booking ID</label>
+                                    &nbsp;&nbsp;
+                                </div>
+
+                            </div>
+                        </div>
+                    @*</div>*@
+                }
+
+            </div>
+</div>
+
+        @*<hr />*@
+
+<div class="container-fluid">
+        <div class="row">
+            @*<div class="col-md-12">*@
+                <div id="list" class="row">
+                    @Html.Partial("~/Areas/Admin/Views/SupplierPaymetList/_List.cshtml", Model)
+                </div>
+            </div>
+        @*</div>*@
+</div>
+
+
+
+    <script type="text/javascript">
+
+    $('#btnSearch').click(function () {
+        $('#searchType').val($('input[name="ruv"]:checked').val());
+        var url = '@Url.Action("Filter", "SupplierPaymetList")?' + $('#frmFiltersSupplierPayment').serialize();
+        $.get(url, function (data) {
+            $('#list').html(data);
+        });
+    });
+    function onClickDelete(supplierPaymentId) {
+        var answer = confirm("Are you sure you want to delete this Supplier Payment ?");
+        if (answer == true) {
+            var url = '@Url.Action("Delete", "SupplierPaymetList")?supplierPaymentId=' + supplierPaymentId + '&' + $('#frmFiltersSupplierPayment').serialize();
+            $.get(url, function (data) {
+                $('#list').html(data);
+            });
+        }
+    }
+    function onClickEdit(OrderNo) {
+        var url = '@Url.Action("getDetail", "SupplierPaymetList")?supplierPaymentId=' + OrderNo;
+        window.location.href = url;
+    }
+
+    function showPager(num) {
+        //alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager1", "SupplierPaymetList")';
+        $.post(url, $("#frmPagers1").serialize(),
+                function (data) {
+                    $("#list").html(data);
+                });
+    }
+    </script>
+

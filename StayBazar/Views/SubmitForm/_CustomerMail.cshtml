@@ -1,0 +1,97 @@
+﻿@model StayBazar.Models.SuggestModel
+@{
+    Layout = null;
+}
+<table width="100%" style="font-family: sans-serif; font-weight: 100; padding: 0 5%;" class="tbl">
+    <thead>
+        <tr>
+            <th style="padding-top: 2%; " align="left" colspan="3">
+                <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+            </th>
+            <th width="400" align="right" style="font-size:12px;">
+                @*Phone: @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)*@
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @*<tr>
+                <td colspan="4" align="center">
+                    <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">BOOKING CONFIRMATION</h5>
+                </td>
+            </tr>*@
+        <tr>
+            <td colspan="4">
+                <p style="line-height: 35px; font-size: 12px; color: #666;">
+                    Dear @Model.Name,<br />
+                    Thank you for your query. We will contact with you in shortest possible time.
+                </p>
+            </td>
+        </tr>
+
+        <tr style="text-align:center;">
+            <td>
+                @*<table style="margin-left: 100px;">
+                    <tr style="font-size:12px; ">
+                        <td style="font-weight:bold;">Team Staybazar</td>
+                    </tr>
+                    <tr style="font-size:12px; ">
+                        <td>1800-425-2393</td>
+                    </tr>
+                    <tr style="font-size:12px; ">
+                        <td>+91-80-2572-2898/4091-6686</td>
+                    </tr>
+
+                    <tr style="font-size:12px; ">
+                        <td>info@staybazar.com</td>
+                    </tr>
+                </table>*@
+
+            </td>
+        </tr>
+      
+        <tr style="font-size:12px; ">
+            <td valign="top" style="font-weight:bold; padding-top: 25px;">Staybazar.com</td>
+
+        </tr>
+
+        <tr style="font-size:12px;">
+            <td colspan="4" valign="top">Serviced Apartments&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;Guest Houses&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;Home Stays&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;Hotels&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;Resorts&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td align="center" colspan="4">
+                <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px;">
+                    Have a query or need assistance ?
+                </p>
+                <p style="font-size:14px;">
+                    Please contact us at toll free number :  1800-425-2393
+                </p>
+                <p style="font-size:14px;">
+                    Or 080-2572 2898 / 080-4091-6686
+                </p>
+                <p style="font-size:14px;">
+                    Write to us at support@staybazar.com
+                </p>
+
+                <p style="height:10px;">
+                   
+                </p>
+
+                <p style="font-size:14px;">
+                    Staybazar.com
+                </p>
+                <p style="font-size:14px;">
+                    Division of Southern E-Commerce Solutions Pvt Ltd,
+                </p>
+                <p style="font-size:14px;">
+                    No. 993, 9th Main, Sector – 7, HSR Layout, Bangalore – 560 102, India
+                </p>
+                <p style="font-size:14px;">
+                    www.staybazar.com
+                </p>
+            </td>
+        </tr>
+    </tfoot>
+</table>

@@ -1,0 +1,692 @@
+﻿@model StayBazar.Areas.Admin.Models.SuppierInvoiceModel
+@{
+    ViewBag.Title = "Supplier Invoice Details";
+}
+
+@using (Html.BeginForm("saveSupplierInvoiceDetails", "SupplierInvoiceDetails", FormMethod.Post, new { @id = "frmSuppInvDet" }))
+{
+    @Html.HiddenFor(m => m.isFromList)
+    @Html.HiddenFor(m => m.BookingRefIDs)
+    @Html.HiddenFor(m => m.checkedBookingRefIDs)
+    @Html.HiddenFor(m => m.editedBookingRefIDs)
+    @Html.HiddenFor(m => m.BookingRefIDsWithValue)
+
+
+    @*<h4 class="bold">
+        </h4>*@
+    <div class="page-title-container style3">
+        <div class="row">
+            <div class="col-md-4">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="col-md-12">
+
+        <div id="PropertyDetails">
+            <div class="col-md-6">
+                <div class="row" style="margin-bottom:15px;">
+                    @*<div class="col-md-5" style="padding:0;">
+                    *@
+                    <div class="col-md-8">
+                        @Html.HiddenFor(m => m.SupplierInvoiceID)
+                        @Html.HiddenFor(m => m.PropertyId)
+                        @Html.HiddenFor(m => m.TaxType)
+                        @Html.HiddenFor(m => m.PropertyEmailAddresss)
+                        @Html.HiddenFor(m => m.PropertyType)
+                        @Html.LabelFor(m => m.PropertyName)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.PropertyName, new { @class = "form-control input-sm", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(m => m.PropertyName)
+                    </div>
+                    <div class="col-md-2" style="padding-left: 0px;">
+                        <br /><br />
+                        <input type="button" onclick="browseProperty()" value="Choose Property" class="btn btn-success" />
+                        <span id="propertynames"></span>
+                    </div>
+                    @*
+                        </div>*@
+                </div>
+
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.SupplierId)
+                    @Html.LabelFor(m => m.InvoiceNumber)
+                    @Html.TextBoxFor(m => m.InvoiceNumber, new { @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.InvoiceDate)
+                    @Html.TextBoxFor(m => m.InvoiceDate, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm datepicker", Title = " Date" })
+                </div>
+                <div class="form-group">
+                    @if (Model.TaxType == (int)CLayer.SupplierInvoice.TaxTypes.ServiceTax)
+                    {
+                        @Html.Label("GSTIN Number")
+                        @*@Html.LabelFor(m => m.ServiceTaxRegNumber)*@
+                    }
+                    else
+                    {
+                        @Html.Label("GSTIN Number")
+                    }
+                    @Html.TextBoxFor(m => m.ServiceTaxRegNumber, new { @class = "form-control input-sm hasDatepicker" })
+                </div>
+                <div class="form-group hide">
+                    @Html.LabelFor(m => m.PAN_Number)
+                    @Html.TextBoxFor(m => m.PAN_Number, new { @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.BaseAmount)
+                    @Html.TextBoxFor(m => m.BaseAmount, new { @class = "form-control input-sm" })
+                </div>
+                @if (Model.TaxType == (int)CLayer.SupplierInvoice.TaxTypes.ServiceTax)
+                {
+                    @*<div class="form-group">
+                            @Html.LabelFor(m => m.LuxuryTax)
+                            @Html.TextBoxFor(m => m.LuxuryTax, new { @class = "form-control input-sm" })
+                        </div>*@
+                }
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @if (Model.TaxType == (int)CLayer.SupplierInvoice.TaxTypes.ServiceTax)
+                    {
+                        @Html.Label("GST Amount")
+                    }
+                    else
+                    {
+                        @Html.Label("GST Amount")
+                    }
+                    <br /> @Html.TextBoxFor(m => m.ServiceTax, new { @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TotalInvoiceValue)
+                    @Html.TextBoxFor(m => m.TotalInvoiceValue, new { @class = "form-control input-sm" })
+                    @*<input type="text" readonly id="txtTotalAdjustmentResult" />*@
+                </div>
+                <div class="form-group">
+                    @Html.Label("Amount Adjustment")
+                    @*@Html.TextBox("txtTotalAdjustmentResult", "", new { @class = "form-control input-sm", @readonly = "readonly" })*@
+                    @Html.TextBoxFor(m => m.txtTotalAdjustmentResult, new { @class = "form-control input-sm" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.EntryDate)
+                    @Html.TextBoxFor(m => m.EntryDate, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm datepicker", Title = " Dates" })
+                </div>
+                <br />
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsSupInvoicedone)  @Html.LabelFor(m => m.IsSupInvoicedone)
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+    <div class="col-md-12 margin-bot-10">
+        <div id="divBroseBotton" class="col-md-12" @if (Model.PropertyId > 0 && Model.SupplierInvoiceID > 0) { <text> style="display:block;" </text>  } else { <text> style="display:none;" </text> }>
+            <br />
+            <input type="button" value="Browse New Booking" class="btn btn-primary" onclick="onClickBrowseNewBooking();" />
+        </div>
+        <div id="divSelectedBookings_Parent" class="col-md-12" style="display:none;">
+        </div>
+        <div id="DivInvPropSavedBookingList" class="col-md-12" style="padding:0;">
+            <br />
+            @if (Model.savedBookingList != null)
+            {
+                if (Model.SupplierInvoiceID > 0 && Model.PropertyId > 0 && Model.savedBookingList.Count() > 0)
+                {
+                    @Html.Partial("~/Areas/Admin/Views/SupplierInvoiceDetails/_InvPropertySavedBookingList.cshtml", Model)
+                }
+            }
+       
+        </div> 
+    </div>
+  
+    <div class="col-md-12 " style="padding-bottom:10px; margin-bottom:250px;">
+        <div class="col-md-4">
+            <br />
+            <input type="button" id="btnSave" value="Save" onclick="" class="btn btn-success " tabindex="23" />
+            @if (Model.isFromList)
+            {
+                <a href="~/Admin/SupplierInvoiceDetails/getSupplierInvoiceList" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+            }
+            else
+            {
+                <a href="~/Admin/SupplierInvoiceDetails/Index" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+            }
+        </div>
+    </div>
+
+}
+
+
+
+<!-- Modal 1 -->
+<div class="modal fade" id="chooseProperty" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Choose Property</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        @Html.Partial("_BrowsProperty")
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal 1 -->
+<!-- Modal 2 -->
+<div class="modal fade" id="popupSupplierInvoiceBooking" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog popUpModification">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Choose Bookings</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div id="popupContentDivBooking_Filter">
+                        @*@Html.Partial("~/Areas/Admin/Views/SupplierInvoiceDetails/_InvPropertyBookingList_Filter.cshtml", Model)*@
+                    </div>
+                    <div class="" id="popupContentDivBooking">
+                        @*@Html.Partial("_BrowsProperty")*@
+                    </div>
+                </div>
+            </div>
+            @*<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>*@
+        </div>
+    </div>
+</div>
+<!-- Modal 2 -->
+
+<style>
+    .popUpModification {
+        width: 950px;
+    }
+</style>
+
+
+<script type="text/javascript">
+    function showPager(num) {
+        $("#currentPage_Booking").val(num);
+        $('#searchTypeBooking').val($('input[name="ruvBooking"]:checked').val());
+        var url = '@Url.Action("getInvPropertyBookingList_Filter_Pager", "SupplierInvoiceDetails")?searchTypeBooking=' + $('#searchTypeBooking').val() + '&searchTextBooking=' + encodeURIComponent($('#searchTextBooking').val()) + '&propID=' + $('#PropertyId').val() + '&SupplierInvoiceID=' + $('#SupplierInvoiceID').val() + '&currentPage_Booking=' + $('#currentPage_Booking').val() + '&PropertyEmailAddresss=' + $('#PropertyEmailAddresss').val() + '&PropertyType=' + $('#PropertyType').val() + '&BookingRefIDs=' + encodeURIComponent($('#BookingRefIDs').val());
+        $.get(url, function (data) {
+            $('#popupContentDivBooking').html(data);
+        });
+    }
+</script>
+
+<script type="text/javascript">
+
+    function refreshTotalAdjustment() {
+        //var pattern = new RegExp('(^[-+]?([0-9]+)(\.[0-9]+)?)$');
+        //var res = $('#TotalInvoiceValue').val() - $('#TotalWhenSelection').val();
+        //if (pattern.test(res)) {
+        //    $('#txtTotalAdjustmentResult').val(res);
+        //}
+        //else {
+        //    if (pattern.test($("#TotalInvoiceValue").val()) && $("#TotalInvoiceValue").val() != 0) {
+        //        $('#txtTotalAdjustmentResult').val($("#TotalInvoiceValue").val());
+        //    }
+        //    else {
+        //        $('#txtTotalAdjustmentResult').val(0);
+        //    }
+        //}
+    }
+
+    $("#BaseAmount").on('change keyup paste', function () {
+        calculateTotalInvoiceValue();
+    });
+    $("#LuxuryTax").on('change keyup paste', function () {
+        calculateTotalInvoiceValue();
+    });
+    $("#ServiceTax").on('change keyup paste', function () {
+        calculateTotalInvoiceValue();
+    });
+
+    $("#TotalInvoiceValue").on('change keyup paste', function () {
+        //onChangeTotalInvoiceValue();
+    });
+
+    function onChangeTotalInvoiceValue() {
+        //var pattern = new RegExp('(^[-+]?([0-9]+)(\.[0-9]+)?)$');
+        //var res = $("#TotalInvoiceValue").val() - $('#TotalWhenSelection').val();
+        //if (pattern.test(res)) {
+        //    $('#txtTotalAdjustmentResult').val(res);
+        //}
+        //else {
+        //    if (pattern.test($("#TotalInvoiceValue").val()) && $("#TotalInvoiceValue").val() != 0) {
+        //        $('#txtTotalAdjustmentResult').val($("#TotalInvoiceValue").val());
+        //    }
+        //    else {
+        //        $('#txtTotalAdjustmentResult').val(0);
+        //    }
+        //}
+    }
+
+    function calculateTotalInvoiceValue() {
+        var pattern = new RegExp('(^[-+]?([0-9]+)(\.[0-9]+)?)$');
+        var ttl = 0.0;
+        if (pattern.test($("#BaseAmount").val())) {
+            ttl = ttl + parseFloat($("#BaseAmount").val());
+        }
+        if (pattern.test($("#LuxuryTax").val())) {
+            ttl = ttl + parseFloat($("#LuxuryTax").val());
+        }
+        if (pattern.test($("#ServiceTax").val())) {
+            ttl = ttl + parseFloat($("#ServiceTax").val());
+        }
+        $("#TotalInvoiceValue").val(ttl);
+        onChangeTotalInvoiceValue();
+    }
+
+    function onClickBrowseNewBooking() {
+        if ($('#PropertyId').val() > 0) {
+            var urlFilter = '@Url.Action("getInvPropertyBookingList_Filter_Html", "SupplierInvoiceDetails")';
+            $.get(urlFilter, function (data) {
+                $('#popupContentDivBooking_Filter').html(data);
+            });
+            var url = '@Url.Action("getInvPropertyBookingList", "SupplierInvoiceDetails")?propID=' + $('#PropertyId').val() + '&SupplierInvoiceID=' + $('#SupplierInvoiceID').val() + '&PropertyEmailAddresss=' + $('#PropertyEmailAddresss').val() + '&PropertyType=' + $('#PropertyType').val() + '&BookingRefIDs=' + encodeURIComponent($('#BookingRefIDs').val() + "&TaxType=" + $('#TaxType').val());
+            $.get(url, function (data) {
+                $('#popupContentDivBooking').html(data);
+                $('#popupSupplierInvoiceBooking').modal('show');
+            });
+        }
+    }
+
+    function onClickFilterInvBookingList() {
+        $('#searchTypeBooking').val($('input[name="ruvBooking"]:checked').val());
+        var url = '@Url.Action("getInvPropertyBookingList_Filter", "SupplierInvoiceDetails")?searchTypeBooking=' + $('#searchTypeBooking').val() + '&searchTextBooking=' + encodeURIComponent($('#searchTextBooking').val()) + '&propID=' + $('#PropertyId').val() + '&SupplierInvoiceID=' + $('#SupplierInvoiceID').val() + '&PropertyEmailAddresss=' + $('#PropertyEmailAddresss').val() + '&PropertyType=' + $('#PropertyType').val() + '&BookingRefIDs=' + encodeURIComponent($('#BookingRefIDs').val());
+        $.get(url, function (data) {
+            $('#popupContentDivBooking').html(data);
+        });
+    }
+
+    function DeleteSavedBookingList(RefNum, ths) {
+        if ($('#SupplierInvoiceID').val() > 0) {
+            var url = '@Url.Action("deleteSupplierInvoiceSavedBookingListItem", "SupplierInvoiceDetails")?propID=' + $('#PropertyId').val() + '&refNum=' + encodeURIComponent(RefNum) + '&supplierInvID=' + $('#SupplierInvoiceID').val() + '&PropertyEmailAddresss=' + $('#PropertyEmailAddresss').val() + '&PropertyType=' + $('#PropertyType').val();
+            $.get(url, function (data) {
+                $('#DivInvPropSavedBookingList').html(data);
+                refreshTotalAdjustment();
+
+            });
+
+            var txt1 = $('#BookingRefIDs').val();
+            var joinString = "";
+            $.each(txt1.split(','), function (index, value) {
+                if (value == RefNum) {
+                    console.log('Removed : ' + value);
+                }
+                else {
+                    if (joinString == "") {
+                        joinString = value;
+                        //console.log('ConCate :' + joinString);
+                    }
+                    else {
+                        joinString = joinString + ',' + value;
+                        //console.log('ConCate1 :' + joinString);
+                    }
+                }
+            });
+            $('#BookingRefIDs').val(joinString);
+
+        }
+        else {
+            var txt1 = $('#BookingRefIDs').val();
+            var joinString = "";
+            $.each(txt1.split(','), function (index, value) {
+                if (value == RefNum) {
+                    console.log('Removed : ' + value);
+                }
+                else {
+                    if (joinString == "") {
+                        joinString = value;
+                        //console.log('ConCate :' + joinString);
+                    }
+                    else {
+                        joinString = joinString + ',' + value;
+                        //console.log('ConCate1 :' + joinString);
+                    }
+                }
+            });
+            $('#BookingRefIDs').val(joinString);
+            //$(ths).closest("tr").remove();
+            getDelSubFn();
+        }
+        GetAdjustmentAmount();
+    }
+
+    function getDelSubFn() {
+        var url = '@Url.Action("deleteSupplierInvoiceSavedBookingListItemTableRow", "SupplierInvoiceDetails")?propID=' + $('#PropertyId').val() + '&BookingRefNo=' + encodeURIComponent($('#BookingRefIDs').val()) + '&PropertyEmailAddresss=' + $('#PropertyEmailAddresss').val() + '&PropertyType=' + $('#PropertyType').val();
+        $.get(url, function (data) {
+            $('#DivInvPropSavedBookingList').html(data);
+            refreshTotalAdjustment();
+        });
+    }
+
+    function onClickUnSelectSelected(RefNo) {
+        var txt1 = $('#BookingRefIDs').val();
+        var joinString = "";
+        $.each(txt1.split(','), function (index, value) {
+            if (value == RefNo) {
+                console.log('Removed : ' + value);
+            }
+            else {
+                if (joinString == "") {
+                    joinString = value;
+                    //console.log('ConCate :' + joinString);
+                }
+                else {
+                    joinString = joinString + ',' + value;
+                    //console.log('ConCate1 :' + joinString);
+                }
+            }
+        });
+        $('#BookingRefIDs').val(joinString);
+        //console.log('Final :' + $('#BookingRefIDs').val());
+        RefreshSelectedBookingsBobble();
+    }
+
+    function RefreshSelectedBookingsBobble() {
+        if ($('#BookingRefIDs').val().length > 0) {
+            var url = '@Url.Action("getSelectedBookings", "SupplierInvoiceDetails")?BookingRefNo=' + encodeURIComponent($("#BookingRefIDs").val());
+            $.get(url, function (data) {
+                $('#divSelectedBookings_Parent').html(data);
+                $('#divSelectedBookings_Parent').css('display', 'block');
+            });
+        }
+        else {
+            $('#divSelectedBookings_Parent').html("");
+            $('#divSelectedBookings_Parent').css('display', 'none');
+        }
+    }
+
+
+
+
+    function onAddClickOnBrowseBookingPopUp() {
+        $('#popupSupplierInvoiceBooking').modal('hide');
+        if ($('#BookingRefIDs').val().length > 0) {
+            var url = '@Url.Action("saveSelectedBookingList", "SupplierInvoiceDetails")?BookingRefIDs=' + encodeURIComponent($("#BookingRefIDs").val()) + '&SupplierInvID=' + $('#SupplierInvoiceID').val() + '&PropertyId=' + $('#PropertyId').val() + '&PropertyEmailAddresss=' + $('#PropertyEmailAddresss').val() + '&PropertyType=' + $('#PropertyType').val() + '&editedBookingRefIDs='+$('#editedBookingRefIDs').val();
+            $.get(url, function (data) {
+                $('#DivInvPropSavedBookingList').html(data);
+                refreshTotalAdjustment();
+                GetAdjustmentAmount();
+            });
+            @*var url = '@Url.Action("getSelectedBookings", "SupplierInvoiceDetails")?BookingRefNo=' + encodeURIComponent($("#BookingRefIDs").val());
+            $.get(url, function (data) {
+                $('#divSelectedBookings_Parent').html(data);
+                $('#divSelectedBookings_Parent').css('display', 'block');
+            });*@
+        }
+        //else {
+        //    $('#divSelectedBookings_Parent').html("");
+        //    $('#divSelectedBookings_Parent').css('display', 'none');
+        //}
+    }
+
+    //function onClickSavedBookingCheck(ths)
+    //{
+    //    alert('Saved Booking Check');
+    //}
+
+
+    $(document).ready(function () {
+        //$("#thechecked").click(function () {
+        //    var closestTr = $(':checkbox:checked').closest('tr').attr('id');
+        //    alert(closestTr);
+        //});
+
+
+
+        $('#btnSave').click(function () {
+            var chk = "";
+            if($('#frmSuppInvDet').valid())
+            {
+                $('#thechecked').find('tr').each(function () {
+                    var row = $(this);
+                    if (row.find('input[type="checkbox"]').is(':checked')) {
+                        var valu = row.find('input[type="checkbox"]').val();
+                        if(chk=="")
+                        {
+                           chk = valu;
+                        }
+                        else
+                        {
+                           chk=chk + "," + valu;
+                        }
+                    }
+                });
+
+                //add amount to each booking ref no:
+
+                var BRefIds = $('#BookingRefIDs').val();
+                var strngBRefWtValue = "";
+                $.each(BRefIds.split(','), function (index, value) {
+
+                 var Paidvaluetxt = '#txtPaidvalue_' + value;
+                 var Invoicevaluetxt = '#txtInvvalue_' + value;
+
+                 var BRefWtValue = value + '#' + $(Invoicevaluetxt).val() + '#' + $(Paidvaluetxt).val()
+
+                 if (strngBRefWtValue == "") {
+                     strngBRefWtValue = BRefWtValue;
+                 }
+                 else {
+                     strngBRefWtValue = strngBRefWtValue + "," + BRefWtValue;
+                 }
+                });
+                $('#BookingRefIDsWithValue').val(strngBRefWtValue);
+
+
+
+
+
+                $('#checkedBookingRefIDs').val(chk);
+                //alert($('#checkedBookingRefIDs').val());
+                $('#frmSuppInvDet').submit();
+            }
+
+
+
+        });
+
+
+
+    });
+
+
+
+
+    function onClickBookingCheck(ths) {
+        var txt = "";
+        var txtChk = "";
+
+        if ($(ths).is(":checked")) {
+            if ($('#BookingRefIDs').val() == "") {
+                txt = $(ths).attr('data-val');
+            }
+            else {
+                txt = $('#BookingRefIDs').val() + ',' + $(ths).attr('data-val');
+            }
+
+            if ($('#editedBookingRefIDs').val() == "") {
+                txtChk = $(ths).attr('data-val');
+            }
+            else {
+
+                txtChk = $('#editedBookingRefIDs').val() + ',' + $(ths).attr('data-val');
+            }
+
+            $('#BookingRefIDs').val(txt);
+            $('#editedBookingRefIDs').val(txtChk);
+
+
+        }
+        else {
+            var txt1 = $('#BookingRefIDs').val();
+
+            var joinString = "";
+
+            $.each(txt1.split(','), function (index, value) {
+                //alert(index + ": " + value);
+                if ($(ths).attr('data-val') == value) {
+                    console.log('Removed : ' + value);
+                }
+                else {
+                    if (joinString == "") {
+                        joinString = value;
+                    }
+                    else {
+                        joinString = joinString + ',' + value;
+                    }
+                }
+            });
+            $('#BookingRefIDs').val(joinString);
+
+            var txt2 = $('#editedBookingRefIDs').val();
+
+            var joinString2 = "";
+
+            $.each(txt2.split(','), function (index, value) {
+                //alert(index + ": " + value);
+                if ($(ths).attr('data-val') == value) {
+                    console.log('Removed : ' + value);
+                }
+                else {
+                    if (joinString2 == "") {
+                        joinString2 = value;
+                    }
+                    else {
+                        joinString2 = joinString2 + ',' + value;
+                    }
+                }
+            });
+            $('#editedBookingRefIDs').val(joinString2);
+
+        }
+        //console.log('Current List :' + $('#BookingRefIDs').val());
+    }
+
+    $(document).ready(function () {
+        //$('#EntryDate').datepicker();
+        //$('#InvoiceDate').datepicker();
+        //$('.datepicker').datepicker();
+    });
+
+    $(function () {
+        $('#EntryDate').datepicker({
+            dateFormat: "dd/mm/yy"
+        });
+        $('#InvoiceDate').datepicker({
+            dateFormat: "dd/mm/yy"
+        });
+    });
+
+    function browseProperty() {
+        $('#chooseProperty').modal('show');
+    }
+
+    function proSelected(corpId) {
+
+        if ($("#procity_" + corpId).html() == -1) {
+            $("#PropertyCity").hide();
+            $("#other_cityprop").show();
+            document.getElementById("close_other_cityprop").style.display = 'block';
+        }
+
+        $("#PropertyId").val(corpId);
+        $("#PropertyName").val($("#proname_" + corpId).html());
+
+        $("#SupplierId").val($("#prosupid_" + corpId).html());
+
+        $("#PropertyEmailAddresss").val($("#proemail_" + corpId).html());
+        $('#PropertyType').val($("#proType_" + corpId).html());
+
+        $("#searchprop").val("");
+        $('#chooseProperty').modal('hide');
+        $('#choosePropertyfromsup').modal('hide');
+        $('#chooseSupplier').modal('hide');
+
+
+
+        if (corpId > 0) {
+            $('#divBroseBotton').css('display', 'block');
+            if ($('#TaxType').val() == 1) {
+                $("#ServiceTaxRegNumber").val($("#prosupServTaxNo_" + corpId).html());
+            }
+            else {
+                $("#ServiceTaxRegNumber").val($("#prosupGSTNo_" + corpId).html());
+            }
+            $("#PAN_Number").val($("#prosupPan_" + corpId).html());
+        }
+
+        //GenBookAmt();
+    }
+
+</script>
+
+<script>
+    function GetAdjustmentAmount() {
+        var bookidlist = $('#BookingRefIDs').val();
+
+        var totalInvoiceValue = $('#TotalInvoiceValue').val();
+        var url = '@Url.Action("GetAdjustmentAmount", "SupplierInvoiceDetails")?bookidlist=' + $('#BookingRefIDs').val() + '&totalInvoiceValue=' + $('#TotalInvoiceValue').val();
+        $.get(url, function (data) {
+            if (data != null)
+            {
+                //alert(data)
+                var output = data - $('#TotalInvoiceValue').val();
+                //alert(output);
+
+                $('#txtTotalAdjustmentResult').val(output);
+            }
+
+        });
+
+
+
+    }
+
+    $(document).ready(function () {
+
+        $('#TotalInvoiceValue').keyup(function () {
+            if ($('#TotalInvoiceValue').val() != "")
+            {
+                GetAdjustmentAmount();
+            }
+
+
+        });
+        $('#BaseAmount').keyup(function () {
+            if ($('#TotalInvoiceValue').val() != "") {
+                GetAdjustmentAmount();
+            }
+
+
+        });
+        $('#ServiceTax').keyup(function () {
+            if ($('#TotalInvoiceValue').val() != "") {
+                GetAdjustmentAmount();
+            }
+
+
+        });
+
+    });
+
+</script>

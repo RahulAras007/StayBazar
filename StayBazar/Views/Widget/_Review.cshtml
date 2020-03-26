@@ -1,0 +1,65 @@
+﻿@model long
+@{
+    List<CLayer.Review> review = BLayer.Review.ByProperty(Model,(int)CLayer.ObjectStatus.StatusType.Verified);
+    //StayBazar.Models.ReviewModel b = new StayBazar.Models.ReviewModel();
+    // b.ReviewList = BLayer.Review.ReviewByProperty(Model.PropertyId);
+}
+@if (review.Count > 0)
+{ 
+<div class="row">
+    <div class="col-md-12">
+        <div class="line">
+            <div class="pull-left leftside pattern ">Reviews</div>
+        </div>
+        <div class="panel panel-default">
+
+            <div class="panel-body">
+                @{
+                    bool flag = false;
+                }
+                @foreach (CLayer.Review b in review)
+                {
+                    if(flag)
+                    { 
+                    <hr />
+                }
+                    <div class="row">
+                        <div class="col-lg-2 ">
+                            @*<div id="i_@b.Rating" data-score="@b.Rating"></div>*@ @(Html.Raw(StayBazar.Common.Utils.GetStarRating(b.Rating)))
+                            <div id="result"></div><br />
+                            @b.FirstName@b.LastName<br />
+                            @b.ReviewDate.ToShortDateString()
+                        </div>
+                        <div class="col-lg-10">
+                            @b.Description
+                        </div>
+                    </div>
+
+                    
+                    
+                    <script type="text/javascript">
+    $(function () {
+        $('#i_@b.Rating').raty(
+        {
+            path: '../../Content/raty27/images/',
+            half: true,
+            readOnly: true,
+            // target: '#result',
+            targetKeep: true,
+            score: function () {
+                return $(this).attr('data-score');
+            }
+        });
+    });
+</script>
+                    flag = true;
+                }
+            </div>
+        </div>
+    </div>
+</div>
+}
+<!--Adding jQuery rating plug-in-->
+<script src="~/Content/raty27/jquery.raty.js"></script>
+<link href="~/Content/raty27/jquery.raty.css" rel="stylesheet" property="" />
+

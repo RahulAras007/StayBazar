@@ -1,0 +1,283 @@
+﻿@model StayBazar.Models.UserModel
+@using CaptchaMvc.HtmlHelpers
+@{
+    ViewBag.Title = "Register";
+}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<style>
+    .form-control {
+        display: block;
+        width: 100%;
+        height: calc(3.25rem + 4px);
+        padding-top: 0.375rem;
+        padding-right: 0.75rem;
+        padding-bottom: 0.375rem;
+        padding-left: 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #496057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+    }
+
+    input, optgroup, select, textarea {
+        margin: 0;
+        font-family: inherit;
+        font-size: inherit;
+        /* line-height: inherit; */
+        line-height: 2.5;
+        width: 122px;
+    }
+</style>
+<div class="parent-div">
+    <!--Landing Starts Here -->
+    <div class="landing-img">
+        <div class="landing-heading" style="padding-bottom:0px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+
+                        <h2>Embark on a</h2>
+                        <h3 class="landing-caption">new Journey.....</h3>
+                    </div>
+                    <!-- <div class="col-6">
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ABout us heading section-->
+    <section class="about-section text-left">
+        <div class="title-heading">
+            <h3>REGISTER</h3>
+        </div>
+
+
+
+
+        @if (Model.UserId > 0)
+        {
+            <div class="emptypage bdy_min_height">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3">
+                        <div class="alert alert-info">
+                            Your account has been created successfully. Waiting for email verification.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+        else
+        {
+            @*<div class="row">
+                    <div class="col-md-12">
+                        <h2 class="form-header">Create a new account</h2>
+                    </div>
+                </div>*@
+            <div class="row">
+                <div class="col-md-4 sidesplash">
+                    <img src="/images/imac.jpg" />
+                </div>
+                <div class="col-md-1">
+
+                </div>
+                <div class="col-md-7">
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-warning">
+                            @ViewBag.Message
+                        </div>
+                    }
+                    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="row">
+
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="form-group col-md-2 ">
+                                        @Html.LabelFor(m => m.Salutations, new { style = "padding-left:0px;font-size:16px;" })
+                                        @Html.DropDownListFor(m => m.SalutationId, Model.Salutations, new { @tabindex = "1", @class = "form-control", style = "font-size:16px;" })
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        @Html.LabelFor(m => m.FirstName, new { style = "padding-left:0px;font-size:16px;" })<span style="color:red"> *</span>
+                                        @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control", style = "font-size:16px;" })
+                                        @Html.ValidationMessageFor(m => m.FirstName)
+                                    </div>
+
+                                    <div class="form-group col-md-5 ">
+                                        @Html.LabelFor(m => m.LastName, new { style = "padding-left:0px;font-size:16px;" })
+                                        @Html.TextBoxFor(m => m.LastName, new { @tabindex = "3", @class = "form-control", style = "font-size:16px;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="form-group col-md-8">
+                                        @Html.LabelFor(m => m.Email, new { style = "padding-left:0px;font-size:16px;" })<span style="color:red"> *</span>
+                                        @Html.TextBoxFor(m => m.Email, new { @tabindex = "4", @class = "form-control", style = "font-size:16px;" })
+                                        @Html.ValidationMessageFor(m => m.Email)
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        @Html.LabelFor(m => m.Moblie, new { style = "padding-left:0px;font-size:16px;" })<span style="color:red"> *</span>
+                                        @Html.TextBoxFor(m => m.Moblie, new { @tabindex = "9", @class = "form-control", @maxlength = "15", @onkeypress = "return isINNumbers(event)", style = "font-size:16px;" })
+                                        @Html.ValidationMessageFor(m => m.Moblie)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                @*<div class="row">*@
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Address, new { style = "padding-left:0px;font-size:16px;" })<span style="color:red"> *</span>
+                                    @Html.TextAreaFor(m => m.Address, new { @tabindex = "5", @class = "form-control", style = "font-size:16px;height:80px;" })
+                                    @Html.ValidationMessageFor(m => m.Address)
+                                </div>
+                                @*</div>*@
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="row">
+
+                                    <div class="form-group col-md-6">
+                                        @Html.LabelFor(m => m.CountryId, new { style = "padding-left:0px;font-size:16px;" })<span style="color:red"> *</span>
+                                        @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "5", @class = "form-control", style = "font-size:16px;" })
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        @Html.LabelFor(m => m.State, new { style = "padding-left:0px;font-size:16px;" })<span style="color:red"> *</span>
+                                        @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "6", @class = "form-control", style = "font-size:16px;" })
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="row">
+
+                                    <div class="form-group col-md-6">
+                                        @Html.LabelFor(m => m.CityId, new { style = "padding-left:0px;font-size:16px;" })<span style="color:red"> *</span>
+                                        <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                        @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "7", @class = "form-control", style = "font-size:16px;" })
+                                        <div id="other_city" style="display:none;">
+                                            @Html.TextBoxFor(m => m.City, new { @tabindex = "8", @class = "form-control", style = "font-size:16px;" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        @Html.LabelFor(m => m.Password, new { style = "padding-left:0px;font-size:16px;" })<span style="color:red"> *</span>
+                                        @Html.PasswordFor(m => m.Password, new { @tabindex = "10", @class = "form-control", @autocomplete = "off" })
+                                        @Html.ValidationMessageFor(m => m.Password)
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        @Html.LabelFor(m => m.ConfirmPassword, new { style = "padding-left:0px;font-size:16px;" })<span style="color:red"> *</span>
+                                        @Html.PasswordFor(m => m.ConfirmPassword, new { @tabindex = "11", @class = "form-control", @autocomplete = "off" })
+                                        @Html.ValidationMessageFor(m => m.ConfirmPassword)
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12" style="font-size:14px;">
+                                @Html.Captcha("try another", "Enter the Captcha Text in the Box", 5, "is required field", true)
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <div class="submitctr">
+                                    <input type="submit" class="btn btn-danger" tabindex="13" value="Register" style="width:260px;height:50px;font-size:18px;font-family:'Times New Roman';border-radius: 10px;" />
+                                </div>
+                            </div>
+                        </div>
+
+
+                    }
+                </div>
+            </div>
+            <script type="text/javascript">
+                $(function () {
+
+                    if ($('#CityId').val() == -1) {
+                        $('#CityId').empty().html('<option selected="selected" value="0">not available...</option>');
+                    }
+                    //  $("#SalutationId").val($('#SalutationId').find('option[text="Mr"]').val());
+                    $("#SalutationId option").filter(function () {
+                        return this.text == "Mr";
+                    }).prop('selected', true);
+                    $("#SalutationId").val($("#SalutationId option:first").val());
+
+                    $("#SalutationId").focus();
+                    $("#CaptchaInputText").attr("tabindex", "12");
+
+                    $('#CountryId').change(function () {
+                        $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                            if (data != "")
+                                $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                            else
+                                $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                            LoadCity();
+                        });
+                    });
+
+                    $('#State').change(function () {
+                        $("#CityId").show();
+                        $("#City").val("");
+                        $("#other_city").hide();
+                        $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                            if (data != "") {
+                                $('#CityId').empty().append(data);
+                                if ($("select#CityId option").length == 1) {
+                                    $("#CityId").hide();
+                                    $("#City").val("");
+                                    $("#other_city").show();
+                                }
+                            }
+                            else {
+                                $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                            }
+                        });
+
+                    });
+                    $('#CityId').change(function () {
+                        if ($(this).val() == -1) {
+                            $(this).hide();
+                            $("#City").val("");
+                            $("#other_city").show();
+                            $("#close_other_city").show();
+                        }
+                    });
+                    $('#close_other_city').click(function () {
+                        $("#CityId").show();
+                        $("#City").val("");
+                        $("#other_city").hide();
+                        $("#close_other_city").hide();
+                    });
+                });
+
+                function LoadCity() {
+
+                    $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                        if (data != "") {
+                            $('#CityId').empty().append(data);
+                            if ($("select#CityId option").length == 1) {
+                                $("#CityId").hide();
+                                $("#City").val("");
+                                $("#other_city").show();
+                            }
+                        }
+                        else {
+                            $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                        }
+                    });
+                }
+            </script>
+        }
+
+
+    </section>
+</div>

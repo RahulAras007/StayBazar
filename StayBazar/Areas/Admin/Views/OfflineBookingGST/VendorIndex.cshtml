@@ -1,0 +1,45 @@
+﻿@model  StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+
+}
+
+<style>
+    .Paddbtm50px {
+    padding-bottom:10%;
+    padding-top:2%;
+    }
+</style>
+<div class="col-md-12" id="VendorPayment">
+    @Html.Partial("~/Areas/Admin/Views/OfflineBookingGST/VendorPayment.cshtml", Model)
+</div>
+
+<div class="col-md-12 margin-top-30" id="VendorPaymentList">
+
+    @if (Model.Vendorlist != null)
+    {
+        @Html.Partial("~/Areas/Admin/Views/OfflineBookingGST/_VendorPaymentList.cshtml", Model.Vendorlist)
+    }
+
+</div>
+
+<div class="col-md-12 margin-bot-30 margin-top-10 Paddbtm50px">
+    <div style="float: left; margin-right: 20px;">
+        <input type="button" id="btngoback" value="Go back" onclick="Goback(@Model.OfflineBookingId)" class="btn btn-danger " tabindex="23" />
+        <input type="button" id="btnSave" value="Continue" onclick="SubmitOffline()" class="btn btn-success " tabindex="23" />
+        <input type="button" id="btngoback" value="Cancel" onclick="Goback(@Model.OfflineBookingId)" class="btn btn-danger " tabindex="23" />
+        
+    </div>
+</div>
+
+<script>
+    function SubmitOffline() {
+        $('#ventor_FormOfflineBooking').attr('action', "/Admin/OfflineBookingGST/VendorPaymentSubmit").submit();
+    }
+    function Goback(OffId) {
+
+
+
+        window.location.href = '/Admin/OfflineBookingGST/OfflineEdit?OfflineBookId=' + OffId;
+    }
+
+</script>

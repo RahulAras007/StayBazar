@@ -1,0 +1,30 @@
+﻿@model StayBazar.Models.ConditionModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Condition";
+    //StayBazar.Areas.Admin.Models.InventoryModel rv = new StayBazar.Areas.Admin.Models.InventoryModel();
+    //rv.AccommodationId = Model.AccommodationId;
+  string accTitle = BLayer.Accommodation.GetAccommodationTitle((long)Model.AccommodationId);
+    string prpTitle = BLayer.Accommodation.GetPropertyTitle((long)Model.AccommodationId);
+}
+<div class="container bdy_min_height">
+    <script type="text/javascript">
+        $(function () { validateRq(); });
+    </script>
+    <div class="row margin10px"><h2>Condition/<a href="~/PropertyEdit/Index/@Model.PropertyId">@prpTitle</a>/@accTitle</h2></div>
+    <div id="content">
+        @Html.HiddenFor(m => m.AccommodationId)
+        @Html.HiddenFor(m => m.PropertyId)
+        <div id="Details" class="row">
+            @{
+                Html.RenderPartial("~/Views/Condition/_Details.cshtml");
+            }
+        </div>
+        <hr />
+        <div id="List" class="row">
+            @{
+                Html.RenderPartial("~/Views/Condition/_List.cshtml", Model);
+            }
+        </div>
+    </div>
+</div>

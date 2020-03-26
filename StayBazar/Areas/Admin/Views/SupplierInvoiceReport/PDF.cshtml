@@ -1,0 +1,49 @@
+﻿@model StayBazar.Areas.Admin.Models.SuppierInvoiceModel
+@{
+    Layout = null;
+}
+
+<style type="text/css" media="print">
+    body {
+        margin: 0;
+        background-image: none;
+    }
+    table{
+        width:100%;
+    }
+    table th{
+        font-size:14px;
+    }
+    table td{
+        font-size:13px;
+    }
+
+    #eventText {
+        display: block;
+        overflow-y: visible;
+        height: auto;
+        margin: 0;
+        font-family: geneva, arial, helvetica, sans-serif;
+        font-size: xx-small;
+    }
+
+    #eventButtons {
+        display: none;
+    }
+</style>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Print</title>
+</head>
+<body>
+    <div>
+        @Html.Partial("_PDFList", Model)
+        <script type="text/javascript">
+            window.print();
+        </script>
+    </div>
+</body>
+</html>

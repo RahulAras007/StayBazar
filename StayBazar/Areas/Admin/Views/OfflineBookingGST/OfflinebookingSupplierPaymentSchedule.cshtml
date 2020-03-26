@@ -1,0 +1,313 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    Layout = null;
+    CLayer.OfflineBooking offedit = BLayer.OfflineBooking.GetAllDetailsById(Model.OfflineBookingId);
+
+
+
+    //get booking details amount
+    decimal TotalcustomervaluebeforeGSTFrombookingdetails = 0;
+    List<CLayer.OfflineBooking> BListGST = BLayer.OfflineBooking.GetMultipleBookingDetailsGST(Model.OfflineBookingId);
+    foreach (CLayer.OfflineBooking bookData in BListGST)
+    {
+        TotalcustomervaluebeforeGSTFrombookingdetails = TotalcustomervaluebeforeGSTFrombookingdetails + 
+            (Math.Round(bookData.AvgDailyRateBefreStaxForSalePrice * bookData.NoOfNight * bookData.NoOfRooms, 2));
+    }
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+   <title>Payment Schedule</title>
+
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <tr>
+            <td align="center">
+                <table width="700">
+                    <thead>
+                        <tr>
+                            <th align="left" style="padding-top: 2%;" colspan="3">
+                                <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                            </th>
+                            <th width="200" align="right" style="font-size:12px;">
+                                Phone: +91 80 25722898 @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                                Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" align="center">
+                                <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">SUPPLIER PAYMENT REQUEST FORM
+
+                                @if (offedit != null)
+                                {
+                                    if (offedit.IsSupplierPaymentMailSend)
+                                    {
+                                     <text> <b> [Revised] </b></text>
+                                    }
+                                }
+                                </h5>
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td colspan="2"><b style="font-weight:bold; font-size: 13px; margin: 10px 0px; display: inline-block;">CUSTOMER DETAILS</b></td>
+                            <td colspan="2">&nbsp;</td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Booking ID</td>
+                            <td>:</td>
+                            <td>@Model.ConfirmationNumber</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Customer Name</td>
+                            <td>:</td>
+
+                            <td>@Model.CustomerName</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Customer Location</td>
+                            <td>:</td>
+                            <td>@Model.CustomerCityname</td>
+
+                        </tr>
+
+                        <tr style="font-size:12px;">
+                            <td>Customer Email Id</td>
+                            <td>:</td>
+                            <td>@Model.emailaddress</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Name of Guest</td>
+                            <td>:</td>
+                            <td>@Model.GuestName</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Check-in Date</td>
+                            <td>:</td>
+                            <td>@Model.CheckIn
+                            <td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Check-out Date</td>
+                            <td>:</td>
+                            <td>@Model.CheckOut</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>No of Pax</td>
+                            <td>:</td>
+                            <td>@Model.NoOfPaxAdult</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>No of Rooms</td>
+                            <td>:</td>
+                            <td>@Model.NoOfRooms</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Total Room nights</td>
+                            <td>:</td>
+                            <td>@(Model.NoOfRooms * Model.NoOfNight)</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Total customer value before GST</td>
+                            <td>:</td>
+                            <td>@TotalcustomervaluebeforeGSTFrombookingdetails</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Total billing to customer(including tax)</td>
+                            <td>:</td>
+                            <td>@Model.TotalSalePrice</td>
+
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Customer Payment mode</td>
+                            <td>:</td>
+                            <td>
+                              @if(Model.CustomerPaymentMode == (int) CLayer.ObjectStatus.CustomerPaymentMode.Advance_Payment)
+                              {
+                                  <text>Advance Payment</text>
+                              }
+                              else if (Model.CustomerPaymentMode == (int)CLayer.ObjectStatus.CustomerPaymentMode.Credit)
+                              {
+                                <text>Credit</text>
+                                
+                              }
+                              else if (Model.CustomerPaymentMode == (int)CLayer.ObjectStatus.CustomerPaymentMode.Payment_on_check_out)
+                              {
+                                <text>Payment on check out</text>
+                              }
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="2"><b style="font-weight:bold; font-size: 13px; margin: 10px 0px; display: inline-block;">SUPPLIER DETAILS</b></td>
+                            <td colspan="2">&nbsp;</td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Property Name</td>
+                            <td>:</td>
+                            <td>@Model.PropertyName</td>
+
+                        </tr>
+
+
+                        <tr style="font-size:12px;">
+                            <td>Property Location</td>
+                            <td>:</td>
+                            <td>@Model.PropertyCityname</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Total amount payable to property against this booking(including tax)</td>
+                            <td>:</td>
+                            <td>@Model.TotalBuyPrice</td>
+
+                        </tr>
+                       
+                        @if (Model.SupplierPaymentScheduleList.Count > 0)
+                        {
+
+                            if (Model.SupplierPaymentScheduleList.Count == 1)
+                            {
+                                foreach (var data in Model.SupplierPaymentScheduleList)
+                                {
+                                    string heading = "";
+                                    string value = "";
+
+
+                                    if (data.SupplierPaymentMode == (int)CLayer.OfflineBooking.SupplierPaymentModelist.FullAmountBeforeCheckin)
+                                    {
+                                        heading = CLayer.OfflineBooking.SupplierPaymentModelist.FullAmountBeforeCheckin.ToString();
+                                        value = "";
+                                        <tr style="font-size:12px;">
+                                            <td>Payment Schedule</td>
+                                            <td>:</td>
+                                            <td align="left">Full Amount Before Checkin</td>
+                                        </tr>
+
+                                    }
+                                    if (data.SupplierPaymentMode == (int)CLayer.OfflineBooking.SupplierPaymentModelist.FullAmountBeforeCheckout)
+                                    {
+                                        heading = CLayer.OfflineBooking.SupplierPaymentModelist.FullAmountBeforeCheckout.ToString();
+                                        value = "";
+                                        <tr style="font-size:12px;">
+                                            <td>Payment Schedule</td>
+                                            <td>:</td>
+                                            <td align="left">Full Amount Before Checkout</td>
+                                        </tr>
+
+                                    }
+                                    if (data.SupplierPaymentMode == (int)CLayer.OfflineBooking.SupplierPaymentModelist.Credit)
+                                    {
+                                        heading = CLayer.OfflineBooking.SupplierPaymentModelist.Credit.ToString();
+                                        value = data.SupplierCreditDays.ToString() + " " + "Days";
+                                        <tr style="font-size:12px;">
+                                            <td>Payment Schedule</td>
+                                            <td>:</td>
+                                            <td>@heading - @value</td>
+                                        </tr>
+                                      
+                                    }
+
+
+                                }
+
+                            }
+                            else
+                            {
+                                <tr style="font-size:12px;">
+                                    <td>Payment Schedule</td>
+                                </tr>
+                                foreach (var data in Model.SupplierPaymentScheduleList)
+                                {
+                                    string heading = "";
+                                    string value = "";
+                                    if (data.SupplierPaymentMode == (int)CLayer.OfflineBooking.SupplierPaymentModelist.OnInstalments)
+                                    {
+                                        heading = "Date - " + data.SupplierPaymentModeDate.ToString("dd-MMM-yyyy");
+                                        value = data.SupplierPaymentAmount.ToString();
+                                    }
+                               
+                                    <tr style="font-size:12px;">
+                                        <td align="right">@heading</td>
+                                        <td>:</td>
+                                        <td>@value</td>
+                                    </tr>
+
+                                }
+                            }
+
+                        }
+
+                        <tr style="font-size:12px;">
+                            <td>Property Bank A/c No</td>
+                            <td>:</td>
+                            <td>@Model.AccountNumber</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Account Type</td>
+                            <td>:</td>
+                            <td>@Model.AccountType</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Bank Account Name</td>
+                            <td>:</td>
+                            <td>@Model.AccountName</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Bank</td>
+                            <td>:</td>
+                            <td>@Model.BankName</td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Branch</td>
+                            <td>:</td>
+                            <td>@Model.BranchName</td>
+
+                    </tr>
+                        <tr style="font-size:12px;">
+                            <td>IFSC Code</td>
+                            <td>:</td>
+                            <td>@Model.IFSCcode</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Property e-mail id</td>
+                            <td>:</td>
+                            <td>@Model.PropertyEmail</td>
+
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Sales Person Name </td>
+                            <td>:</td>
+                            <td>@Model.SalesPersonName</td>
+
+                        </tr>
+                    </tbody>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

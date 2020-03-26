@@ -1,0 +1,2785 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@using System.Configuration;
+@using CaptchaMvc.HtmlHelpers
+@using System.Linq
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Offline Booking Form";
+
+    int startD = 0;
+    int endD = 0;
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarStartDate"), out startD);
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarEndDate"), out endD);
+    int diff = endD - startD;
+
+    string email = User.Identity.GetUserName();
+    int roleId = BLayer.User.GetRole(email);
+
+    List<CLayer.RolePermission> perm = BLayer.RolePermissions.GetAllPermissions(roleId);
+    bool hasEditPermisson = perm.Exists(m => m.ModuleId == StayBazar.Common.AdminRolePermission.OFFLINEBOOKING_EDIT && m.HasAccess);
+
+
+    <link href="~/Content/jquery.dpNumberPicker-holoLight-1.0.1.css" rel="stylesheet" />
+    <link href="~/Content/datepicker.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery.dpNumberPicker-1.0.1.js"></script>
+    <script src="~/Scripts/Moment.js"></script>
+
+    @*<script src="~/Scripts/date.js"></script>*@
+
+
+long nonight = 1;
+long norooms = 1;
+string ModelCheckIn = "";
+string ModelCheckOut = "";
+long nopaxadult = 0;
+long nopaxchaild = 0;
+string accname = "";
+long stayid = 0;
+int status = 0;
+
+//long Accid = 0;
+long offid = 0;
+Model.BookingDate = Convert.ToDateTime(Model.BookingDate).ToShortDateString();
+string bookingdate = Convert.ToDateTime(DateTime.Now).ToShortDateString();
+
+if (Model.OfflineBookingId > 0)
+{
+    Model.CheckIn = Convert.ToDateTime(Model.CheckIn).ToShortDateString();
+    Model.CheckOut = Convert.ToDateTime(Model.CheckOut).ToShortDateString();
+
+    ModelCheckIn = Convert.ToDateTime(Model.CheckIn).ToShortDateString();
+    ModelCheckOut = Convert.ToDateTime(Model.CheckOut).ToShortDateString();
+
+    offid = Model.OfflineBookingId;
+    stayid = Model.StayCategoryid;
+    //Accid = Model.Accommodationtypeid;
+    accname = Model.AccommodationTypeName;
+    nonight = Model.NoOfNight;
+    norooms = Model.NoOfRooms;
+    nopaxadult = Model.NoOfPaxAdult;
+    nopaxchaild = Model.NoOfPaxChild;
+    status = Model.SaveStatus;
+
+}
+else
+{
+    Model.CheckIn = DateTime.Now.ToShortDateString();
+    Model.CheckOut = DateTime.Now.AddDays(1).ToShortDateString();
+}
+}
+
+<style>
+    .dropdonreadonly {
+        pointer-events: none;
+        background-color: #eee;
+    }
+</style>
+
+
+<div class="container">
+    @try
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="form-header">
+                    @ViewBag.Title
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 sidesplash">
+                <div class="col-md-12">
+                    @if (TempData["OfflineBookSuccessMessage"] != null)
+                    {
+                        @*<div class="alert alert-success">
+                                @TempData["OfflineBookSuccessMessage"]
+                            </div>*@
+                    }
+                    @using (Html.BeginForm("OfflineBookingFirst", "OfflineBooking", FormMethod.Post, new { enctype = "multipart/form-data", id = "FormOfflineBooking" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        @Html.HiddenFor(m => m.OfflineBookingId)
+                        <div class="formcontainer border-radius" id="formoff">
+                            <div class="col-md-12">
+                                <h4 class="bold">
+                                    Customer Details
+                                </h4>
+                            </div>
+                            <div class="col-md-12 margin-bot-10">
+                                <div class="col-md-5">
+                                    <div id="cus">
+                                        @*Customer Details*@
+                                        <div class="row" style="margin-bottom:15px;">
+                                            <div class="col-md-8">
+                                         
+
+                                                @Html.HiddenFor(m => m.BillingState1)
+                                                @Html.HiddenFor(m => m.BillingCountryId1) 
+                                                @Html.HiddenFor(m => m.BillingCity1)
+                                                @Html.HiddenFor(m => m.PinCode1)
+                                                
+                                                @Html.HiddenFor(m => m.BillingMobile1)
+                                                @Html.HiddenFor(m => m.ContactPerson1)
+                                                @Html.HiddenFor(m => m.OfficeNO1)
+                                                @Html.HiddenFor(m => m.BillingAddress1) 
+                                                 
+
+                                                @Html.HiddenFor(m => m.CustomerId)  
+                                                @Html.HiddenFor(m=>m.CategoryType)
+                                                @Html.LabelFor(m => m.CustomerName)<span style="color:red">*</span>
+                                                @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                                @Html.ValidationMessageFor(m => m.CustomerName)
+                                            </div>
+                                            <div class="col-md-2">
+                                                <br />
+                                                <input type="button" onclick="browsecustomer()" value="Choose Customer" class="btn btn-success" />
+                                                <span id="Customernames"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.CustomerEmail)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.CustomerEmail, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                            @Html.ValidationMessageFor(m => m.CustomerEmail)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.CustomerMobile)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.CustomerMobile, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.CustomerMobile)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.GuestName)
+                                            @Html.TextBoxFor(m => m.GuestName, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.GuestName)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.GuestEmail)
+                                            @Html.TextBoxFor(m => m.GuestEmail, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.GuestEmail)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.NewCustomerReferenceNo)
+                                            @Html.TextBoxFor(m => m.NewCustomerReferenceNo, new { @class = "form-control input-sm" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 ">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CustomerCountry)<span style="color:red">*</span>
+                                        @Html.DropDownListFor(m => m.CustomerCountry, Model.CusCountryList, new { @class = "form-control input-sm " })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CustomerState)<span style="color:red">*</span>
+                                        @Html.DropDownListFor(m => m.CustomerState, Model.CusStateList, new { @class = "form-control input-sm " })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CustomerCity)<span style="color:red">*</span> &nbsp;
+                                        <a href="#" id="close_other_citycus" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                        @Html.DropDownListFor(m => m.CustomerCity, Model.CusCityList, "select", new { @class = "form-control" })
+                                        <div id="other_citycus" style="display:none;">
+                                            @Html.TextBoxFor(m => m.CustomerCityname, new { @class = "form-control input-sm"})
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.CustomerCity)
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CustomerAddress)<span style="color:red">*</span>
+                                        @Html.TextAreaFor(m => m.CustomerAddress, new { @class = "form-control input-sm" })
+                                        @Html.ValidationMessageFor(m => m.CustomerAddress)
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CustomerpinCode)
+                                        @Html.TextBoxFor(m => m.CustomerpinCode, new { @class = "form-control input-sm" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="col-md-12 margin-top-10 margin-bot-10">
+                                <div class="col-md-5">
+                                    <div id="PropertyDetails">
+                                        <div class="row">
+                                            <h4 class="bold">
+                                                Property Details
+                                            </h4>
+                                        </div>
+                                        <div class="row" style="margin-bottom:15px;">
+                                            <div class="col-md-8">
+                                                @Html.HiddenFor(m => m.SupplierPinCode1)
+                                                @Html.HiddenFor(m => m.PropertyId)
+                                                @Html.HiddenFor(m => m.CustomPropertyId)
+                                                
+                                                @*@Html.HiddenFor(m => m.SupplierAddress)*@
+                                                @Html.HiddenFor(m => m.SupplierCity)
+                                                @Html.HiddenFor(m => m.SupplierCityname)
+                                                @Html.HiddenFor(m => m.SupplierState1)
+                                                @Html.HiddenFor(m => m.SupplierCountry1)
+                                                @Html.HiddenFor(m => m.SupplierMobile1)
+                                                @Html.HiddenFor(m => m.NoInvoiceMail)`
+
+                                                @*@Html.HiddenFor(m => m.SupplierEmail)*@
+
+                                                @Html.LabelFor(m => m.PropertyName)<span style="color:red">*</span>
+                                                @Html.TextBoxFor(m => m.PropertyName, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                                @Html.ValidationMessageFor(m => m.PropertyName)
+                                            </div>
+                                            <div class="col-md-2">
+                                                <br />
+                                                <input type="button" onclick="browseProperty()" value="Choose Property" class="btn btn-success" />
+                                                <span id="propertynames"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            @*@Html.HiddenFor(m => m.SupplierId)*@
+                                            @Html.LabelFor(m => m.SupplierName)
+                                            @Html.TextBoxFor(m => m.SupplierName, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.PropertyAddress)<span style="color:red">*</span>
+                                            @Html.TextAreaFor(m => m.PropertyAddress, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                            @Html.ValidationMessageFor(m => m.PropertyAddress)
+                                        </div>
+
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.PropertyPinCode)
+                                            @Html.TextBoxFor(m => m.PropertyPinCode, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                        </div>
+
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.PropertyCountry)<span style="color:red">*</span>
+                                            @Html.DropDownListFor(m => m.PropertyCountry, Model.PropCountryList, new { @class = "form-control input-sm dropdonreadonly" })
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.PropertyState)<span style="color:red">*</span>
+                                            @Html.DropDownListFor(m => m.PropertyState, Model.PropStateList, new { @class = "form-control input-sm dropdonreadonly", id = "PropertyState" })
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.PropertyCity)<span style="color:red">*</span> &nbsp;
+                                            <a href="#" id="close_other_cityprop" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                            @Html.DropDownListFor(m => m.PropertyCity, Model.PropCityList, "select", new { @class = "form-control  dropdonreadonly" })
+                                            <div id="other_cityprop" style="display:none;">
+                                                @Html.TextBoxFor(m => m.PropertyCityname, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.PropertyCity)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.PropertyEmail)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.PropertyEmail, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                            @Html.ValidationMessageFor(m => m.PropertyEmail)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.PropertyContactNo)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.PropertyContactNo, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                            @Html.ValidationMessageFor(m => m.PropertyContactNo)
+                                        </div>
+
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.PropertyCaretakerName)
+                                            @Html.TextBoxFor(m => m.PropertyCaretakerName, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                            @Html.ValidationMessageFor(m => m.PropertyCaretakerName)
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="col-md-5">
+                                        <div id="supDetails">
+                                            <div class="row">
+                                                <h4 class="bold">
+                                                    Supplier Details
+                                                </h4>
+                                            </div>
+                                            <div class="row" style="margin-bottom:15px;">
+
+                                                <div class="col-md-8">
+                                                    @Html.HiddenFor(m => m.SupplierId)
+                                                    @Html.LabelFor(m => m.SupplierName)<span style="color:red">*</span>
+                                                    @Html.TextBoxFor(m => m.SupplierName, new { @tabindex = "1", @class = "form-control input-sm" })
+                                                    @Html.ValidationMessageFor(m => m.SupplierName)
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <br />
+                                                    <input type="button" onclick="browseSupplier()" value="Choose Supplier" class="btn btn-success" />
+                                                    <span id="suppliernames"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.SupplierAddress)<span style="color:red">*</span>
+                                                @Html.TextAreaFor(m => m.SupplierAddress, new { @tabindex = "2", @class = "form-control input-sm" })
+                                                @Html.ValidationMessageFor(m => m.SupplierAddress)
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.SupplierCountry)<span style="color:red">*</span>
+                                                @Html.DropDownListFor(m => m.SupplierCountry, Model.SupCountryList, new { @tabindex = "4", @class = "form-control input-sm", id = "SupplierCountry" })
+                                            </div>
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.SupplierState)<span style="color:red">*</span>
+                                                @Html.DropDownListFor(m => m.SupplierState, Model.SupStateList, new { @tabindex = "5", @class = "form-control input-sm", id = "SupplierState" })
+                                            </div>
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.SupplierCity)<span style="color:red">*</span> &nbsp;
+                                                <a href="#" id="close_other_citysup" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                                @Html.DropDownListFor(m => m.SupplierCity, Model.SupCityList, "Select", new { @tabindex = "6", @class = "form-control", id = "SupplierCity" })
+                                                @Html.ValidationMessageFor(m => m.SupplierCity)
+                                                <div id="other_citysup" style="display:none;">
+                                                    @Html.TextBoxFor(m => m.SupplierCityname, new { @tabindex = "6", @class = "form-control input-sm", id = "SupplierCityname" })
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.SupplierEmail)<span style="color:red">*</span>
+                                                @Html.TextBoxFor(m => m.SupplierEmail, new { @tabindex = "3", @class = "form-control input-sm" })
+                                                @Html.ValidationMessageFor(m => m.SupplierEmail)
+                                            </div>
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.SupplierMobile)<span style="color:red">*</span>
+                                                @Html.TextBoxFor(m => m.SupplierMobile, new { @tabindex = "3", @class = "form-control input-sm" })
+                                                @Html.ValidationMessageFor(m => m.SupplierMobile)
+                                            </div>
+                                        </div>
+                                    </div>*@
+
+
+                            </div>
+
+                            <hr />
+
+                            <div class="col-md-12  margin-top-10">
+                                <h4 class="bold">
+                                    Booking Details
+                                </h4>
+                            </div>
+
+                            <style>
+                                .dp-numberPicker-input {
+                                    width: 44px !important;
+                                }
+                            </style>
+                            <div class="col-md-12 margin-bot-10">
+                                <div class="col-md-5">
+                                    @*Booking Details*@
+
+                                    <div class="row margin-bot-10" style="margin-bottom:15px;">
+
+                                        <div class="col-xs-12 col-md-12">
+
+                                            <div class=""><div class="col-md-4 pad0 bold">Booking Date<span style="color:red">*</span></div></div>
+                                            <div class="col-xs-6 col-md-6 Bookingdate">
+                                                <div>
+                                                    <input type="text" id="Bookingdate" name="Bookingdate" value="@Model.BookingDate" class="form-control input-sm" onchange="BookingDate()" >
+                                                </div>
+                                            </div>
+                                           
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row margin-bot-10" style="margin-bottom:15px;">
+
+                                        <div class="col-xs-12 col-md-12">
+
+                                            <div class=""><div class="col-md-6 pad0 bold">Check In</div><div class="col-md-6 pad0 bold">Check Out</div></div>
+                                            <div class="col-xs-6 col-md-6 checkin">
+                                                <div>
+                                                    <input type="text" id="CheckIn" name="CheckIn" value="@Model.CheckIn" placeholder="Check In" onchange="changecheckin()">
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-6 col-md-6 checkout">
+                                                <div>
+                                                    <input type="text" id="CheckOut" name="CheckOut" value="@Model.CheckOut" onchange="changecheckout()" placeholder="Check Out">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="row margin-bot-10" style="margin-bottom:15px;">
+                                        <div class="col-xs-12 col-md-12">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.NoOfNight)
+                                                @Html.TextBoxFor(m => m.NoOfNight, new { @class = "form-control input-sm", @onchange = "changenoofnight()", @minmumvalue = "1" })
+                                                @Html.ValidationMessageFor(m => m.NoOfNight)
+                                            </div>
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.NoOfRooms)
+                                                @Html.TextBoxFor(m => m.NoOfRooms, new { @class = "form-control input-sm", @onchange = "changenoofrooms()" })
+                                                @Html.ValidationMessageFor(m => m.NoOfRooms)
+                                            </div>
+                                            <div class="col-md-6 pad0 bold">No Of Pax:</div><br />
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.NoOfPaxAdult)
+                                                @Html.TextBoxFor(m => m.NoOfPaxAdult, new { @class = "form-control input-sm" })
+                                                @Html.ValidationMessageFor(m => m.NoOfPaxAdult)
+                                            </div>
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.NoOfPaxChild)
+                                                @Html.TextBoxFor(m => m.NoOfPaxChild, new { @class = "form-control input-sm" })
+                                                @Html.ValidationMessageFor(m => m.NoOfPaxChild)
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row" style="margin-bottom:15px;">
+
+                                        <div class="col-xs-12 col-md-12">
+
+                                            <div class="row"><div class="col-md-6 bold">Stay options</div></div>
+
+
+                                            <a onclick="staydivdisplay()" id="close_other_staytype" class="lnk " style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+
+                                            <div id="other_staytype" style="display:none;">
+                                                @Html.TextBoxFor(m => m.StayCategoryName, new { @class = "form-control input-sm" })
+                                            </div>
+
+                                            <div class="row" id="staydiv">
+
+                                                <div class="col-md-12">
+                                                    @Html.HiddenFor(m => m.StayCategoryid)
+                                                    <select class="styleselect" style="width:100%;" name="StayType" id="StayType">
+                                                        @{
+                        List<CLayer.StayCategory>
+                            staytypes = BLayer.StayCategory.GetActiveList();
+
+                                                        }
+                                                        @foreach (CLayer.StayCategory sc in staytypes)
+                                                        {
+                                                            <option value="@sc.CategoryId">@sc.Title</option>
+                                                        }
+
+                                                        @*<option value="-1">Other</option>*@
+                                                    </select>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" style="margin-bottom:15px;">
+                                        <div class="col-xs-12 col-md-12">
+
+                                            <div class="row"><div class="col-md-5 bold">Accommodation Type  &nbsp; </div><a onclick="Accdivdisplay()" id="close_other_Acctype" class="lnk handpointer " style="display:none; "><span class="glyphicon glyphicon-remove"></span>choose from the list</a></div>
+
+                                            <div id="other_Acctype">
+                                                @Html.TextBoxFor(m => m.AccommodationTypeName, new { @class = "form-control input-sm", id = "AccommodationTypeName" })
+                                                @Html.ValidationMessageFor(m => m.AccommodationTypeName)
+                                            </div>
+
+                                            <div class="row" style="display:none;">
+                                                <div class="col-md-12">
+                                                    <div id="Accdiv">
+                                                        @Html.HiddenFor(m => m.Accommodationid)
+                                                        @Html.HiddenFor(m => m.Accommodationtypeid)
+                                                        @*chosen-select*@
+                                                        <select @*data-placeholder="Choose a Country..." *@ class="styleselect" style="width:100%;" name="AccommodatoinType" id="AccommodatoinType">
+                                                            @{
+                        List<CLayer.AccommodationType>
+                            Acctypes = BLayer.AccommodationType.GetAll();
+                                                            }
+                                                            @foreach (CLayer.AccommodationType sc in Acctypes)
+                                                            {
+                                                                <option value="@sc.AccommodationTypeId">@sc.Title</option>
+                                                            }
+                                                            <option value="-1">Other</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                @*<div class="col-md-5">
+
+                                        <div class="row margin-bot-10" style="margin-bottom:15px;">
+
+                                            <div class="col-xs-12 col-md-12">
+
+                                                <div class="col-md-3 pad0 bold">No Of Night</div><div class="col-md-6 pad0 bold">No Of Rooms</div>
+                                                <div class="col-xs-6 col-md-6 margin-top-10 pad0">
+                                                    <div>
+                                                        <div class="col-md-6 pad0 "><div id="spnrAdnight" onchange="night()"></div></div>
+                                                        @Html.HiddenFor(m => m.NoOfNight)
+                                                    </div>
+                                                    <div>
+                                                        <div class="col-md-6 pad0 "><div id="spnrCdrooms" onchange="rooms()"></div></div>
+                                                        @Html.HiddenFor(m => m.NoOfRooms)
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-md-6 pad0 bold">No Of Pax:</div>
+
+                                        <div class="row margin-bot-10" style="margin-bottom:15px;">
+
+                                            <div class="col-xs-12 col-md-12">
+
+                                                <div class="col-md-3 pad0 bold">Adult</div><div class="col-md-6 pad0 bold">Child</div>
+                                                <div class="col-xs-6 col-md-6 margin-top-10 pad0  ">
+                                                    <div>
+                                                        <div class="col-md-6 pad0"><div id="sprbxadult" onchange="adult()"></div></div>
+                                                        @Html.HiddenFor(m => m.NoOfPaxAdult)
+                                                    </div>
+                                                    <div>
+                                                        <div class="col-md-6 pad0 "><div id="sprbxchild" onchange="child()"></div></div>
+                                                        @Html.HiddenFor(m => m.NoOfPaxChild)
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>*@
+
+
+                            </div>
+
+                            <hr />
+
+                            <div class="col-md-12 margin-top-10">
+                                <h4 class="bold">
+                                    Pricing Details
+                                </h4>
+                            </div>
+
+                            @*<div class="col-md-12 margin-top-10" id="amtgenbtn">
+                                    <a class="btn btn-info handpointer" onclick="GenBookAmt()">Generate Pricing Amounts</a>
+                                </div>*@
+
+                            <div class="col-md-12 margin-bot-10" id="pricediv" style="display:none;  text-align: center; margin-top: 50px; margin-bottom: 50px;">
+                                <img src="~/images/loading_spinner.gif" width="100px" height="100px" />
+                            </div>
+                            <div id="pricingdet">
+                                @Html.Partial("~/Areas/Admin/Views/OfflineBooking/_PricingDetails.cshtml")
+                            </div>
+
+                            <div class="col-md-12 margin-top-10 margin-bot-10">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.OtherService)
+                                        @Html.TextAreaFor(m => m.OtherService, new { @class = "form-control input-sm" })
+                                        @Html.ValidationMessageFor(m => m.OtherService)
+                                    </div>
+                                </div>
+                                <div class="col-md-5 col-md-offset-2">
+
+                                </div>
+                            </div>
+                            <div class="col-md-12 margin-top-10 margin-bot-10">
+                                <div class="col-md-5">
+                                    @Html.LabelFor(m => m.SalesPersonId)<span style="color:red">*</span>
+                                    @Html.DropDownListFor(m => m.SalesPersonId, Model.SalesPerson,"Select" ,new { @class = "form-control input-sm", @onchange = "ChangeSalesPerson(this.value)" })
+                   
+                                </div>
+                            </div>
+                            <div class="col-md-12 margin-top-10 margin-bot-10">
+                                <div class="col-md-5">
+                                    @Html.LabelFor(m => m.SalesRegion)
+                                    @Html.TextBoxFor(m => m.SalesRegion, new { @class = "form-control input-sm", @readonly = "readonly" })
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 margin-top-10 margin-bot-10">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+
+                                        @Html.CheckBoxFor(m => m.sendmailtocustomer)
+                                        @Html.LabelFor(m => m.sendmailtocustomer)
+
+                                        &nbsp;   &nbsp;
+                                        @Html.CheckBoxFor(m => m.sendmailtosupplier)
+                                        @Html.LabelFor(m => m.sendmailtosupplier)
+                                    </div>
+                                </div>
+                                <div class="col-md-5 col-md-offset-2">
+
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-md-12">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.MailContent)
+                                        @Html.TextAreaFor(m => m.MailContent, new { @class = "form-control input-sm" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.HotelFacility)
+                                        @Html.TextAreaFor(m => m.HotelFacility, new { @class = "form-control input-sm mceSimple" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.HotelConformationNo)
+                                        @Html.TextBoxFor(m => m.HotelConformationNo, new { @class = "form-control input-sm" })
+                                    </div>
+                                </div>
+                            </div>
+
+
+                         
+
+
+
+
+                            <div class="col-md-12 margin-top-10 margin-bot-10">
+                                @{ int ii = 0, iii = 0;
+                                }
+
+                                <div class="col-md-5 clsDivServiceTaxSplitUpValidation">
+                                    <h4>Service Tax :</h4>
+                                    <h6 id="ServiceTaxSplitUpValidation" style="color:red;display:none;">Taxes spit up should be equal to Service tax ( % )</h6>
+                                    @if (Model.TaxPercentageList_Service != null && Model.TaxPercentageList_Service.Count() > 0)
+                                    {
+                                        for (int i = 0; i < Model.TaxPercentageList_Service.Count(); i++)
+                                        {
+                                            ii++;
+                                            <div class="row" style="margin-bottom: 4px;">
+                                                @Html.HiddenFor(m => Model.TaxPercentageList_Service[i].TaxPerID)
+                                                <div class="col-md-9">
+                                                    @Html.TextBoxFor(m => Model.TaxPercentageList_Service[i].TaxTitle, new { @class = "form-control input-sm" })
+                                                </div>
+                                                <div class="col-md-3" style="padding-left: 0px;">
+                                                    <div class="input-group">
+                                                        @Html.TextBoxFor(m => Model.TaxPercentageList_Service[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    @for (int i = ii; i < 5; i++)
+                                    {
+                                        string nameTxtT_Title = "TaxPercentageList_Service[" + i + "].TaxTitle";
+                                        string nameTxtT_Percent = "TaxPercentageList_Service[" + i + "].TaxPercent";
+
+                                        string ID_nameTxtT_Title = "TaxPercentageList_Service_" + i + "__TaxTitle";
+                                        string ID_nameTxtT_Percent = "TaxPercentageList_Service_" + i + "__TaxPercent";
+
+                                        <div class="row" style="margin-bottom: 4px;">
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control input-sm" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                            </div>
+                                            <div class="col-md-3" style="padding-left: 0px;">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                                    <span class="input-group-addon">%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="col-md-5 clsDivServiceTaxOthersSplitUpValidation">
+                                    <h4>Service Tax - Others :</h4>
+                                    <h6 id="ServiceTaxOthersSplitUpValidation" style="color:red;display:none;">Taxes spit up should be equal to Service tax - other services  ( % )</h6>
+                                    @if (Model.TaxPercentageList_Others != null && Model.TaxPercentageList_Others.Count() > 0)
+                                    {
+                                        for (int i = 0; i < Model.TaxPercentageList_Others.Count(); i++)
+                                        {
+                                            iii++;
+                                            <div class="row" style="margin-bottom: 4px;">
+                                                @Html.HiddenFor(m => Model.TaxPercentageList_Others[i].TaxPerID)
+                                                <div class="col-md-9">
+                                                    @Html.TextBoxFor(m => Model.TaxPercentageList_Others[i].TaxTitle, new { @class = "form-control input-sm" })
+                                                </div>
+                                                <div class="col-md-3" style="padding-left: 0px;">
+                                                    <div class="input-group">
+                                                        @Html.TextBoxFor(m => Model.TaxPercentageList_Others[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    @for (int i = iii; i < 5; i++)
+                                    {
+                                        string nameTxtT_Title = "TaxPercentageList_Others[" + i + "].TaxTitle";
+                                        string nameTxtT_Percent = "TaxPercentageList_Others[" + i + "].TaxPercent";
+
+                                        string ID_nameTxtT_Title = "TaxPercentageList_Others" + i + "__TaxTitle";
+                                        string ID_nameTxtT_Percent = "TaxPercentageList_Others" + i + "__TaxPercent";
+
+                                        <div class="row" style="margin-bottom: 4px;">
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control input-sm" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                            </div>
+                                            <div class="col-md-3" style="padding-left: 0px;">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                                    <span class="input-group-addon">%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+
+
+                            @Html.ValidationMessage("CustomerMobile")<br />
+                            @Html.ValidationMessage("CustomerName")<br />
+                            @Html.ValidationMessage("CustomerEmail")<br />
+                            @Html.ValidationMessage("CustomerCity")<br />
+                            @Html.ValidationMessage("GuestName")<br />
+                            @Html.ValidationMessage("GuestEmail")<br />
+                            @Html.ValidationMessage("PropertyName")<br />
+                            @Html.ValidationMessage("PropertyAddress")<br />
+                            @Html.ValidationMessage("PropertyCity")<br />
+                            @Html.ValidationMessage("PropertyContactNo")<br />
+                            @Html.ValidationMessage("AccommodationTypeName")<br />
+                            @Html.ValidationMessage("SalesPersonId")<br />
+                            @Html.ValidationMessage("BookingDate")<br />
+                            
+                            
+                            <div class="col-md-12">
+                                <div class="col-md-4">
+                                    @*<input type="button" id="btnSave" value="Save" onclick="SaveOffline()" class="btn btn-success marginleft30px" tabindex="23" />*@
+                                    <input type="button" id="btnSave" value="Save & Continue" onclick="SubmitOffline()" class="btn btn-success " tabindex="23" />
+                                    <a href="~/Admin/OfflineBooking/OfflineBooking" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+                                </div>
+                            </div>
+
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="chooseCustomer" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Choose Customer</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    @Html.Partial("_BrowsCustomer")
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal -->
+                            <!-- Modal -->
+                            <div class="modal fade" id="chooseSupplier" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Choose Supplier</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    @Html.Partial("_BrowseSupplier")
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal -->
+                            <!-- Modal -->
+                            <div class="modal fade" id="chooseProperty" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" style="width:894px;">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Choose Property</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    @Html.Partial("_BrowsProperty")
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal -->
+                            <!-- Modal -->
+                            <div class="modal fade" id="choosePropertyfromsup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Choose Property</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    @Html.Partial("_BrowsPropertySup")
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal -->
+
+
+                            <br />
+
+
+
+
+
+                            <div id="confirmBoxWindow" class="modal fade" role="dialog">
+                                <div class="modal-dialog modal-md">
+
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+
+                                            <h5 class="modal-title">Sale Price is lesser than Buy Price!, Do you want to save?</h5>
+                                        </div>
+
+                                        <div class="modal-footer">
+
+                                            <button id="btnConfirmBoxNo" type="button" class="btn btn-primary" data-dismiss="modal">NO</button>
+                                            <button id="btnConfirmBoxYes" type="button" class="btn btn-primary" data-dismiss="modal">YES</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                            <div id="OfflineBookingAlreadyExistsChecking" class="modal fade" role="dialog">
+                                <div class="modal-dialog modal-md">
+
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+
+                                            <h5 class="modal-title">Found a booking with same details - Booking No : <label id="orderno"></label> Do you want to save?</h5>
+                                        </div>
+
+                                        <div class="modal-footer">
+
+                                            <button id="OfflineBookingAlreadyExistsCheckingNO" type="button" class="btn btn-danger" data-dismiss="modal">NO</button>
+                                            <button id="OfflineBookingAlreadyExistsCheckingYES" type="button" class="btn btn-success" data-dismiss="modal">YES</button>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div id="OfflineBookingEditCheckingValueChange" class="modal fade" role="dialog">
+                                <div class="modal-dialog modal-md">
+
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+
+                                            <h5 class="modal-title">We found that Total Pax has been reduced. Please contact administrator to edit this booking.</h5>
+                                        </div>
+
+                                        <div class="modal-footer">
+
+                                            <button id="OfflineBookingEditCheckingValueChangeNO" type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                            @*<button id="OfflineBookingEditCheckingValueChangeYES" type="button" class="btn btn-success" data-dismiss="modal">YES</button>*@
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <script src="~/Scripts/tinymce/tiny_mce.js"></script>
+                            <script>
+
+
+                                function BookingDate()
+                                {
+                                    debugger
+                                    re = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+                                    var date=  $("#Bookingdate").val()
+                                    if(date==null||date=="")
+                                    {
+                                        var curDate = new Date();
+                                      curDate.setDate(curDate.getDate());
+                                        var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+                                        $("#Bookingdate").val(idat);
+                                    }
+                                    else if(date != '' && !date.match(re)) {
+                                        var curDate = new Date();
+                                        curDate.setDate(curDate.getDate());
+                                        var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+                                        $("#Bookingdate").val(idat);
+                                    }
+                                    else{
+                                        return true;
+                                    }
+                                }
+
+
+    tinyMCE.init({
+        mode: "textareas",
+        theme: "simple",
+        force_br_newlines : true,
+        force_p_newlines : false,
+        theme_simple_toolbar_location: "top",
+        height: "100", width: "420",
+        editor_selector: "mceSimple"
+
+    });
+
+                            </script>
+                            <script type="text/javascript">
+
+
+
+    function onClickNewProperty()
+    {
+        $.get('@Url.Action("EditCustomProperty", "CustomProperty")',function (data){
+            $("#SalesRegion").val(data);
+        });
+    }
+
+    function ChangeSalesPerson(salespersonid)
+    {
+        var id=salespersonid;
+        $.get('@Url.Action("GetSalesRegion", "OfflineBooking")?id='+ salespersonid,function (data){
+            $("#SalesRegion").val(data);
+        });
+    }
+
+    function changecheckout()
+    {
+        var CheckOutdt =   moment( $("#CheckOut").val(), "DD/MM/YYYY");
+        var Checkindt =    moment( $("#CheckIn").val(), "DD/MM/YYYY");
+
+        var days = daydiff(Checkindt, CheckOutdt );
+        $("#NoOfNight").val(days);
+
+        onchangestaxbuyprice();
+        onchangestaxsaleprice();
+    }
+
+    function changenoofnight()
+    {
+        var CheckOutdt =   moment( $("#CheckOut").val(), "DD/MM/YYYY");
+        var Checkindt  =    moment( $("#CheckIn").val(), "DD/MM/YYYY");
+        var Noofnight  =   $("#NoOfNight").val();
+        if(isNaN(parseFloat(Noofnight))){ Noofnight = 0;}
+        var updatecheckoutdt =moment( Checkindt.add("days",Noofnight),"DD/MM/YYYY" ).format("DD/MM/YYYY");
+        //$("#CheckOut").val(updatecheckoutdt);
+
+        onchangestaxbuyprice();
+        onchangestaxsaleprice();
+    }
+
+    function changecheckin()
+    {
+        var CheckOutdt =   moment( $("#CheckOut").val(), "DD/MM/YYYY");
+        var Checkindt =    moment( $("#CheckIn").val(), "DD/MM/YYYY");
+
+        var days = daydiff(Checkindt, CheckOutdt );
+        $("#NoOfNight").val(days);
+
+        onchangestaxbuyprice();
+        onchangestaxsaleprice();
+    }
+    function changenoofrooms()
+    {
+        onchangestaxbuyprice();
+        onchangestaxsaleprice();
+    }
+    //$("#spnrAdnight").bind( function(){
+    //    alert("sdsd1");
+    //});
+
+    //function night()
+    //{
+    //    alert( $('#spnrAdnight').text());
+    //    $("#NoOfNight").val();
+    //}
+
+    //function rooms()
+    //{
+    //    $("#NoOfRooms").val();
+    //}
+    //function adult()
+    //{
+    //    $("#NoOfPaxAdult").val();
+    //}
+    //function child()
+    //{
+    //    $("#NoOfPaxChild").val();
+    //}
+    //$('#spnrCdrooms').bind( function(){
+    //    alert("sdsd2");
+    //});
+
+    //$('#sprbxadult').bind( function(){
+    //    alert("sdsd3");
+    //});
+
+    //$('#sprbxchild').bind( function(){
+    //    alert("sdsd4");
+    //});
+
+    $("#AccommodationTypeName").autocomplete({
+        minLength: 0,
+        source: "/Common/GetAccommodation",
+        focus: function (event, ui) {
+            $("#AccommodationTypeName").val(ui.item.value);
+            return false;
+        }
+    })
+    .autocomplete("instance")._renderItem = function (ul, item) {
+        ul.addClass("custom");
+        return $("<li>") //.addClass("custom")
+        .append("<a>" + item.label )
+        .appendTo(ul);
+    };
+
+    function SaveOffline()
+    {
+        var PropertyId = $("#PropertyId").val();
+        //var SupplierId = $("#SupplierId").val();
+        var accommodationtypeid = $("#AccommodatoinType").find('option:selected').attr('value');
+        var AccommodationId =$("#AccommodatoinType").find('option:selected').attr('id');
+        var staycategoryid =$("#StayType").find('option:selected').attr('value');
+        $("#Accommodationtypeid").val($("#AccommodatoinType").val());
+        $("#Accommodationid").val(AccommodationId);
+        $("#StayCategoryid").val($("#StayType").find('option:selected').attr('value'));
+        $("#FormOfflineBooking").submit();
+
+        //$.get("/OfflineBooking/SaveOfflineBooking", $("#FormOfflineBooking").serialize(), function (data) {
+        //    if (data != "") {
+        //        if( data != 0)
+        //        {
+        //            alert("Saved Successfully");
+        //        }
+        //    }
+        //});
+    }
+
+
+    function SubmitOff(tnc)
+    {
+
+        if(tnc == 0)
+        {
+            var PropertyId = $("#PropertyId").val();
+            //var SupplierId = $("#SupplierId").val();
+            var accommodationtypeid = $("#AccommodatoinType").find('option:selected').attr('value');
+            var AccommodationId =$("#AccommodatoinType").find('option:selected').attr('id');
+            var staycategoryid =$("#StayType").find('option:selected').attr('value');
+            $("#Accommodationtypeid").val($("#AccommodatoinType").val());
+            $("#Accommodationid").val(AccommodationId);
+            $("#StayCategoryid").val($("#StayType").find('option:selected').attr('value'));
+            $('#FormOfflineBooking').attr('action', "/Admin/OfflineBooking/SubmitOfflineBooking").submit();
+        }
+    }
+
+    function SubmitOffline1()
+    {
+        $.ajax({
+            type: "POST",
+            url: "/Admin/OfflineBooking/OfflineBookingAlreadyExistsChecking",
+            data: { CustomerName: $("#CustomerName").val(), GuestName: $("#GuestName").val(), PropertyName: $("#PropertyName").val(), CheckIn: $("#CheckIn").val(), CheckOut: $("#CheckOut").val(),SalesPersonId: $("#SalesPersonId").val(),OfflineBookingId:$("#OfflineBookingId").val()},
+        }).done(function (data) {
+
+            if (data == 0) {
+
+
+                var cnt=0;
+                var servTax=$('#StaxForSalePrice').val();
+                var servOtherTax=$('#StaxForotherForSalePrice').val();
+                if(isNaN(servTax))
+                {
+                    servTax=0.0;
+                }
+                if(isNaN(servOtherTax))
+                {
+                    servOtherTax=0.0;
+                }
+                var StaxForSalePrice = parseFloat(servTax);
+                var StaxForotherForSalePrice= parseFloat(servOtherTax);
+                var sumOFServiceTax =0.0; var sumOFServiceTaxOthers=0.0;
+                var intRegex = /^\d+(?:\.\d\d?)?$/;
+                $('div.clsDivServiceTaxSplitUpValidation :input.numberboxTaxPerccent').each(function(){
+                    //console.log($(this).val());
+                    if( !isNaN(parseFloat($(this).val())) )
+                        sumOFServiceTax = 0 + sumOFServiceTax + parseFloat($(this).val());
+                    else
+                        console.log('null1');
+                });
+                $('div.clsDivServiceTaxOthersSplitUpValidation :input.numberboxTaxPerccent').each(function(){
+                    //console.log($(this).val());
+                    if(  !isNaN(parseFloat($(this).val())) ) //$(this).val().match(intRegex)
+                        sumOFServiceTaxOthers = 0 + sumOFServiceTaxOthers + parseFloat($(this).val());
+                    else
+                        console.log('null2');
+                });
+                if(sumOFServiceTax.toFixed(4) == StaxForSalePrice.toFixed(4))
+                {
+                    $('#ServiceTaxSplitUpValidation').css("display","none");
+                    console.log('Servi Equal');
+                }
+                else{
+                    $('#ServiceTaxSplitUpValidation').css("display","block");
+                    console.log('Servi not Equal');
+                    cnt=1;
+                }
+                if(sumOFServiceTaxOthers.toFixed(4) == StaxForotherForSalePrice.toFixed(4))
+                {
+                    $('#ServiceTaxOthersSplitUpValidation').css("display","none");
+                    console.log('Servi Others Equal');
+                }
+                else{
+                    $('#ServiceTaxOthersSplitUpValidation').css("display","block");
+                    console.log('Servi Others not Equal');
+                    cnt=2;
+                }
+                SubmitOff(cnt);
+            }
+            else {
+                $("#orderno").html(data);
+                $('#OfflineBookingAlreadyExistsChecking').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                })
+                  .one('click', '#OfflineBookingAlreadyExistsCheckingYES', function(e) {
+                      var cnt=0;
+                      var servTax=$('#StaxForSalePrice').val();
+                      var servOtherTax=$('#StaxForotherForSalePrice').val();
+                      if(isNaN(servTax))
+                      {
+                          servTax=0.0;
+                      }
+                      if(isNaN(servOtherTax))
+                      {
+                          servOtherTax=0.0;
+                      }
+                      var StaxForSalePrice = parseFloat(servTax);
+                      var StaxForotherForSalePrice= parseFloat(servOtherTax);
+                      var sumOFServiceTax =0.0; var sumOFServiceTaxOthers=0.0;
+                      var intRegex = /^\d+(?:\.\d\d?)?$/;
+                      $('div.clsDivServiceTaxSplitUpValidation :input.numberboxTaxPerccent').each(function(){
+                          //console.log($(this).val());
+                          if( !isNaN(parseFloat($(this).val())) )
+                              sumOFServiceTax = 0 + sumOFServiceTax + parseFloat($(this).val());
+                          else
+                              console.log('null1');
+                      });
+                      $('div.clsDivServiceTaxOthersSplitUpValidation :input.numberboxTaxPerccent').each(function(){
+                          //console.log($(this).val());
+                          if(  !isNaN(parseFloat($(this).val())) ) //$(this).val().match(intRegex)
+                              sumOFServiceTaxOthers = 0 + sumOFServiceTaxOthers + parseFloat($(this).val());
+                          else
+                              console.log('null2');
+                      });
+                      if(sumOFServiceTax.toFixed(4) == StaxForSalePrice.toFixed(4))
+                      {
+                          $('#ServiceTaxSplitUpValidation').css("display","none");
+                          console.log('Servi Equal');
+                      }
+                      else{
+                          $('#ServiceTaxSplitUpValidation').css("display","block");
+                          console.log('Servi not Equal');
+                          cnt=1;
+                      }
+                      if(sumOFServiceTaxOthers.toFixed(4) == StaxForotherForSalePrice.toFixed(4))
+                      {
+                          $('#ServiceTaxOthersSplitUpValidation').css("display","none");
+                          console.log('Servi Others Equal');
+                      }
+                      else{
+                          $('#ServiceTaxOthersSplitUpValidation').css("display","block");
+                          console.log('Servi Others not Equal');
+                          cnt=2;
+                      }
+                      SubmitOff(cnt);
+                  });
+
+            }
+        })
+
+
+
+
+    }
+
+
+
+
+    function SubmitOffline()
+    {
+
+        if($('#FormOfflineBooking').valid()){
+            var byPrice = parseFloat($('#TotalBuyPrice').val()) > 0 ? parseFloat($('#TotalBuyPrice').val()) : 0;
+            var salePrice = parseFloat($('#TotalSalePrice').val()) > 0 ? parseFloat($('#TotalSalePrice').val()) : 0;
+            if($('#OfflineBookingId').val()!=null||$('#OfflineBookingId').val()!=""||$('#OfflineBookingId').val()!=0 )
+            {
+                debugger
+                var id= $('#OfflineBookingId').val();
+                //$.get("/Admin/OfflineBooking/StatusUpdateOfflineBookingEdit?id=" + id, function (data) {
+                var Approved= @((int)@CLayer.ObjectStatus.BookingOfflineStatus.Approved)
+                var ApprovedFromModel=@status;
+                @if(hasEditPermisson) {<text>var hasPermission =  true;</text>}else{<text>var hasPermission =  false;</text>}
+                if(Approved==ApprovedFromModel)
+                {//checking for approved models
+                    var totalPax=(@nonight*@norooms);
+                    var textbox_NoOfNight =  $('#NoOfNight').val();
+                    var textbox_NoOfRooms=  $('#NoOfRooms').val();
+                    @*$('#NoOfNight').val(@nonight);
+                    $('#NoOfRooms').val(@norooms);*@
+                    var totalpaxTextbox=(textbox_NoOfNight*textbox_NoOfRooms)
+                    if(totalpaxTextbox > totalPax && (!hasPermission) )//&& (!hasPermission)
+                    {
+                        //show message and leave, no save
+                        //message
+                        $('#OfflineBookingEditCheckingValueChange').modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        })
+
+                        return;
+                    }
+                }
+
+                if(byPrice > salePrice  )
+                {
+                    $('#confirmBoxWindow').modal({
+                        backdrop: 'static',
+                        keyboard: false
+                    })
+                    .one('click', '#btnConfirmBoxYes', function(e) {
+                        SubmitOffline1();
+                    });
+                    //.one('click', '#btnConfirmBoxNo', function(e) {
+                    //    console.log('No');
+                    //});
+                }else{
+                    SubmitOffline1();
+                }
+            }//offline id checking
+
+
+        }
+    }
+
+
+
+    function onchangestaxbuyprice()
+    {
+        var avgdailyrate = parseFloat( $("#AvgDailyRateBefreStaxForBuyPrice").val());
+        var noofnight = parseFloat($("#NoOfNight").val());
+        var noofrooms = parseFloat($("#NoOfRooms").val());
+        var Stax  =parseFloat( $("#StaxForBuyPrice").val());
+
+        var avgdailyrateother = parseFloat( $("#BuyPriceforotherservicesForBuyprice").val());
+        var Staxother  =parseFloat( $("#StaxForotherBuyPrice").val());
+
+        if(isNaN(parseFloat(avgdailyrate))){ avgdailyrate = 0;}
+        if(isNaN(parseFloat(avgdailyrateother))){ avgdailyrateother = 0;}
+        if(isNaN(parseFloat(noofnight))){ noofnight = 0;}
+        if(isNaN(parseFloat(noofrooms))){ noofrooms = 0;}
+        if(isNaN(parseFloat(Stax))){ Stax = 0;}
+        if(isNaN(parseFloat(Staxother))){ Staxother = 0;}
+
+        var total =parseFloat( ( avgdailyrate + (avgdailyrate*Stax/100)) * noofnight * noofrooms );
+
+        $("#TotalAmtForBuyPrice").val(Math.round(total));
+
+
+        var totalbuyamount =  parseFloat ($("#TotalAmtForBuyPrice").val() );
+
+
+        var totalbuyotheramount = parseFloat(avgdailyrateother + (avgdailyrateother * Staxother /100) );
+        $("#TotalAmtotherForBuyPrice").val(totalbuyotheramount);
+
+        if(isNaN(parseFloat(totalbuyamount))){ totalbuyamount = 0;}
+        if(isNaN(parseFloat(totalbuyotheramount))){ totalbuyotheramount = 0;}
+
+        var totalbuy = parseFloat( ( totalbuyamount + totalbuyotheramount));
+        //alert(totalbuy);
+        $("#TotalBuyPrice").val(totalbuy);
+
+    }
+
+
+    function onchangestaxsaleprice()
+    {
+        var avgdailyrate =parseFloat( $("#AvgDailyRateBefreStaxForSalePrice").val());
+        var noofnight = parseFloat($("#NoOfNight").val());
+        var noofrooms = parseFloat($("#NoOfRooms").val());
+        var Stax  =parseFloat( $("#StaxForSalePrice").val());
+
+        var avgdailyrateother =parseFloat( $("#BuyPriceforotherservicesForSalePrice").val());
+        var Staxother  =parseFloat( $("#StaxForotherForSalePrice").val());
+
+
+        if(isNaN(parseFloat(avgdailyrate))){ avgdailyrate = 0;}
+        if(isNaN(parseFloat(avgdailyrateother))){ avgdailyrateother = 0;}
+        if(isNaN(parseFloat(noofnight))){ noofnight = 0;}
+        if(isNaN(parseFloat(noofrooms))){ noofrooms = 0;}
+        if(isNaN(parseFloat(Stax))){ Stax = 0;}
+        if(isNaN(parseFloat(Staxother))){ Staxother = 0;}
+
+
+        var total =parseFloat( ( avgdailyrate + (avgdailyrate * Stax / 100 )) * noofnight * noofrooms );
+        $("#TotalAmtForSalePrice").val(Math.round(total));
+
+        var totalbuyamount = parseFloat ($("#TotalAmtForSalePrice").val());
+
+        var totalbuyotheramount =parseFloat(avgdailyrateother + ( avgdailyrateother * Staxother /100) );
+
+        $("#TotalAmtotherForSalePrice").val(totalbuyotheramount) ;
+
+
+
+        $("#TotalSalePrice").val(totalbuyamount + totalbuyotheramount);
+
+    }
+
+    function onchangestaxbuypriceforotherservice()
+    {
+        var avgdailyrateother = parseFloat( $("#BuyPriceforotherservicesForBuyprice").val());
+        var noofnight = parseFloat($("#NoOfNight").val());
+        var noofrooms = parseFloat($("#NoOfRooms").val());
+        var Staxother  =parseFloat( $("#StaxForotherBuyPrice").val());
+
+        var avgdailyrate = parseFloat( $("#AvgDailyRateBefreStaxForBuyPrice").val());
+        var Stax  =parseFloat( $("#StaxForBuyPrice").val());
+
+        if(isNaN(parseFloat(avgdailyrate))){ avgdailyrate = 0;}
+        if(isNaN(parseFloat(Stax))){ Stax = 0;}
+
+
+        if(isNaN(parseFloat(avgdailyrateother))){ avgdailyrateother = 0;}
+        if(isNaN(parseFloat(Staxother))){ Staxother = 0;}
+
+        var total = parseFloat( ( avgdailyrateother + Staxother));
+
+        $("#TotalAmtotherForBuyPrice").val(Math.round( total));
+
+
+        var totalbuyamount =parseFloat( avgdailyrate + Stax);
+        $("#TotalAmtForBuyPrice").val(totalbuyamount);
+
+        var totalbuyotheramount =parseFloat( $("#TotalAmtotherForBuyPrice").val() );
+        $("#TotalBuyPrice").val(totalbuyamount + totalbuyotheramount);
+
+
+    }
+
+
+    function onchangestaxsalepriceforotherservice()
+    {
+        var avgdailyrateother =parseFloat( $("#BuyPriceforotherservicesForSalePrice").val());
+        var noofnight = parseFloat($("#NoOfNight").val());
+        var noofrooms = parseFloat($("#NoOfRooms").val());
+        var Staxother =parseFloat( $("#StaxForotherForSalePrice").val());
+
+        var avgdailyrate =parseFloat( $("#AvgDailyRateBefreStaxForSalePrice").val());
+        var Stax  =parseFloat( $("#StaxForSalePrice").val());
+
+        if(isNaN(parseFloat(avgdailyrate))){ avgdailyrate = 0;}
+        if(isNaN(parseFloat(Stax))){ Stax = 0;}
+
+        if(isNaN(parseFloat(avgdailyrateother))){ avgdailyrateother = 0;}
+        if(isNaN(parseFloat(Staxother))){ Staxother = 0;}
+
+        var total = parseFloat( ( avgdailyrateother + Staxother));
+
+        $("#TotalAmtotherForSalePrice").val(Math.round(total));
+
+
+        var totalbuyamount = parseFloat(avgdailyrate + Stax );
+        $("#TotalAmtForSalePrice").val(totalbuyamount);
+        var totalbuyotheramount =parseFloat( $("#TotalAmtotherForSalePrice").val() );
+
+
+        $("#TotalSalePrice").val(parseFloat (totalbuyamount) + parseFloat (totalbuyotheramount));
+    }
+
+
+    function onchangetotalbuyprice()
+    {
+        var totalbuyamount =  parseFloat ($("#TotalAmtForBuyPrice").val() );
+        var totalbuyotheramount =parseFloat( $("#TotalAmtotherForBuyPrice").val());
+
+        if(isNaN(parseFloat(totalbuyamount))){ totalbuyamount = 0;}
+        if(isNaN(parseFloat(totalbuyotheramount))){ totalbuyotheramount = 0;}
+
+        var totalbuy = parseFloat( ( totalbuyamount + totalbuyotheramount));
+        $("#TotalBuyPrice").val(totalbuy);
+
+    }
+
+    function onchangetotalsaleprice()
+    {
+        var totalbuyamount = parseFloat ($("#TotalAmtForSalePrice").val());
+        var totalbuyotheramount = parseFloat( $("#TotalAmtotherForSalePrice").val());
+
+        if(isNaN(parseFloat(totalbuyamount))){ totalbuyamount = 0;}
+        if(isNaN(parseFloat(totalbuyotheramount))){ totalbuyotheramount = 0;}
+
+        var totalbuy = parseFloat( ( totalbuyamount + totalbuyotheramount));
+        $("#TotalSalePrice").val(totalbuy);
+
+    }
+
+    function GenBookAmt(){
+
+        var PropertyId = $("#PropertyId").val();
+        if(PropertyId != "" && PropertyId >0)
+        {
+            if($("input[id=Defaultcheck]").is(":checked") == true)
+            {
+                document.getElementById("pricediv").style.display = "block";
+                var SupplierId = $("#SupplierId").val();
+                var accommodationtypeid = $("#AccommodatoinType").find('option:selected').attr('value');
+                var AccommodationId =$("#AccommodatoinType").find('option:selected').attr('id');
+                var staycategoryid =$("#StayType").find('option:selected').attr('value');
+                $("#Accommodationtypeid").val($("#AccommodatoinType").val());
+                $("#Accommodationid").val(AccommodationId);
+                $("#StayCategoryid").val($("#StayType").find('option:selected').attr('value'));
+
+                var booking_CheckIndate= $("#CheckIn").val();
+                var booking_CheckOutdate = $("#CheckOut").val();
+
+
+                var NoOfNight = $("#NoOfNight").val();
+                var NoOfRooms= $("#NoOfRooms").val();
+
+                var NoOfpax_Adult =$("#NoOfPaxAdult").val();
+                var NoOfpax_Child =$("#NoOfPaxChild").val();
+
+                $('#pricingdet').html("");
+                //{ propertyid :  PropertyId ,SupplierId :SupplierId,accommodationtypeid:accommodationtypeid, AccommodationId: AccommodationId,staycategoryid:staycategoryid,booking_CheckIndate :booking_CheckIndate,booking_CheckOutdate :booking_CheckOutdate,NoOfNight :NoOfNight,NoOfRooms :NoOfRooms,NoOfpax_Adult :NoOfpax_Adult,NoOfpax_Child:NoOfpax_Child }
+                // controller part - long propertyid, long SupplierId, long accommodationtypeid, long AccommodationId, long staycategoryid, string booking_CheckIndate, string booking_CheckOutdate, int NoOfNight, int NoOfRooms, int NoOfpax_Adult, int NoOfpax_Child
+                $.get("/OfflineBooking/SetPricingDetailsforOffline", $("#FormOfflineBooking").serialize(), function (data) {
+                    if (data != "") {
+
+                        document.getElementById("pricediv").style.display = "none";
+                        $('#pricingdet').html(data);
+
+                    }
+                });
+            }
+
+
+
+        }
+
+    }
+
+    //$('#AccommodatoinType').change(function () {
+    //    if($("#AccommodatoinType").find('option:selected').attr('Value') == -1)
+    //    {
+    //        document.getElementById("Accdiv").style.display = "none";
+    //        document.getElementById("other_Acctype").style.display = "block";
+    //        document.getElementById("close_other_Acctype").style.display = "block";
+    //    }
+
+    //    GenBookAmt();
+
+    //});
+
+
+
+    //function Accdivdisplay(){
+    //    document.getElementById("Accdiv").style.display = "block";
+    //    document.getElementById("other_Acctype").style.display = "none";
+    //    document.getElementById("close_other_Acctype").style.display = "none";
+    //}
+
+    $('#StayType').change(function () {
+
+        if($("#StayType").find('option:selected').attr('Value') == -1)
+        {
+            document.getElementById("staydiv").style.display = "none";
+            document.getElementById("other_staytype").style.display = "block";
+            document.getElementById("close_other_staytype").style.display = "block";
+        }
+
+    });
+
+
+
+    function staydivdisplay(){
+        document.getElementById("staydiv").style.display = "block";
+        document.getElementById("other_staytype").style.display = "none";
+        document.getElementById("close_other_staytype").style.display = "none";
+    }
+
+
+    function browseSupplier() {
+        $('#chooseSupplier').modal('show');
+    }
+
+    function browseProperty() {
+
+        $('#chooseProperty').modal('show');
+    }
+
+    function onCancelCustomPropSave()
+    {
+        $('#chooseProperty').modal('hide');
+    }
+
+    function browsecustomer() {
+
+        $('#chooseCustomer').modal('show');
+    }
+
+    function supSelected(corpId)
+    {
+
+
+        $("#SupplierId").val(corpId);
+
+        $('#chooseSupplier').modal('hide');
+        $('#choosePropertyfromsup').modal('show');
+
+
+        document.getElementById("searchpropfromsup").style.display = "none";
+        document.getElementById("goidforsup").style.display = "none";
+
+
+        $("#SupplierName").val($("#supname_" + corpId).html());
+        $("#SupplierEmail").val($("#supemail_" + corpId).html());
+        $("#SupplierMobile").val($("#supmobile_" + corpId).html());
+        $("#SupplierAddress").val($("#supaddress_" + corpId).html());
+
+
+        var c = $("#supCountryid_" + corpId).html();
+        var s = $("#supStateId_" + corpId).html();
+        var ci = $("#supCityId_" + corpId).html();
+
+        $("#SupplierCountry").val(c);
+
+
+        $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {S
+            if (data != "") {
+                $('#SupplierState').empty().append(data);
+                $("#SupplierState").val(s);
+                $("#SupplierState option[value= '" + s + "' ]").attr("selected","selected");
+            }
+            else {
+                $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+
+        $.get("/Common/GetCity?id=" + s, function (data) {
+            if (data != "") {
+                $('#SupplierCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                $("#SupplierCity").val(ci);
+                $("#SupplierCity option[value= '" + ci + "' ]").attr("selected","selected");
+
+                $("#SupplierCityname").val($("#SupplierCity").find('option:selected').text());
+
+            }
+            else {
+                $('#SupplierCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+
+        var cname1 =  corpId;
+        $.post('@Url.Action("Searchforofflinebookaftersup", "property", new { area = "Admin" })', { name: cname1 },function (data){
+            $("#browseListprofromsup").html(data);
+        });
+        $("#searchsup").val("");
+
+        //GenBookAmt();
+    }
+    function CustomerValueAppend(corpId)
+    {
+        $("#CustomerId").val(corpId);
+
+        $("#CustomerName").val(htmlDecode($("#CustomerName1Hidden" + corpId).html()));
+        $("#CustomerEmail").val($("#CustomerEmail1Hidden" + corpId).html());
+        $("#CustomerMobile").val($("#CustomerMobile1Hidden" + corpId).html());
+        $("#GuestName").val(htmlDecode($("#GuestName1Hidden" + corpId).html()));
+        $("#GuestEmail").val($("#GuestEmail1Hidden" + corpId).html());
+        $("#CustomerpinCode").val($("#CustomerpinCodeHidden" + corpId).html());
+        $("#CustomerpinCode").val($("#CustomerpinCodeHidden" + corpId).html());
+        $("#CustomerAddress").val(htmlDecode($("#CustomerAddress1Hidden" + corpId).html()));
+        $("#CustomerCityname").val($("#CustomerCitynameHidden" + corpId).html());
+
+        $("#BillingCountryId1").val($("#HiddenBillingCountryId" + corpId).html());
+        $("#BillingState1").val($("#HiddenBillingState" + corpId).html());
+        $("#BillingCity1").val($("#HiddenBillingCity" + corpId).html());
+        $("#PinCode1").val($("#HiddenBillingPinCode" + corpId).html());
+
+        $("#BillingMobile1").val($("#HiddenBillingMobile" + corpId).html());
+        $("#ContactPerson1").val($("#HiddenContactPerson" + corpId).html());
+        $("#OfficeNO1").val($("#HiddenOfficeNO" + corpId).html());
+        $("#BillingAddress1").val($("#HiddenBillingAddress" + corpId).html());
+
+        $("#NoInvoiceMail").val($("#HIddenNoInvoiceMail" + corpId).html());
+
+
+
+        var c = $("#CustomerCountryHidden" + corpId).html();
+        var s = $("#CustomerStateHidden" + corpId).html();
+
+        var ci = $("#CustomerCity1Hidden" + corpId).html();
+        var CityName = $("#CustomerCitynameHidden" + corpId).html();
+
+        $("#CustomerCountry").val(c);
+
+        $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+            if (data != "") {
+                $('#CustomerState').empty().append(data);
+                $("#CustomerState").val(s);
+                $("#CustomerState option[value= '" + s + "' ]").attr("selected","selected");
+            }
+            else {
+                $('#CustomerState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+        if(ci>0||ci != -1)
+        {
+            $.get("/Common/GetCity?id=" + s, function (data) {
+                if (data != "") {
+                    $('#CustomerCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                    $("#CustomerCity").val(ci);
+                    $("#CustomerCity option[value= '" + ci + "' ]").attr("selected","selected");
+
+                }
+                else {
+                    $('#CustomerCity').html('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        }
+        else
+        {
+            $('#CustomerCity').hide();
+            $('#other_citycus').show();
+            $("#CustomerCityname").val(CityName);
+        }
+    }
+
+
+
+
+    function proSelectedFromCstomPropSave(corpId)
+    {
+        if($("#procity_" + corpId).html() == -1)
+        {
+            $("#PropertyCity").hide();
+            $("#other_cityprop").show();
+            document.getElementById("close_other_cityprop").style.display = 'block';
+            //$("#close_other_cityprop").show();
+        }
+
+        $("#CustomPropertyId").val(corpId);
+        $("#PropertyId").val(0);
+
+        $("#SupplierId").val($("#customeprosupid_" + corpId).html());
+
+        $("#SupplierIdforprop").val($("#customeprosupid_" + corpId).html());
+
+        $("#PropertyName").val(htmlDecode($("#customeproname_" + corpId).html()));
+
+        $("#PropertyEmail").val($("#customeproemail_" + corpId).html());
+        $("#PropertyAddress").val(htmlDecode($("#customeproAddress_" + corpId).html()));
+        $("#PropertyCaretakerName").val($("#customeprotakecarename_" + corpId).html());
+        $("#PropertyContactNo").val($("#customepromobile_" + corpId).html());
+        $("#PropertyPinCode").val($("#customepropertypincode_" + corpId).html());
+
+        $("#SupplierName").val(htmlDecode($("#customeprosupbuissname_" + corpId).html()));
+        $("#SupplierEmail").val($("#customeprosupemail_" + corpId).html());
+        $("#SupplierMobile").val($("#customeprosupmobile_" + corpId).html());
+        $("#SupplierAddress").val(htmlDecode($("#customeprosupaddress_" + corpId).html()));
+        $("#SupplierPinCode1").val(htmlDecode($("#HiddenSupplierPinCode" + corpId).html()));
+
+
+
+        var c = $("#customeprosupcountry_" + corpId).html();
+        var s = $("#customeprosupstate_" + corpId).html();
+        var ci = $("#customeprosupcityid_" + corpId).html();
+
+
+        $("#CustomerCountry").val(c);
+
+        $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+            if (data != "") {
+                $('#SupplierState').empty().append(data);
+                $("#SupplierState").val(s);
+                $("#SupplierState option[value= '" + s + "' ]").attr("selected","selected");
+            }
+            else {
+                $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+        $.get("/Common/GetCity?id=" + s, function (data) {
+            if (data != "") {
+                $('#SupplierCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                $("#SupplierCity").val(ci);
+                $("#SupplierCity option[value= '" + ci + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#SupplierCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+        $("#SupplierCityname").val($("#SupplierCity").find('option:selected').text());
+
+        $("#PropertyCountry").val($("#customeprocountry_" + corpId).html());
+
+
+
+
+        //if($("input[id=Defaultcheck]").is(":checked") == true)
+        //{
+
+        //    $.get("/Common/GetAcctypebypropertyid?id=" + corpId , function (data) {
+        //        if (data != "") {
+        //            $('#AccommodatoinType').empty().append(data);
+        //        }
+        //    });
+
+        //    $.get("/Common/Getstaytypebypropertyid?id=" + corpId, function (data) {
+        //        if (data != "") {
+        //            $('#StayType').empty().append(data);
+        //        }
+        //    });
+
+        //}
+        //else
+        //{
+        //    $.get("/Common/GetAcctypebypropertyid?id=" + 0 , function (data) {
+        //        if (data != "") {
+        //            $('#AccommodatoinType').empty().append(data);
+        //        }
+        //    });
+
+
+        //    $.get("/Common/Getstaytypebypropertyid?id=" + 0, function (data) {
+        //        if (data != "") {
+        //            $('#StayType').empty().append(data);
+        //        }
+        //    });
+        //}
+
+
+
+
+
+        var ps =  $("#customeprostate_" + corpId).html();
+
+        $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+            if (data != "") {
+                $('#PropertyState').empty().append(data);
+                $("#PropertyState").val(ps);
+                $("#PropertyState option[value= '" + ps + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+        var pc = $("#customeprocity_" + corpId).html();
+        var newcityname = $("#customeprocity_New" + corpId).html();
+
+
+        if(pc!=-1||pc>0)
+        {
+            $.get("/Common/GetCity?id=" + ps, function (data) {
+                if (data != "") {
+                    $('#PropertyCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                    $("#PropertyCity").val(pc);
+
+                    $("#PropertyCity option[value= '" + pc + "' ]").attr("selected","selected");
+
+                }
+                else {
+                    $('#PropertyCity').html('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        }
+        else
+        {
+            $('#PropertyCity').hide();
+            $('#other_cityprop').show();
+            $("#PropertyCityname").val(newcityname);
+        }
+
+
+
+        //$("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+
+        ////if($("#PropertyCityname").val() == "" || $("#PropertyCityname").val() == null)
+        ////{
+        //$("#PropertyCityname").val($("#customeprocityname_" + corpId).html());
+        ////}
+
+        if($("#SupplierCityname").val() == "" ||  $("#SupplierCityname").val() == null)
+        {
+            $("#SupplierCityname").val($("#customeprosupcityname_" + corpId).html());
+        }
+
+
+        $("#searchprop").val("");
+        $('#chooseProperty').modal('hide');
+        $('#choosePropertyfromsup').modal('hide');
+        $('#chooseSupplier').modal('hide');
+
+        //GenBookAmt();
+    }
+
+
+    function proSelectedForCustom(corpId)
+    {
+
+        if($("#procity_" + corpId).html() == -1)
+        {
+            $("#PropertyCity").hide();
+            $("#other_cityprop").show();
+            document.getElementById("close_other_cityprop").style.display = 'block';
+            //$("#close_other_cityprop").show();
+        }
+
+        $("#CustomPropertyId").val(corpId);
+        $("#PropertyId").val(0);
+
+
+
+
+        $("#SupplierId").val($("#prosupid_" + corpId).html());
+
+        $("#SupplierIdforprop").val($("#prosupid_" + corpId).html());
+
+        $("#PropertyName").val(htmlDecode($("#proname_" + corpId).html()));
+
+        $("#PropertyEmail").val($("#proemail_" + corpId).html());
+        $("#PropertyAddress").val(htmlDecode($("#proAddress_" + corpId).html()));
+        $("#PropertyCaretakerName").val($("#prosupname_" + corpId).html());
+        $("#PropertyContactNo").val($("#promobile_" + corpId).html());
+        $("#PropertyPinCode").val($("#PropertyPinCode_" + corpId).html());
+        $("#SupplierPinCode1").val($("#SupplierPinCode_" + corpId).html());
+
+
+
+        $("#SupplierName").val(htmlDecode($("#prosupbuissname_" + corpId).html()));
+        $("#SupplierEmail").val($("#prosupemail_" + corpId).html());
+        $("#SupplierMobile").val($("#prosupmobile_" + corpId).html());
+        $("#SupplierAddress").val(htmlDecode($("#prosupaddress_" + corpId).html()));
+
+
+        var c = $("#prosupcountry_" + corpId).html();
+        var s = $("#prosupstate_" + corpId).html();
+        var ci = $("#prosupcityid_" + corpId).html();
+
+
+        $("#SupplierCountry").val(c);
+
+        $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+            if (data != "") {
+                $('#SupplierState').empty().append(data);
+                $("#SupplierState").val(s);
+                $("#SupplierState option[value= '" + s + "' ]").attr("selected","selected");
+            }
+            else {
+                $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+        $.get("/Common/GetCity?id=" + s, function (data) {
+            if (data != "") {
+                $('#SupplierCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                $("#SupplierCity").val(ci);
+                $("#SupplierCity option[value= '" + ci + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#SupplierCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+        $("#SupplierCityname").val($("#SupplierCity").find('option:selected').text());
+
+        $("#PropertyCountry").val($("#procountry_" + corpId).html());
+
+
+
+
+        var ps =  $("#prostate_" + corpId).html();
+
+        $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+            if (data != "") {
+                $('#PropertyState').empty().append(data);
+                $("#PropertyState").val(ps);
+                $("#PropertyState option[value= '" + ps + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+        var pc = $("#procity_" + corpId).html();
+        $.get("/Common/GetCity?id=" + ps, function (data) {
+            if (data != "") {
+                $('#PropertyCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                $("#PropertyCity").val(pc);
+
+                $("#PropertyCity option[value= '" + pc + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#PropertyCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+
+        $("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+
+        //if($("#PropertyCityname").val() == "" || $("#PropertyCityname").val() == null)
+        //{
+        $("#PropertyCityname").val($("#procityname_" + corpId).html());
+        //}
+
+        if($("#SupplierCityname").val() == "" ||  $("#SupplierCityname").val() == null)
+        {
+            $("#SupplierCityname").val($("#prosupcityname_" + corpId).html());
+        }
+
+
+        $("#searchprop").val("");
+        $('#chooseProperty').modal('hide');
+        $('#choosePropertyfromsup').modal('hide');
+        $('#chooseSupplier').modal('hide');
+
+        //GenBookAmt();
+    }
+
+
+
+    function proSelected(corpId)
+    {
+        debugger
+        if($("#procity_" + corpId).html() == -1)
+        {
+            $("#PropertyCity").hide();
+            $("#other_cityprop").show();
+            document.getElementById("close_other_cityprop").style.display = 'block';
+            //$("#close_other_cityprop").show();
+        }
+
+        $("#PropertyId").val(corpId);
+
+
+
+
+        $("#SupplierId").val($("#prosupid_" + corpId).html());
+
+        $("#SupplierIdforprop").val($("#prosupid_" + corpId).html());
+
+        $("#PropertyName").val(htmlDecode($("#proname_" + corpId).html()));
+
+        $("#PropertyEmail").val($("#proemail_" + corpId).html());
+        $("#PropertyAddress").val(htmlDecode($("#proAddress_" + corpId).html()));
+        $("#PropertyCaretakerName").val($("#prosupname_" + corpId).html());
+        $("#PropertyContactNo").val($("#promobile_" + corpId).html());
+
+
+        $("#SupplierName").val(htmlDecode($("#prosupbuissname_" + corpId).html()));
+        $("#SupplierEmail").val($("#prosupemail_" + corpId).html());
+        $("#SupplierMobile").val($("#prosupmobile_" + corpId).html());
+        $("#SupplierAddress").val(htmlDecode($("#prosupaddress_" + corpId).html()));
+
+        $("#PropertyPinCode").val($("#PropertyZipcode_" + corpId).html());
+        $("#SupplierPinCode1").val($("#SupplierZipcode_" + corpId).html());
+        $("#SupplierAddress").val($("#SupplierAddress_" + corpId).html());
+
+
+
+        var c = $("#prosupcountry_" + corpId).html();
+        var s = $("#prosupstate_" + corpId).html();
+        var ci = $("#prosupcityid_" + corpId).html();
+
+
+        $("#SupplierCountry").val(c);
+
+        $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+            if (data != "") {
+                $('#SupplierState').empty().append(data);
+                $("#SupplierState").val(s);
+                $("#SupplierState option[value= '" + s + "' ]").attr("selected","selected");
+            }
+            else {
+                $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+        $.get("/Common/GetCity?id=" + s, function (data) {
+            if (data != "") {
+                $('#SupplierCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                $("#SupplierCity").val(ci);
+                $("#SupplierCity option[value= '" + ci + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#SupplierCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+        $("#SupplierCityname").val($("#SupplierCity").find('option:selected').text());
+
+        $("#PropertyCountry").val($("#procountry_" + corpId).html());
+
+
+
+
+        //if($("input[id=Defaultcheck]").is(":checked") == true)
+        //{
+
+        //    $.get("/Common/GetAcctypebypropertyid?id=" + corpId , function (data) {
+        //        if (data != "") {
+        //            $('#AccommodatoinType').empty().append(data);
+        //        }
+        //    });
+
+        //    $.get("/Common/Getstaytypebypropertyid?id=" + corpId, function (data) {
+        //        if (data != "") {
+        //            $('#StayType').empty().append(data);
+        //        }
+        //    });
+
+        //}
+        //else
+        //{
+        //    $.get("/Common/GetAcctypebypropertyid?id=" + 0 , function (data) {
+        //        if (data != "") {
+        //            $('#AccommodatoinType').empty().append(data);
+        //        }
+        //    });
+
+
+        //    $.get("/Common/Getstaytypebypropertyid?id=" + 0, function (data) {
+        //        if (data != "") {
+        //            $('#StayType').empty().append(data);
+        //        }
+        //    });
+        //}
+
+
+
+
+
+        var ps =  $("#prostate_" + corpId).html();
+
+        $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+            if (data != "") {
+                $('#PropertyState').empty().append(data);
+                $("#PropertyState").val(ps);
+                $("#PropertyState option[value= '" + ps + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+        var pc = $("#procity_" + corpId).html();
+        $.get("/Common/GetCity?id=" + ps, function (data) {
+            if (data != "") {
+                $('#PropertyCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                $("#PropertyCity").val(pc);
+
+                $("#PropertyCity option[value= '" + pc + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#PropertyCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+
+        $("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+
+        //if($("#PropertyCityname").val() == "" || $("#PropertyCityname").val() == null)
+        //{
+        $("#PropertyCityname").val($("#procityname_" + corpId).html());
+        //}
+
+        if($("#SupplierCityname").val() == "" ||  $("#SupplierCityname").val() == null)
+        {
+            $("#SupplierCityname").val($("#prosupcityname_" + corpId).html());
+        }
+
+
+        $("#searchprop").val("");
+        $('#chooseProperty').modal('hide');
+        $('#choosePropertyfromsup').modal('hide');
+        $('#chooseSupplier').modal('hide');
+
+        //GenBookAmt();
+    }
+
+    function cusSelected(corpId)
+    {
+
+        //cus Customer
+        if($("#cuscity_" + corpId).html() == -1)
+        {
+            $("#CustomerCity").hide();
+            $("#other_citycus").show();
+            document.getElementById("close_other_citycus").style.display = 'block';
+            //$("#close_other_cityprop").show();
+        }
+
+
+
+        $("#CustomerId").val(corpId);
+
+        
+        $("#NoInvoiceMail").val($("#NoInvoiceMail_" + corpId).html());
+        $("#CategoryType").val($("#UserTableCategory_" + corpId).html());
+
+        $("#CustomerName").val(htmlDecode($("#cusname_" + corpId).html()));
+        $("#CustomerEmail").val($("#cusemail_" + corpId).html());
+        $("#CustomerAddress").val(htmlDecode($("#cusAddress_" + corpId).html()));
+        $("#CustomerMobile").val($("#cusmobile_" + corpId).html());
+        $("#CustomerCountry").val($("#cuscountry_" + corpId).html());
+        console.log()
+        $("#CustomerpinCode").val($("#ZipCode_" + corpId).html());
+
+        var cs =  $("#cusstate_" + corpId).html();
+
+        $.get("/Common/GetState?id=" + $('#CustomerCountry').val(), function (data) {
+            if (data != "") {
+                $('#CustomerState').empty().append(data);
+                $("#CustomerState").val(cs);
+                $("#CustomerState option[value= '" + cs + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#CustomerState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+        var cc = $("#cuscity_" + corpId).html();
+        $.get("/Common/GetCity?id=" + cs, function (data) {
+            if (data != "") {
+                $('#CustomerCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                $("#CustomerCity").val(cc);
+
+                $("#CustomerCity option[value= '" + cc + "' ]").attr("selected","selected");
+
+            }
+            else {
+                $('#CustomerCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+        $("#CustomerCityname").val($("#CustomerCity").find('option:selected').text());
+        $("#CustomerCityname").val($("#cuscityname_" + corpId).html());
+        $("#searchcust").val("");
+        $('#chooseCustomer').modal('hide');
+    }
+
+
+    function htmlDecode(value){
+        return $('<div/>').html(value).text();
+    }
+
+
+
+    $(function () {
+
+        if(@offid > 0)
+        {
+            $('#StayType').val(@stayid);
+            @*$('#AccommodatoinType').val(@Accid);*@
+            @*$('#AccommodatoinType option[value=@Accid]').attr('selected','selected');*@
+
+            @*if(@Accid != -1)
+                                        {
+                                            document.getElementById("Accdiv").style.display = "block";
+                                            document.getElementById("other_Acctype").style.display = "none";
+                                            document.getElementById("close_other_Acctype").style.display = "none";
+                                        }
+                                        else
+                                        {
+
+                                            document.getElementById("Accdiv").style.display = "none";
+                                            document.getElementById("other_Acctype").style.display = "block";
+                                            document.getElementById("close_other_Acctype").style.display = "block";
+                                        }*@
+
+
+            $("#NoOfNight").val(@nonight);
+            $("#NoOfRooms").val(@norooms);
+            $("#NoOfPaxAdult").val(@nopaxadult);
+            $("#NoOfPaxChild").val(@nopaxchaild);
+        }
+        else
+        {
+
+            $("#NoOfNight").val(1);
+            $("#NoOfRooms").val(1);
+            $("#NoOfPaxAdult").val(0);
+            $("#NoOfPaxChild").val(0);
+        }
+        $("#spnrAdnight").dpNumberPicker({
+            value: @nonight,
+            min: 1,
+            max: 10000,
+            step: 1,
+            afterChange: function () { $("#NoOfNight").val(this.options.value); }
+        });
+        $("#spnrCdrooms").dpNumberPicker({
+            value: @norooms,
+            min: 0,
+            max: 10000,
+            step: 1,
+            afterChange: function () { $("#NoOfRooms").val(this.options.value); }
+        });
+
+        $("#sprbxadult").dpNumberPicker({
+            value: @nopaxadult,
+            min: 0,
+            max: 10000,
+            step: 1,
+            afterChange: function () { $("#NoOfPaxAdult").val(this.options.value); }
+        });
+        $("#sprbxchild").dpNumberPicker({
+            value: @nopaxchaild,
+            min: 0,
+            max: 10000,
+            step: 1,
+            afterChange: function () { $("#NoOfPaxChild").val(this.options.value); }
+        });
+    });
+
+
+</script>
+
+                            <script type="text/javascript">
+                                // for customer
+
+                                $(function () {
+
+
+                                    if ($('#CustomerCity').val() == -1) {
+                                        $("#CustomerCity").hide();
+                                        @*if(@offid < 1)
+                                {
+                                    $("#CustomerCityname").val("");
+                                }*@
+                                        $("#other_citycus").show();
+                                    }
+
+                                    $('#CustomerCountry').change(function () {
+                                        $.get("/Common/GetState?id=" + $('#CustomerCountry').val(), function (data) {
+                                            if (data != "")
+                                                $('#CustomerState').empty().append(data);
+                                            else
+                                                $('#CustomerState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            cusLoadcity()
+                                        });
+                                    });
+
+                                    $('#CustomerState').change(function () {
+                                        $("#CustomerCity").show();
+                                        $("#CustomerCityname").val("");
+                                        $("#other_citycus").hide();
+                                        $.get("/Common/GetCity?id=" + $('#CustomerState').val(), function (data) {
+                                            if (data != "") {
+                                                $('#CustomerCity').empty().append(data);
+                                                $("#CustomerCityname").val($("#CustomerCity").find('option:selected').text());
+                                                if ($("select#CustomerCity option").length == 1) {
+                                                    $("#CustomerCity").hide();
+                                                    $("#CustomerCityname").val("");
+                                                    $("#other_citycus").show();
+                                                }
+                                            }
+                                            else {
+                                                $('#CustomerCity').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            }
+                                        });
+
+                                    });
+
+                                    $('#CustomerCity').change(function () {
+                                        $("#CustomerCityname").val($("#CustomerCity").find('option:selected').text());
+                                        if ($(this).val() == -1) {
+                                            $(this).hide();
+
+                                            $("#CustomerCityname").val("");
+
+                                            $("#other_citycus").show();
+                                            $("#close_other_citycus").show();
+                                        }
+                                    });
+                                    $('#close_other_citycus').click(function () {
+                                        $("#CustomerCity").show();
+                                        $("#CustomerCityname").val("");
+                                        $("#other_citycus").hide();
+                                        $("#close_other_citycus").hide();
+                                    });
+                                });
+
+                                function cusLoadcity() {
+                                    $.get("/Common/GetCity?id=" + $('#CustomerState').val(), function (data) {
+                                        if (data != "") {
+                                            $('#CustomerCity').html(data);
+                                        }
+                                        else {
+                                            $('#CustomerCity').html('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+                                function cusLoadState() {
+                                    $.get("/Common/GetState?id=" + $('#CustomerCountry').val(), function (data) {
+                                        if (data != "") {
+                                            $('#CustomerState').empty().append(data);
+                                        }
+                                        else {
+                                            $('#CustomerState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+
+
+                                // for property
+
+
+                                $(function () {
+
+
+                                    if ($('#PropertyCity').val() == -1) {
+                                        $("#PropertyCity").hide();
+                                        @*if(@offid < 1)
+                                {
+                                    $("#PropertyCityname").val("");
+                                }*@
+
+                                        $("#other_cityprop").show();
+                                    }
+
+                                    $('#PropertyCountry').change(function () {
+                                        $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+                                            if (data != "")
+                                                $('#PropertyState').empty().append(data);
+                                            else
+                                                $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            propLoadcity()
+                                        });
+                                    });
+                                    $('#PropertyState').change(function () {
+                                        $("#PropertyCity").show();
+                                        $("#PropertyCityname").val("");
+                                        $("#other_cityprop").hide();
+                                        $.get("/Common/GetCity?id=" + $('#PropertyState').val(), function (data) {
+                                            if (data != "") {
+                                                $('#PropertyCity').empty().append(data);
+                                                $("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+                                                if ($("select#PropertyCity option").length == 1) {
+                                                    $("#PropertyCity").hide();
+                                                    $("#PropertyCityname").val("");
+                                                    $("#other_cityprop").show();
+                                                }
+                                            }
+                                            else {
+                                                $('#PropertyCity').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            }
+                                        });
+
+                                    });
+                                    $('#PropertyCity').change(function () {
+                                        $("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+                                        if ($(this).val() == -1) {
+                                            $(this).hide();
+                                            $("#PropertyCityname").val("");
+                                            $("#other_cityprop").show();
+                                            $("#close_other_cityprop").show();
+                                        }
+                                    });
+                                    $('#close_other_cityprop').click(function () {
+                                        $("#PropertyCity").show();
+                                        $("#PropertyCityname").val("");
+                                        $("#other_cityprop").hide();
+                                        $("#close_other_cityprop").hide();
+                                    });
+                                });
+
+                                function propLoadcity() {
+                                    $.get("/Common/GetCity?id=" + $('#PropertyState').val(), function (data) {
+                                        if (data != "") {
+                                            $('#PropertyCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                                        }
+                                        else {
+                                            $('#PropertyCity').html('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+                                function propLoadState() {
+                                    $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+                                        if (data != "") {
+                                            $('#PropertyState').empty().append(data);
+                                        }
+                                        else {
+                                            $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+
+                                //for supplier
+
+                                $(function () {
+
+
+                                    if ($('#SupplierCity').val() == -1) {
+                                        $("#SupplierCity").hide();
+                                        $("#SupplierCityname").val("");
+                                        $("#other_citysup").show();
+                                    }
+
+                                    $('#SupplierCountry').change(function () {
+                                        $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+                                            if (data != "")
+                                                $('#SupplierState').empty().append(data);
+                                            else
+                                                $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            supLoadcity()
+                                        });
+                                    });
+                                    $('#SupplierState').change(function () {
+                                        $("#SupplierCity").show();
+                                        $("#SupplierCityname").val("");
+                                        $("#other_citysup").hide();
+                                        $.get("/Common/GetCity?id=" + $('#SupplierState').val(), function (data) {
+                                            if (data != "") {
+                                                $('#SupplierCity').empty().append(data);
+                                                if ($("select#SupplierCity option").length == 1) {
+                                                    $("#SupplierCity").hide();
+                                                    $("#SupplierCityname").val("");
+                                                    $("#other_citysup").show();
+                                                }
+                                            }
+                                            else {
+                                                $('#SupplierCity').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            }
+                                        });
+                                    });
+                                    $('#SupplierCity').change(function () {
+
+
+                                        $("#SupplierCityname").val($("#SupplierCity").find('option:selected').text());
+
+                                        if ($(this).val() == -1) {
+                                            $(this).hide();
+                                            $("#SupplierCityname").val("");
+                                            $("#other_citysup").show();
+                                            $("#close_other_citysup").show();
+                                        }
+                                    });
+                                    $('#close_other_citysup').click(function () {
+                                        $("#SupplierCity").show();
+                                        $("#SupplierCityname").val("");
+                                        $("#other_citysup").hide();
+                                        $("#close_other_citysup").hide();
+                                    });
+                                });
+
+                                function supLoadcity() {
+                                    $.get("/Common/GetCity?id=" + $('#SupplierState').val(), function (data) {
+                                        if (data != "") {
+                                            $('#SupplierCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                                        }
+                                        else {
+                                            $('#SupplierCity').html('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+                                function supLoadState() {
+                                    $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+                                        if (data != "") {
+                                            $('#SupplierState').empty().append(data);
+                                        }
+                                        else {
+                                            $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+
+                                $(function () {
+
+                                    // $('#most-popular1').show();
+                                    $('#most-popular12').show();
+                                    $('#most-popular123').show();
+
+                                    // for Start Date
+                                    var now = new Date();
+                                    now.setDate(now.getDate() + @startD );
+
+                                    var mnth = pad(now.getMonth() + 1, 2);
+                                    var sdate = pad(now.getDate(), 2) + "/" + mnth + "/" + now.getFullYear();
+
+                                    //$("#CheckIn").val(sdate);
+
+                                    //    var now = nowTemp; // new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDay(), 0, 0, 0, 0);
+                                    var Bookingdate = $('#Bookingdate').datepicker(
+                                        {
+                                            minDate:$("#hiddenmindate").val(),
+                                            defaultDate: now,
+                                            numberOfMonths: 2,
+                                            dateFormat: "dd/mm/yy"
+                                        });
+
+
+
+                                    $(".Bookingdate div").click(function () { $("#Bookingdate").datepicker('show'); });
+
+
+                                    var checkin = $('#CheckIn').datepicker(
+                                        {
+                                            minDate:$("#hiddenmindate").val(),
+                                            defaultDate: now,
+                                            numberOfMonths: 2,
+                                            dateFormat: "dd/mm/yy"
+                                        });
+
+
+
+                                    $(".checkin div").click(function () { $("#CheckIn").datepicker('show'); });
+                                    $(".checkout div").click(function () { $("#CheckOut").datepicker('show'); });
+
+                                    // for end date
+                                    now.setDate(now.getDate() + @diff);
+
+                                    var mnth1 = pad(now.getMonth() + 1, 2);
+                                    var edate = pad(now.getDate(), 2) + "/" + mnth1 + "/" + now.getFullYear();
+
+                                    //$("#CheckOut").val(edate);
+
+                                    var checkout = $('#CheckOut').datepicker(
+                                         {
+                                             minDate: 2,
+                                             numberOfMonths: 2,
+                                             defaultDate: now,
+                                             dateFormat: "dd/mm/yy"
+                                         });
+
+                                    $("#CheckIn").change(function () {
+                                        var v = $(this).val().trim();
+
+                                        var curDate = new Date();
+                                        curDate.setDate(curDate.getDate() + 1);
+                                        var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+                                        curDate.setDate(curDate.getDate() + 2);
+                                        var odat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+
+                                        if (checkDate(v)) {
+                                            re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                                            if (regs = v.match(re)) {
+                                                var day, mnt, yr;
+                                                yr = parseInt(regs[3]);
+                                                mnt = parseInt(regs[2]);
+                                                dy = parseInt(regs[1]);
+                                                if (mnt > 0) mnt = mnt - 1;
+                                                var cd = new Date(Date.UTC(yr, mnt, dy));
+                                                cd.setDate(cd.getDate() + 1);
+                                                var mn = cd.getMonth() + 1; //parseInt(cd.getMonth()) + 1;
+                                                var chgDt = pad(cd.getDate(), 2) + "/" + pad(mn, 2) + "/" + cd.getFullYear();
+                                                // alert(chgDt);
+                                                var cs = new Date(Date.UTC(yr, mnt, dy));
+                                                var mind = new Date(Date.UTC(yr, mnt, dy));
+                                                mind.setDate(mind.getDate() + 1);
+                                                var mindx = pad(mind.getDate(), 2) + "/" + pad(parseInt(mind.getMonth()) + 1, 2) + "/" + mind.getFullYear();
+                                                var xo = $("#CheckOut").val();
+                                                //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                                                if (checkDate(xo)) {
+                                                    if (regss = xo.match(re)) {
+                                                        yr = parseInt(regss[3]);
+                                                        mnt = parseInt(regss[2]);
+                                                        dy = parseInt(regss[1]);
+                                                        if (mnt > 0) mnt = mnt - 1;
+                                                        var co = new Date(Date.UTC(yr, mnt, dy));
+                                                        if (co <= cs) {
+                                                            $("#CheckOut").val(chgDt);
+                                                            // $("#CheckOut").datepicker("option", "setDate", cd);
+                                                        }
+                                                    }
+                                                    else {
+                                                        // $("#CheckOut").datepicker("option", "setDate", cd);
+                                                        $("#CheckOut").val(chgDt);
+                                                    }
+                                                }
+                                                else {
+                                                    // $("#CheckOut").datepicker("option", "setDate", cd);
+                                                    $("#CheckOut").val(chgDt);
+                                                }
+                                                //checkout.minDate = n;
+                                                $("#CheckOut").datepicker("option", "minDate", mindx);
+                                                //$("#CheckOut").datepicker("show");
+                                            }
+                                            else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+                                        }
+                                        else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+                                    });
+
+
+
+                                });
+
+                                function valdInOutDates() {
+                                    var v = $.trim($("#CheckIn").val());
+                                    if (checkDate(v)) {
+                                        re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                                        if (regs = v.match(re)) {
+                                            var cs = new Date(parseInt(regs[3]), parseInt(regs[2])-1, parseInt(regs[1]));
+                                            var xo = $("#CheckOut").val();
+                                            //                    $("#CheckOut").datepicker("option", "minDate", mind);
+                                            if (checkDate(xo)) {
+                                                if (regss = xo.match(re)) {
+                                                    var co = new Date(parseInt(regss[3]), parseInt(regss[2])-1, parseInt(regss[1]));
+                                                    if (co <= cs) {
+
+                                                        $("#DestinationAlert").html('Please enter a checkout date which falls after checkin date');
+                                                        $("#CheckOut").focus();
+                                                        return false;
+                                                    }
+                                                }
+                                                else {
+                                                    $("#DestinationAlert").html('Invalid Check Out date');
+                                                    $("#CheckOut").focus();
+                                                    return false;
+                                                }
+                                            }
+                                            else {
+                                                $("#DestinationAlert").html('Invalid Check Out date');
+                                                $("#CheckOut").focus();
+                                                return false;
+                                            }
+                                        }
+                                        else {
+                                            $("#DestinationAlert").html('Invalid Check In date');
+                                            $("#CheckIn").focus();
+                                            return false;
+                                        }
+                                    } else {
+                                        $("#DestinationAlert").html('Invalid Check In date');
+                                        $("#CheckIn").focus();
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                                function pad(num, size) {
+                                    var s = num + "";
+                                    while (s.length < size) s = "0" + s;
+                                    return s;
+                                }
+                                function checkDate(field)
+                                { var allowBlank = true; var minYear = 2014; var maxYear = (new Date()).getFullYear()+ 1;
+                                    // regular expression to match required date format
+                                    re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                                    if (field != '') {
+                                        if (regs = field.match(re)) {
+                                            if (regs[1] < 1 || regs[1] > 31)
+                                            { return false;}
+                                            else if (regs[2] < 1 || regs[2] > 12)
+                                            { return false; }
+                                            else if (regs[3] < minYear || regs[3] > maxYear)
+                                            { return false; }
+                                        } else { return false; }
+                                    } else { return false; }
+                                    return true;
+                                }
+                                function daydiff(first, second) {
+                                    return (second - first) / (1000 * 60 * 60 * 24);
+                                }
+
+                                $(function () {
+
+                                    $("#Destination").autocomplete({
+                                        minLength: 0,
+                                        source: "/Common/GetDestination",
+                                        focus: function (event, ui) {
+                                            $("#Destination").val(ui.item.value);
+                                            return false;
+                                        }
+                                    })
+                                    .autocomplete("instance")._renderItem = function (ul, item) {
+                                        ul.addClass("custom");
+                                        return $("<li>") //.addClass("custom")
+                                        .append("<a>" + item.label + "<br>" + item.desc + "</a>")
+                                        .appendTo(ul);
+                                    };
+                                });
+
+                            </script>
+
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    }
+    catch (Exception ex)
+    {
+
+
+    }
+</div>
+
+
+
+<script type="text/javascript">
+
+    $('.numberboxTaxPerccent').keyup(function(event){
+        if($(this).val().substr(0, 1) == ".")
+        {
+            this.value = this.value.replace('.','0.');
+        }
+        this.value = this.value.replace(/[^0-9\.]/g, '');
+        if ($(this).val() > 100){
+            $(this).val('100');
+        }
+    });
+
+</script>

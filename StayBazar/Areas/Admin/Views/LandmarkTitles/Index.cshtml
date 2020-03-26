@@ -1,0 +1,44 @@
+﻿@model IEnumerable<CLayer.LandmarkTitles>
+
+@{
+    ViewBag.Title = "Landmark Titles";
+    try
+    {
+        var grid = new WebGrid(Model, canSort: false, canPage: true, rowsPerPage: 25,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Areas.Admin.Models.LandmarkTitlesModel data = (StayBazar.Areas.Admin.Models.LandmarkTitlesModel)ViewBag.LandmarkTitle;
+        <text>
+            <div id="bodycontent">
+                <div id="divedit">
+                    @{
+        Html.RenderPartial("~/Areas/Admin/Views/LandmarkTitles/_Edit.cshtml", data, ViewData);
+                    }
+                </div>
+                <div id="gridContent">
+                    @grid.GetHtml(
+                    tableStyle: "webGrid table table-striped table-hover table-condensed",
+                headerStyle: "header",
+                alternatingRowStyle: "alt",
+                selectedRowStyle: "select",
+                columns: grid.Columns(grid.Column("LandmarkTitle", "Landmark Title"),
+                grid.Column("", format: @<text><a href="#" title="Edit" onclick="EditBT(@item.LandmarkTitleId)"><span class="glyphicon glyphicon-edit"></span></a></text>, style: "btnclm"),
+                grid.Column("", format: @<text><a href="/Admin/LandmarkTitles/Delete/@item.LandmarkTitleId" title="Delete" onclick="return confirm('Are you sure you want to delete this title?')" ><span class="glyphicon glyphicon-remove"></span></a></text>, style: "btnclm")
+                ))
+                </div>
+            </div>
+            <script type="text/javascript">
+                function EditBT(id) {
+                    $.get("LandmarkTitles/Edit?id=" + id, function (data) {
+                        $("#divedit").html(data);
+                    });
+                }
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}

@@ -1,0 +1,919 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "B2B";
+    int startD = 0;
+    int endD = 0;
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarStartDate"), out startD);
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarEndDate"), out endD);
+    int diff = endD - startD;
+
+    int allowmindate = 1;
+
+    long userid = Convert.ToInt32(User.Identity.GetUserId());
+    if (userid > 0)
+    {
+        CLayer.Role.Roles urole = BLayer.User.GetRole(userid);
+        if (urole == CLayer.Role.Roles.Corporate)
+        {
+            DateTime Credirbookingsmedayexp = BLayer.B2B.GetbookingsmedayforCorp(userid);
+            if (Credirbookingsmedayexp < DateTime.Now)
+            {
+                allowmindate = 1;
+            }
+            else
+            {
+                allowmindate = 0;
+            }
+        }
+    }
+}
+
+<!-- Carousel
+================================================== -->
+<div class="wrapper">
+    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="false">
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner">
+            <div class="item active">
+                <img src="../images/slider04.jpg" title="..." alt="...">
+                <div class="carousel-caption"></div>
+            </div>
+            <div class="item">
+                <img src="../images/slider04.jpg" title="..." alt="...">
+                <div class="carousel-caption"></div>
+            </div>
+            <div class="item">
+                <img src="../images/slider04.jpg" title="..." alt="...">
+                <div class="carousel-caption"></div>
+            </div>
+        </div>
+        <!-- Controls -->
+        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+    </div>
+    <div class="searchctr">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#home" data-toggle="tab">
+                                <i class="glyphicon glyphicon-search"></i>Search
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#profile" data-toggle="tab">
+                                <i class="glyphicon glyphicon-tag"></i>Deals of the day
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#messages" data-toggle="tab">
+                                <i class="glyphicon glyphicon-time"></i>Long stay deals
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane fade in active" id="home">
+                            @{
+                                string sidx = "sindex";
+                                if (User.Identity.IsAuthenticated)
+                                {
+                                    long uid = 0;
+                                    long.TryParse(User.Identity.GetUserId(), out uid);
+                                    CLayer.Role.Roles rle = BLayer.User.GetRole(uid);
+                                    if (rle == CLayer.Role.Roles.Corporate || rle == CLayer.Role.Roles.CorporateUser)
+                                    {
+                                        sidx = "index";
+                                    }
+                                }
+                            }
+                            @using (Html.BeginForm(sidx, "search", FormMethod.Post, new { id = "searchform", onsubmit = "submitSForm()" }))
+                            {
+                                <div class="row">
+                                    <div class="col-xs-12 col-md-2">
+                                        <h3>Where</h3>
+                                        @*<div class="greytext">are you planning to go?</div>*@
+                                        <div class="smtext">City, location or property</div>
+                                        <input type="text" class="destination" name="Destination" id="Destination" placeholder="Enter your destination" onkeypress="return isINLetters(event)">
+                                    </div>
+                                    <div class="col-xs-12 col-md-3">
+                                        <h3>When</h3>
+                                        @*<div class="greytext">are you planning?</div>*@
+                                        <div class="smtext"><div class="col-md-6 pad0">Check In</div><div class="col-md-6 pad0">Check Out</div></div>
+                                        <div class="col-xs-6 col-md-6 checkin">
+                                            <div>
+                                                <input type="text" id="CheckIn" name="CheckIn" placeholder="Check In" @*value="@((DateTime.Today.AddDays(startD).ToShortDateString()).Replace("-","/"))"*@>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-md-6 checkout">
+                                            <div>
+                                                <input type="text" id="CheckOut" name="CheckOut" placeholder="Check Out" @*value="@((DateTime.Today.AddDays(endD).ToShortDateString()).Replace("-","/"))"*@>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-md-2 persons">
+                                        <h3>Who</h3>
+                                        @*<div class="greytext">is coming with you?</div>*@
+                                        <div class="row smtext srch_spn"><div class="col-md-6 ">Adult (10+ yrs)</div><div class="col-md-6 pad0">Children</div></div>
+                                        <div class="col-md-6 pad0 sprbx"><div id="spnrAd"></div></div>
+                                        <div class="col-md-6 pad0 sprbx"><div id="spnrCd"></div></div>
+                                        <input type="hidden" id="Adults" name="Adults" value="1" />
+                                        <input type="hidden" id="Children" name="Children" value="0" />
+                                    </div>
+                                    <div class="col-xs-12 col-md-3">
+                                        <h3>What</h3>
+                                        @*<div class="greytext">is your prefered accommodation?</div>*@
+                                        <div class="smtext row"><div class="col-md-6">Stay options</div><div class="col-md-6 pad0">Bedrooms</div></div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <select class="styleselect" style="width:100%;" name="StayType" id="StayType">
+                                                    <option value="0" selected>Any</option>
+                                                    @{
+                                List<CLayer.StayCategory> staytypes = BLayer.StayCategory.GetActiveList();
+                                                    }
+                                                    @foreach (CLayer.StayCategory sc in staytypes)
+                                                    {
+                                                        <option value="@sc.CategoryId">@sc.Title</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 pad0 topmargin12"><div id="spnrBed"></div></div>
+                                        </div>
+                                        <input type="hidden" name="BedRooms" id="BedRooms" value="0" />
+
+                                    </div>
+                                    <div class="col-xs-12 col-md-2 searchbtnctrZ">
+                                        <button class="redbg whitetext" id="searchbutton" type="button" onclick="submitSForm()">Search</button>
+                                        @*<a href="#" class="blacktext underline">Advanced Search</a>*@
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <span id="DestinationAlert" style="color:red;margin-left:15px;" />
+                                </div>
+                            }
+                        </div>
+                        @*<div class="tab-pane fade" id="profile">...</div>
+                            <div class="tab-pane fade" id="messages">...</div>*@
+
+
+                        <div class="tab-pane fade" id="profile">
+                            @Html.Partial("~/Views/Widget/_DealsOfTheDay_Profile.cshtml")
+                        </div>
+                        <div class="tab-pane fade" id="messages">
+                            @Html.Partial("~/Views/Widget/_LongStayDeals.cshtml")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pattern">
+    <div class="container ctrpad">
+        <div class="row">
+            <!--  Most popular section -->
+            <div class="col-sm-12 col-md-8">
+                <div class="boxoffers">
+                    @*<img src="../images/extra.jpg" alt="" title="" width="400" />*@
+                </div>
+            </div>
+            <!-- Testimonials Section -->
+            @*<div class="col-sm-12 col-md-4">
+                    <div class="line">
+                        <div class="pull-left leftside pattern">Testimonials</div>
+                    </div>
+                    <div class="wrap">
+                        <div class="tbadge">
+                            <img src="../images/badge.png" title="Badge" alt="Badge">
+                        </div>
+                        <div id="testimonials" class="owl-carousel">
+                            <div class="testimonial">
+                                <h4 class="bold">Extremely impresssed</h4>
+                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                                <p class="redtext">
+                                    A Palmer , VP
+                                    <br />Cadbury Schwepps
+                                </p>
+                            </div>
+                            <div class="testimonial">
+                                <h4 class="bold">Impresssed extremely</h4>
+                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+                                <p class="redtext">
+                                    Palmer A, VP
+                                    <br />Schwepps Cadbury
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="margin10px text-right">
+                        <a href="#" class="redtext underline">Read All Testimonials</a>
+                    </div>
+                </div>*@
+            <!-- Testimonials Section -->
+            @Html.Partial("~/Views/Testimonials/_widget.cshtml")
+            <!-- Testimonials Section End-->
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="line">
+                    <div class="centerhead pattern">How Staybazar helps the Corporate</div>
+                </div>
+                <p>Staybazar for Business brings the technology platform for you to plan, book and complete your lodging bookings for your business and corporate travel.  We focus on alternate stay options including service apartments and provide variety of options across major cities in India.  We understand needs of business and corporate travelers having been from business and corporate world ourselves. Finding a cozy home for stays during your business trips is key to making your travel a great experience, and we are here to help with that.</p>
+                <p>Staybazar provides special account access to corporate using which you can see the variety of alternate stay options for your employees or travel desk to make the booking.  The portal provides features to search your options make decisions and book your stays. If you are not currently registered please register with us using register link below (Corporate - <a href="~/Join/Corporate/">Register</a> ). For any further clarifications please write to us at  <a href="mailto:info@staybazar.com">info@staybazar.com</a>. </p>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Most Popular section-->
+<div class="whitebg">
+    @Html.Partial("~/Views/Widget/_BuzMostPopular.cshtml")
+    @*<div class="container ctrpad">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="line">
+                        <div class="pull-left leftside whitebg">Most Popular</div>
+                        <div class="pull-right rightside whitebg">
+                            <a href="javascript:void(0)" class="pplr prev">
+                                <img src="../images/arrow-left.png" title="Left" alt="Left">
+                            </a>
+                            <a href="javascript:void(0)" class="pplr next">
+                                <img src="../images/arrow-right.png" title="Right" alt="Right">
+                            </a>
+                        </div>
+                    </div>
+                    <div id="most-popular" class="owl-carousel">
+                        <div class="prop">
+                            <div class="prop-image">
+                                <img src="../images/properties/prop-image.jpg" title="" alt="" />
+                                <span class="price">
+                                    <i class="fa fa-rupee"></i>8888888888
+                                    <small>88</small>
+                                    <p class="onwards whitetext">onwards</p>
+                                </span>
+                            </div>
+                            <div class="tile_desc">
+                                <span class="name">
+                                    The Green Gradens
+                                    <br>
+                                    <b>Koramangala, Banglore</b>
+                                </span>
+                                <div>
+                                    <span class="star">
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                    </span>
+                                </div>
+                                <a href="#" class="redtext">
+                                    <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                                </a>
+                                <a href="#" class="pull-right redtext">
+                                    <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                                </a>
+                            </div>
+                            <a href="#">
+                                <div class="text-center redbg whitetext book">Book now</div>
+                            </a>
+                        </div>
+                        <div class="prop">
+                            <div class="prop-image">
+                                <img src="../images/properties/prop-image.jpg" title="" alt="" />
+                                <span class="price">
+                                    <i class="fa fa-rupee"></i>25000
+                                    <small>00</small>
+                                    <p class="onwards whitetext">onwards</p>
+                                </span>
+                            </div>
+                            <div class="tile_desc">
+                                <span class="name">
+                                    The Green Gradens
+                                    <br>
+                                    <b>Koramangala, Banglore</b>
+                                </span>
+                                <div>
+                                    <span class="star">
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                    </span>
+                                </div>
+                                <a href="#" class="redtext">
+                                    <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                                </a>
+                                <a href="#" class="pull-right redtext">
+                                    <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                                </a>
+                            </div>
+                            <a href="#">
+                                <div class="text-center redbg whitetext book">Book now</div>
+                            </a>
+                        </div>
+                        <div class="prop">
+                            <div class="prop-image">
+                                <img src="../images/properties/prop-image.jpg" title="" alt="" />
+                                <span class="price">
+                                    <i class="fa fa-rupee"></i>2500
+                                    <small>00</small>
+                                    <p class="onwards whitetext">onwards</p>
+                                </span>
+                            </div>
+                            <div class="tile_desc">
+                                <span class="name">
+                                    The Green Gradens
+                                    <br>
+                                    <b>Koramangala, Banglore</b>
+                                </span>
+                                <div>
+                                    <span class="star">
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                    </span>
+                                </div>
+                                <a href="#" class="redtext">
+                                    <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                                </a>
+                                <a href="#" class="pull-right redtext">
+                                    <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                                </a>
+                            </div>
+                            <a href="#">
+                                <div class="text-center redbg whitetext book">Book now</div>
+                            </a>
+                        </div>
+                        <div class="prop">
+                            <div class="prop-image">
+                                <img src="../images/properties/prop-image.jpg" title="" alt="" />
+                                <span class="price">
+                                    <i class="fa fa-rupee"></i>2500
+                                    <small>00</small>
+                                    <p class="onwards whitetext">onwards</p>
+                                </span>
+                            </div>
+                            <div class="tile_desc">
+                                <span class="name">
+                                    The Green Gradens
+                                    <br>
+                                    <b>Koramangala, Banglore</b>
+                                </span>
+                                <div>
+                                    <span class="star">
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                    </span>
+                                </div>
+                                <a href="#" class="redtext">
+                                    <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                                </a>
+                                <a href="#" class="pull-right redtext">
+                                    <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                                </a>
+                            </div>
+                            <a href="#">
+                                <div class="text-center redbg whitetext book">Book now</div>
+                            </a>
+                        </div>
+                        <div class="prop">
+                            <div class="prop-image">
+                                <img src="../images/properties/prop-image.jpg" title="" alt="" />
+                                <span class="price">
+                                    <i class="fa fa-rupee"></i>2500
+                                    <small>00</small>
+                                    <p class="onwards whitetext">onwards</p>
+                                </span>
+                            </div>
+                            <div class="tile_desc">
+                                <span class="name">
+                                    The Green Gradens
+                                    <br>
+                                    <b>Koramangala, Banglore</b>
+                                </span>
+                                <div>
+                                    <span class="star">
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                    </span>
+                                </div>
+                                <a href="#" class="redtext">
+                                    <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                                </a>
+                                <a href="#" class="pull-right redtext">
+                                    <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                                </a>
+                            </div>
+                            <a href="#">
+                                <div class="text-center redbg whitetext book">Book now</div>
+                            </a>
+                        </div>
+                        <div class="prop">
+                            <div class="prop-image">
+                                <img src="../images/properties/prop-image.jpg" title="" alt="" />
+                                <span class="price">
+                                    <i class="fa fa-rupee"></i>2500
+                                    <small>00</small>
+                                    <p class="onwards whitetext">onwards</p>
+                                </span>
+                            </div>
+                            <div class="tile_desc">
+                                <span class="name">
+                                    The Green Gradens
+                                    <br>
+                                    <b>Koramangala, Banglore</b>
+                                </span>
+                                <div>
+                                    <span class="star">
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                    </span>
+                                </div>
+                                <a href="#" class="redtext">
+                                    <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                                </a>
+                                <a href="#" class="pull-right redtext">
+                                    <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                                </a>
+                            </div>
+                            <a href="#">
+                                <div class="text-center redbg whitetext book">Book now</div>
+                            </a>
+                        </div>
+                        <div class="prop">
+                            <div class="prop-image">
+                                <img src="../images/properties/prop-image.jpg" title="" alt="" />
+                                <span class="price">
+                                    <i class="fa fa-rupee"></i>2500
+                                    <small>00</small>
+                                    <p class="onwards whitetext">onwards</p>
+                                </span>
+                            </div>
+                            <div class="tile_desc">
+                                <span class="name">
+                                    The Green Gradens
+                                    <br>
+                                    <b>Koramangala, Banglore</b>
+                                </span>
+                                <div>
+                                    <span class="star">
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star st-active"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                        <i class="glyphicon glyphicon-star"></i>
+                                    </span>
+                                </div>
+                                <a href="#" class="redtext">
+                                    <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                                </a>
+                                <a href="#" class="pull-right redtext">
+                                    <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                                </a>
+                            </div>
+                            <a href="#">
+                                <div class="text-center redbg whitetext book">Book now</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    <!--Most Popular section end-->
+    @*<div class="container ctrpad">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="line">
+                        <div class="pull-left leftside whitebg">Our Clients</div>
+                        <div class="pull-right rightside whitebg">
+                            <a href="javascript:void(0)" class="client prev">
+                                <img src="../images/arrow-left.png" title="Left" alt="Left">
+                            </a>
+                            <a href="javascript:void(0)" class="client next">
+                                <img src="../images/arrow-right.png" title="Right" alt="Right">
+                            </a>
+                        </div>
+                    </div>
+                    <div id="clients" class="owl-carousel">
+                        <div class="prop-image">
+                            <img src="../images/hitachi.jpg" alt="" title="" />
+                        </div>
+                        ***<div class="prop-image">
+                            <img src="../images/hcl.jpg" alt="" title="" />
+                        </div>
+                        <div class="prop-image">
+                            <img src="../images/infopark.jpg" alt="" title="" />
+                        </div>
+                        <div class="prop-image">
+                            <img src="../images/infosys.jpg" alt="" title="" />
+                        </div>
+                        <div class="prop-image">
+                            <img src="../images/tata_consultancy.jpg" alt="" title="" />
+                        </div>
+                        <div class="prop-image">
+                            <img src="../images/wipro.jpg" alt="" title="" />
+                        </div>***
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    <!--Most Popular section end-->
+</div>
+<input type="text" id="hiddenmindate" style="display:none;" name="hiddenmindate" value="@allowmindate" />
+@*<script type='text/javascript'>
+        $(window).resize(function () {
+            wrapperadj();
+        });
+
+        wrapperadj();
+
+        function wrapperadj() {
+            $(".wrapper").css("margin-top", $(".navbar-wrapper").innerHeight());
+        }
+    </script>*@
+<script type='text/javascript'>
+    $(function () {
+        $('#most-popular12').show();
+        $('#most-popular123').show();
+
+        // for Start Date
+        var now = new Date();
+        now.setDate(now.getDate() + @startD );
+
+        var mnth = pad(now.getMonth() + 1, 2);
+        var sdate = pad(now.getDate(), 2) + "/" + mnth + "/" + now.getFullYear();
+        $("#CheckIn").val(sdate);
+
+        //    var now = nowTemp; // new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDay(), 0, 0, 0, 0);
+        var checkin = $('#CheckIn').datepicker(
+            {
+                minDate: $("#hiddenmindate").val(),
+                defaultDate: now,
+                numberOfMonths: 2,
+                dateFormat: "dd/mm/yy"
+            });
+        $(".checkin div").click(function () { $("#CheckIn").datepicker('show'); });
+        $(".checkout div").click(function () { $("#CheckOut").datepicker('show'); });
+
+        // for end date
+        now.setDate(now.getDate() + @diff);
+
+        var mnth1 = pad(now.getMonth() + 1, 2);
+        var edate = pad(now.getDate(), 2) + "/" + mnth1 + "/" + now.getFullYear();
+
+        $("#CheckOut").val(edate);
+
+
+        var checkout = $('#CheckOut').datepicker(
+             {
+                 minDate: 2,
+                 numberOfMonths: 2,
+                 defaultDate: now,
+                 dateFormat: "dd/mm/yy"
+             });
+
+        $("#CheckIn").change(function () {
+            var v = $(this).val().trim();
+
+            var curDate = new Date();
+            curDate.setDate(curDate.getDate() + 1);
+            var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+            curDate.setDate(curDate.getDate() + 2);
+            var odat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+
+            if (checkDate(v)) {
+                re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                if (regs = v.match(re)) {
+                    var day, mnt, yr;
+                    yr = parseInt(regs[3]);
+                    mnt = parseInt(regs[2]);
+                    dy = parseInt(regs[1]);
+                    if (mnt > 0) mnt = mnt - 1;
+                    var cd = new Date(Date.UTC(yr, mnt, dy));
+                    cd.setDate(cd.getDate() + 2);
+                    var mn = cd.getMonth() + 1; //parseInt(cd.getMonth()) + 1;
+                    var chgDt = pad(cd.getDate(), 2) + "/" + pad(mn, 2) + "/" + cd.getFullYear();
+                    // alert(chgDt);
+                    var cs = new Date(Date.UTC(yr, mnt, dy));
+                    var mind = new Date(Date.UTC(yr, mnt, dy));
+                    mind.setDate(mind.getDate() + 1);
+                    var mindx = pad(mind.getDate(), 2) + "/" + pad(parseInt(mind.getMonth()) + 1, 2) + "/" + mind.getFullYear();
+                    var xo = $("#CheckOut").val();
+                    //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                    if (checkDate(xo)) {
+                        if (regss = xo.match(re)) {
+                            yr = parseInt(regss[3]);
+                            mnt = parseInt(regss[2]);
+                            dy = parseInt(regss[1]);
+                            if (mnt > 0) mnt = mnt - 1;
+                            var co = new Date(Date.UTC(yr, mnt, dy));
+                            if (co <= cs) {
+                                $("#CheckOut").val(chgDt);
+                                // $("#CheckOut").datepicker("option", "setDate", cd);
+                            }
+                        }
+                        else {
+                            // $("#CheckOut").datepicker("option", "setDate", cd);
+                            $("#CheckOut").val(chgDt);
+                        }
+                    }
+                    else {
+                        // $("#CheckOut").datepicker("option", "setDate", cd);
+                        $("#CheckOut").val(chgDt);
+                    }
+                    //checkout.minDate = n;
+                    $("#CheckOut").datepicker("option", "minDate", mindx);
+                    //$("#CheckOut").datepicker("show");
+                }
+                else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+            }
+            else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+        });
+
+
+
+
+
+
+        $("#spnrAd").dpNumberPicker({
+            value: 1,
+            min: 1,
+            max: 8,
+            step: 1,
+            afterChange: function () { $("#Adults").val(this.options.value); }
+        });
+        $("#spnrCd").dpNumberPicker({
+            value: 0,
+            min: 0,
+            max: 8,
+            step: 1,
+            afterChange: function () { $("#Children").val(this.options.value); }
+        });
+
+        $("#spnrBed").dpNumberPicker({
+            value: 0,
+            min: 0,
+            max: 6,
+            step: 1,
+            afterChange: function () { $("#BedRooms").val(this.options.value); }
+        });
+    });
+
+    function submitSForm() {
+        if ($.trim($("#Destination").val()) == '') {
+            $("#DestinationAlert").html("Please enter a valid city, location or property name to search");
+            $("#Destination").val('').focus();
+            return false;
+        }
+        else {
+            if (!valdInOutDates()) return false;
+        }
+        var url = "/Search/@sidx" + "?Destination=" + $("#Destination").val() + "&CheckIn=" + $("#CheckIn").val() + "&CheckOut=" + $("#CheckOut").val() + "&Adults=" + $("#Adults").val() + "&Children=" + $("#Children").val() + "&BedRooms=" + $("#BedRooms").val() + "&StayType=" + $("#StayType").val();
+        window.location.href = url;
+        @*frm = document.getElementById("searchform");
+            var param = "&Destination=" + $("#Destination").val() + "&CheckIn=" + $("#CheckIn").val() + "&CheckOut=" + $("#CheckOut").val() + "&Adults=" + $("#Adults").val() + "&Children=" + $("#Children").val() + "&BedRooms=" + $("#BedRooms").val() + "&StayType=" + $("#StayType").val();
+            frm.action = '@Url.Action(sidx,"Search")?'+ param;
+                frm.submit();*@
+        return true;
+
+
+    }
+
+    function valdInOutDates() {
+        var v = $.trim($("#CheckIn").val());
+        if (checkDate(v)) {
+            re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            if (regs = v.match(re)) {
+                var cs = new Date(regs[3], regs[2], regs[1]);
+                var xo = $("#CheckOut").val();
+                //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                if (checkDate(xo)) {
+                    if (regss = xo.match(re)) {
+                        var co = new Date(regss[3], regss[2], regss[1]);
+                        if (co <= cs) {
+                            $("#DestinationAlert").html('Please enter a checkout date which falls after checkin date');
+                            $("#CheckOut").focus();
+                            return false;
+                        }
+                    }
+                    else {
+                        $("#DestinationAlert").html('Invalid Check Out date');
+                        $("#CheckOut").focus();
+                        return false;
+                    }
+                }
+                else {
+                    $("#DestinationAlert").html('Invalid Check Out date');
+                    $("#CheckOut").focus();
+                    return false;
+                }
+            }
+            else {
+                $("#DestinationAlert").html('Invalid Check In date');
+                $("#CheckIn").focus();
+                return false;
+            }
+        } else {
+            $("#DestinationAlert").html('Invalid Check In date');
+            $("#CheckIn").focus();
+            return false;
+        }
+        return true;
+    }
+    function pad(num, size) {
+        var s = num + "";
+        while (s.length < size) s = "0" + s;
+        return s;
+    }
+    function checkDate(field) {
+        var allowBlank = true; var minYear = 2014; var maxYear = (new Date()).getFullYear()+1;
+        // regular expression to match required date format
+        re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        if (field != '') {
+            if (regs = field.match(re)) {
+                if (regs[1] < 1 || regs[1] > 31)
+                { return false; }
+                else if (regs[2] < 1 || regs[2] > 12)
+                { return false; }
+                else if (regs[3] < minYear || regs[3] > maxYear)
+                { return false; }
+            } else { return false; }
+        } else { return false; }
+        return true;
+    }
+    function daydiff(first, second) {
+        return (second - first) / (1000 * 60 * 60 * 24);
+    }
+    @* //// disabling dates
+        //var nowTemp = new Date();
+        //nowTemp.setDate(nowTemp.getDate() + 7);
+        //var now = nowTemp;
+
+        //var checkin = $('#CheckIn').datepicker({
+        //    format: "dd/mm/yyyy",
+        //    onRender: function (date) {
+        //        return date.valueOf() < now.valueOf() ? 'disabled' : '';
+        //    }
+        //}).on('changeDate', function (ev) {
+        //    if (ev.date.valueOf() > checkout.date.valueOf()) {
+        //        var newDate = new Date(ev.date)
+        //        newDate.setDate(newDate.getDate() + 1);
+        //        checkout.setValue(newDate);
+        //    }
+        //    checkin.hide();
+        //    $('#CheckOut')[0].focus();
+        //}).data('datepicker');
+        //var checkout = $('#CheckOut').datepicker({
+        //    format: "dd/mm/yyyy",
+        //    onRender: function (date) {
+        //        return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
+        //    }
+        //}).on('changeDate', function (ev) {
+        //    checkout.hide();
+        //}).data('datepicker'); *@
+
+</script>
+
+
+<script type='text/javascript'>
+     $(document).ready(function () {
+        var owl = $("#most-popular"),
+            owl1 = $("#clients"),
+            owl2 = $("#testimonials")
+
+        owl.owlCarousel({
+            pagination: false,
+            items: 4,
+            itemsDesktop: [1199, 3],
+        });
+
+        owl1.owlCarousel({
+            pagination: false,
+            items: 5,
+            itemsDesktop: [1199, 3],
+            autoPlay: 5000
+        });
+
+        owl2.owlCarousel({
+            singleItem: true,
+            pagination: false,
+            autoPlay: 7000
+        });
+
+        // Custom Navigation Events
+        $(".pplr.prev").click(function () {
+            $("#most-popular").trigger('owl.prev');
+        })
+        $(".pplr.next").click(function () {
+            $("#most-popular").trigger('owl.next');
+        })
+        $(".client.prev").click(function () {
+            $("#clients").trigger('owl.prev');
+        })
+        $(".client.next").click(function () {
+            $("#clients").trigger('owl.next');
+        })
+    });
+
+
+    //$(document).ready(function () {
+    //    var owl = $("#most-popular"),
+    //        owl1 = $("#clients"),
+    //        owl2 = $("#testimonials")
+
+    //    owl.owlCarousel({
+    //        items: 4,
+    //        itemsDesktop: [1199, 3],
+    //        pagination: false,
+    //        loop: true,
+    //        dots: false,
+    //        margin: 10,
+    //        navigation: false,
+    //        autoplay: 7000     
+    //    });
+
+    //    owl1.owlCarousel({
+    //        items: 5,
+    //        itemsDesktop: [1199, 4],
+    //        pagination: false,
+    //        loop: true,
+    //        dots: false,
+    //        margin: 10,
+    //        navigation: false,
+    //        autoplay: 5000  
+    //    });
+
+    //    owl2.owlCarousel({
+    //        items: 1,
+    //        singleItem: true,
+    //        pagination: false,
+    //        loop: true,
+    //        dots: false,
+    //        margin: 10,
+    //        navigation: false,
+    //        autoplay: 7000
+    //    });
+
+    //    // Custom Navigation Events
+    //    $(".pplr.prev").click(function () {
+    //        $("#most-popular").trigger('prev.owl.carousel');
+    //    })
+    //    $(".pplr.next").click(function () {
+    //        $("#most-popular").trigger('next.owl.carousel');
+    //    })
+    //    $(".client.prev").click(function () {
+    //        $("#clients").trigger('prev.owl.carousel');
+    //    })
+    //    $(".client.next").click(function () {
+    //        $("#clients").trigger('next.owl.carousel');
+    //    })
+    //});
+
+    $(function () {
+
+        $("#Destination").autocomplete({
+            minLength: 0,
+            source: "/Common/GetDestination",
+            focus: function (event, ui) {
+                $("#Destination").val(ui.item.value);
+                return false;
+            }
+        })
+        .autocomplete("instance")._renderItem = function (ul, item) {
+            ul.addClass("custom");
+            return $("<li>") //.addClass("custom")
+            .append("<a>" + item.label + "<br>" + item.desc + "</a>")
+            .appendTo(ul);
+        };
+    });
+
+</script>
+@if (!Request.IsAuthenticated)
+{
+    <script>
+        $(function () {
+            $("#formelnk").removeClass("redtext").addClass("blacktext");
+            $("#forbuzlnk").removeClass("blacktext").addClass("redtext");
+        });
+    </script>
+}

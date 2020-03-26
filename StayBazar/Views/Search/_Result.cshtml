@@ -1,0 +1,163 @@
+﻿@model StayBazar.Models.SearchResultModel
+@{
+    Layout = null;
+int noOfRows =  Model.Results.Count;
+    bool rowsNotFound = (noOfRows == 0);
+    //for test purpose
+   // rowsNotFound = false;
+    StayBazar.Lib.GridPager pager = new StayBazar.Lib.GridPager();
+    pager.ColumnsInPager = 6;
+    pager.JavascriptFuncName = "SearchPager";
+    int rip = 0;
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get(StayBazar.Common.Utils.SERARCH_MAX_ROWS), out rip);
+    pager.RowsInAPage = rip;
+    string gridPage = pager.GetPager(Model.MaxCount, Model.CurrentPageIndex);
+    if (ViewBag.Criteria == null) {ViewBag.Criteria= new StayBazar.Models.SimpleSearchModel(); }
+    StayBazar.Models.SimpleSearchModel sm = ViewBag.Criteria;
+}
+@if (sm.Location != null && sm.Location != "")
+{
+    List<string> sloc = BLayer.Property.GetLocation(sm.Location);
+    if (sloc.Count == 2)
+    {
+        <text>
+            <script type="text/javascript">
+                $(function () {
+                    dataLayer[0]["cityName"] = "@sloc[0]";
+                    dataLayer[0]["locationName"] = "@sloc[1]";
+                });
+            </script>
+        </text>
+    }
+    else
+    {
+        string city, location;
+        location = sm.Location.Replace("\"", "");
+        
+        city = BLayer.Property.GetCity(sm.Destination);
+        if (city != null && city != "")
+        {
+            <text>
+                <script type="text/javascript">
+                    $(function () {
+                        dataLayer[0]["cityName"] = "@sm.Destination";
+                        dataLayer[0]["locationName"] = "@location";
+                    });
+                </script>
+            </text>
+        }
+    }
+}
+@if(!rowsNotFound ) { 
+ <script type="text/javascript">
+     $(function () {
+         $('.trunc').jTruncate({
+             length: 160,
+             minTrail: 0,
+             moreText: "",
+             lessText: "",
+             moreAni: "fast",
+             lessAni: 1000,
+             ellipsisText: "",
+         });
+         imgadj();
+         
+     })
+ </script>
+}
+@if (Model.IsSearched)
+{
+     <script type="text/javascript">
+    $(function () { showFilterBoxes(); });
+    </script>
+}
+<div class="col-md-12 selectionctr fullwidth pull-left" id="teste" style="display:none">
+    <div class="whitebg fullwidth pull-left border-radius lightgreybg padding10px">
+        <p class="col-md-12">
+        @if (rowsNotFound)
+{
+                    if (Model.IsSearched) { 
+                    <div class="alert alert-info">No apartments or rooms are available for options you have selected</div>
+                    }
+}else{
+    int cnt = Model.MaxCount;
+    if (cnt < Model.Results.Count) { cnt = Model.Results.Count; }
+        if(cnt>1)
+        {<p>@cnt Properties found in @Model.Destination</p>}
+        else { if(cnt==1)
+        {<p>1 Property found in @Model.Destination</p> }
+        }
+   }
+        <div class="col-md-8 filter" id="filterbox">   </div>
+@if (!rowsNotFound) { 
+        <ul class="nav nav-tabs col-md-4 searchview nav-pills text-center border-radius whitebg">
+            <li class="active">
+                <a href="#home" data-toggle="tab">
+                    <i class="glyphicon glyphicon glyphicon-list"></i>List View
+                </a>
+            </li>
+            <li>
+                <a href="#profile" id="mapview" data-toggle="tab">
+                    <i class="glyphicon glyphicon-map-marker"></i>Map View
+                </a>
+            </li>
+        </ul>
+}
+    </div>
+</div>
+@if (!rowsNotFound)
+{
+<div class="col-xs-12 col-md-12 tab-content searchviewctr" style="display:none">
+    <div class="col-xs-12 col-md-12 tab-pane fade in active" id="home">
+        <div class="col-md-7 pad0">
+            @*<div class="page-number"></div>
+            <ul class="pagination"></ul>*@
+            @Html.Raw(gridPage)
+        </div>
+        <div class="col-md-5 pad0 styleselect2ctr">
+            <select class="styleselect2" id="dlSortOrder" onchange="sortOrderChange()">
+                <option selected="selected" value="2">Price Low to High</option>           
+                <option value="3" >Price High to Low</option>
+                <option value="1">Nearest First</option>
+
+            </select>
+            @{
+    List<CLayer.Currency> currencies = BLayer.Currency.GetForListing();
+    System.Text.StringBuilder curcodes = new System.Text.StringBuilder();
+    
+           }@{
+            <select class="styleselect2 hidden"  id="srchcur" onchange="seraConv()" >
+                @foreach (CLayer.Currency item in currencies)
+                {
+                <option value="@item.Title" >@item.Title</option>
+                }
+            </select>
+           }
+        </div>
+       
+        <div class="listsctr" style="display:none">
+          @Html.Partial("~/Views/Search/_List.cshtml",Model)
+        </div>
+        <div class="col-md-12 pad0 paginator">
+            @*<div class="page-number"></div>
+            <ul class="pagination"></ul>*@
+            @Html.Raw(gridPage)
+        </div>
+    </div>
+    <div class="col-md-12 tab-pane fade" id="profile">
+        <div class="map_canvas"></div>
+    </div>
+</div>
+    <script type="text/javascript">
+        $(function () {
+            var ox = $("#OrderBy").val();
+            if (ox < 1 || ox > 3) ox = 2;
+
+            $("#dlSortOrder").val(ox);
+            
+        });
+
+    </script>
+}
+
+

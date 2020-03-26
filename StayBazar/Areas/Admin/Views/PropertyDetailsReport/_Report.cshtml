@@ -1,0 +1,108 @@
+﻿@model List<CLayer.PropertyDetailsReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+}
+<div class="row margin10px">
+
+    
+
+    <div class="col-md-12">
+        <div>
+            @if (Model.Count > 0)
+            {
+    <!--START-->
+                <table class="table table-bordered table-hover table-striped" cellspacing="0" border="1">
+                    <thead>
+                        <tr>
+                            <th>Supplier Business Name</th>
+                            <th>Login Id</th>
+                            <th>Supplier EmailId</th>
+                            <th>Supplier Contact Name</th>
+                            <th>Supplier Address</th>
+                            <th>Supplier Phone</th>
+                            <th>Supplier Mobile</th>
+                            <th>Supplier City</th>
+                            <th>Supplier State</th>
+                            <th>Property Name</th>
+                            <th>Property Address</th>
+                            <th>Property City</th>
+                            <th>Property State</th>
+                            <th>B2B Markup LongTerm</th>
+                            <th>B2B Markup ShortTerm</th>
+                            <th>B2C Markup LongTerm</th>
+                            <th>B2C Markup ShortTerm</th>
+                            <th>Supplier EmailID</th>
+                            <th>Joined Date</th>
+                            @*<th>Accommodation Description</th>*@
+                            <th>Accommodation Type</th>
+                            <th>Quantity</th>
+                            <th>Daily Rate</th>
+                            <th>Weekly Rate</th>
+                            <th>Monthly Rate</th>
+                            <th>LongTerm Rate</th>
+                            <th>Guest Rate</th>
+                            <th>Bedrooms</th>
+                            <th>Supplier Total Accommodations</th>
+                            <th>Accommodation MaxPeople</th>
+                            <th>Adults</th>
+                            <th>Children</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (CLayer.PropertyDetailsReport reportList in Model)
+                        {
+
+                            <tr>
+                                <td>@reportList.SupplierBusinessName</td>
+                                <td>@reportList.LoginID</td>
+                                <td>@reportList.SupplierEmailID</td>
+                                <td>@reportList.SupplierContactName</td>
+                                <td>@reportList.SupplierAddress</td>
+                                <td>@reportList.SupplierPhone</td>
+                                <td>@reportList.SupplierMobile</td>
+                                <td>@reportList.SupplierCity</td>
+                                <td>@reportList.SupplierState</td>
+                                <td>@reportList.PropertyName</td>
+                                <td>@reportList.PropertyAddress</td>
+                                <td>@reportList.PropertyCity</td>
+                                <td>@reportList.PropertyState</td>
+                                <td>@reportList.B2BMarkupLongTerm</td>
+                                <td>@reportList.B2BMarkupShortTerm</td>
+                                <td>@reportList.B2CMarkupLongTerm</td>
+                                <td>@reportList.B2CMarkupShortTerm</td>
+                                <td>@reportList.SupplierEmailID</td>
+                                <td>@reportList.JoinedDate</td>
+                                @*<td>@reportList.Accommodation_Description</td>*@
+                                <td>@reportList.AccommodationType</td>
+                                <td>@reportList.Quantity</td>
+                                <td>@reportList.DailyRate</td>
+                                <td>@reportList.WeeklyRate</td>
+                                <td>@reportList.MonthlyRate</td>
+                                <td>@reportList.LongTermRate</td>
+                                <td>@reportList.GuestRate</td>
+                                <td>@reportList.Bedrooms</td>
+                                <td>@reportList.SupplierTotalAccommodations</td>
+                                <td>@reportList.Accommodation_MaxPeople</td>
+                                <td>@reportList.Adults</td>
+                                <td>@reportList.Children</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+    <!--END-->
+            }
+            else
+            {
+                <text></text>
+            }
+        </div>
+    </div>
+</div>
+
+
+

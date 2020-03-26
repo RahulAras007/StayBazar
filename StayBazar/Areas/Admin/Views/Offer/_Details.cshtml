@@ -1,0 +1,292 @@
+﻿@model StayBazar.Areas.Admin.Models.OfferModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Offer";
+    Layout = null;
+}
+@try
+{
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+    </div>
+    </div>
+    <div>
+        <br>
+        @using (Html.BeginForm("Save", "Offer", FormMethod.Post, new { area = "Admin", @id = "frmFiltersUpdate1" }))
+        {
+            @Html.HiddenFor(m => m.PropertyId)
+            @Html.HiddenFor(m => m.AccommodationId)
+            @Html.HiddenFor(m => m.OfferId)
+            @*<div class="row">
+                    <div class="col-lg-12 h4">
+                
+                        @ViewBag.Message
+                     </div>
+                </div>*@
+            <div class="container-fluid">
+                @*<div class="row">*@
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.OfferTitle)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.OfferTitle, new { @tabindex = "6", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.OfferTitle)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.StartDate)<span style="color:red">*</span>@Html.TextBoxFor(m => m.StartDate, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm" }) @Html.ValidationMessageFor(m => m.StartDate)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.EndDate)<span style="color:red">*</span>@Html.TextBoxFor(m => m.EndDate, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm" }) @Html.ValidationMessageFor(m => m.EndDate)
+                    </div>
+                    <br />@*Offer on :*@
+
+                    @Html.LabelFor(m => m.OfferFor)<span style="color:red">*</span>
+                    <div class="form-control">
+                        @Html.RadioButtonFor(m => m.OfferType, (int)StayBazar.Areas.Admin.Models.OfferModel.OfferOn.Accommodation, new { @onclick = "FillOfferCategory(1)", id = "Category1", @class = "rediooffertype" })Accommodation
+                        @Html.RadioButtonFor(m => m.OfferType, (int)StayBazar.Areas.Admin.Models.OfferModel.OfferOn.Property, new { @onclick = "FillOfferCategory(2)", id = "Category2", @class = "rediooffertype" })Property
+                        @Html.ValidationMessageFor(m => m.OfferType)
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    @Html.LabelFor(m=>m.RateType)<span style="color:red">*</span> 
+                    <div class="form-control">
+                        @Html.RadioButtonFor(m => m.RateType, (int)CLayer.ObjectStatus.OfferRateType.OfferPercentageRate, new { @onclick = "FillRateType(1)", id = "rad1", @class = "redioofferRatetype" }) %
+                        @Html.RadioButtonFor(m => m.RateType, (int)CLayer.ObjectStatus.OfferRateType.OfferFlatRate, new { @onclick = "FillRateType(2)", id = "rad2", @class = "redioofferRatetype" }) Flat
+                        @Html.RadioButtonFor(m => m.RateType, (int)CLayer.ObjectStatus.OfferRateType.OfferFreeRate, new { @onclick = "FillRateType(3)", id = "rad3", @class = "redioofferRatetype" }) Free
+                        @Html.ValidationMessageFor(m => m.RateType)
+                        @Html.HiddenFor(m => m.Rate)
+                    </div>
+                    <br />
+                    <div class="form-groupammout" id="ammoutDetails">
+                         @Html.LabelFor(m => m.Amount)<span style="color:red">*</span>
+                        @*@Html.LabelFor(m=>m.Rate)<b>/Rate</b>*@
+                        @Html.TextBoxFor(m => m.Amount, new { @tabindex = "6", @class = "form-control input-sm" })
+                    </div>
+                    <div id="FreeDaysDetails">
+                        <div class="form-groupammout">
+                            <br /> <b>No of Days</b>
+                            @Html.TextBoxFor(m => m.NoOfDays, new { @tabindex = "6", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-groupammout">
+                            <br /><b>Free Days</b>
+                            @Html.TextBoxFor(m => m.FreeDays, new { @tabindex = "6", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                </div>
+                @*</div>*@
+            </div>
+            <br />
+            <div class="row">
+                <div class=" col-lg-12">
+                    <div class="btn-toolbar ">
+                        <div class="btn-group">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    }
+    catch (Exception ex)
+    {
+    Response.Redirect("~/Admin/Offer/Index");
+    }
+    <script type="text/javascript">
+    $(function () {
+        $("#AccommodationListDisplay").hide();
+        $("#PropertyListDisplay").hide();
+        $("#finishbutton").show();/////
+        $("#ExistingList").hide();
+        $("#OfferAccommodationList").hide();
+        $("#OfferPropertyList").hide();
+        $("#OfferDetails").show();
+        //$("#btnNextClick").hide();
+        $("#ammoutDetails").hide();
+        $("#FreeDaysDetails").hide();
+        $("#btnSaveFinish").hide();
+
+        var oftyp = $("input[type=radio].rediooffertype:checked").val();
+        //alert(oftyp);
+        if (oftyp > 0)
+        {
+           // alert(oftyp);
+            FillOfferCategory(oftyp);
+        }
+
+        var val = $("input[type=radio].redioofferRatetype:checked").val();
+       // alert(val);
+        if (val == 3) {
+            $("#ammoutDetails").hide();
+            $("#FreeDaysDetails").show();
+        }
+        else {
+            $("#ammoutDetails").show();
+            $("#FreeDaysDetails").hide();
+        }
+    });
+    $(function () {
+        var d = new Date();
+        $('#StartDate').datepicker({
+            dateFormat: "dd/mm/yy"
+        });
+        $('#EndDate').datepicker({
+            dateFormat: "dd/mm/yy",
+            defaultDate: "+1w",
+            beforeShow: function () {
+                $(this).datepicker('option', 'minDate', $('#StartDate').val());
+                if ($('#StartDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+            }
+        });
+        //date error
+        $.validator.addMethod('date',
+    function (value, element, params) {
+        if (this.optional(element)) {
+            return true;
+        }
+
+        var ok = true;
+        try {
+            $.datepicker.parseDate('dd/mm/yy', value);
+        }
+        catch (err) {
+            ok = false;
+        }
+        return ok;
+    });
+
+
+        $("#finishbutton").show();/////
+    });
+    function FillOfferCategory(id) {
+        var i = 1;//important using another use
+        i = id;//important
+        //alert(i);
+        $("#OfferType").val(i);//important
+        $("#SOfferType").val(i);//important
+        $("#SearchValue").val(i);
+       //alert("i="+i+"id="+id);
+    }
+    function ViewAllOffer() {
+        var url = '@Url.Action("GetAllOfferList", "Offer")';
+        $.post(url, function (data) {
+            $("#ExistingList").html(data);
+        });
+        $("#ExistingList").show();
+
+    }
+    function NextClick() {
+        if ($("#OfferTitle").val() == "")
+        {
+            alert("Enter title name");
+            return false;
+        }
+        if ($("#StartDate").val() == "") {
+            alert("Enter valid start date");
+            return false;
+        }
+        if ($("#EndDate").val() == "") {
+            alert("Enter valid end date");
+            return false;
+        }
+        if ($("#Amount").val() == "") {
+            alert("Enter amount/rate");
+            return false;
+        }
+        $("#btnNextClick").hide();
+        //$("#BackFinishgrop").show();
+        $("#btnSaveFinish").show();
+        $("#SPropertyId").val($("#PropertyId").val());
+        $("#SAccommodationId").val($("#AccommodationId").val());
+        $("#SOfferId").val($("#OfferId").val());
+        $("#SOfferTitle").val($("#OfferTitle").val());
+        $("#SStartDate").val($("#StartDate").val());
+        $("#SEndDate").val($("#EndDate").val());
+        $("#SOfferType").val($("#OfferType").val());
+        $("#SRateType").val($("input[type='radio'].redioofferRatetype:checked").val());
+        $("#SAmount").val($("#Amount").val());
+        $("#SNoOfDays").val($("#NoOfDays").val());
+        $("#SFreeDays").val($("#FreeDays").val());
+        $("SSBCommission").val($("#SBCommission").val());
+        $("SOfferFor").val($("#OfferFor").val());
+        var id = $("#SearchValue").val();
+        var i = id;
+       // alert(id);
+        $("#SearchValue").val(id);
+        $("#SearchValueForAccommodation").val(id);
+        $("#OfferType").val(id);
+
+        if (i == 1) {
+            $("#SearchValue").val(1);
+            $("#SOfferType").val(1);
+            $("#OfferDetails").hide();
+            $("#AccommodationListDisplay").show();
+            $("#PropertyListDisplay").hide();
+            $("#ExistingList").hide();
+            //$("#finishbutton").show();
+            $("#OfferAccommodationList").show();
+            $("#OfferPropertyList").hide();
+            i = 0;
+            //Accommodation List on the selected rediobuttion
+            var url = '@Url.Action("PropertyListAccommodationListByOfferId","Offer")';
+            $.post(url, $("#frmFiltersAccommodation1").serialize(),
+                    function (data) {
+                        $("#OfferAccommodationList").html(data);
+
+                        //alert("acc ");
+                        selectacccheck();//select acc check box
+                        getAccids();//select acc ids to the hidden
+                    });
+            $("#OfferType").val(1);
+            $("#OfferPropertyList").hide();
+        }
+        else if (i == 2) {
+            $("#SearchValueForAccommodation").val(2);
+            $("#SOfferType").val(2);
+            $("#OfferDetails").hide();
+            $("#PropertyListDisplay").show();
+            $("#AccommodationListDisplay").hide();
+            $("#ExistingList").hide();
+            //$("#finishbutton").show();
+            $("#OfferAccommodationList").hide();
+            $("#OfferPropertyList").show();
+            i = 0;
+
+            //Property List on the selected rediobuttion
+            var url = '@Url.Action("PropertyListAccommodationListByOfferId", "Offer")';
+                $.post(url, $("#frmFiltersGetproperty").serialize(),
+                        function (data) {
+                            $("#OfferPropertyList").html(data);
+
+                            selectpropertyCheck();////select property check box
+                            getpropeIds();//select property ids to the hidden
+                        });
+                $("#AccommodationListDisplay").hide();
+                $("#OfferType").val(2);
+        }
+        else {
+            $("#OfferDetails").show();
+        }
+    }
+    function FillRateType(val) {
+        var i = val;
+        $("#SRateType").val(i);
+        $("#RateType").val(i);
+        if (val == 3) {
+            $("#ammoutDetails").hide();
+            $("#FreeDaysDetails").show();
+        }
+        else {
+            $("#ammoutDetails").show();
+            $("#FreeDaysDetails").hide();
+        }
+       // alert("slected free" + val);
+    }
+    $("#btnSave").click(function () {
+        var url = '@Url.Action("Save", "Offer")';
+        // $("#btnNextClick").show();
+    });
+    </script>

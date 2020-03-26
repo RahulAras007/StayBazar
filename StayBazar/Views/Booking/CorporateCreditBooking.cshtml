@@ -1,0 +1,58 @@
+﻿@model StayBazar.Models.BookingModel
+@{
+    Layout = null;
+
+    string Message = "";
+    if (ViewBag.BookingSuccess != null)
+    {
+
+        Message = ViewBag.BookingSuccess;
+
+    }
+}
+
+@*<div class="alert alert-success">
+    Your booking is confirmed
+</div>*@
+@if (Message == "Success")
+{
+  
+        <div class="row">
+            <div class="col-md-6 col-lg-offset-3">
+                <div class="panel panel-body panel-default margin10px " style="width:535px;">
+                    <div class="row">
+                        <div class="col-md-1">
+                            <span class="fa fa-check-circle greentext" style="font-size:37px;"></span>
+                        </div>
+                        <div class="col-md-11">
+                            <h4>Thanks for your booking and confirmation will be sent shortly</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+}
+else
+{
+        <div class="row">
+            <div class="col-md-6 col-lg-offset-3">
+                <div class="panel panel-body panel-default margin10px " style="width:535px;">
+                    <div class="row">
+                        <div class="col-md-1">
+                            <span class="fa fa-check-circle greentext" style="font-size:37px;"></span>
+                        </div>
+                        <div class="col-md-11">
+                            <h4>Thanks for your booking request and confirmation will be sent shortly</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+
+    @*<div class="row">
+            <div class="col-md-12">
+                @Html.Partial("~/Views/Booking/_BillIntegration.cshtml", Model.BookingId)
+            </div>
+        </div>*@

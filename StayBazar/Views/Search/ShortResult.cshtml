@@ -1,0 +1,51 @@
+﻿@model StayBazar.Models.SearchResultModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Result</title>
+</head>
+<body>
+@{
+    double km;
+    if (ViewBag.Criteria == null) { ViewBag.Criteria = new StayBazar.Models.SimpleSearchModel(); }
+    StayBazar.Models.SimpleSearchModel sm = ViewBag.Criteria;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+    //if(sm == null)
+    //{ sm = new StayBazar.Models.SimpleSearchModel();}
+    //if (sm.Location == null) { sm.Location = ""; }
+    //string param = "&adults=" + sm.Adults.ToString() + "&destination=" + sm.Destination.ToLower().ToString() + "&checkIn=" + sm.CheckIn.ToShortDateString() + "&checkout=" + sm.CheckOut.ToShortDateString() + "&children=" + sm.Children.ToString() + "&staytype=" + sm.StayType.ToString() + "&bedrooms=" + sm.Bedrooms.ToString() + "&rangebudgetmax=" + sm.rangeBudgetMax.ToString() + "&rangebudgetmin=" + sm.rangeBudgetMin.ToString() + "&starratingrange=" + sm.starRatingRange.ToString() + "&beds=" + sm.beds.ToString() + "&distanceInKm=" + sm.distanceInKm.ToString();
+}
+    @foreach (CLayer.SearchResult rst in Model.Results)
+    {
+ <div class="row">
+     @*<div class="col-md-3">
+@if (rst.ImageFile == "Empty")
+{<img src="~/@no_image" alt="noimage" /> }
+else
+{<img src="~/Files/Property/@rst.PropertyId/@rst.ImageFile" alt="@rst.Title serviced apartment in  @rst.Location @rst.City" />}
+     </div>*@
+     <div class="col-md-12">
+         <h2><a href="~/serviced-apartments/@(rst.City.Replace("/"," ").Replace("  "," ").Replace(" ","-"))/@(rst.Location.Replace("/", " ").Replace("  ", " ").Replace(" ", "-"))/@rst.PropertyId" >@rst.Title</a></h2>
+         <p> 
+             @if(rst.Description.Length>500)
+             {
+                 @Html.Raw((rst.Description.Substring(500)))
+             }
+             else
+             {
+                 @Html.Raw((rst.Description))
+             }
+
+         </p>
+     </div>
+ </div>
+ 
+        <!-- End -->       
+
+    }
+   
+</body>
+</html>

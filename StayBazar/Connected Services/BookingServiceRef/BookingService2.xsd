@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="CartItemByID">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CartItemID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CartItemByID" nillable="true" type="tns:CartItemByID" />
+  <xs:complexType name="InputException">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ExceptionMessage" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="InnerException" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="StackTrace" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Title" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="InputException" nillable="true" type="tns:InputException" />
+  <xs:complexType name="CartItem">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AllowOnrequest" type="xs:boolean" />
+      <xs:element minOccurs="0" name="BreakFast" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CartID" type="xs:int" />
+      <xs:element minOccurs="0" name="CartItemID" type="xs:int" />
+      <xs:element minOccurs="0" name="CheckInDate" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="CityID" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Dinner" type="xs:boolean" />
+      <xs:element minOccurs="0" name="DoubleRooms" type="xs:int" />
+      <xs:element minOccurs="0" name="ExtraBeds" type="xs:int" />
+      <xs:element minOccurs="0" name="FlightDetails" nillable="true" type="tns:CartFlightDetails" />
+      <xs:element minOccurs="0" name="GST" type="xs:decimal" />
+      <xs:element minOccurs="0" name="HotelID" type="xs:int" />
+      <xs:element minOccurs="0" name="HotelRateCartDetailID" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Lunch" type="xs:boolean" />
+      <xs:element minOccurs="0" name="NoOfNights" type="xs:int" />
+      <xs:element minOccurs="0" name="OriginCountryID" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Passengers" nillable="true" type="tns:ArrayOfCartPaxDetails" />
+      <xs:element minOccurs="0" name="RoomCategoryID" type="xs:int" />
+      <xs:element minOccurs="0" name="SingleRooms" type="xs:int" />
+      <xs:element minOccurs="0" name="TwinRooms" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CartItem" nillable="true" type="tns:CartItem" />
+  <xs:complexType name="CartFlightDetails">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ArrivalDate" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="ArriveBy" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ArriveCity" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ArriveTime" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CartItemID" type="xs:int" />
+      <xs:element minOccurs="0" name="DepartBy" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="DepartureCity" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="DepartureDate" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="DepartureTime" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Instructions" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CartFlightDetails" nillable="true" type="tns:CartFlightDetails" />
+  <xs:complexType name="ArrayOfCartPaxDetails">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CartPaxDetails" nillable="true" type="tns:CartPaxDetails" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCartPaxDetails" nillable="true" type="tns:ArrayOfCartPaxDetails" />
+  <xs:complexType name="CartPaxDetails">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CartItemID" type="xs:int" />
+      <xs:element minOccurs="0" name="LeadName" type="xs:boolean" />
+      <xs:element minOccurs="0" name="PaxFirstName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="PaxID" type="xs:int" />
+      <xs:element minOccurs="0" name="PaxLastName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="PaxSalutation" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="RoomType" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CartPaxDetails" nillable="true" type="tns:CartPaxDetails" />
+  <xs:complexType name="CartItemToDelete">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CartID" type="xs:int" />
+      <xs:element minOccurs="0" name="CartItemID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CartItemToDelete" nillable="true" type="tns:CartItemToDelete" />
+  <xs:complexType name="DetailedCart">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CartID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DetailedCart" nillable="true" type="tns:DetailedCart" />
+  <xs:complexType name="CartPolicies">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CancellationDetails" type="xs:boolean" />
+      <xs:element minOccurs="0" name="CartItemID" type="xs:int" />
+      <xs:element minOccurs="0" name="CheckInDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="RateCardDetailsID" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CartPolicies" nillable="true" type="tns:CartPolicies" />
+  <xs:complexType name="Cart">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CartID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Cart" nillable="true" type="tns:Cart" />
+  <xs:complexType name="ArrayOfCartItemReferencePolicy">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CartItemReferencePolicy" nillable="true" type="tns:CartItemReferencePolicy" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCartItemReferencePolicy" nillable="true" type="tns:ArrayOfCartItemReferencePolicy" />
+  <xs:complexType name="CartItemReferencePolicy">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CartID" type="xs:int" />
+      <xs:element minOccurs="0" name="CartItemID" type="xs:int" />
+      <xs:element minOccurs="0" name="IsRuleAccepted" type="xs:boolean" />
+      <xs:element minOccurs="0" name="ReferenceNo" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CartItemReferencePolicy" nillable="true" type="tns:CartItemReferencePolicy" />
+  <xs:complexType name="Quotation">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CancellationDetails" type="xs:boolean" />
+      <xs:element minOccurs="0" name="QuotationID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Quotation" nillable="true" type="tns:Quotation" />
+  <xs:complexType name="BookingList">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="BookingNo" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CheckInDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="CheckOutDate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="PassengerName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BookingList" nillable="true" type="tns:BookingList" />
+  <xs:complexType name="BookingDetails">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="QuotationID" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BookingDetails" nillable="true" type="tns:BookingDetails" />
+</xs:schema>

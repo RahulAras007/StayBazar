@@ -1,0 +1,60 @@
+﻿@model IEnumerable<CLayer.ReportRoomInventory>
+@{
+    Layout = null;
+    Response.ContentType = "application/vnd.ms-excel";
+    Response.AppendHeader("content-disposition", "attachment; filename=report.xls");
+    Response.Charset = "";
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" />
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="CollectionReport">
+        <ss:Table>
+            @foreach (CLayer.ReportRoomInventory reportList in Model)
+            {
+                if (i != reportList.PropertyId)
+                {
+                    i = reportList.PropertyId;
+                    <ss:Row>
+                        <ss:Cell ss:StyleID="1"><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                        <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String">@reportList.SupplierName</ss:Data></ss:Cell>
+                    </ss:Row>
+                    <ss:Row>
+                        <ss:Cell ss:StyleID="1"><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                        <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+                    </ss:Row>
+                    <ss:Row>
+                        <ss:Cell ss:StyleID="1"><ss:Data ss:Type="String">Address of Property</ss:Data></ss:Cell>
+                        <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String">@reportList.AddressOfProperty @reportList.PropertyCity @reportList.State @reportList.PropertyZipCode, @reportList.PropertyEmail</ss:Data></ss:Cell>
+                    </ss:Row>
+                    <ss:Row ss:StyleID="1">
+                        <ss:Cell><ss:Data ss:Type="String">Accomodation Type</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Total Inventory Allocated</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Inventory Booked</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Inventory Available</ss:Data></ss:Cell>
+                    </ss:Row>
+                }
+                else
+                {
+                    <text>  </text>
+                }
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.AccomodationType</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingDate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.TotalInventoryAllocated</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.InventoryBooked</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@{long total = reportList.TotalInventoryAllocated; long booked = reportList.InventoryBooked; long avilable = total - booked; if (avilable < 0) { avilable = 0; } } @avilable</ss:Data></ss:Cell>
+                </ss:Row>
+            }
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:i0="www.tamarindtours.in/IBookingService" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BookingService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:Policy wsu:Id="BasicHttpBinding_IBookingService_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy>
+            <sp:TransportToken>
+              <wsp:Policy>
+                <sp:HttpsToken RequireClientCertificate="false" />
+              </wsp:Policy>
+            </sp:TransportToken>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:Basic256 />
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Lax />
+              </wsp:Policy>
+            </sp:Layout>
+            <sp:IncludeTimestamp />
+          </wsp:Policy>
+        </sp:TransportBinding>
+        <sp:SignedSupportingTokens xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy>
+            <sp:UsernameToken sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+              <wsp:Policy>
+                <sp:WssUsernameToken10 />
+              </wsp:Policy>
+            </sp:UsernameToken>
+          </wsp:Policy>
+        </sp:SignedSupportingTokens>
+        <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy />
+        </sp:Wss10>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsdl:import namespace="www.tamarindtours.in/IBookingService" location="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?wsdl=wsdl0" />
+  <wsdl:types />
+  <wsdl:binding name="BasicHttpBinding_IBookingService" type="i0:IBookingService">
+    <wsp:PolicyReference URI="#BasicHttpBinding_IBookingService_policy" />
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetCartItemDetailsByCartItemID">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/GetCartItemDetailsByCartItemID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="InputExceptionFault">
+        <soap:fault use="literal" name="InputExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="InsertCartItem">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/InsertCartItem" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveFromCart">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/RemoveFromCart" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="InputExceptionFault">
+        <soap:fault use="literal" name="InputExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetCartDetails">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/GetCartDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="InputExceptionFault">
+        <soap:fault use="literal" name="InputExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetBookedCartDetails">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/GetBookedCartDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSalutations">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/GetSalutations" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPolicies">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/GetPolicies" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConfirmBooking">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/ConfirmBooking" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RejectApproval">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/RejectApproval" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="InputExceptionFault">
+        <soap:fault use="literal" name="InputExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="AcceptApproval">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/AcceptApproval" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="InputExceptionFault">
+        <soap:fault use="literal" name="InputExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetAmendBookingDetailsbyCartItemID">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/GetAmendBookingDetailsbyCartItemID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="InputExceptionFault">
+        <soap:fault use="literal" name="InputExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetFlightAndOtherDetailsbyCartItemID">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/GetFlightAndOtherDetailsbyCartItemID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="InputExceptionFault">
+        <soap:fault use="literal" name="InputExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetBookingList">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/GetBookingList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="InputExceptionFault">
+        <soap:fault use="literal" name="InputExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ViewBookingHistory">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/ViewBookingHistory" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="InputExceptionFault">
+        <soap:fault use="literal" name="InputExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetCancellationDetails">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/GetCancellationDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CancelBooking">
+      <soap:operation soapAction="www.tamarindtours.in/IBookingService/IBookingService/CancelBooking" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="BookingService">
+    <wsdl:port name="BasicHttpBinding_IBookingService" binding="tns:BasicHttpBinding_IBookingService">
+      <soap:address location="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc/BookingService" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

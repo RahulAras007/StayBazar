@@ -1,0 +1,21 @@
+﻿@model StayBazar.Models.BookingModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Booking Details</title>
+</head>
+<body>
+    @Html.Partial("_BookingConfirmation", Model)
+
+    @if (Model.ForPrint == true)
+    {
+        <script type="text/javascript">
+            window.print();
+        </script>
+    }
+</body>
+</html>

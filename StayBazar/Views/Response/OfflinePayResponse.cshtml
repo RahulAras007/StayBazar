@@ -1,0 +1,55 @@
+﻿@model StayBazar.Models.ResponseModel
+@{
+    CLayer.OfflinePayment PaymentData = null;
+    if (Model.OffinePaymentId > 0)
+    {
+        PaymentData = BLayer.OfflinePayment.GetOfflinePaymentDetails(Model.OffinePaymentId);
+    }
+    if (PaymentData.Name == null) { PaymentData.Name = ""; }
+    if (PaymentData.Amount == null) { PaymentData.Amount = 0; }
+    
+}
+<div class="container he">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="margin10px">
+                @switch (Model.PaymentResponse)
+                {
+                    case CLayer.ObjectStatus.GateWayResponse.Invalid:
+                        <div class="alert alert-danger">We could not process the request.Please contact our Helpdesk @Html.ActionLink("Contact Us", "Contact", "Home")</div>
+                        break;
+                    case CLayer.ObjectStatus.GateWayResponse.Flagged:
+                    <div class="alert alert-warning">You have made the payment, your registration will be finished once the payment is confirmed.</div>
+                        break;
+                    case CLayer.ObjectStatus.GateWayResponse.Success:
+                  
+                        break;
+                    case CLayer.ObjectStatus.GateWayResponse.Failed:
+                    <div class="alert alert-danger">Amount payment has not gone through, please contact Staybazar support.</div>
+                        break;
+                }
+            </div>
+        </div>
+    </div>
+    @if (Model.PaymentResponse == CLayer.ObjectStatus.GateWayResponse.Success)
+    {
+        <div class="row">
+            <div class="col-md-6 col-lg-offset-3">
+                <div class="panel panel-body panel-default margin10px " style="width:535px;" >
+                    <div class="row">
+                        <div class="col-md-1">
+                            <span class="fa fa-check-circle greentext" style="font-size:37px;"></span>
+                        </div>
+                        <div class="col-md-11">
+                            <h4>Thank you, we received your payment INR @PaymentData.Amount</h4>
+                            <h4 class="margin-top-30">Payment Details</h4>
+                            <h5>Name: @PaymentData.Name</h5>
+                            <h5>Email: @PaymentData.Email</h5>
+                            <h5>Mobile No: @PaymentData.Mobile</h5>                          
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

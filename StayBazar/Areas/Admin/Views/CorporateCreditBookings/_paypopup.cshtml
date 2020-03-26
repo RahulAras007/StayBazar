@@ -1,0 +1,79 @@
+﻿@model StayBazar.Areas.Admin.Models.CreditBookingModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("PaymentBooking", "CorporateCreditBookings", new { Area = "Admin" }, FormMethod.Post, new { id = "PaymentBooking" }))
+{
+    <div class="modal fade" id="PaymentBox" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Payment</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                        <div class="col-lg-12">
+                            <div id="cancelBox">
+                                <div class="row topmargin5">
+                            
+                                    <div class="col-md-4">                                      
+                                        @Html.HiddenFor(m => m.bookid)                                  
+                                    </div>
+                                </div>
+                                <div class="row topmargin5">
+                                    <div class="col-md-4">Comment</div>
+                                    <div class="col-md-4">
+                                        @Html.TextAreaFor(m => m.CreditComment, new { @rows = 3, @class = "col-md-12" })
+                                    </div>
+                                </div>
+                                <div class="row topmargin5">
+                                    <div class="col-md-4">Payment Date</div>
+                                    <div class="col-md-4">
+                                        @*<input type="text" class="col-md-12"  id="dcheckin" />*@
+
+                                        @Html.TextBoxFor(m => m.Paymentdate, new { @class = "col-md-12" })
+                                    </div>
+                                </div>
+                                @*<div class="row topmargin5">
+                                        <div class="col-md-4">Mark as paid</div>
+                                        <div class="col-md-2">
+                                            @Html.CheckBoxFor(m => m.Paid)
+                                        </div>
+                                    </div>*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="Pay()" class="btn btn-success">Proceed</button>
+                    <button type="button" id="Paymentclose" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(function () {
+        $("#Paymentdate").datepicker({
+            defaultDate: '@DateTime.Now.ToShortDateString().Replace("-", "/")',
+            numberOfMonths: 2,
+            dateFormat: "dd/mm/yy"           
+        });
+        //$("#Paymentdate").val($("#dcheckin").val());
+        //$("#dcheckin").change(function () { $("#Paymentdate").val($(this).val()); });
+
+    });
+    function Pay() {
+        var url = '@Url.Action("PaymentBooking", "CorporateCreditBookings", new { Area = "Admin" })';
+        $.post(url, $("#PaymentBooking").serialize(), function (data) {
+            alert("Updated successfully");
+            $('#PaymentBox').modal('hide');
+            //$("#List").html(data);
+            //$("#Status").val(2);
+            $("#BookingAmount").val(0);
+            $("#CreditComment").val("");
+        });
+    }
+</script>

@@ -1,0 +1,83 @@
+﻿@{
+    Layout = null;
+}
+<div class="modal fade" id="modBoxId" tabindex="-1" role="dialog" aria-labelledby="modModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="modModalLabel">Change Booking</h4>
+            </div>
+            <div class="modal-body">
+                <div id="mprogress"><p><img src="/content/ajax11-loader.gif" /> Loading...</p></div>
+                <div id="modifyBox"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="Bookingavailablecheckalertmodify" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="width:34%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Not available</h4>
+            </div>
+            <div id="maximojo" class="modal-body">
+                <h5 class="redtext" id="alertfrombookcheckmodify"> </h5>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Ok</button></div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function callModify(bookId) {
+        $("#mprogress").show();
+        $("#modifyBox").hide();
+        $('#modBoxId').modal('show');
+        var url = '@Url.Action("Modify", "Cancellation")?bookingId=' + bookId;
+          $.get(url, function (data) {
+              $("#mprogress").hide();
+              $("#modifyBox").html(data);
+              $("#modifyBox").show();
+           });
+    }
+   function modifyBooking(BId,CID,CIO)
+   {
+     
+       var url = "@Url.Action("CheckAccommodationAvailable", "Cancellation")";           
+       $.get(url, { BookingId: BId, CheckIn: CID, CheckOut: CIO }, function (data) {
+           if(data == "true")
+           {                   
+               $("#mprogress").show();
+               $("#modifyBox").hide();
+               var url = '@Url.Action("Change", "Cancellation")';
+               $.post(url, $("#frmModify").serialize(), function (data) {
+                   $("#mprogress").hide();
+                   $("#modifyBox").html(data);
+                   $("#modifyBox").show();
+               });
+           }
+           else
+           {
+               $("#alertfrombookcheckmodify").html(data);
+               $("#Bookingavailablecheckalertmodify").modal('show');
+                    
+           }
+       });
+   }
+    @*
+    function cancelAcc() {
+        $("#cprogress").show();
+        $("#cancelBox").hide();
+        var id = $("#cancFormValueId").val();
+        var url = '@Url.Action("CancelAccommodation", "Cancellation")';
+        $.post(url, { bookingId: id }, function (data) {
+            $("#cprogress").hide();
+            $("#cancelBox").html(data);
+            $("#cancelBox").show();
+        });
+    }*@
+</script>

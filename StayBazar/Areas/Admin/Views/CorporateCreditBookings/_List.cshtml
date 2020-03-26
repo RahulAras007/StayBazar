@@ -1,0 +1,352 @@
+﻿@model IEnumerable<CLayer.Booking>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+}
+<div class="body-content">
+    @if (Model.Count() == 0)
+    {
+        <div class="alert alert-info">Data not found</div>
+    }
+    <div class="panel-group" id="accordion">
+        @{
+            StayBazar.Areas.Admin.Models.CreditBookingModel filterform = (StayBazar.Areas.Admin.Models.CreditBookingModel)ViewBag.Filter;
+            using (Html.BeginForm("Pager", "CorporateCreditBookings", FormMethod.Post, new { @id = "frmPagers" }))
+            {
+                <input type="hidden" id="Status" name="Status" value="@filterform.Status" />
+                <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+                <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+        }
+        @if (Model != null && Model.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+        }
+        @foreach (CLayer.Booking usr in Model)
+        {
+            CLayer.ObjectStatus.Corpcreditbookstatus paymentstatus = BLayer.CreditBooking.GetCorpCreditPaymentStatus(usr.BookingId);
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#i_@usr.BookingId">
+                        <div class="row">
+                            <div class="col-md-2 ">
+                                <span></span>Date:@usr.BookingDate.ToShortDateString()
+                            </div>
+                            <div class="col-md-2">Confirmation No:@usr.OrderNo </div>
+                            <div class="col-md-3">  Location: @usr.propertyLocation </div>
+                            @*//CLayer.CreditBooking dt = BLayer.CreditBooking.GetAllCredBookDetailsbyBookid(usr.BookingId);
+                                 //if (dt != null)
+                                 //{
+                                //}
+                            *@
+
+                            <div class="col-md-3">Corporate Name : @usr.CorporateName </div>
+
+                            @if (paymentstatus == CLayer.ObjectStatus.Corpcreditbookstatus.Paid)
+                            {
+                                <div class="col-md-2">Payment Status : Paid</div>
+                            }
+                            else
+                            {
+
+                                <div class="col-md-2">Payment Status : Pending</div>
+                            }
+                        </div>
+                    </a>
+
+                </div>
+                <div id="i_@usr.BookingId" class="panel-collapse collapse ">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <b>Supplier Details</b><br />
+                                Title:@usr.PropertyTitle<br />
+                                Name:  @usr.FirstName <br />
+                                @*Last Name: @usr.LastName<br />*@
+                                Address:@usr.Address<br />
+                                City:@usr.City<br />
+                                State: @usr.StateName<br />
+                                Country:@usr.CountryName<br />
+                                Phone:@usr.Phone,@usr.Mobile<br />
+                                Email:@usr.Email<br />
+                            </div>
+                            <div class="col-md-2">
+                                <b>Booking Details</b>
+                                Confirmation No:@usr.OrderNo <br />
+                                Booking Date:  @usr.BookingDate.ToShortDateString()<br />
+                                Property Address: @usr.propertyAddress<br />
+                                @{
+            int id = usr.BookingStatus;
+                                }
+                                Total  Amount: @usr.bookingTotalAmount<br />
+                            </div>
+                            <div class="col-md-3" id="databuyer_@usr.BookingId">
+                                <a id="i1_@usr.BookingId" href="#" onclick="BuyerBT(@usr.BookingId)">
+                                    Show Buyer Address
+                                    <div id="loading1_@usr.BookingId"></div>
+                                </a>
+                            </div>
+                            <div class="col-md-2" id="DataFor_@usr.BookingId">
+                                <a id="i2_@usr.BookingId" href="#" onclick="ForBuyerBT(@usr.BookingId)">
+                                    Show For Buyer Address
+                                    <div id="loading2_@usr.BookingId"></div>
+                                </a>
+                            </div>
+
+
+                            <div class="col-md-1 pad0">
+
+                                @if (paymentstatus == CLayer.ObjectStatus.Corpcreditbookstatus.NotPaid)
+                                {
+                                    <input type="button" class="btn btn-success" value="Mark as paid" onclick="MarkAsPayment(@usr.BookingId)" />
+                                }
+
+                                <input type="button" class="btn btn-success margin-top-10" value="Payment" onclick="showpayment(@usr.BookingId)" />
+                            </div>
+
+
+
+                        </div>
+
+                        @*send emails and sms*@
+                        <div class="row">
+
+
+                            @if (System.DateTime.Today <= usr.CheckIn)
+                            {
+                                <div class="col-md-12 margin-bot-10 margin-top-10 rightalign">
+
+                                    @{
+
+                                CLayer.ObjectStatus.BookingStatus sts = BLayer.Bookings.GetStatus(usr.BookingId);
+
+
+                                if (sts == CLayer.ObjectStatus.BookingStatus.BookingRequest)
+                                {
+
+                                    <a href="#" id="status@(usr.BookingItemId)" title="ConfirmBooking" class="btn btn-danger" onclick="BookingConfirm(@usr.BookingId)">
+                                        Confirm Booking
+                                    </a>
+                                }
+                                else
+                                {
+
+                                    <text><span style="color:green;">Booking Confirmed</span> </text>
+
+                                }
+
+                                    }
+
+                                    <a href="#" id="status@(usr.BookingItemId)" title="Resendemail" class="btn btn-success" onclick="ResendemailC(@usr.BookingId)">
+                                        Resend email to customer
+                                    </a>
+
+                                    <a href="#" id="status@(usr.BookingItemId)" title="Resendsms" class="btn btn-success marginleft10" onclick="ResendsmsC(@usr.BookingId)">
+                                        Resend SMS to customer
+                                    </a>
+
+
+                                    <a href="#" id="status@(usr.BookingItemId)" title="Resendemail" class="btn btn-success marginleft10" onclick="ResendemailS(@usr.BookingId)">
+                                        Resend email to supplier
+                                    </a>
+
+
+                                    <a href="#" id="status@(usr.BookingItemId)" title="Resendsms" class="btn btn-success marginleft10" onclick="ResendsmsS(@usr.BookingId)">
+                                        Resend SMS to supplier
+                                    </a>
+
+                                </div>
+                            }
+                        </div>
+
+
+
+                        <div class="row">
+                            <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>Accommodation</th>
+                                        <th>CheckIn</th>
+                                        <th>Check out</th>
+                                        <th>Quantity</th>
+                                        <th>Adults</th>
+                                        <th>Children</th>
+                                        <th>Guests</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+            List<CLayer.BookingItem> Acdt = BLayer.BookingItem.GetAllDetailsForPartialPay(usr.BookingId);
+
+                                    }
+                                    @foreach (CLayer.BookingItem dt in Acdt)
+                                    {
+                                        <tr>
+                                            <td>@dt.AccommodationTitle</td>
+                                            <td>@dt.CheckIn.ToShortDateString()</td>
+                                            <td>@dt.CheckOut.ToShortDateString()</td>
+                                            <td>@dt.quantity</td>
+                                            <td>@dt.NoOfAdults</td>
+                                            <td>@dt.NoOfChildren</td>
+                                            <td>@dt.NoOfGuests</td>
+                                            <td>@dt.TotalAmount</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            @{
+
+                                long BuserId = BLayer.Bookings.GetBookedByUserId(usr.BookingId);
+                                CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(BuserId);
+                                if (role == CLayer.Role.Roles.CorporateUser)
+                                {
+                                    BuserId = BLayer.B2B.GetCorporateIdOfUser(BuserId);
+                                }
+                                CLayer.B2B Creditbookingdata = BLayer.B2B.GetbookingcreditforCorte(BuserId);
+                                decimal amt = BLayer.Bookings.GetTotalcreditbookamount(BuserId);
+                                decimal creditbalceAmt = Creditbookingdata.TotalCreditAmount - amt;
+
+                            }
+                            <h4 class="bold">Corporate Credit Booking Details</h4>
+                            <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>Total Amount booked by Corporate</th>
+                                        <th>Credit Limit Total</th>
+                                        <th>Credit Limit Balance</th>
+                                        <th>Payments Due</th>
+                                        <th>Date Due</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>@usr.bookingTotalAmount</td>
+                                        <td>@Creditbookingdata.TotalCreditAmount</td>
+                                        <td>@creditbalceAmt</td>
+                                        <td>
+                                            @if (paymentstatus == CLayer.ObjectStatus.Corpcreditbookstatus.Paid)
+                                            {
+                                                <text> No </text>
+                                            }
+                                            else
+                                            {
+                                                <text> Yes </text>
+                                            }
+                                        </td>
+                                        <td>@usr.BookingDate.AddDays(Creditbookingdata.CreditDays)</td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+        //alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "CorporateCreditBookings", new { area = "Admin" })';
+        $.post(url, $("#frmPagers").serialize(), function (data) {
+            $("#List").html(data);
+        });
+    }
+
+    function BookingConfirm(id) {
+        var r = confirm("Are you sure you want to Confirm Booking ? ")
+        if (r == true) {
+            var url = '@Url.Action("BookingConfirm", "CorporateCreditBookings")?bookingId=' + id;
+            $.post(url, function (data) {
+                if (data == "True") {
+                    alert("Booking Confirmed");
+                    window.location.href = '/Admin/CorporateCreditBookings/'
+                }
+            });
+        }
+        else {
+            return false
+        }
+
+
+    }
+
+    function ResendemailC(id) {
+        var r = confirm("Are you sure you want to resend confirmation mail? ")
+        if (r == true) {
+            var url = '@Url.Action("ResendemailC", "CorporateCreditBookings")?bookingId=' + id;
+            $.post(url, function (data) {
+
+            });
+        }
+        else {
+            return false
+        }
+    }
+    function ResendemailS(id) {
+        var r = confirm("Are you sure you want to resend confirmation mail? ")
+        if (r == true) {
+            var url = '@Url.Action("ResendemailS", "CorporateCreditBookings")?bookingId=' + id;
+            $.post(url, function (data) {
+
+            });
+        }
+        else {
+            return false
+        }
+    }
+    function ResendsmsC(id) {
+        var r = confirm("Are you sure you want to resend confirmation sms? ")
+        if (r == true) {
+            var url = '@Url.Action("ResendsmsC", "CorporateCreditBookings")?bookingId=' + id;
+            $.post(url, function (data) {
+
+            });
+        }
+        else {
+            return false
+        }
+    }
+    function ResendsmsS(id) {
+        var r = confirm("Are you sure you want to resend confirmation sms? ")
+
+        if (r == true) {
+            var url = '@Url.Action("ResendsmsS", "CorporateCreditBookings")?bookingId=' + id;
+            $.post(url, function (data) {
+
+            });
+        }
+        else {
+            return false
+        }
+    }
+    function Cancelbtn(Id) {
+        var r = confirm("Are you sure you want to Cancel? ")
+        // alert(Id);
+        if (r == true) {
+            $.post('@Url.Action("StatusCancel", "CorporateCreditBookings", new { area = "Admin" })', { BookingId: Id }, function (data) {
+
+            });
+        }
+        else {
+            return false
+        }
+    }
+</script>
+
+
+
+

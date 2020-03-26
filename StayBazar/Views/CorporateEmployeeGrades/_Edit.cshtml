@@ -1,0 +1,39 @@
+﻿@model StayBazar.Models.CorporateEmployeeGradeModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Edit", "CorporateEmployeeGrades"))
+{
+<h2> Employee Grades</h2>
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+<div class="incontainer">
+    <div class="form-group">
+        <div>
+            @Html.DisplayNameFor(m => m.GradeCode)<span style="color:red">*</span>
+            @Html.TextBoxFor(m => m.GradeCode, new { @tabindex = "1", @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.GradeCode)
+        </div>
+        <div>
+            @Html.DisplayNameFor(m => m.GradeDescription)
+            @Html.TextBoxFor(m => m.GradeDescription, new { @tabindex = "1", @class = "form-control input-sm" })
+
+        </div>
+    </div>
+        <div class="btn-toolbar">
+            <div class="btn-group">
+                <input type="submit" id="btnSave" value="Save" class="btn btn-sm btn-default" tabindex="3" />
+                <a href="~/CorporateEmployeeGrades" id="btnReset" class="btn btn-sm btn-danger" tabindex="4">Cancel</a>
+            </div>
+        </div>
+    
+</div>
+    @Html.HiddenFor(m => m.GradeID)
+    <script type="text/javascript">
+        $(function () {
+            $("#Title").focus();
+        });
+    </script>
+}
+
+

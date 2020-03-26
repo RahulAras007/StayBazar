@@ -1,0 +1,35 @@
+﻿@model  StayBazar.Areas.Admin.Models.Invoice
+@{
+    Layout = null;
+}
+<style>
+    td {
+        padding: 2px !important;
+    }
+</style>
+
+@{
+
+    long IsGST = BLayer.OfflineBooking.GetOfflinebookingIsGST(Model.OfflineBookingId);
+}
+@if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.GST)
+{
+    @Html.Partial("_InvoiceHeaderGst", Model.OfflineBookingId)
+}
+else
+{
+    @Html.Partial("_InvoiceHeader")
+}
+@Html.Raw(Model.HtmlSection1)
+@Html.Raw(Model.HtmlSection2)
+@Html.Raw(Model.HtmlSection3)
+
+@if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.GST)
+{
+    @Html.Partial("_InvoiceFooterGST")
+}
+else
+{
+    @Html.Partial("_InvoiceFooter")
+}
+            

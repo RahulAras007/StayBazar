@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="www.tamarindtours.in/ITamarindDataService" elementFormDefault="qualified" targetNamespace="www.tamarindtours.in/ITamarindDataService" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" />
+  <xs:element name="SearchHotels">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" minOccurs="0" name="param" nillable="true" type="q1:HotelSearchParam" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SearchHotelsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="SearchHotelsResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetHotels">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" minOccurs="0" name="param" nillable="true" type="q2:HotelSearchParam" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetHotelsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetHotelsResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetHotelInfo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" minOccurs="0" name="hotel" nillable="true" type="q3:SingleHotel" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetHotelInfoResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetHotelInfoResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCostBreakup">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" minOccurs="0" name="brkupParam" nillable="true" type="q4:CostBreakupParam" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCostBreakupResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetCostBreakupResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="viewPendingApprovals">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="viewPendingApprovalsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="viewPendingApprovalsResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="approvalreject">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" minOccurs="0" name="app" nillable="true" type="q5:Quotation" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="approvalrejectResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="approvalrejectResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCancellationPolicies">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" minOccurs="0" name="CancellationPolicy" nillable="true" type="q6:CancellationPolicyParam" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCancellationPoliciesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetCancellationPoliciesResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

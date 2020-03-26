@@ -1,0 +1,168 @@
+﻿@model  IEnumerable<CLayer.PendingCustomerInvoiceReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 2;
+    long i = 1;
+    string type = "";
+    string mtype = "";
+    decimal buycost = 0, salevalue = 0, grossmargin = 0, commissionpayable = 0, netmargin = 0, gbuycost = 0, gsalevalue = 0, ggrossmargin = 0, gcommissionpayable = 0, gnetmargin = 0, grandtotal = 0;
+    long nonights, noaccs, gnonights, gnoaccs;
+    nonights = noaccs = gnonights = gnoaccs = 0;
+}
+<?xml version="1.0"?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <ss:Styles>
+     <ss:Style ss:ID="1">
+        <ss:Font ss:Bold="1" /> 
+     </ss:Style>
+  </ss:Styles>
+    <ss:Worksheet ss:Name="CollectionReport">
+                <ss:Table>
+                    <ss:Row ss:StyleID="1">
+                        <ss:Cell><ss:Data ss:Type="String">Sl No </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> Date of booking </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking Id</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Customer Name</ss:Data></ss:Cell>
+
+                        <ss:Cell><ss:Data ss:Type="String">Property Name </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">City </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check-in date </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check-out date </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">No of Rooms </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">No of nights </ss:Data></ss:Cell>
+                       <ss:Cell><ss:Data ss:Type="String">Booking Value </ss:Data></ss:Cell>
+                       <ss:Cell><ss:Data ss:Type="String">Guest Name </ss:Data></ss:Cell>
+
+                        @* <ss:Cell><ss:Data ss:Type="String">Additional Guests </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">CustomerType </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Customer Name </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Supplier Rate(Pre-tax) </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Tax Type </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Tax </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Total Supplier Buy Cost </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking  Rate </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking Value(pre-tax) </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Service Tax </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Luxury Tax </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Total Booking Value  </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Gross Margin </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Agent Commission Payable  </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Net Margin </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Net Margin % </ss:Data></ss:Cell>*@
+                    </ss:Row>
+                    @foreach (CLayer.PendingCustomerInvoiceReport reportList in Model)
+                    {                    
+                DateTime checkin = reportList.CheckIn;
+                DateTime checkout = reportList.CheckOut;
+                TimeSpan ts = checkout - checkin;
+                int differenceInDays = ts.Days;
+                long netmarpercent = (long)Math.Round((double)(((double)(reportList.GrossMargin - reportList.AgentCommissionPayable) / reportList.TotalSupplierBuyCost)) * 100);
+                mtype = reportList.CustomeType;
+                if (type != mtype)
+                {
+                    if (type != "")
+                    {
+                        <ss:Row>
+                            <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">@type Totals</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@noaccs</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@nonights</ss:Data></ss:Cell>
+                            <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@buycost.ToString("N0")</ss:Data></ss:Cell>
+                            <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@salevalue.ToString("N0")</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@grossmargin.ToString("N0")</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@commissionpayable.ToString("N0")</ss:Data></ss:Cell>
+                            <ss:Cell ss:MergeAcross="1"><ss:Data ss:Type="String">@netmargin.ToString("N0")</ss:Data></ss:Cell>
+                        </ss:Row>
+                        buycost = 0;
+                        salevalue = 0;
+                        grossmargin = 0;
+                        commissionpayable = 0;
+                        netmargin = 0;
+                        nonights = 0;
+                        noaccs = 0;
+                    }
+                    type = reportList.CustomeType;
+                }
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">@i</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingDate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.orderno</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CustomerName </ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CheckIn.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CheckOut.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.NoOfRooms</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.NumberofNights</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.TotalBookingValue</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.guestname</ss:Data></ss:Cell>
+
+                    @*<ss:Cell><ss:Data ss:Type="String">@differenceInDays</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.NoOfGuests</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CustomeType</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CustomerName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierRate </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.TaxType</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.TaxRate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.TotalSupplierBuyCost</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingRate</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingValue</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.ServiceTax </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.LuxuryTax </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.TotalBookingValue </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.GrossMargin </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.AgentCommissionPayable</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@(reportList.GrossMargin - reportList.AgentCommissionPayable)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@(netmarpercent)</ss:Data></ss:Cell>*@
+                </ss:Row>
+                i = i + 1;
+                buycost = buycost + reportList.TotalSupplierBuyCost;
+                salevalue = salevalue + reportList.TotalBookingValue;
+                grossmargin = grossmargin + reportList.GrossMargin;
+                commissionpayable = commissionpayable + reportList.AgentCommissionPayable;
+                netmargin = netmargin + reportList.NetMargin;
+                nonights += differenceInDays;
+                noaccs += reportList.NumberofAccomodation;
+                gnonights += differenceInDays;
+                gnoaccs += reportList.NumberofAccomodation;
+                gbuycost = gbuycost + reportList.TotalSupplierBuyCost;
+                gsalevalue = gsalevalue + reportList.TotalBookingValue;
+                ggrossmargin = ggrossmargin + reportList.GrossMargin;
+                gcommissionpayable = gcommissionpayable + reportList.AgentCommissionPayable;
+                gnetmargin = gnetmargin + reportList.NetMargin;
+            }
+                    @*<ss:Row>
+                        <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">@type Totals</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@noaccs</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@nonights</ss:Data></ss:Cell>
+                        <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@buycost.ToString("N0")</ss:Data></ss:Cell>
+                        <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@salevalue.ToString("N0")</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@grossmargin.ToString("N0")</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@commissionpayable.ToString("N0")</ss:Data></ss:Cell>
+                        <ss:Cell ss:MergeAcross="1"><ss:Data ss:Type="String">@netmargin.ToString("N0")</ss:Data></ss:Cell>
+                    </ss:Row>
+                    <ss:Row>
+                        <ss:Cell ss:MergeAcross="6"><ss:Data ss:Type="String">Grand Totals</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@gnoaccs</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@gnonights</ss:Data></ss:Cell>
+                        <ss:Cell ss:MergeAcross="5"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@gbuycost.ToString("N0")</ss:Data></ss:Cell>
+                        <ss:Cell ss:MergeAcross="3"><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@gsalevalue.ToString("N0")</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@ggrossmargin.ToString("N0")</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@gcommissionpayable.ToString("N0")</ss:Data></ss:Cell>
+                        <ss:Cell ss:MergeAcross="1"><ss:Data ss:Type="String">@gnetmargin.ToString("N0")</ss:Data></ss:Cell>
+                    </ss:Row>*@
+              </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

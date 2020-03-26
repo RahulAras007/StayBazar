@@ -1,0 +1,1218 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflinePropertyBookingModel
+@using Microsoft.AspNet.Identity
+@using System;
+@using System.Collections.Generic;
+@using System.Linq;
+@using System.Web;
+@using System.Web.Mvc;
+@using Microsoft.AspNet.Identity;
+@using System.Text;
+@using System.Threading.Tasks;
+@{
+    Layout = null;
+    StayBazar.Models.PropertyModel Pmodel = new StayBazar.Models.PropertyModel();
+    Pmodel = GetAccommodationsForEmptyData(@Model.PropertyId);
+
+    ViewBag.Title = "Index";
+    int nosAdults = 0, nosChildren = 0;
+    int maxGuests;
+    int.TryParse(Pmodel.Filter.Adults, out nosAdults);
+    int.TryParse(Pmodel.Filter.Children, out nosChildren);
+    bool itemRemoved = true;
+    while (itemRemoved)
+    {
+        itemRemoved = false; //stop flag
+        foreach (CLayer.Accommodation ac in Pmodel.Accommodations.Accommodations)
+        {
+            if (ac.AccommodationCount == 0)
+            {
+                Pmodel.Accommodations.Accommodations.Remove(ac);
+                itemRemoved = true;
+                break;
+            }
+        }
+    }
+    long firstacc = 0;
+    List<CLayer.Condition> conditions;
+    List<CLayer.Offers> offrs;
+    bool showOffer = (Pmodel.UserType != CLayer.Role.Roles.Corporate && Pmodel.UserType != CLayer.Role.Roles.CorporateUser);
+    if (showOffer)
+    {
+        offrs = BLayer.Offers.GetForPropertyCalc(Pmodel.PropertyId, Convert.ToDateTime(@Model.CheckIn), Convert.ToDateTime(@Model.CheckOut));
+    }
+    else
+    { offrs = new List<CLayer.Offers>(); }
+    double avgDailyRate = 0;
+    int noOfDays = (Convert.ToDateTime(@Model.CheckOut) - Convert.ToDateTime(@Model.CheckIn)).Days;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+
+    if (Pmodel.Accommodations.Accommodations.Count > 0)
+    {
+        List<CLayer.Accommodation> accs = Pmodel.Accommodations.Accommodations.OrderBy(m => m.Rate).ToList();
+        Pmodel.Accommodations.Accommodations = accs;
+    }
+    //show Checktime
+    long PropertyId = Pmodel.PropertyId;
+    decimal tax = BLayer.PropertyTax.GetTotalTax(PropertyId);
+    CLayer.Property dttime = BLayer.Property.GetCheckTime(PropertyId);
+
+    if (dttime != null)
+    {
+
+        if (dttime.MetaDescription != null && dttime.MetaDescription != "")
+        {
+            ViewBag.MetaDescription = dttime.MetaDescription;
+        }
+        if (dttime.PageTitle != null && dttime.PageTitle != "")
+        {
+            ViewBag.Title = dttime.PageTitle;
+        }
+        else
+        {
+            ViewBag.Title = Pmodel.Title;
+        }
+    }
+
+    ViewBag.PId = Pmodel.PropertyId;
+
+    //set mindate
+    int allowmindate = 1;
+    if (User.IsInRole("Administrator"))
+    {
+        allowmindate = 0;
+    }
+
+    //set mindate  forcorporate
+    long userid = Convert.ToInt32(User.Identity.GetUserId());
+    if (userid > 0)
+    {
+        CLayer.Role.Roles urole = BLayer.User.GetRole(userid);
+        if (urole == CLayer.Role.Roles.Corporate)
+        {
+            DateTime Credirbookingsmedayexp = BLayer.B2B.GetbookingsmedayforCorp(userid);
+            if (Credirbookingsmedayexp < DateTime.Now)
+            {
+                allowmindate = 1;
+            }
+            else
+            {
+                allowmindate = 0;
+            }
+        }
+    }
+}
+@functions{
+    private StayBazar.Models.PropertyModel GetAccommodationsForEmptyData(long propertyId)
+    {
+
+        StayBazar.Models.SimpleSearchModel bookingData = new StayBazar.Models.SimpleSearchModel();
+        bookingData.PropertyId = propertyId;
+
+        StayBazar.Models.PropertyModel property = new StayBazar.Models.PropertyModel();
+        property.CameFromSearchPage = false;
+
+        if (bookingData.PropertyId > 0)
+        {
+            long userId = 0;
+            CLayer.Role.Roles role = CLayer.Role.Roles.Customer;
+            if (User.Identity.IsAuthenticated)
+            {
+                long.TryParse(User.Identity.GetUserId(), out userId);
+                role = BLayer.User.GetRole(userId);
+            }
+
+            bool isCorp = false;
+
+            if (role == CLayer.Role.Roles.Corporate || role == CLayer.Role.Roles.CorporateUser) isCorp = true;
+
+
+            CLayer.Property data = BLayer.Property.Get(bookingData.PropertyId);
+            if (data != null)
+            {
+                property = new StayBazar.Models.PropertyModel()
+                {
+                    PropertyId = data.PropertyId,
+                    Title = data.Title,
+                    Description = data.Description,
+                    Location = data.Location,
+                    Address = data.Address,
+                    Country = data.Country,
+                    State = data.State,
+                    City = data.City,
+                    ZipCode = data.ZipCode,
+                    Status = (int)data.Status,
+                    PositionLat = data.PositionLat,
+                    PositionLng = data.PositionLng,
+                    Rating = data.Rating,
+                    CityName = data.City,
+                    StateName = data.Statename,
+                    CountryName = data.Countryname
+                };
+                bookingData.HiddenCheckIn = Convert.ToDateTime(@Model.CheckIn);
+                bookingData.HiddenCheckOut = Convert.ToDateTime(@Model.CheckOut);
+
+                if (bookingData.HiddenCheckIn == DateTime.MinValue)
+                {
+                    bookingData.HiddenCheckIn = DateTime.Today.AddDays(7.0);
+                }
+                if (bookingData.HiddenCheckOut == DateTime.MinValue)
+                { bookingData.HiddenCheckOut = bookingData.HiddenCheckIn.AddDays(1); }
+                if (bookingData.HiddenCheckIn > bookingData.HiddenCheckOut)
+                {
+                    DateTime t = bookingData.HiddenCheckIn;
+                    bookingData.HiddenCheckIn = bookingData.HiddenCheckOut;
+                    bookingData.HiddenCheckOut = t;
+                }
+                DateTime cin, cout;
+                cin = bookingData.HiddenCheckIn;
+                cout = bookingData.HiddenCheckOut;
+
+                CLayer.SearchCriteria sc = new CLayer.SearchCriteria();
+                int tx = 0;
+                int.TryParse(bookingData.HidAdults, out tx);
+                sc.Adults = tx;
+                tx = 0;
+                int.TryParse(bookingData.HidBedrooms, out tx);
+                sc.Bedrooms = tx;
+                sc.CheckIn = bookingData.HiddenCheckIn;
+                sc.CheckOut = bookingData.HiddenCheckOut;
+                tx = 0;
+                int.TryParse(bookingData.HidChildren, out tx);
+                sc.Children = tx;
+
+                sc.Features = bookingData.features;
+                sc.RangeBudgetMax = bookingData.rangeBudgetMax;
+                sc.RangeBudgetMin = bookingData.rangeBudgetMin;
+                sc.StayTypeGroup = "";
+                tx = 0;
+                int.TryParse(bookingData.StayType, out tx);
+                sc.StayType = tx;
+
+                property.Accommodations = new StayBazar.Models.PropertyAccommmodationModel()
+                {
+                    Accommodations = BLayer.Property.GetDetailsForBooking(bookingData.PropertyId, sc)
+                    //chosen accommodations
+                };
+
+
+
+
+                // Checking Hotelid,roomid available
+
+                int InventoryAPIType = BLayer.Property.GetInventoryAPITypeId(bookingData.PropertyId);
+
+                if (InventoryAPIType != 0)
+                {
+                    //MAXIMOJO CHECKING
+                    if (bookingData.CheckIn == DateTime.MinValue)
+                    {
+                        bookingData.CheckIn = DateTime.Now.AddDays(7);
+                    }
+                    if (bookingData.CheckOut == DateTime.MinValue)
+                    {
+                        bookingData.CheckOut = bookingData.CheckIn.AddDays(1);
+                    }
+                    string HotelId = BLayer.Property.GetHotelId(bookingData.PropertyId);
+                    string QueryKey = HotelId + DateTime.Now.ToString("yyyyMMdd_hhmmsstt");
+                    string BookingSessionId = "bs_" + HotelId + DateTime.Now.ToString("yyyyMMdd_hhmmsstt");
+                    string BookingRequestId = "br_" + HotelId + DateTime.Now.ToString("yyyyMMdd_hhmmsstt");
+                    List<long> NoinvetAcc = new List<long>();
+                    if (property.Accommodations.Accommodations.Count > 0)
+                    {
+                        if (HotelId != null && HotelId != "")
+                        {
+                            HotelId = HotelId.Trim();
+
+                            //booking available
+                            List<StayBazar.Inventory.Models.MaxBookingAvailibility_Response.HotelroomsDetails> HotelRoomList = StayBazar.Inventory.MaximojoBook.BookingAvailDeserializeJsonResponse(HotelId, bookingData.CheckIn.ToString("yyyy-MM-dd"), bookingData.CheckOut.ToString("yyyy-MM-dd"), Convert.ToInt16(bookingData.Adults), Convert.ToInt16(bookingData.Children), Convert.ToInt16(bookingData.Bedrooms), QueryKey, BookingSessionId, BookingRequestId);
+
+                            //rooms only checking here
+
+                            foreach (CLayer.Accommodation acc in property.Accommodations.Accommodations)
+                            {
+                                string RoomId = BLayer.Accommodation.GetRoomId(acc.AccommodationId);
+                                if (RoomId != null && RoomId != "")
+                                {
+                                    RoomId = RoomId.Trim();
+                                    if (!HotelRoomList.Exists(a => a.roomtype_id == RoomId))
+                                    {
+                                        NoinvetAcc.Add(acc.AccommodationId);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    property.Accommodations.Accommodations.RemoveAll(ap => NoinvetAcc.Any(y => y == ap.AccommodationId));
+                }
+
+
+
+
+
+
+
+                StringBuilder strAccIds = new StringBuilder();
+                List<long> accIds = new List<long>();
+                foreach (CLayer.Accommodation acc in property.Accommodations.Accommodations)
+                {
+                    if (!accIds.Contains(acc.AccommodationId))
+                    {
+                        accIds.Add(acc.AccommodationId);
+                        strAccIds.Append(",");
+                        strAccIds.Append(acc.AccommodationId);
+                    }
+                }
+                if (strAccIds.Length > 0) strAccIds.Remove(0, 1);
+                //Get rates and availability
+                List<CLayer.Rates> rtes = new List<CLayer.Rates>();
+                if (accIds.Count > 0)
+                {
+                    rtes = BLayer.Rate.GetTotalRates(accIds, bookingData.HiddenCheckIn, bookingData.HiddenCheckOut, ((isCorp) ? CLayer.Role.Roles.Corporate : CLayer.Role.Roles.Customer), userId);
+                }
+                int cnt, idx;
+                cnt = property.Accommodations.Accommodations.Count();
+
+
+
+
+                foreach (CLayer.Rates item in rtes)
+                {
+                    for (idx = 0; idx < cnt; idx++)
+                    {
+                        if (property.Accommodations.Accommodations[idx].AccommodationId == item.AccommodationId)
+                        {
+                            property.Accommodations.Accommodations[idx].Rate = item.Amount;
+                            property.Accommodations.Accommodations[idx].GuestRate = item.GuestRate;
+                            property.Accommodations.Accommodations[idx].AccommodationCount = item.NoofAcc;
+                        }
+                    }
+                }
+                //accommodation conditions
+                List<CLayer.Condition> conds;
+
+                if (accIds.Count == 0)
+                    conds = new List<CLayer.Condition>();
+                else
+                    conds = BLayer.Condition.GetAllForAccommodations(strAccIds.ToString());
+
+                property.AccConditions = conds;
+                //load property pictures
+                property.Pictures = new StayBazar.Models.PropertyPicturesModel() { Pictures = BLayer.PropertyFiles.GetAll(data.PropertyId) };
+                property.Landmarks = new StayBazar.Models.PropertyLandmarkModel()
+                {
+                    Landmarks = BLayer.Landmarks.GetOnProperty(data.PropertyId)
+                };
+
+                property.Filter.HiddenCheckIn = bookingData.HiddenCheckIn;
+                property.Filter.HiddenCheckOut = bookingData.HiddenCheckOut;
+                property.Filter.Adults = bookingData.HidAdults;
+                property.Filter.Children = bookingData.HidChildren;
+                property.Filter.PropertyId = bookingData.PropertyId;
+                property.Filter.rangeBudgetMax = bookingData.rangeBudgetMax;
+                property.Filter.rangeBudgetMin = bookingData.rangeBudgetMin;
+                property.Filter.starRatingRange = bookingData.starRatingRange;
+                property.Filter.HidStayType = bookingData.HidStayType;
+                property.Filter.HiddenDestination = bookingData.HiddenDestination;
+                property.Filter.Location = bookingData.Location;
+                property.Filter.features = bookingData.features;
+                property.Filter.Bedrooms = bookingData.HidBedrooms;
+
+                property.Filter.Destination = bookingData.HiddenDestination;
+                property.Filter.StayType = bookingData.HidStayType;
+                property.Filter.HidAdults = bookingData.HidAdults;
+                property.Filter.HidBedrooms = bookingData.HidBedrooms;
+                property.Filter.HidChildren = bookingData.HidChildren;
+                property.Filter.CheckIn = bookingData.HiddenCheckIn;
+                property.Filter.CheckOut = bookingData.HiddenCheckOut;
+                property.Filter.PropertyId = bookingData.PropertyId;
+
+            }
+
+        }
+        return property;
+    }
+}
+<link href="~/Content/Loading/waitMe.css" rel="stylesheet" />
+<script src="~/Content/Loading/waitMe.js"></script>
+@try
+{
+    <div class="">
+        <div class="container">
+            <div class="row room-details border-radius topmargin10">
+                <div class="col-md-11">
+                    @{  long accid = 0;
+                      int Noacc = 0;
+                      int chld = 0;
+                      int adut = 0;
+                      decimal SupRate = 0;
+                      decimal Totalrate = 0;
+                      decimal taxrate = 0;
+                      decimal grandtotal = 0;
+
+                    }
+                    @if (Pmodel.Accommodations.Accommodations.Count > 0)
+                    {
+                        if (firstacc == 0) { firstacc = Pmodel.Accommodations.Accommodations[0].AccommodationId; }
+                        foreach (CLayer.Accommodation ac in Pmodel.Accommodations.Accommodations)
+                        {
+                            accid = 0;
+                            Noacc = 0;
+                            chld = 0;
+                            adut = 0;
+
+                            SupRate = 0;
+                            Totalrate = 0;
+                            taxrate = 0;
+                            grandtotal = 0;
+
+
+                            if (Model.Type == 2)
+                            {
+                                if (Model.bookingitmList != null && Model.bookingitmList.Count() > 0)
+                                {
+                                    foreach (CLayer.BookingItem accdt in Model.bookingitmList)
+                                    {
+                                        if (accdt.AccommodationId == ac.AccommodationId)
+                                        {
+                                            long IsCustomBook = BLayer.BookingItem.GetCustomBookByItemId(accdt.BookingItemId);
+
+                                            if (IsCustomBook == 1)
+                                            {
+                                                SupRate = Math.Round(accdt.TotalAmount - accdt.TotalTax - accdt.CommissionSB,0);
+                                                Totalrate = Math.Round(accdt.TotalAmount - accdt.TotalTax,0);
+                                                grandtotal = Math.Round(accdt.TotalAmount,0);
+                                                taxrate = Math.Round(accdt.TotalTax,0);
+                                            }
+
+                                            accid = accdt.AccommodationId;
+                                            Noacc = accdt.NoOfAccommodations;
+                                            chld = accdt.NoOfChildren;
+                                            if (accdt.NoOfAdults == 0) { accdt.NoOfAdults = 1; }
+                                            adut = accdt.NoOfAdults;
+                                        }
+                                    }
+                                }
+                            }
+
+
+
+                            maxGuests = ac.MaxNoOfPeople;
+                            if (maxGuests < 0) { maxGuests = 0; }
+                            avgDailyRate = Math.Round((double)ac.Rate / noOfDays);
+                            <table class="room-options fullwidth">
+                                <tbody>
+                                    <tr>
+                                        <td style="width:170px">
+                                            <div class="col-md-12">
+                                                <h4>@ac.AccommodationType</h4>
+
+                                                @{
+                            List<CLayer.AccommodationFeature> features = BLayer.AccommodationFeature.GetAllWithSelectedForAccommodation(ac.AccommodationId);
+                            foreach (CLayer.AccommodationFeature af in features)
+                            {
+                                if (af.IsUsed)
+                                {
+                                    <div class="accdtn-icon @if (af.Style != ""){ <text>@af.Style</text>  }"><label data-toggle="tooltip" title="@af.Title"></label></div>
+                                }
+                            }
+                                                }
+                                            </div>
+                                        </td>
+                                        <td class="wdt80">
+                                            <header>Max</header>
+                                            <div class="cell_fill_maxcol">
+                                                <p>
+                                                    @if (ac.MinNoOfPeople < 4)
+                                                    {
+                                                        for (int ii = 0; ii < ac.MinNoOfPeople; ii++)
+                                                        {
+                                                            <span class="fa fa-male max_adult_size"></span>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@ac.MinNoOfPeople X <span class="fa fa-male max_adult_size"></span></text>
+                                                    }
+                                                </p>
+                                                <p>
+                                                    @if (ac.MaxNoOfChildren < 4)
+                                                    {
+                                                        for (int ii = 0; ii < ac.MaxNoOfChildren; ii++)
+                                                        {
+                                                            <span class="fa fa-male max_child_size"></span>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>@ac.MaxNoOfChildren X <span class="fa fa-male max_child_size"></span></text>
+                                                    }
+                                                </p>
+                                                <p><a class="maxpinfo" href="#" data-toggle="popover" data-html="true" data-content="These are adults/children limits exceeding which additional guest charges will be applied "><span class="glyphicon glyphicon-info-sign"></span></a></p>
+                                            </div>
+                                        </td>
+                                        <td class="wdt80">
+                                            <header>People</header>
+                                            <div class="table-cell">
+                                                <p>
+                                                    <div style="width:100px;">Adults</div>
+                                                    <input type="hidden" id="@(ac.AccommodationId)_rate" class="cxcurinput" value="@Math.Round(ac.Rate)" />
+                                                    <input type="hidden" id="@(ac.AccommodationId)_grate" class="cxcurinput" value="@Math.Round(ac.GuestRate)" />
+                                                    <input type="hidden" id="@(ac.AccommodationId)_maxgt" value="@maxGuests" />
+                                                    <input type="hidden" id="@(ac.AccommodationId)_maxad" value="@ac.MinNoOfPeople" />
+                                                    <input type="hidden" id="@(ac.AccommodationId)_maxch" value="@ac.MaxNoOfChildren" />
+                                                    <input type="hidden" id="@(ac.AccommodationId)_total" value="0" />
+                                                    <select class="fullwidth bkpeople" id="@(ac.AccommodationId)_adults">
+                                                        @if (ac.MaxNoOfPeople != null && ac.MaxNoOfPeople != 0)
+                                                        {
+                                                            if (Model.Type == 2)
+                                                            {
+                                                                <option @if (adut == 0) { <text> selected </text>                        } value="0">0</option>
+                                                                for (int i = 1; i <= ac.MaxNoOfPeople; i++)
+                                                                {
+                                                                    <option value="@i" @if (i == adut) { <text> selected </text>                       }>@i</option>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                <option selected value="0">0</option>
+                                                                for (int i = 1; i <= ac.MaxNoOfPeople; i++)
+                                                                {
+                                                                    <option value="@i">@i</option>
+                                                                }
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="0">0</option>
+                                                        }
+                                                    </select>
+                                                    <div>Children</div>
+                                                    <select class="fullwidth bkpeople" id="@(ac.AccommodationId)_kids">
+
+                                                        @if (ac.MaxNoOfChildren != null && ac.MaxNoOfChildren != 0)
+                                                        {
+                                                            if (Model.Type == 2)
+                                                            {
+                                                                <option @if (chld == 0) { <text> selected </text>                         } value="0">0</option>
+                                                                for (int i = 1; i <= ac.MaxNoOfChildren; i++)
+                                                                {
+                                                                    <option value="@i" @if (i == chld) { <text> selected </text>                        }>@i</option>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+
+                                                                <option selected value="0">0</option>
+                                                                for (int i = 1; i <= ac.MaxNoOfChildren; i++)
+                                                                {
+                                                                    <option value="@i">@i</option>
+                                                                }
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <option selected value="0">0</option>
+                                                        }
+
+                                                    </select>
+                                                    <input type="hidden" value="0" id="@(ac.AccommodationId)_guests" />
+
+                                                </p>
+                                            </div>
+                                        </td>
+                                        <td class="wdt80">
+                                            <header>Avg Daily Rate</header>
+                                            <div class="table-cell rightalign">
+                                                <div class="fa cxprice fa-rupee" style="font-size: 23px;"><span class="cxcurele" style="font-size: 23px;">@avgDailyRate</span></div>
+                                            </div>
+                                        </td>
+                                        <td style="width:100px">
+                                            <header>No. Accommodations</header>
+                                            <div class="table-cell">
+                                                <select class="fullwidth bkacc" id="@(ac.AccommodationId)_noaccomm">
+                                                    @if (ac.AccommodationCount != null && ac.AccommodationCount != 0)
+                                                    {
+                                                        if (Model.Type == 2)
+                                                        {
+                                                            <option @if (Noacc == 0) { <text> selected </text>                         } value="0">0</option>
+                                                            for (int i = 1; i <= ac.AccommodationCount; i++)
+                                                            {
+                                                                <option value="@i" @if (i == Noacc) { <text> selected </text>                         }>@i</option>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <option selected value="0">0</option>
+                                                            for (int i = 1; i <= ac.AccommodationCount; i++)
+                                                            {
+                                                                <option value="@i">@i</option>
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <option selected value="0">0</option>
+                                                    }
+                                                </select>
+
+                                            </div>
+                                            <div class="table-cell">
+                                                <div style="margin-top:15px;">Price</div>
+                                                <div class="fa cxprice fa-rupee" style="font-size: 23px;"><span style="font-size: 23px;" id="@(ac.AccommodationId)_showr">@ac.Rate</span></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 300px">
+                                            <header>Custom Amount</header>
+                                            @*<input type="checkbox"  class="cus_amount" id="@(ac.AccommodationId)_hdnChk_CusAmunt" style=" margin-left: 5px; display:none;" />
+                                                <input type="hidden" style="display:none;"  id="@(ac.AccommodationId)_Chk_CusAmunt" value="0" />*@
+                                            @*<div id="@(ac.AccommodationId)_Cus_Amount_Div" style=" pointer-events: none;">*@
+                                            @*</div>*@
+                                            <div class="row" style=" padding-left: 5px; padding-right: 5px;">
+                                                <div class="col-xs-6">
+                                                    <label for="ex2">Supplier Rate:</label>
+                                                    <input class="form-control cus_amount" @if (SupRate > 0) { <text> value="@SupRate" </text>  } id="@(ac.AccommodationId)_cus_Supplier_amount" type="text">
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <label for="ex3">Total Amount:</label>
+                                                    <input class="form-control cus_amount" @if (Totalrate > 0) { <text> value="@Totalrate" </text>   } id="@(ac.AccommodationId)_cus_Total_amount" type="text">
+                                                </div>
+                                            </div>
+                                            <div class="row" style=" padding-left: 5px; padding-right: 5px; padding-bottom:5px;">
+                                                <div class="col-xs-8">
+                                                    <label for="ex3">Grand Total Amount(Incl. Tax):</label><br />
+                                                    <div class="fa cxprice fa-rupee blacktext">
+                                                        <span id="@(ac.AccommodationId)_cus_GrandTotal_amount">@if (grandtotal > 0){<text>@grandtotal</text>}else{<text>0</text>}
+                                                        </span>
+                                                    </div>
+                                                    <input type="hidden" id="@(ac.AccommodationId)_Cus_tax" @if (taxrate > 0) { <text> value="@taxrate" </text>    } />
+                                                </div>
+                                            </div>
+
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        }
+                    }
+                    else
+                    {
+                        <div class="row ">
+                            <div class="col-md-8 col-md-offset-2">
+                                <div class="alert alert-info"> Stay options are not available in date range and options you have selected. Please select alternate date range or options to proceed.</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            @if (Pmodel.Accommodations.Accommodations.Count > 0)
+            {
+                <form method="post" action="@Url.Action("Modifybook", "BookingofflineRequestTransactions")" id="bookAccommodationFromOffline">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="lightgreybg lightgreyborder pull-left over_div">
+                                <div class="redbg fullwidth pull-left padding10px" style="font-size: 25px;">
+                                    <div class="pull-left">
+                                        <div class="fa cxprice fa-rupee whitetext">
+                                            <span id="BookingTotal">00</span>
+                                        </div>
+                                        <p class="onwards lightgreytext"></p>
+                                    </div>
+                                    <div id="loading" class="loader" style="display:none;">
+                                        <div class="center_load">
+                                            <img src="~/images/loading.gif" width="30" height="30" />
+                                        </div>
+                                    </div>
+
+                                    <div class="pull-right bookdiv">
+                                        <input type="hidden" id="BookingId_OffLine" name="BookingId_OffLine" value="@Model.BookingId" />
+                                        <input type="hidden" id="BookingUserId_OffLine" name="BookingUserId_OffLine" value="@Model.CustomerId" />
+
+                                        <input type="hidden" id="BookingData" name="BookingData" />
+                                        <input type="hidden" id="PropertyId" name="PropertyId" value="@Model.PropertyId" />
+                                        <input type="hidden" id="BookCheckIn" name="BookCheckIn" value="@if ( Model.CheckIn != null && Model.CheckIn != "") { <text> @Model.CheckIn </text>     } else { <text> @Pmodel.Filter.HiddenCheckIn </text> } " />
+                                        <input type="hidden" id="BookCheckOut" name="BookCheckOut" value="@if ( Model.CheckOut != null && Model.CheckOut != "") { <text> @Model.CheckOut </text>     } else { <text> @Pmodel.Filter.HiddenCheckOut </text> } " />
+                                    </div>
+                                </div>
+
+                                <div class="padding10px pull-left fullwidth" style="font-size: 12px;">
+                                    <div class="col-xs-12 col-md-12 whitebg lightgreyborder">
+                                        <div class="col-xs-6 col-md-6 checkin">
+                                            <span>Check in</span>
+                                            <div>
+                                                <input type="text" readonly="readonly" id="start" @if (Model.CheckIn != null && Model.CheckIn != "") {  <text> value="@Model.CheckIn" </text>                                         } placeholder="Check In">
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-md-6 checkout">
+                                            <span>Check out</span>
+                                            <div>
+                                                <input type="text" readonly="readonly" id="end" @if (Model.CheckOut != null && Model.CheckOut != "") {  <text> value="@Model.CheckOut" </text>                                          } placeholder="Check Out">
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-12 col-md-12 text-center padding10px">
+                                            <button type="button" id="confirmdatebutton" class="btn btn-default" onclick="reviseDates()">Confirm dates</button>
+                                            <button type="button" id="revisedatebuttton" class="btn btn-default">Revise dates</button>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:20px">
+                        <div class="col-md-12">
+                            <input id="property_booknow" onclick="bookAccommodationFromOffline()" type="button" class="btn btn-success" value="Modify" />
+                            <a href="~/Admin/BookingofflineRequestTransactions" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+
+    <div id="Bookingavailablecheckalert" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="width:34%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Not available</h4>
+                </div>
+                <div id="maximojo" class="modal-body">
+                    <h5 class="redtext" id="alertfrombookcheck"> </h5>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Ok</button></div>
+            </div>
+        </div>
+    </div>
+    <script type='text/javascript'>
+        $(window).resize(function () {
+            imgadj();
+        });
+
+        imgadj();
+
+        function imgadj() {
+
+            $(".img-thumb").each(function () {
+                var refH = $(this).height();
+                var refW = $(this).width();
+                var refRatio = refW / refH;
+                var imgH = $(this).children("img").height();
+                var imgW = $(this).children("img").width();
+
+                if ((imgW / imgH) < refRatio) {
+                    $(this).addClass("portrait");
+                } else {
+                    $(this).addClass("landscape");
+                }
+            })
+        }
+    </script>
+    <script type='text/javascript'>
+        for (i = 0; i <= $('.carousel-inner').children().length; i++) {
+            $(".carousel-inner div:nth-child(" + i + ")").attr('data-slide-number', i);
+            $("#slider-thumbs ul li:nth-child(" + i + ")").attr('id', 'carousel-selector-' + i + '');
+        }
+
+        $('#gallery').carousel({
+            interval: 4000
+        });
+
+        function thumbactive() {
+            var id = $('.item.active').data('slide-number');
+            id = parseInt(id);
+            $('[id^=carousel-selector-]').removeClass('selected');
+            $('[id^=carousel-selector-' + id + ']').addClass('selected');
+        }
+
+        thumbactive(); //To initialize the active thumbnail
+
+        // when the carousel slides, auto update
+        $('#gallery').on('slid.bs.carousel', function (e) {
+            thumbactive();
+        });
+
+        // handles the carousel thumbnails
+        $('[id^=carousel-selector-]').click(function () {
+            var id_selector = $(this).attr("id");
+            var id = id_selector.substr(id_selector.length - 1);
+            id = parseInt(id);
+            $('#gallery').carousel(id - 1);
+            $('[id^=carousel-selector-]').removeClass('selected');
+            $(this).addClass('selected');
+        });
+    </script>
+    <script type='text/javascript'>
+        $('td .styleselect2').on('change', function () {
+            $(this).parents("td").find(".person").remove();
+            for (i = 0; i < $(this).val() ; i++) {
+                $(this).parents("td").find(".persons").append("<div class='person'></div>")
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        function gallery(id) {
+            $.get('@(Url.Action("GetAccommodation", "Property"))?id=' + id, function (data) {
+                if (data != null) {
+                    $("#galleryData").html(data);
+                    $("#accommodationGallery").modal('show');
+                }
+            });
+        }
+    </script>
+    <script>
+        function setCalendar() {
+
+            var now = new Date();
+            now.setDate(now.getDate() + 7);
+
+            var checkin = $('#start').datepicker(
+                {
+                    minDate: $("#hiddenmindate").val(),
+                    defaultDate: now,
+                    numberOfMonths: 2,
+                    dateFormat: "dd/mm/yy"
+                });
+            now.setDate(now.getDate() + 2);
+            var checkout = $('#end').datepicker({
+                minDate: 2,
+                numberOfMonths: 2,
+                defaultDate: now,
+                dateFormat: "dd/mm/yy"
+            });
+        }
+        $(function () {
+            $("#start").change(function () {
+                var v = $(this).val().trim();
+
+                var curDate = new Date();
+                curDate.setDate(curDate.getDate() + 1);
+                var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+                curDate.setDate(curDate.getDate() + 2);
+                var odat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+
+                if (checkDate(v)) {
+                    re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                    if (regs = v.match(re)) {
+                        var day, mnt, yr;
+                        yr = parseInt(regs[3]);
+                        mnt = parseInt(regs[2]);
+                        dy = parseInt(regs[1]);
+                        if (mnt > 0) mnt = mnt - 1;
+                        var cd = new Date(Date.UTC(yr, mnt, dy));
+                        cd.setDate(cd.getDate() + 2);
+                        var mn = cd.getMonth() + 1; //parseInt(cd.getMonth()) + 1;
+                        var chgDt = pad(cd.getDate(), 2) + "/" + pad(mn, 2) + "/" + cd.getFullYear();
+                        // alert(chgDt);
+                        var cs = new Date(Date.UTC(yr, mnt, dy));
+                        var mind = new Date(Date.UTC(yr, mnt, dy));
+                        mind.setDate(mind.getDate() + 1);
+                        var mindx = pad(mind.getDate(), 2) + "/" + pad(parseInt(mind.getMonth()) + 1, 2) + "/" + mind.getFullYear();
+                        var xo = $("#end").val();
+                        //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                        if (checkDate(xo)) {
+                            if (regss = xo.match(re)) {
+                                yr = parseInt(regss[3]);
+                                mnt = parseInt(regss[2]);
+                                dy = parseInt(regss[1]);
+                                if (mnt > 0) mnt = mnt - 1;
+                                var co = new Date(Date.UTC(yr, mnt, dy));
+                                if (co <= cs) {
+                                    $("#end").val(chgDt);
+                                    // $("#CheckOut").datepicker("option", "setDate", cd);
+                                }
+                            }
+                            else {
+                                // $("#CheckOut").datepicker("option", "setDate", cd);
+                                $("#end").val(chgDt);
+                            }
+                        }
+                        else {
+                            // $("#CheckOut").datepicker("option", "setDate", cd);
+                            $("#end").val(chgDt);
+                        }
+                        //checkout.minDate = n;
+                        $("#end").datepicker("option", "minDate", mindx);
+                        //$("#CheckOut").datepicker("show");
+                    }
+                    else { $("#start").val(idat); $("#end").val(odat); }
+                }
+                else { $("#start").val(idat); $("#end").val(odat); }
+            });
+        });
+
+      
+        $(function () {
+            $(".bkpeople").change(function () {
+                var ids = $(this).attr("id");
+                var aid = getId(ids);
+                calcBkTotal(aid);
+            });
+            $(".cus_amount").change(function () {
+                var ids = $(this).attr("id");
+                var aid = getId(ids);
+
+                //calculate grand total amount
+                var elem = "#" + aid + "_";
+                var cus_Supplier_amount = $(elem + "cus_Supplier_amount").val();
+                var cus_Total_amount = $(elem + "cus_Total_amount").val();
+                var Taxamunt = $(elem + "Cus_tax").val();
+
+                if (Number(cus_Supplier_amount) > 0 && Number(cus_Total_amount) > 0) {
+                    Taxamunt = ( (Number(cus_Total_amount) * @tax)/100)
+                    $(elem + "Cus_tax").val(Taxamunt);
+
+                    var cus_GrandTotal_amount = Number(cus_Total_amount) + Number(Taxamunt);
+                    $(elem + "cus_GrandTotal_amount").html(Math.round(cus_GrandTotal_amount));
+                }
+                else {
+                    if (Number(cus_Supplier_amount) > 0) {
+                        $(elem + "cus_GrandTotal_amount").html(cus_Supplier_amount);
+                    }
+                    else {
+                        $(elem + "cus_GrandTotal_amount").html(cus_Total_amount);
+                    }
+                }
+
+
+                if (Number(cus_Supplier_amount) == 0 && Number(cus_Total_amount) == 0) {
+                    
+                    $(elem + "cus_GrandTotal_amount").html(0);
+                }
+                AddData(aid);
+                calcBkTotal(aid);
+                //var elem = "#" + aid + "_";
+                //var hdnchkvalue = $(elem + "Chk_CusAmunt").val();
+                //if (hdnchkvalue == 0) {
+                //    $(elem + "Chk_CusAmunt").val(1);
+                //}
+                //else {
+                //    $(elem + "Chk_CusAmunt").val(0);
+                //}
+
+                //if ($(elem + "Chk_CusAmunt").val() == 1) {
+                //    $(elem + "Cus_Amount_Div").css({ 'pointer-events': "all" });
+                //}
+                //else {
+                //    $(elem + "Cus_Amount_Div").css({ 'pointer-events': "none" });
+                //}
+            });
+
+
+            $(".bkacc").change(function () {
+                var ids = $(this).attr("id");
+                var aid = getId(ids);
+                var elem = "#" + aid + "_";
+                var rooms = $(elem + "noaccomm").val();
+                if (rooms < 1) rooms = 1;
+                var gmax = $(elem + "maxgt").val();
+                var gs = "";
+                var cur = 0;
+                mx = rooms * gmax;
+                cur = $(elem + "adults").val();
+                for (i = 1; i <= mx; i++) {
+                    gs = gs + "<option value='" + i + "' ";
+                    if (i == 0) gs = gs + " selected ";
+                    gs = gs + ">" + i + "</option>";
+                }
+                $(elem + "adults").html(gs);
+                if (cur > mx) {
+                    cur = $("#Adults").val();
+                }
+                $(elem + "adults").val(cur);
+                gs = "";
+                mx = rooms * gmax;
+                cur = $(elem + "kids").val();
+                for (i = 0; i <= mx; i++) {
+                    gs = gs + "<option value='" + i + "' ";
+                    if (i == 0) gs = gs + " selected ";
+                    gs = gs + ">" + i + "</option>";
+                }
+                $(elem + "kids").html(gs);
+                if (cur > mx) {
+                    cur = $("#Children").val();
+                }
+                $(elem + "kids").val(cur);
+                calcBkTotal(aid);
+            });
+
+            $(".bkacc").change();
+            $(".backtosearch").click(function () { gotoSearch(); });
+        });
+        function calcBkTotal(aid) {
+
+            var elem = "#" + aid;
+
+            var rooms = $(elem + "_noaccomm").val();
+            if (rooms < 1) rooms = 1;
+
+            var rt = $(elem + "_rate").val();
+            var grt = $(elem + "_grate").val();
+            if (rt < 0) rt = 0;
+            if (grt < 0) grt = 0;
+            var gmax = $(elem + "_maxgt").val();
+            var pv = $(elem + "_adults").val();
+            var px = $(elem + "_maxad").val();
+            var guests = 0;
+            //  alert('adult pv px ' + pv + ' ' + px);
+            px = px * rooms;
+            if (pv > px) guests = guests + (pv - px);
+            pv = $(elem + "_kids").val();
+            px = $(elem + "_maxch").val();
+            px = px * rooms;
+            if (pv > px) guests = guests + (pv - px);
+            //  alert('child pv px ' + pv + ' ' + px);
+            // = $(elem + "_guests").val();
+            $(elem + "_guests").val(guests);
+
+            var total = (guests * grt) + (rooms * rt);
+            $(elem + "_showr").html(htmlCurr(total));
+            $(elem + "_total").val(total);
+            var gtotal = 0;
+            var Cus_gtotal = 0;
+            $(".bkacc").each(function () {
+                var id = getId($(this).attr("id"));
+                if (parseInt($(this).val()) > 0) {
+                    var TAmt = 0;
+                    if( Number($("#" + id + "_cus_GrandTotal_amount").html()) > 0)
+                    {
+                        gtotal = parseFloat(gtotal) + Number($("#" + id + "_cus_GrandTotal_amount").html());
+                    }
+                    else
+                    { 
+                        gtotal = parseFloat(gtotal) + parseFloat($("#" + id + "_total").val());
+                    }
+                }
+            });
+
+            $("#BookingTotal").html(htmlCurr(gtotal));
+            AddData(aid);
+        }
+
+        function htmlCurr(val) {
+
+            return Math.round(val) + "";
+        }
+        function getId(idname) {
+            var idx = idname.indexOf("_");
+            if (idx < 0) return "";
+            return idname.substr(0, idx);
+        }
+        function AddData(aid) {
+            var bd = $("#BookingData").val();
+
+            var elem = "#" + aid + "_";
+            if (bd != "") {
+                var dt = bd.split("#");
+                if (dt.length > 0) {
+                    var len = dt.length;
+                    var bt;
+                    var found = false;
+                    bd = "";
+                    for (i = 0; i < len; i++) {
+                        bt = dt[i].split(",");
+                        if (bt.length ==9) {
+                            if (bt[0] == aid) {
+                                bd = bd + "#" + makeData(aid);
+                                found = true;
+                            } else {
+                                bd = bd + "#" + dt[i];
+                            }
+                        }
+                    }
+                    if (!found) {
+                        bd = bd + "#" + makeData(aid);
+                    }
+                }
+            }
+            else { bd = makeData(aid); }
+            $("#BookingData").val(bd);
+        }
+        function makeData(aid) {
+            var elem = "#" + aid + "_";
+            var guests = 0;
+            var ad = $(elem + "adults").val();
+            var ch = $(elem + "kids").val();
+            var apx = $(elem + "maxad").val();
+            var cpx = $(elem + "maxch").val();
+            var rooms = $(elem + "noaccomm").val();
+
+
+            var cus_Supplier_amount = $(elem + "cus_Supplier_amount").val();
+            var cus_Total_amount = $(elem + "cus_Total_amount").val();
+            var cus_GrandTotal_amount = $(elem + "cus_GrandTotal_amount").html();
+            var Cus_tax =  $(elem + "Cus_tax").val();
+
+            apx = apx * rooms;
+            cpx = cpx * rooms;
+            if (ad > apx) { guests = guests + (ad - apx); ad = apx; }
+            if (ch > cpx) { guests = guests + (ch - cpx); ch = cpx; }
+
+            return "" + aid + "," + $(elem + "noaccomm").val() + "," + ad + "," + ch + "," + guests + "," + cus_Supplier_amount + "," + cus_Total_amount + "," + Cus_tax + "," + cus_GrandTotal_amount;
+        }
+
+        function reviseDates() {
+
+            $('#BookCheckIn').val($("#start").val())
+            $('#BookCheckOut').val($("#end").val())
+
+            $.get("/BookingofflineRequestTransactions/GetAccommodationList?Pid=" + $("#PropertyId").val() + "&BId=" + $("#BookingId").val() + "&CusId=" + $("#CustomerId").val() + "&ChIn=" + $("#BookCheckIn").val() + "&Chout=" + $("#BookCheckOut").val(), function (data) {
+                if (data != "") {
+                    $('#Booking_Acc_Details').empty();
+                    $('#Booking_Acc_Details').append(data);
+                }
+            });
+
+
+            $("#revisedatebuttton").show();
+            $("#confirmdatebutton").hide();
+
+            $('#start').attr("readonly");
+            $('#end').attr("readonly");
+            $("#start").addClass("greybgc");
+            $("#end").addClass("greybgc");
+
+
+
+        }
+        function bookAccommodationFromOffline() {
+
+            if ($("#BookingTotal").html() == "0") {
+                $("#alertfrombookcheck").html('You need to make your accomodation selections  to proceed');
+                $("#Bookingavailablecheckalert").modal('show');
+            }
+            else {
+
+                $.cookie("BookingData", $("#BookingData").val(), { path: '/' });
+                $.cookie("BookCheckIn", $("#BookCheckIn").val(), { path: '/' });
+                $.cookie("BookCheckOut", $("#BookCheckOut").val(), { path: '/' });
+
+                $("#bookAccommodationFromOffline").submit();
+            }
+
+            @*if($("#BookingTotal").html() == "0")
+            {
+                $("#alertfrombookcheck").html('You need to make your accomodation selections  to proceed');
+                $("#Bookingavailablecheckalert").modal('show');
+
+            }
+            else
+            {
+                document.getElementById('loading').style.display='block';
+
+                var url = "@Url.Action("CheckAccommodationAvailable", "Property")";
+
+                $.get(url,{PropertyId: @PropertyId, BookingData: $("#BookingData").val(),CheckIn :$("#BookCheckIn").val(),CheckOut : $("#BookCheckOut").val()}, function (data) {
+
+                    document.getElementById('loading').style.display='none';
+                    if(data == "true")
+                    {
+                        $.cookie("BookingData",$("#BookingData").val(), { path: '/' });
+                        $.cookie("BookCheckIn",$("#BookCheckIn").val(), { path: '/' });
+                        $.cookie("BookCheckOut",$("#BookCheckOut").val(), { path: '/' });
+
+                        $( "#BookAccommodation" ).submit();
+                    }
+                    else
+                    {
+                        $("#alertfrombookcheck").html(data);
+                        $("#Bookingavailablecheckalert").modal('show');
+                    }
+                });
+            }*@
+        }
+
+        function pad(num, size) {
+            var s = num + "";
+            while (s.length < size) s = "0" + s;
+            return s;
+        }
+        function checkDate(field) {
+            var allowBlank = true; var minYear = 2014; var maxYear = (new Date()).getFullYear() + 1;
+            // regular expression to match required date format
+            re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            if (field != '') {
+                if (regs = field.match(re)) {
+                    if (regs[1] < 1 || regs[1] > 31)
+                    { return false; }
+                    else if (regs[2] < 1 || regs[2] > 12)
+                    { return false; }
+                    else if (regs[3] < minYear || regs[3] > maxYear)
+                    { return false; }
+                } else { return false; }
+            } else { return false; }
+            return true;
+        }
+        function daydiff(first, second) {
+            return (second - first) / (1000 * 60 * 60 * 24);
+        }
+
+        function valdInOutDates() {
+            var v = $("#start").val().trim();
+            if (checkDate(v)) {
+                re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                if (regs = v.match(re)) {
+                    var cs = new Date(regs[3], regs[2], regs[1]);
+                    var xo = $("#end").val();
+                    //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                    if (checkDate(xo)) {
+                        if (regss = xo.match(re)) {
+                            var co = new Date(regss[3], regss[2], regss[1]);
+                            if (co <= cs) {
+                                alert('Please enter a checkout date which falls after checkin date');
+                                $("#end").focus();
+                                return false;
+                            }
+                        }
+                        else {
+                            alert('Invalid Check Out date');
+                            $("#end").focus();
+                            return false;
+                        }
+                    }
+                    else {
+                        alert('Invalid Check Out date');
+                        $("#end").focus();
+                        return false;
+                    }
+                }
+                else {
+                    alert('Invalid Check In date');
+                    $("#start").focus();
+                    return false;
+                }
+            } else {
+                alert('Invalid Check In date');
+                $("#start").focus();
+                return false;
+            }
+            return true;
+        }
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip({ 'placement': 'top' });
+        });
+        $('#policytooltip').popover({ trigger: "hover" });
+        $(".maxpinfo").popover({ trigger: "hover" });
+        $("#revisedatebuttton").click(function () {
+            $("#confirmdatebutton").show();
+            $("#revisedatebuttton").hide();
+            $('#start').removeAttr("readonly");
+            $('#end').removeAttr("readonly");
+            $("#start").removeClass("greybgc");
+            $("#end").removeClass("greybgc");
+            setCalendar();
+            $("#start").focus(); //datepicker('show');
+        })
+        $("#confirmdatebutton").hide();
+        $("#start").addClass("greybgc");
+        $("#end").addClass("greybgc");
+    </script>
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+   
+}

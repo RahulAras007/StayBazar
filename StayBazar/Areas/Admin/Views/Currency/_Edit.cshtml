@@ -1,0 +1,88 @@
+﻿@model StayBazar.Areas.Admin.Models.CurrencyModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Edit", "Currency"))
+{
+    @*<h2>Currency</h2>*@
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @*<div class="incontainer">
+        <div class="row">
+            <div class=" col-lg-12">
+                <div class="row">
+                    <div class=" col-lg-4">
+                        <div class="form-group">*@
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-1">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        <div class="col-md-1">
+            @Html.LabelFor(m => m.Title)<span style="color:red">*</span>
+            @Html.TextBoxFor(m => m.Title, new { @tabindex = "1", @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.Title)
+        </div>
+        @*<div class="form-group">*@
+        <div class="col-md-2">
+            @Html.LabelFor(m => m.Symbol)<span style="color:red">*</span>
+            @Html.TextBoxFor(m => m.Symbol, new { @tabindex = "2", @class = "form-control input-sm" })
+        </div>
+
+    
+    @*<div class=" col-lg-4">
+        <div class="form-group">*@
+    <div class="col-md-2">
+        @Html.LabelFor(m => m.ConversionRate)<span style="color:red">*</span>
+        @Html.TextBoxFor(m => m.ConversionRate, new { @tabindex = "3", @class = "form-control input-sm" })
+        @Html.ValidationMessageFor(m => m.ConversionRate)
+    </div>
+    @*<div class="form-group">
+            @Html.LabelFor(m => m.ConversionPercentage)<span style="color:red">*</span>
+            @Html.TextBoxFor(m => m.ConversionPercentage, new { @tabindex = "3", @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.ConversionPercentage)
+        </div>*@
+    @*<div class="form-group">*@
+    <div class="col-md-2">
+        @Html.LabelFor(m => m.Exchangecode)<span style="color:red">*</span>
+        @Html.TextBoxFor(m => m.Exchangecode, new { @tabindex = "3", @class = "form-control input-sm" })
+        @Html.ValidationMessageFor(m => m.Exchangecode)
+    </div>
+    @*</div>*@
+
+    @*<div class=" col-lg-4">*@
+
+    @*<div class="form-group">
+            @Html.CheckBoxFor(m => m.IsDefault, new { @tabindex = "4" })
+            @Html.LabelFor(m => m.IsDefault)
+        </div>*@
+    @*<div class="form-group">*@
+    <div class="col-md-2">
+        @Html.LabelFor(m => m.Status)<span style="color:red">*</span>
+        @Html.DropDownListFor(m => m.Status, Model.StatusList, new { @tabindex = "5", @class = "form-control input-sm" })
+    </div>
+        <br />
+        <br />
+    <div class="col-md-2">
+        <div class="btn-toolbar">
+            <div class="btn-group">
+                <input type="submit" id="btnSave" value="Save" class="btn btn-default" tabindex="6" />
+                <a href="~/Admin/Currency" id="btnReset" class="btn btn-danger" tabindex="7">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+    <br />
+    @*</div>
+    </div>*@
+    <div class="container-fluid">
+        @Html.HiddenFor(m => m.CurrencyId)
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#Title").focus();
+        });
+    </script>
+}
+

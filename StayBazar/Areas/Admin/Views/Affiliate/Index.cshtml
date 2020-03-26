@@ -1,0 +1,101 @@
+﻿@model StayBazar.Areas.Admin.Models.UserSearchModel
+@{
+    ViewBag.Title = "Affiliates";
+
+}
+@*<div class="row">*@
+@*<div class="col-md-10">*@
+
+@*</div>
+    <div class="col-md-2">
+        <div class="height10px"></div><a href="/Join/Affiliates" title="Add New" class="create_new">Add New</a>
+    </div>*@
+@*</div>*@
+
+
+<div class="page-title-container style3">
+   @* <div class="container">*@
+        
+            <div class="row">
+                <div class="col-md-2">
+                    <h2 style="color:white">@ViewBag.Title</h2>
+                </div>
+
+                @using (Html.BeginForm("Filter", "Affiliate", FormMethod.Post, new { @id = "frmFilters", onsubmit = "return false;" }))
+                {
+
+
+                        <div class="col-md-2">
+                            @Html.DropDownListFor(m => m.Status, Model.StatusTypes, new { @tabindex = "1", @class = "form-control" })
+                        </div>
+                        <div class="col-md-3">
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                            <span class="input-group-btn">
+                                <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </span>
+                        </div>
+                        </div>
+                    <div class="col-md-5">
+                        <div class="form-control">
+                            @foreach (StayBazar.Areas.Admin.Models.UserSearchModel.AffiliateValues ruv in (StayBazar.Areas.Admin.Models.UserSearchModel.AffiliateValues[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.UserSearchModel.AffiliateValues)))
+                            {
+                                <input type="radio" name="ruv" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text> } />
+                                <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                                <text>&nbsp;&nbsp;</text>
+                            }
+                        </div>
+                    </div>
+
+
+                    @Html.HiddenFor(m => m.SearchValue)
+                }
+
+                @*<hr />*@
+            </div>
+        
+    </div>
+@*</div>*@
+<br />
+<br />
+<br />
+<div class="container-fluid">
+    <div id="list" class="row">
+        @{
+            Html.RenderPartial("~/Areas/Admin/Views/Affiliate/List.cshtml", Model.userlist);
+        }
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        $("#Status").change(function () {
+            var url = '@Url.Action("Filter", "Affiliate")';
+            $.post(url, $("#frmFilters").serialize(),
+                    function (data) {
+                        $("#list").html(data);
+                    });
+        });
+    });
+
+    $(function () {
+        $("#SearchValue").val("1");
+        $(".css-radiobutton").change(function () {
+            $("#SearchValue").val("1");
+            $(".css-radiobutton").each(function () {
+                if (this.checked) {
+                    $("#SearchValue").val($(this).attr("id"));
+                }
+            });
+        });
+        $("#btnSearch").click(function () {
+            var url = '@Url.Action("Filter", "Affiliate")';
+            $.post(url, $("#frmFilters").serialize(),
+                    function (data) {
+                        $("#list").html(data);
+                    });
+        });
+    });
+</script>

@@ -1,0 +1,129 @@
+﻿@model StayBazar.Areas.Admin.Models.ReportForSuppliersRegistrationModel
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("Filter", "ReportForSuppliersRegistration", FormMethod.Post, new { @id = "frmFiltersForSuppliersRegistration" }))
+        {
+            <div class="row">
+                <div class="col-md-3" style="width: 142px;">
+                    @*<br />
+                    <div class="form-control">
+                       @foreach (StayBazar.Areas.Admin.Models.ReportForSuppliersRegistrationModel.SupplierSearchValue ruv in (StayBazar.Areas.Admin.Models.ReportForSuppliersRegistrationModel.SupplierSearchValue[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.ReportForSuppliersRegistrationModel.SupplierSearchValue)))
+                             {
+    <input type="radio" name="ruv" class="css-radiobuttonSuppliersRegistration" id="@((int)ruv)" @if ((int)ruv == 1) { <text> </text>     } />
+                            <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                            <text></text>
+                        }
+                    </div>*@
+                    @Html.TextBoxFor(m => m.FromDate, "{0:dd/MM/yyyy}", new { @class = "form-control ", Title = " Date" })
+                </div>
+                <div class="col-md-3" style="width: 180px;">
+                    
+                    <div class="input-group ">
+@Html.TextBoxFor(m => m.ToDate, "{0:dd/MM/yyyy}", new { @class = "form-control ", Title = " Date" })
+                         <span class="input-group-btn">
+                <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </span>
+        </div>
+                </div>
+                    <div class="col-md-3 exporticons">
+                        <a title="Print" href="#" onclick="printDoc()" id="btnNextClick" class="fa fa-print white-color fa-2x" tabindex="6"> </a>
+                        <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6"></a>
+                        <a title="Export" href="#" onclick="Export()" id="btnNextClick" class="fa fa-file-excel-o" tabindex="6"></a>
+                    </div>
+                <div class="col-md-3"></div>
+            </div>
+            @Html.HiddenFor(m => m.SearchValue)
+        }
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        //$('#ToDate').datepicker({
+        //    dateFormat: "dd/mm/yy"
+        //});
+        //$('#FromDate').datepicker({
+        //    dateFormat: "dd/mm/yy"
+        //});
+
+        $('#FromDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy"
+            });
+        $('#ToDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+                beforeShow: function () {
+                    $(this).datepicker('option', 'minDate', $('#FromDate').val());
+                    if ($('#FromDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+        //var d = new Date();
+        //$('#CurrentDate').datepicker({
+        //    format: "dd/mm/yyyy",
+        //    changeMonth: true,
+        //    changeYear: true
+        //});
+    });
+
+    $(function () {
+        $("#SearchValue").val("1");
+        $(".css-radiobuttonSuppliersRegistration").change(function () {
+            $("#SearchValue").val("1");
+            $(".css-radiobuttonSuppliersRegistration").each(function () {
+                if (this.checked) {
+                   // alert($(this).attr("id"));
+                    $("#SearchValue").val($(this).attr("id"));
+                }
+            });
+        });
+    });
+        $("#btnSearch").click(function () {
+            var url = '@Url.Action("Filter","ReportForSuppliersRegistration", new { area = "Admin" })';
+           // alert("hai");
+            $.post(url, $("#frmFiltersForSuppliersRegistration").serialize(),
+                    function (data) {
+                        $("#SuppliersRegistration").html(data);
+                    });
+        });
+    function PDF() {
+        var pSearchValue = $("#SearchValue").val();
+        var pfromdate = $("#FromDate").val();
+        var pToDate = $("#ToDate").val();
+        var pLimit = $("#Limit").val();
+        var pcurrentPage = $("#currentPage").val();
+        //alert(pSearchValue);
+        //alert(pfromdate);
+        //alert(pToDate);
+        var url = '@Url.Action("ReportPdf", "ReportForSuppliersRegistration")?' + "SearchValue=" + pSearchValue + "&" + "FromDate=" + pfromdate + "&" + "ToDate=" + pToDate + "&" +"Limit=" + pLimit + "&" + "currentPage=" + pcurrentPage;
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function Export() {
+        var pSearchValue = $("#SearchValue").val();
+        var pfromdate = $("#FromDate").val();
+        var pToDate = $("#ToDate").val();
+        var pLimit = $("#Limit").val();
+        var pcurrentPage = $("#currentPage").val();     
+        window.location = '@Url.Action("ExcelReport", "ReportForSuppliersRegistration", new { area = "Admin" })?' + "SearchValue=" + pSearchValue + "&" + "FromDate=" + pfromdate + "&" + "ToDate=" + pToDate + "&" + "Limit=" + pLimit + "&" + "currentPage=" + pcurrentPage;
+      //  window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+
+    }
+    function printDoc() {
+        var pSearchValue = $("#SearchValue").val();
+        var pfromdate = $("#FromDate").val();
+        var pToDate = $("#ToDate").val();
+        var pLimit = $("#Limit").val();
+        var pcurrentPage = $("#currentPage").val();
+        //alert(pSearchValue);
+        //alert(pfromdate);
+        //alert(pToDate);
+        var url = '@Url.Action("ReportPrint", "ReportForSuppliersRegistration")?' + "SearchValue=" + pSearchValue + "&" + "FromDate=" + pfromdate + "&" + "ToDate=" + pToDate + "&" + "Limit=" + pLimit + "&" + "currentPage=" + pcurrentPage;
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+</script>

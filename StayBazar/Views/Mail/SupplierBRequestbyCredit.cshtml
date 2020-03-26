@@ -1,0 +1,219 @@
+﻿@model StayBazar.Models.BookingModel
+@{
+    Layout = null;
+    CLayer.User supplier = BLayer.Bookings.GetSupplierDetailsAmadeus(Model.BookingId);
+    int noOfDays = 0;
+
+    CLayer.Role.Roles roleType = CLayer.Role.Roles.Customer;
+    string titleName = "";
+    long id = 0;
+    try
+    {
+
+        id = BLayer.Bookings.GetBookedByUserId(Model.BookingId);
+
+        if (id > 0)
+        {
+            roleType = BLayer.User.GetRole(id);
+            if (roleType == CLayer.Role.Roles.Agent || roleType == CLayer.Role.Roles.Corporate)
+            {
+                titleName = BLayer.B2B.GetBusinessName(id);
+            }
+            else
+            {
+                if (roleType == CLayer.Role.Roles.CorporateUser)
+                {
+                    long cid = BLayer.B2B.GetCorporateIdOfUser(id);
+                    titleName = BLayer.B2B.GetBusinessName(cid);
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        roleType = CLayer.Role.Roles.Customer;
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>BConfirmation</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <thead>
+            <tr>
+                <th style="padding-top: 2%;" colspan="2">
+                    <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                </th>
+                <th width="400" align="right" style="font-size:12px;" colspan="2">
+                    Phone: @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                    Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)<br />
+                    Toll Free Number: 1800-425- 2393
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="4" align="center">
+                    <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">BOOKING REQUEST</h5>
+                </td>
+            </tr>
+            @if (roleType == CLayer.Role.Roles.CorporateUser || roleType == CLayer.Role.Roles.Corporate)
+            {
+                <tr>
+                    @if (roleType == CLayer.Role.Roles.Agent)
+                    {
+                        <td colspan="2" align="left">Travel Agent Booking - @titleName</td>
+                    }
+                    else
+                    {
+                        <td colspan="2" align="left">Corporate Booking - @titleName</td>}
+                    <td colspan="2" align="center">
+                        &nbsp;
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td colspan="4">
+                    <p style="line-height: 35px; font-size: 12px; color: #666;">
+                        Attn: @supplier.Businessname,<br />
+                        A booking request has been received by us from our customer for your property, details of which are given below.Please check and confirm availability of the same immediately:
+                    </p>
+                </td>
+            </tr>
+
+
+
+            <tr>
+                <td colspan="2"><h5 style="font-size: 12px; margin: 10px 0px; display: inline-block;">Enquiry Details:</h5></td>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+
+
+
+
+            <tr>
+                <td align="left" colspan="4" style="font-size:14px;">
+
+                    <table width="100%" cellpadding="5" border="1" cellspacing="0" title="Booking and Payment Details">
+                        <thead>
+                            <tr>
+                                <td colspan="7">
+                                    @Model.OrderedBy.PropertyTitle ,
+
+                                    @{
+                                        List<CLayer.Address> addrssprList = new List<CLayer.Address>();
+
+                                        int addressCount = 0;
+                                    }
+                                    @if (Model.OrderedBy.PropertyId > 0)
+                                    {
+                                        addrssprList = BLayer.Bookings.GetpropertyAddress(Model.OrderedBy.PropertyId);
+                                        addressCount = addrssprList.Count;
+                                        if (addressCount > 0)
+                                        {
+                                            <text>
+                                                @addrssprList[0].City
+                                            </text>
+                                        }
+                                    }
+                                </td>
+
+                            </tr>
+                            <tr style="background-color: #a51e22;color:white; height:30px; font-size:12px;">
+                                <th style="background-color: #a51e22; padding: 10px;">Stay Category</th>
+                                <th>Accommodation Type</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                                <th>Quantity</th>
+                                <th style="padding-right: 5px;">No. of nights</th>
+                                @*<th>Value Payable</th>*@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (CLayer.BookingItem item in Model.Items)
+                            {
+                                //var valuepayable = (Math.Round(item.TotalAmount)) - (Math.Round(item.CommissionSB)) + (Math.Round(item.TotalCommissionforother));
+                                var valuepayable = Math.Round(item.Amount);//) - (Math.Round(item.CommissionSB)) + (Math.Round(item.CorporateDiscountAmount));
+                                if (noOfDays == 0) { noOfDays = (item.CheckOut - item.CheckIn).Days; }
+                                <tr style="font-size: 12px; height: 35px;">
+                                    <td style="padding: 10px;">@item.StayCategoryT</td>
+                                    <td>@item.AccommodationTypeT</td>
+                                    <td>@item.CheckIn.ToShortDateString()</td>
+                                    <td>@item.CheckOut.ToShortDateString()</td>
+                                    <td>@item.NoOfAccommodations</td>
+                                    <td>@(noOfDays)</td>
+                                    @*<td>@valuepayable</td>*@
+                                </tr>
+                                <tr style="font-size: 12px; height: 30px; border-bottom: 1px solid #CCC;">
+                                    <td colspan="7">
+                                        Adults: @if (item.NoOfAdults > 0)
+                                        { @item.NoOfAdults }
+                                        else
+                                        {<text>None</text>},
+                                        Children: @if (item.NoOfChildren > 0)
+                                        { @item.NoOfChildren }
+                                        else
+                                        {<text>None</text>},
+                                        Additional Guests: @if (item.NoOfGuests > 0)
+                                        { @item.NoOfGuests }
+                                        else
+                                        {<text>None</text>}
+                                    </td>
+
+                                </tr>
+                                <tr style="font-size: 12px; height: 30px; border-bottom: 1px solid #CCC;">
+                                    <td colspan="7">
+                                        Guest Name: @Model.OrderedBy.Firstname
+                                    </td>
+                                </tr>
+
+
+                            }
+                        </tbody>
+                    </table>
+
+
+                </td>
+            </tr>
+
+            <tr>
+                <td align="center" colspan="4">
+                    <p style="margin-top: 20px; margin-bottom: 10px;font-size:12px;">
+                        This booking will be governed by the terms and conditions given in below link.<br />
+                        <a href="https://www.staybazar.com/Home/TermsOfUse">Terms & Conditions</a>
+                        | <a href="https://www.staybazar.com/Home/Privacy">Privacy Policy</a>
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td align="center" colspan="4">
+                    <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px;">
+                        Access your supplier account online for additional information on booking
+                    </p>
+                    <p style="font-size:14px;">
+                        Please call us  on clarifications at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                    </p>
+                    <p style="font-size:14px;">
+                        Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                    </p>
+                    <p style="font-size:14px;">
+                        www.staybazar.com
+                    </p>
+                    <p style="font-size:14px;">
+                        @*<strong>Address:</strong>   No. 38-A, 2nd Avenue, Shubh Enclave, Haralur Road,  Bangalore 560102, Karnataka*@
+                        <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                        <span style="font-weight:bold;">Phone: </span>080-2572-2898 / 4091 - 6686
+                    </p>
+                </td>
+            </tr>
+        </tfoot>
+
+    </table>
+</body>
+</html>

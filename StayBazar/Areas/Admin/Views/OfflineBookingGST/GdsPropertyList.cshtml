@@ -1,0 +1,170 @@
+﻿@model List<CLayer.SearchResult>
+@{ Layout = null; }
+<div class="col-md-12 col-sm-12 col-xs-12">
+
+    <div id="divpro">
+
+    </div>
+    @if (Model.Count > 0)
+    {
+        @*<h4> List Of Properties for @Model[0].BusinessName</h4>*@
+
+        <div class="height-popup">
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th>Property Name</th>
+                        <th>City</th>
+                        <th>Amount</th>
+                        <th>Choose</th>
+                        @*<th>Supplier Name</th>*@
+                        @*<th style="display:none;">email</th>
+                        <th style="display:none;">address</th>
+                        <th style="display:none;">FirstName</th>
+                        <th style="display:none;">Mobile</th>
+                        <th style="display:none;">ccountry,state,city</th>
+                        <th>
+
+                        </th>*@
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (CLayer.SearchResult item in Model)
+                    {
+                        var propertyid = item.PropertyId;
+                        var city ="'"+ item.City +"'";
+                        <tr>
+                            <td><span id="proname_@item.PropertyId">@item.Title</span></td>
+                            <td>@item.City</td>
+                            <td>@Math.Round(item.Amount, 0)</td>
+                            @*<td>@item.BusinessName</td>*@
+                            <td style="display:none;"><span id="proemail_@item.PropertyId">@Math.Round(item.Amount, 0)</span></td>
+                            <td style="display:none;"><span id="proAddress_@item.PropertyId">@item.HotelID</span></td>
+                            <td style="display:none;"><span id="prosupname_@item.PropertyId">@item.Location</span></td>
+                            <td style="display:none;"><span id="promobile_@item.PropertyId">@item.PropertyId</span></td>
+
+                            <td style="display:none;"><span id="promobile_@item.PropertyId">@item.StarRate</span></td>
+                            <td style="display:none;"><span id="promobile_@item.PropertyId">@item.State</span></td>
+                            <td style="display:none;"><span id="promobile_@item.PropertyId">@item.Country</span></td>
+                            <td style="display:none;"><span id="promobile_@item.PropertyId">@item.Pincode</span></td>
+                            <td style="display:none;"><span id="promobile_@item.PropertyId">@item.PropertyCount</span></td>
+                            <td style="display:none;"><span id="promobile_@item.PropertyId">@item.Avail</span></td>
+                           
+                            <td><a href="#" onclick="proSelectedgds(@propertyid,@city)">Choose</a></td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        if (ViewBag.ErrorMessage != null && ViewBag.ErrorMessage != "")
+        {
+            <div class="alert alert-info" role="alert">No matching data found.</div>
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">Please search by property,city,location,supplier name </div>
+        }
+    }
+</div>
+
+<div class="modal fade" id="chooseGDSProperty" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:894px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>*@
+                <h4 class="modal-title" id="myModalLabel">Choose Room Type</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                 
+                    <div class="col-lg-12" id="GDSRoomTypeList">
+                    
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="ClosechooseGDSProperty()" id="chooseGDSPropertyCLose" class="btn btn-default" >Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="loadingPropertyList">
+    <div class="center_load">
+        <img src="~/images/loading.gif" width="30" height="30" />
+    </div>
+</div>
+<style>
+    #loadingPropertyList {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        position: fixed;
+        display: block;
+        opacity: 0.7;
+        background-color: #fff;
+        z-index: 99;
+        text-align: center;
+    }
+
+    #loadingPropertyList-image {
+        position: absolute;
+        top: 100px;
+        left: 240px;
+        z-index: 100;
+    }
+</style>
+<script language="javascript" type="text/javascript">
+     $(window).load(function() {
+    // $('#loading').hide();
+  });
+</script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#loadingPropertyList').hide();
+    });
+</script>
+<script>
+
+
+    function proSelectedgds(corpId, city) {
+        debugger;
+        $("#place").val(city);
+    
+   
+    $('#loadingPropertyList').show();
+        $.ajax({
+            type: "Get",
+            url: "/OfflineBookingGST/GetGDSRoomTypes",
+            data: { id:corpId, CheckIn: $("#CheckIn").val(), CheckOut: $("#CheckOut").val(),place: $("#place").val() },
+            success: function (data) {
+                $("#GDSRoomTypeList").html(data)
+                $('#chooseGDSProperty').modal('show');
+                $('#loadingPropertyList').hide();
+
+            }
+        })
+
+    }
+
+
+    function ClosechooseGDSProperty()
+    {
+        $('#chooseGDSProperty').modal('hide');
+        $("#GDSRoomTypeList").html("");
+    }
+   
+
+
+
+</script>

@@ -1,0 +1,262 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    long i = 0;
+    long total = 0;
+    decimal tt = 0;
+    decimal m = 0;
+    double TotalSBC = 0;
+    double TotalKKC = 0;
+    ViewBag.Title = "Customer Invoice Report";
+    //Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+}
+
+@*<div class="row" style="padding-left: 4%;">
+    <h2 class="bold">
+        Customer Invoice Report
+    </h2>
+</div>*@
+<input type="hidden" id="HiddenFromDate" value="@ViewBag.FromDate"/>
+<input type="hidden" id="HiddenToDate" value="@ViewBag.ToDate" />
+<input type="hidden" id="HiddenSearchString" value="@ViewBag.SearchString" />
+<div class="page-title-container style3">
+
+    <div class="row">
+
+        <div class="col-md-3">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        @*<div class="col-md-10">*@
+        @using (Html.BeginForm("Filter", "CustomerInvoiceReport", FormMethod.Post, new { @id = "CustomerInvoiceReportFilter" }))
+        {
+            @*<div class="row">*@
+            <div class="col-md-2 form-group">
+                <label>From Date</label><input type="text" id="FromDate" name="FromDate" class="form-control input-sm" />
+            </div>
+
+
+            <div class="col-md-2 form-group">
+                <label>To Date</label><input type="text" id="ToDate" name="ToDate" class="form-control input-sm" />
+            </div>
+
+            <div class="col-md-3 form-group">
+                <label>Customer Name/Email</label>
+                <input type="text" id="SearchString" name="SearchString" class="form-control input-sm" />
+            </div>
+            <br />
+            <div class="col-md-1 form-group margin-top-10">
+
+                <button id="btnSearch" class="btn btn-default margin-top-10" type="submit" tabindex="3">Search</button>
+            </div>
+
+            <div class="col-md-1">
+                <br />
+                @*<div class="col-md-3 exporticons" style="TOP: -6PX;">
+                    <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6"></a>
+                </div>*@
+                <div class="exporticons" style="TOP: -6PX;">
+                    <a title="Export" onclick="Export()" id="btnNextClick" class="fa fa-file-excel-o" tabindex="6"></a>
+                </div>
+            </div>
+
+        }
+    </div>
+</div>
+<br />
+<br />
+<div class="container-fluid">
+    <div style="padding-left: 30px;">
+        <div class="row">
+            <table border="0" class="table table-custom table-bordered table-hover table-striped" cellpadding="1">
+                <thead>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Invoice Date</th>
+                        <th>Invoice No</th>
+                        <th>Booking ID</th>
+                        <th>Customer Name</th>
+                        <th>Property Name</th>
+                        <th>Property City</th>
+                        <th>Guest Name</th>
+                        <th>Check In Date</th>
+                        <th>Check Out Date</th>
+                        <th>No Of Pax</th>
+                        <th>No Of Room</th>
+                        <th>No Of Night</th>
+                        <th>Total Room Night</th>
+                        <th>Room Value Before ST</th>
+                        <th>Service Tax %</th>
+                        <th>Service Tax</th>
+                        <th>SBC %</th>
+                        <th>SBC Amount</th>
+                        <th>KKC %</th>
+                        <th>KKC Amount</th>
+                        <th>Other Services Before Service Tax</th>
+                        <th>Service Tax %</th>
+                        <th>Service Tax Value </th>
+                        <th>SBC %</th>
+                        <th>SBC Amount</th>
+                        <th>KKC %</th>
+                        <th>KKC Amount</th>
+                        <th>Total Value Before Service Tax</th>
+                        <th>Total SBC</th>
+                        <th>Total KKC</th>
+                        <th>Total Service Tax</th>
+                        <th>Grand Total</th>
+                        <th>Sales Person</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (CLayer.OfflineBooking pr in Model)
+                    {
+
+                        i = i + 1;
+                        if (@pr.Noofnight > 0)
+                        {
+                            total = @pr.NoOfRooms * @pr.Noofnight;
+                        }
+                        else
+                        {
+                            total = @pr.NoOfRooms;
+                        }
+                        m = total * @pr.AvgDailyRateBefreStaxForSalePrice;
+                        tt = @pr.AvgDailyRateBefreStaxForSalePrice * total;
+
+
+                        decimal amount = ((pr.AvgDailyRateBefreStaxForSalePrice * pr.Noofnight * pr.NoOfRooms));
+                        decimal amountOther = @pr.BuyPriceforotherservicesForSalePrice;
+
+                        double prcntgeSwatchbharath = @pr.Swatchbharath;
+                        double prcntgeKrishiKalyan = @pr.KrishiKalyan;
+                        double prcntgeSwatchbharathOthers = @pr.SwatchbharathOthers;
+                        double prcntgeKrishiKalyanOthers = @pr.KrishiKalyanOthers;
+
+
+                        double doubleValue = decimal.ToDouble(amount);
+                        double doubleValueOther = decimal.ToDouble(amountOther);
+                        double SwatchbharathAmount = (doubleValue * prcntgeSwatchbharath) / 100;
+                        double KrishiKalyanAmount = (doubleValue * prcntgeKrishiKalyan) / 100;
+                        double SwatchbharathAmountOthers = (doubleValueOther * prcntgeSwatchbharathOthers) / 100;
+                        double KrishiKalyanAmountOthers = (doubleValueOther * prcntgeKrishiKalyanOthers) / 100;
+
+                        TotalKKC = Math.Round(KrishiKalyanAmount + KrishiKalyanAmountOthers, 2);
+                        TotalSBC = Math.Round(SwatchbharathAmount + SwatchbharathAmountOthers, 2);
+                        KrishiKalyanAmount = Math.Round(KrishiKalyanAmount, 2);
+                        KrishiKalyanAmountOthers = Math.Round(KrishiKalyanAmountOthers, 2);
+                        SwatchbharathAmount = Math.Round(SwatchbharathAmount, 2);
+                        SwatchbharathAmountOthers = Math.Round(SwatchbharathAmountOthers, 2);
+
+
+
+                        //New corrections
+
+                        //Servicetax without sbc&kkc
+                        decimal ServiceTaxWoutsbckkc = ((pr.StaxForSalePrice - Convert.ToDecimal(prcntgeSwatchbharath + prcntgeKrishiKalyan)));
+
+                        //amount
+                        decimal TotalAmountBeforeServiceTax = ((pr.AvgDailyRateBefreStaxForSalePrice * pr.Noofnight * pr.NoOfRooms));
+                        decimal ServiceTaxAmount = Decimal.Round((((TotalAmountBeforeServiceTax) * ServiceTaxWoutsbckkc) / 100), 2);
+                        decimal TotalAmountwithServicetax = (TotalAmountBeforeServiceTax + ServiceTaxAmount);
+
+                        //OtherServicetax without sbc&kkc
+                        decimal OtherServiceTaxWoutsbckkc = ((pr.StaxForotherForSalePrice - Convert.ToDecimal(prcntgeSwatchbharathOthers + prcntgeKrishiKalyanOthers)));
+
+                        //Other services amount
+                        decimal Otherservicesamount = Math.Round(pr.BuyPriceforotherservicesForSalePrice, 2);
+                        decimal OtherServiceTaxAmount = Decimal.Round((((Otherservicesamount) * OtherServiceTaxWoutsbckkc) / 100), 2);
+                        decimal OtherTotalAmountwithServicetax = (OtherServiceTaxAmount + Otherservicesamount);
+
+
+                        decimal GrantTotal = Math.Round(OtherTotalAmountwithServicetax + TotalAmountwithServicetax + Convert.ToDecimal(TotalSBC) + Convert.ToDecimal(TotalKKC), 0);
+
+
+                        <tr>
+                            <td align="center">@i</td>
+                            <td align="center">@pr.InvoiceDate.ToShortDateString()</td>
+                            <td align="center">@pr.InvoiceNumber</td>
+                            <td align="center">@pr.ConfirmationNumber</td>
+                            <td>@pr.FirstName</td>
+                            <td>@pr.PropertyName</td>
+                            <td>@pr.City</td>
+                            <td>@pr.Guestname</td>
+                            <td align="center">@pr.CheckIn_date.ToShortDateString()</td>
+                            <td align="center">@pr.CheckOut_date.ToShortDateString()</td>
+                            <td align="center">@(pr.NoOfPaxAdult + pr.NoOfPaxChild)</td>
+                            <td align="center">@pr.NoOfRooms</td>
+                            <td align="center">@pr.Noofnight</td>
+                            <td align="right">@total</td>
+                            <td align="right">@Math.Round(m, 2)</td>
+                            <td align="center">@Convert.ToDouble(ServiceTaxWoutsbckkc).ToString("G") %</td>
+                            <td align="right">@Math.Round(ServiceTaxAmount, 2)</td>
+                            <td align="center">@pr.Swatchbharath.ToString("G") %</td>
+                            <td align="right">@Math.Round(SwatchbharathAmount, 2)</td>
+                            <td align="center">@pr.KrishiKalyan.ToString("G") %</td>
+                            <td align="right">@Math.Round(KrishiKalyanAmount, 2)</td>
+                            <td align="right">@Math.Round(pr.BuyPriceforotherservicesForSalePrice, 2)</td>
+                            <td align="center">@Convert.ToDouble(OtherServiceTaxWoutsbckkc).ToString("G") %</td>
+                            <td align="right">@Math.Round(OtherServiceTaxAmount, 2)</td>
+                            <td align="center">@pr.SwatchbharathOthers.ToString("G") %</td>
+                            <td align="right">@Math.Round(SwatchbharathAmountOthers, 2)</td>
+                            <td align="center">@pr.KrishiKalyanOthers.ToString("G") %</td>
+                            <td align="right">@Math.Round(KrishiKalyanAmountOthers, 2)</td>
+                            <td align="right">@Math.Round((TotalAmountBeforeServiceTax + Otherservicesamount), 2)</td>
+                            <td align="right">@Math.Round(TotalSBC, 2)</td>
+                            <td align="right">@Math.Round(TotalKKC, 2)</td>
+                            <td align="right">@Math.Round((ServiceTaxAmount + OtherServiceTaxAmount), 2)</td>
+                            <td align="right">@GrantTotal</td>
+                            <td>@pr.SalesPerson</td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+        <script>
+
+
+  var  from=   $('#HiddenFromDate').val();
+  var to = $('#HiddenToDate').val();
+  var SearchString = $('#HiddenSearchString').val();
+
+  //var f = new Date(from);
+  //var t = new Date(to);
+
+  //var from1 = f.ToShortDateString();
+  //var to1 = t.ToShortDateString();
+
+  $('#FromDate').val(from);
+  $('#ToDate').val(to);
+  $('#SearchString').val(SearchString);
+
+
+
+    $(function () {
+        $('#FromDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy"
+            });
+        $('#ToDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+                beforeShow: function () {
+                    //$(this).datepicker('option', 'minDate', $('#FromDate').val());
+                    //if ($('#FromDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+    });
+
+    function PDF() {
+        var url = '@Url.Action("PDFView", "CustomerInvoiceReport")?' + $('#CustomerInvoiceReportFilter').serialize();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function Export() {
+        window.location = '@Url.Action("ExcelReport", "CustomerInvoiceReport")?' +$('#CustomerInvoiceReportFilter').serialize();
+        //window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+
+        </script>

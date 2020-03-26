@@ -1,0 +1,303 @@
+﻿
+@model StayBazar.Models.PaymentRequestModel
+@{
+    Layout = null;
+
+    CLayer.Role.Roles roleType = CLayer.Role.Roles.Customer;
+    string titleName = "";
+    long id = 0;
+    try
+    {
+
+        id = Model.UserId;
+
+        if (id > 0)
+        {
+            roleType = BLayer.User.GetRole(id);
+            if (roleType == CLayer.Role.Roles.Agent || roleType == CLayer.Role.Roles.Corporate)
+            {
+                titleName = BLayer.B2B.GetBusinessName(id);
+            }
+            else
+            {
+                if (roleType == CLayer.Role.Roles.CorporateUser)
+                {
+                    long cid = BLayer.B2B.GetCorporateIdOfUser(id);
+                    titleName = BLayer.B2B.GetBusinessName(cid);
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        roleType = CLayer.Role.Roles.Customer;
+    }
+    //show time
+    //long PropertyId = Model.OrderedBy.PropertyId;
+    //CLayer.Property dttime = BLayer.Property.GetCheckTime(PropertyId);
+
+
+    int noOfDays = 0;
+    string ratesText = "";
+
+
+    long MinDays = Convert.ToInt32(BLayer.Settings.GetValue("PartialPaymentSecondReminder"));
+
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>BConfirmation</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <tr>
+            <td align="center">
+                <table width="700">
+                    <thead>
+                        <tr>
+                            <th style="padding-top: 2%;" colspan="3">
+                                <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                            </th>
+                            <th width="400" align="right" style="font-size:12px;">
+                                Phone: @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                                Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)<br />
+                                Toll Free Number: 1800-425- 2393
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" align="center">
+                                <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">Request for Payment</h5>
+                            </td>
+                        </tr>
+                        @if (roleType == CLayer.Role.Roles.Agent || roleType == CLayer.Role.Roles.CorporateUser || roleType == CLayer.Role.Roles.Corporate)
+                        {
+                            <tr>
+                                @if (roleType == CLayer.Role.Roles.Agent)
+                                {
+                                    <td colspan="2" align="left">Travel Agent Booking - @titleName</td>
+                                }
+                                else
+                                {
+                                    <td colspan="2" align="left">Corporate Booking - @titleName</td>}
+                                <td colspan="2" align="center">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                        }
+                        <tr>
+                            <td colspan="4">
+                                <p style="line-height: 35px; font-size: 12px; color: #666;">
+
+                                    Dear @Model.Name,<br />
+                                    @*karthikms changed on 27-11-2019*@
+                                    @*Below listed bookings are due for payment. Request you to kindly make payment of these bookings, by clicking below link*@
+                                    Below listed bookings are due for payment. Request you to kindly make payment of these bookings, by clicking below link
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" colspan="4" style="font-size:14px;">
+                                <table width="100%" cellpadding="5" border="1" cellspacing="0" title="Booking and Payment Details">
+                                    <thead>
+                                        <tr style="background-color: #a51e22;color:white; height:30px; font-size:12px;">
+                                            @*<th>Customer</th>*@
+                                            <th>Booking Id</th>
+                                            @*<th>Booking No</th>*@
+                                            <th>Property Name</th>
+                                            <th>Property City</th>
+                                            <th>Check In</th>
+                                            <th>Check Out</th>
+                                            <th>Guest Name</th>
+                                            <th>No of Rooms</th>
+                                            <th align="right" style="padding-right: 5px;"><span class="bold">Total Amount</span></th>
+                                            <th align="right" style="padding-right: 5px;"><span class="bold">Advance Received</span></th>
+                                            <th align="right" style="padding-right: 5px;"><span class="bold">Balance Payable</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (CLayer.OfflineBooking usr in Model.OfflineBookingList)
+                                        {
+                                            CLayer.OfflineBooking MinDates = BLayer.OfflineBooking.GetOfflinebookingMinDatesIsGST(@usr.OfflineBookingId);
+                                        <tr>
+                                            @*<td>@usr.CustomerName</td>*@
+                                            @*<td>
+                                                @usr.OfflineBookingId
+                                            </td>*@
+                                            <td>
+                                                @usr.ConfirmationNumber
+                                            </td>
+                                            <td>
+                                                @usr.PropertyName
+                                            </td>
+                                            <td>
+                                                @usr.PropertyCityname
+                                            </td>
+                                            <td>
+                                                @usr.CheckIn.ToShortDateString()
+                                            </td>
+                                            <td>
+                                                @usr.CheckOut.ToShortDateString()
+                                            </td>
+                                            <td>
+                                                @usr.GuestName
+                                            </td>
+                                            <td align="right">
+                                                @usr.NoOfRooms
+                                            </td>
+                                            <td align="right">
+                                                @*@usr.TotalSalePrice*@
+                                                @String.Format("{0:f0}", usr.TotalSalePrice)
+                                            </td>
+                                            <td align="right">
+                                                @*@usr.AdvanceReceived*@
+                                                @String.Format("{0:f0}", usr.AdvanceReceived)
+                                            </td>
+                                            <td align="right">
+                                                @String.Format("{0:f0}", usr.PayableSalePrice)
+                                            </td>
+                                            @*PayableSalePrice = Connection.ToDecimal(dr["TotalSalePrice"]) - Connection.ToDecimal(dr["AdvanceReceived"])*@
+                                        </tr>
+
+                                        }
+                                            <tr style="border-top: 1px solid #a51e22;  ">
+                                                <td colspan="8">&nbsp;</td>
+                                                <td align="right" style="padding-right: 5px;">
+                                                    <b>
+                                                        Total:
+
+                                                    </b>
+                                                </td>
+                                                <td align="right" style="padding-right: 5px;">
+                                                    <b>
+                                                        @*@(Math.Round(Model.OfflineBookingList.First().SumTotalSalePrice))
+                                                        @(Math.Round(Model.PayableSalePrice. Sum(b => b.PayableSalePrice)))*@
+                                                        @(Math.Round(Model.OfflineBookingList.Sum(b => b.PayableSalePrice) ))
+                                                    </b>
+                                                </td>
+                                            </tr>
+                                        @*<tr>
+                                            <td colspan="6">&nbsp;</td>
+                                            <td align="right" style="padding-right: 5px;">
+                                                <b>
+                                                    Advance: 
+                                                </b>
+                                            </td>
+                                            <td align="right" style="padding-right: 5px;">
+                                                <b>
+                                                    @(Math.Round(Model.OfflineBookingList.First().AdvanceReceived))
+                                                </b>
+                                            </td>
+                                        </tr>*@
+                                        @*<tr>
+                                            <td colspan="6">&nbsp;</td>
+                                            <td align="right"  style="padding-right: 5px;">
+                                                <b>
+                                                    Payable:
+                                                </b>
+                                            </td>
+                                            <td align="right"  style="padding-right: 5px;">
+                                                <b>
+                                                    @(Math.Round(Model.GrandTotal))
+                                                </b>
+                                            </td>
+                                        </tr>*@
+
+                                    </tbody>
+                                </table>
+                            </td>
+
+                        </tr>
+                        @{}
+                        @*CLayer.Booking PartialBdt = BLayer.Bookings.GetPartialBookDetailsbyBookId(Model.BookingId);
+                                <tr>
+                                    <td colspan="2"><b style="font-size: 13px; margin: 10px 0px; display: inline-block;">Partial Payment Details</b></td>
+                                </tr>
+                                <tr>
+                                    <td align="left" colspan="4" style="font-size:12px; ">
+                                        Amount already paid is INR @PartialBdt.PaymentFirstinstallment and remaining amount to be paid is INR @PartialBdt.PaymentSecondinstallment
+                                    </td>
+                                </tr>
+
+                            }
+
+
+                            @if (dttime != null)
+                            {
+                                string CheckInTime = dttime.CheckInTime;
+                                string CheckOutTime = dttime.CheckOutTime;
+
+                                if (CheckInTime != "" || CheckOutTime != "")
+                                {
+                                    <tr>
+                                        <td colspan="4">
+                                            <p style="font-size:12px;">
+                                                <label>Check-in Time</label>:@CheckInTime &nbsp;&nbsp; <label>Check-out Time:</label>@CheckOutTime
+
+                                            </p>
+                                        </td>
+                                    </tr>
+                                }
+                            }*@
+
+                        @*<tr>
+                                <td colspan="4">
+                                    <p style="font-size:12px;">
+                                        Rates and Amounts are all Inclusive
+                                    </p>
+                                </td>
+                            </tr>*@
+                        <br />
+                        <tr>
+                            <td align="right"  colspan="8">
+                                <a href="http://staybazar.com/booking/PaymentLinkPayment?PaymentGuid=@Model.PaymentGuid" class="btn btn-success">Make Payment</a>
+                            </td>
+                          
+                        </tr>
+                        <tr>
+                            <td align="center" colspan="4">
+                                <p style="margin-top: 20px; margin-bottom: 10px;font-size:12px;">
+                                    Thank you for choosing Staybazar!This booking is subject to terms and conditions listed in below links.<br />
+                                    <a href="https://www.staybazar.com/Home/TermsOfUse">Terms & Conditions</a>
+                                    | <a href="https://www.staybazar.com/Home/Privacy">Privacy Policy</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td align="center" colspan="4">
+                                <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px;">
+                                    View your online itinerary for additional information
+                                </p>
+                                <p style="font-size:14px;">
+                                    Need help with your reservation? – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                                </p>
+                                <p style="font-size:14px;">
+                                    Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                                </p>
+                                <p style="font-size:14px;">
+                                    www.staybazar.com
+                                </p>
+                                <p style="font-size:14px;">
+                                    <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                                    <span style="font-weight:bold;">Phone: </span>080-2572-2898  / 4091 - 6686
+                                </p>
+                            </td>
+                        </tr>
+
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+
+    </table>
+</body>
+</html>
+
+

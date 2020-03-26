@@ -1,0 +1,71 @@
+﻿@model List<CLayer.Property>
+@{
+    ViewBag.Title = "Manage My Properties";
+    int propertyCount = Model.Count;
+}
+<div class="container bdy_min_height">
+    <script type="text/javascript">
+        $(function () { validateRq(); });
+    </script>
+    <div class="row top_space_10">
+        <div class="col-md-10">
+            <div class="h3">@ViewBag.Title</div>
+            Your properties are listed here. You can edit and add new one by clicking on the Edit and Add New buttons.
+        </div>
+        <div class="col-md-1"><div class="height_adjust"></div><a href="/PropertyEdit" title="Add New" class="create_new">Add New</a></div>
+    </div>
+    <div class="row"><hr /></div>
+
+    @if (propertyCount > 0)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <table border="0" class="table table-condensed table-responsive table-custom">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Accommodations</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (CLayer.Property pr in Model)
+                        {
+                            <tr>
+                                <td>@pr.Title</td>
+                                <td>@pr.Location</td>
+                                <td>@pr.Status</td>
+                                <td>@pr.NoOfAccommodations</td>
+                                <td align="center"><a href="/PropertyEdit/Index/@pr.PropertyId" title="Edit"><span class="glyphicon glyphicon-edit"></span></a></td>
+                                <td align="center"><a class="showhand" onclick="propdelete(@pr.PropertyId)" title="Delete"><span class="glyphicon glyphicon-trash"></span> </a> </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function propdelete(pid)
+            {
+                if(confirm("Are you sure, you want to delete?"))
+                {
+                    window.location = "@Url.Action("Delete","PropertyList")?id=" + pid;
+                }
+            }
+        </script>
+    }
+ else
+{
+    <div class="row margin-top-10">
+        <div class="col-md-4 col-md-offset-4 margin-top-10">
+            <div class="alert alert-info" >You haven't configured any property yet.</div>
+        </div>
+    </div>
+}
+</div>
+
+
+

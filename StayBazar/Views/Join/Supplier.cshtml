@@ -1,0 +1,307 @@
+﻿@model StayBazar.Models.SupplierB2BModel
+@using CaptchaMvc.HtmlHelpers
+@using System.Configuration;
+@{
+    ViewBag.Title = "Join as a Supplier";
+    ViewBag.BreadCrumb = " <p style='margin-top: -29px; margin-left: 38px;'> > </p> <div id='breads' style='margin-top: -30px; margin-left: 50px;'> <div itemscope itemtype='http://data-vocabulary.org/Breadcrumb'> <a href=''  itemprop='url'  class=' whitetext breadhvr' > <span class=' whitetext breadhvr'  itemprop='title'>Join as a Supplier</span></a>  </div> </div>";
+}
+
+<div class="container">
+    @try
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="form-header">
+                    @ViewBag.Title
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 sidesplash">
+                <img src="/images/imac.jpg" />
+            </div>
+            <div class="col-md-6">
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger">
+                        @ViewBag.Message
+                    </div>
+                }
+                @using (Html.BeginForm("SupplierSave", "Join", FormMethod.Post, new { enctype = "multipart/form-data", id = "upload" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <div class="formcontainer border-radius">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Name)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control input-sm"})
+                            @Html.ValidationMessageFor(m => m.Name)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Email)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.Email, new { @tabindex = "2", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.Email)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                            @Html.TextAreaFor(m => m.Address, new { @tabindex = "3", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+                            @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "4", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.State)<span style="color:red">*</span>
+                            @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "5", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CityId)<span style="color:red">*</span> &nbsp;
+                            <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                            @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "6", @class = "form-control" })
+                            <div id="other_city" style="display:none;">
+                                @Html.TextBoxFor(m => m.City, new { @tabindex = "6", @class = "form-control input-sm" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ZipCode)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "7", @class = "form-control input-sm", @MaxLength = "12", @onkeypress = "return isINNumbers(event)" })
+                            @Html.ValidationMessageFor(m => m.ZipCode)
+                        </div>                    
+                        <hr />
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ContactName)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.ContactName, new { @tabindex = "9", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.ContactName)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Phone)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.Phone, new { @tabindex = "8", @class = "form-control input-sm", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
+                            @Html.ValidationMessageFor(m => m.Phone)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Mobile)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "10", @class = "form-control input-sm", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
+                            @Html.ValidationMessageFor(m => m.Mobile)
+                         </div>
+                        <hr />
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PANNo)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.PANNo, new { @tabindex = "10", @class = "form-control input-sm", @onkeypress = "return isINNumbersletters(event)", @MaxLength = "12" })                           
+                            @Html.ValidationMessageFor(m => m.PANNo)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ServiceTaxRegNo)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.ServiceTaxRegNo, new { @tabindex = "11", @class = "form-control input-sm", @onkeypress = "return isINNumbersletters(event)", @MaxLength = "15" })
+                            <div><span class="smtext">[Supported file types .jpg,.gif,.png,.pdf,.doc,.xlsx,.docx,.xls]</span></div><label for="ServiceTaxReg">Copy of Service Tax Registration Document</label><span style="color:red">*</span>
+                            <input type="file" id="ServiceTaxReg" name="ServiceTaxReg" tabindex="12" style="border:0px;" />
+                            @Html.ValidationMessageFor(m => m.ServiceTaxReg)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.VATRegNo)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.VATRegNo, new { @tabindex = "13", @class = "form-control input-sm", @onkeypress = "return isINNumbersletters(event)", @MaxLength = "15" })
+                          
+                            <label for="VATReg">Copy of VAT Registration Document</label><span style="color:red">*</span>
+                            <input type="file" id="VATReg" name="VATReg" tabindex="14" style="border: 0px;" />
+                            @Html.ValidationMessageFor(m => m.VATReg)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyDescription)<span style="color:red">*</span>
+                            @Html.TextAreaFor(m => m.PropertyDescription, new { @tabindex = "15", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.PropertyDescription)
+                         </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.AvailableProperties)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.AvailableProperties, new { @tabindex = "16", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.AvailableProperties)
+                         </div>
+                        <hr />
+                        <h4>
+                            Bank Details [Optional]
+                        </h4>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.AccountNumber)
+                            @Html.TextBoxFor(m => m.AccountNumber, new { @tabindex = "17", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BankName)
+                            @Html.TextBoxFor(m => m.BankName, new { @tabindex = "18", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BranchAddress)
+                            @Html.TextAreaFor(m => m.BranchAddress, new { @tabindex = "19", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.RTGSNumber)
+                            @Html.TextBoxFor(m => m.RTGSNumber, new { @tabindex = "20", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.MICRCode)
+                            @Html.TextBoxFor(m => m.MICRCode, new { @tabindex = "21", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.Captcha("try another", "enter the text you see above:", 5, "is required field", true)
+                        </div>
+                    </div>
+                    <div class="btn-toolbar">
+                        <div class="submitctr">
+                            <input type="submit" id="btnSave" value="Save" class="btn btn-default" tabindex="23" /> 
+                            <a href="~/Join/Supplier" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+                        </div>
+                    </div>
+                        <br />
+                    <script type="text/javascript">
+                        $(function () {
+                            $("#Name").focus();
+                            $("#CaptchaInputText").attr("tabindex", "22");
+                        });
+                    </script>
+                    <script type="text/javascript">
+                        //function isINLetters(event) {
+                        //    var charCode = (event.which) ? event.which : event.keyCode
+                        //    if ((charCode >= 48) && (charCode <= 57) || charCode==64 ||(charCode >=33 &&charCode<=42) || (charCode >=91 &&charCode <=95 ) || (charCode >=123 &&charCode <=126 )){
+                        //        return false;
+                        //    }
+                        //    return true;
+                        //}                    
+
+                        //function isINNumbers(event) {
+                        //    var charCode = (event.which) ? event.which : event.keyCode
+                        //    if ((charCode >= 90) && (charCode <= 126) || (charCode >= 58) && (charCode <= 90) || charCode ==46 ||(charCode >=33 &&charCode<=42) ){
+                        //        return false;
+                        //    }
+                        //       return true;
+                        //};
+
+                        //function isINNumbersletters(event) {
+                        //    var charCode = (event.which) ? event.which : event.keyCode
+                        //    if  ((charCode >=33 &&charCode<=42) || charCode==64 || charCode==44 || (charCode >=46 &&charCode <=47 )|| charCode==59|| charCode==61|| (charCode >=91 &&charCode <=95 ) || (charCode >=123 &&charCode <=126 ) ){
+                        //        return false;
+                        //    }
+                        //    return true;
+                        //};            
+                        
+                        $(function () {
+
+                       @*     if ($('#CountryId').val() == -1) {
+                                $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                            }
+                            else {
+                                LoadState();
+                            }
+                            if ($('#CityId').val() == -1) {
+                                $('#CityId').empty().html('<option selected="selected" value="0">not available...</option>');
+                            }
+                            else {
+                                Loadcity();
+                            } *@
+                            if ($('#CityId').val() == -1) {
+                                //$('#CityId').empty().html('<option selected="selected" value="0">not available...</option>');
+                                $("#CityId").hide();
+                                $("#City").val("");
+                                $("#other_city").show();
+                            }
+
+
+                            $('#CountryId').change(function () {
+                                $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                                    if (data != "")
+                                        $('#State').empty().append(data);
+                                    else
+                                        $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                                    Loadcity()
+                                });
+                            });
+                            $('#State').change(function () {
+                                $("#CityId").show();
+                                $("#City").val("");
+                                $("#other_city").hide();
+                                $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                                    if (data != "") {
+                                        $('#CityId').empty().append(data);
+                                        if ($("select#CityId option").length == 1) {
+                                            $("#CityId").hide();
+                                            $("#City").val("");
+                                            $("#other_city").show();
+                                        }
+                                    }
+                                    else {
+                                        $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                                    }
+                                });
+
+                            });
+                            $('#CityId').change(function () {
+                                if ($(this).val() == -1) {
+                                    $(this).hide();
+                                    $("#City").val("");
+                                    $("#other_city").show();
+                                    $("#close_other_city").show();
+                                }
+                            });
+                            $('#close_other_city').click(function () {
+                                $("#CityId").show();
+                                $("#City").val("");
+                                $("#other_city").hide();
+                                $("#close_other_city").hide();
+                            });
+                        });
+
+                        function Loadcity() {
+                            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                                if (data != "") {
+                                    $('#CityId').html(data).append('<option selected="selected" value="0">Select</option>');;
+                                }
+                                else {
+                                    $('#CityId').html('<option selected="selected" value="0">not available...</option>');
+                                }
+                            });
+                        }
+                        function LoadState() {
+                            $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                                if (data != "") {
+                                    $('#State').empty().append(data);
+                                }
+                                else {
+                                    $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                                }
+                            });
+                        }
+
+                          @{
+                            int fi= Convert.ToInt32(ConfigurationManager.AppSettings.Get("FileUploadSizeInMB"));
+                            long by = fi * 1024 * 1024;
+                        }
+
+                        $('#ServiceTaxReg').bind('change', function (){                   
+                            var filesizeget = this.files[0].size;
+                            //alert(filesizeget + "bytes");
+                            if (filesizeget > @by) {
+                                alert("Please Upload below @(fi)MB file size");
+                                $('#ServiceTaxReg').val("");
+                            return false;
+                            }
+                        });
+
+                        $('#VATReg').bind('change', function (){                   
+                            var filesizeget = this.files[0].size;
+                            //alert(filesizeget + "bytes");
+                            if (filesizeget > @by) {
+                                alert("Please Upload below @(fi)MB file size");
+                            $('#VATReg').val("");
+                            return false;
+                            }
+                        });
+                                            
+                    </script>
+                }
+            </div>
+        </div>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/ErrorPage");
+    }
+</div>
+<br />

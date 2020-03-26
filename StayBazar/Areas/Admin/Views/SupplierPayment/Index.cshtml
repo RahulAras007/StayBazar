@@ -1,0 +1,85 @@
+﻿@model StayBazar.Areas.Admin.Models.SupplierPaymentModel
+@{
+    ViewBag.Title = "Manage Supplier Payment";
+}
+
+@*<h2>@ViewBag.Title</h2>*@
+
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-3">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        @using (Html.BeginForm("Filter", "SupplierPayment", FormMethod.Post, new { @id = "frmFilters", onsubmit = "return false;" }))
+        {
+            @*<div class="row">*@
+                <div class="col-md-2">
+                    @Html.DropDownListFor(m => m.Status, Model.StatusTypes, new { @tabindex = "1", @class = "form-control" })
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                        <span class="input-group-btn">
+                            <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-control">
+
+                        @foreach (StayBazar.Areas.Admin.Models.SupplierPaymentModel.SupplierPaymentValues ruv in (StayBazar.Areas.Admin.Models.SupplierPaymentModel.SupplierPaymentValues[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.SupplierPaymentModel.SupplierPaymentValues)))
+                        {
+                            <input type="radio" name="ruv" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text> } />
+                            <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                            <text>&nbsp;&nbsp;</text>
+                        }
+                    </div>
+                </div>
+            @*</div>*@
+            @Html.HiddenFor(m => m.SearchValue)
+        }
+        </div>
+</div>
+        @*<hr />*@
+<div class="container-fluid">
+
+
+            <div id="list" class="row">
+                @{
+                    Html.RenderPartial("~/Areas/Admin/Views/SupplierPayment/_List.cshtml", Model.userlist);
+                }
+            </div>
+</div>
+
+        <script type="text/javascript">
+    $(function () {
+        $("#Status").change(function () {
+            var url = '@Url.Action("Filter", "SupplierPayment")';
+            $.post(url, $("#frmFilters").serialize(),
+                    function (data) {
+                        $("#list").html(data);
+                    });
+        });
+    });
+
+    $(function () {
+        $("#SearchValue").val("1");
+        $(".css-radiobutton").change(function () {
+            $("#SearchValue").val("1");
+            $(".css-radiobutton").each(function () {
+                if (this.checked) {
+                    $("#SearchValue").val($(this).attr("id"));
+                }
+            });
+        });
+        $("#btnSearch").click(function () {
+            var url = '@Url.Action("Filter", "SupplierPayment")';
+            $.post(url, $("#frmFilters").serialize(),
+                    function (data) {
+                        $("#list").html(data);
+                    });
+        });
+    });
+        </script>

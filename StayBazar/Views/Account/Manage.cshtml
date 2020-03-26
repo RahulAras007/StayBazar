@@ -1,0 +1,43 @@
+﻿@using StayBazar.Models;
+@using Microsoft.AspNet.Identity;
+@{
+    ViewBag.Title = "Manage Profile";
+}
+<div class="container bdy_min_height">
+    <h2>@ViewBag.Title.</h2>
+    @if (ViewBag.StatusMessage != null && ViewBag.StatusMessage != "")
+{
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="alert alert-success">
+                @ViewBag.StatusMessage
+            </div>
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-md-2 col-md-offset-4"><a href="@Url.Action("Profile","Account")">Back to Profile edit</a></div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-12">
+            @if (ViewBag.HasLocalPassword)
+            {
+                @Html.Partial("_ChangePasswordPartial")
+            }
+            else
+            {
+                @Html.Partial("_SetPasswordPartial")
+            }
+            @*<section id="externalLogins">
+                @Html.Action("RemoveAccountList")
+                @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+            </section>*@
+        </div>
+    </div> }
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+</div>

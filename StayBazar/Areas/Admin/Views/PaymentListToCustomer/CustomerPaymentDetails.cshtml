@@ -1,0 +1,86 @@
+﻿@model StayBazar.Areas.Admin.Models.CustomerPaymentDetailModel
+@{
+    /**/
+
+    ViewBag.Title = "Customer Payment Details - " + Model.Name;
+}
+
+<h2>@ViewBag.Title</h2>
+<hr />
+
+<div class="form-group">
+    <div class="row">
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-danger">
+                @ViewBag.Message
+            </div>
+        }
+        @using (Html.BeginForm("CustomerPaymentDetailsUpdate", "PaymentListToCustomer", FormMethod.Post, new { role = "form" }))
+        {
+            <div class="col-lg-2">
+                @*<label>Total Sales Price :</label> <span></span> @usr.SumTotalSalePrice
+                @Html.LabelFor(m => "Total Sales Price:")*@
+                <label>Total Sales Price:</label>
+                @*@Html.LabelFor(m => @usr.SumTotalSalePrice)*@
+                @Html.TextBoxFor(m => (m.OfflineBookingList.First().SumTotalSalePrice), new { @class = "form-control", @readonly = "readonly" })
+            </div>
+            <div class="col-lg-4">
+                <text>
+                        <div class="btn-group" id="div-actions">
+                            <text>
+                                <button id="btnContinue" class="btn btn-default" disabled>Calculate</button>
+                            </text>
+                        </div>
+                        @*<input id="total" name="data" value="" />*@
+                </text>
+            </div>
+            <div class="col-lg-4">
+                @Html.LabelFor(m => m.Email)
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            </div>
+            <div class="col-lg-2">
+                <label>Total Advance Received :</label>
+                @Html.TextBoxFor(m => (m.OfflineBookingList.First().AdvanceReceived), new { @class = "form-control" })
+                @*<span></span> @usr.SumofAdvanceReceived*@
+            </div>
+            <div class="col-lg-1">
+                <div class="form-group text-left" style="padding-top:23px">
+                    <button type="submit" class="btn redbg whitetext border-radius0">Update</button>
+                    @*<a href="/Admin/JoinRequests/Corporate" class="btn greybg whitetext border-radius0">Cancel</a>*@
+                </div>
+            </div>
+            <div class="col-lg-2" style="padding-top:23px">
+                <a href="#" id="status@(Model.OfflineBookingId)" title="Sendemail" class="btn btn-success" onclick="Sendemail(@Model.UserId)">
+                    Send email to customer
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<hr />
+<div id="content">
+    <div class="row">
+        <div id="List" class="row">
+            @{
+                Html.RenderPartial("~/Areas/Admin/Views/PaymentListToCustomer/_PaymentDetails.cshtml", Model.OfflineBookingList);
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function Sendemail(id) {
+        var r = confirm("Are you sure you want to send the mail? ")
+        if (r == true) {
+            var url = '@Url.Action("Sendemail", "PaymentListToCustomer")?UserId=' + id;
+
+            $.post(url, function (data) {
+
+            });
+            }
+            else {
+            return false
+            }
+    }
+</script>

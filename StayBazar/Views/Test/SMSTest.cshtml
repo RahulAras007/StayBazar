@@ -1,0 +1,26 @@
+﻿@model StayBazar.Models.TestModel
+@{
+    Layout = null;
+}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            @*<h2>Please make your payment</h2>*@
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+            @if (Model.emessage != null && Model.emessage != "")
+            {
+                <div class="alert alert-info">@Html.Raw(Model.emessage)</div>
+            }
+            @using (Html.BeginForm("SMSTest", "Test", FormMethod.Post))
+            {
+                <text>
+                Phone Number: @Html.TextBoxFor(m =>m.phone)<br />
+                Message: @Html.TextAreaFor(m =>m.message)
+                <input type="submit" class="btn btn-info" value="Send" /></text>
+            }
+        </div>
+    </div>
+</div>

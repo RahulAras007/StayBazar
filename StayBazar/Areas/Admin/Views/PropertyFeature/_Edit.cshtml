@@ -1,0 +1,92 @@
+﻿@model StayBazar.Areas.Admin.Models.PropertyFeatureModel
+@using System.Linq
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Edit", "PropertyFeature"))
+{
+    @*<h2>Property Feature</h2>*@
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @*<div class="incontainer">
+        <div class="form-group">*@
+    <div class="page-title-container style3">
+        <div class="row">
+            <div class="col-md-3">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+            <div class="col-md-2">
+                @Html.LabelFor(m => m.Title)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.Title, new { @tabindex = "1", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.Title)
+            </div>
+            @*<div class="form-group">*@
+            <div class="col-md-2">
+                @Html.CheckBoxFor(m => m.Showfeatures) Show in search
+                @Html.ValidationMessageFor(m => m.Showfeatures)
+            </div>
+            @*<div class="form-group">*@
+            <div class="col-md-3">
+                @Html.LabelFor(m => m.Style)
+                <div class="btn-group">
+                    <div class="btn btn-sm btn-default dropdown-toggle" tabindex="2" data-toggle="dropdown">
+                        @if (Model.Style == "")
+                        {
+                            <span id="ddlCaption"><span class="feat-icon nobdr"><label>None</label></span></span>
+                        }
+                        else
+                        {
+                            <span id="ddlCaption"><span class="feat-icon nobdr @Model.Style"><label>@Model.Style</label></span></span>
+                        }
+                        <span class="caret"></span>
+                    </div>
+                    <ul class="dropdown-menu feature-selector">
+                        <li class="propertyfeature"><a href="#" id="none" class="feat-icon nobdr"><label>None</label></a></li>
+                        @{
+                            string styleSet = System.Configuration.ConfigurationManager.AppSettings.Get("PropertyFeatureStyles");
+                            if (styleSet != "")
+                            {
+                                string[] styles = styleSet.Split(',');
+                                Array.Sort(styles);
+                                int numberOfStyles = styles.Length;
+                                for (int i = 0; i < numberOfStyles; i++)
+                                {
+                                    <li class="propertyfeature"><a href="#" id="@styles[i].ToString()" class="feat-icon nobdr @styles[i].ToString()"><label>@styles[i].ToString()</label></a></li>
+                                }
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+            <br />
+            <div class="col-md-2">
+                @*<div class="form-group">*@
+                <div class="btn-group">
+                    <input type="submit" id="btnSave" value="Save" class="btn btn-default" tabindex="3" />
+                    <a href="~/Admin/PropertyFeature" id="btnReset" class="btn btn-danger" tabindex="4">Cancel</a>
+                </div>
+            </div>
+        </div>
+        </div>
+        <br />
+        <br />
+    @Html.HiddenFor(m => m.PropertyFeatureId)
+    @Html.HiddenFor(m => m.Style)
+    <script type="text/javascript">
+        $(function () {
+            $("#Title").focus();
+            $('.propertyfeature>a').click(function () {
+                if ($(this).attr("id") == "none") {
+                    $("#style").val("");
+                    //$("#ddlcaption").html("<span class='feat-icon nobdr'>none</span>");
+                }
+                else {
+                    $("#Style").val($(this).attr("id"));
+                }
+                $("#ddlCaption").html("<span class='feat-icon nobdr " + $(this).attr("id") + "'><label>" + $(this).attr("id") + "</label></span>");
+                //}
+            });
+        });
+    </script>
+}
+

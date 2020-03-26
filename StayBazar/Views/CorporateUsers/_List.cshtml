@@ -1,0 +1,115 @@
+﻿@model StayBazar.Models.CorporateModel
+@{
+    Layout = null;
+    int count = Model.Users.Count;
+    int idx = 1;
+    int perPagerCount = 25;
+
+}
+@using Microsoft.AspNet.Identity
+<div class="row top-margin-10px">
+    <div class="col-md-8">
+        <input class="form-control" type="text" id="myInput" placeholder="Search for names or email.." title="Type in a name">
+    </div>
+    <div class="col-md-4">
+        @{
+            long cid = 0;
+            long.TryParse(User.Identity.GetUserId(), out cid);
+            int maxno = BLayer.B2BUser.GetCountMaxNoOfUsers(cid);
+            int countLimit = BLayer.B2BUser.GetCountLimitOfUsers(cid);
+            if (countLimit >= maxno)
+            {
+                <input type="button" value="Create a new User" class="btn btn-primary" onclick="editData(0)" />
+            }
+            else
+            {
+                <text><h4>You can't add a new staff,you have reached maximum staff limit.</h4> </text>
+            }
+        }
+    </div>
+
+</div>
+<br />
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Type</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @foreach (CLayer.User usr in Model.Users)
+        {
+            <tr>
+                <td>@(idx++)</td>
+                <td><span id="name@(usr.UserId)">@usr.Name</span></td>
+                <td>@usr.Email</td>
+                <td>
+                    @{ if (usr.Status == (int)CLayer.ObjectStatus.StatusType.Active)
+                        { <text>Active</text>}
+                    else
+                    { <text>Disabled</text>}
+                    }
+                </td>
+                <td>@( ((CLayer.Role.CorporateRoles)usr.UserTypeId).ToString())</td>
+                <td><a href="#" class="glyphicon glyphicon-edit" title="Edit" onclick="editData(@usr.UserId)"></a></td>
+                <td><a href="#" class="glyphicon glyphicon-trash" title="Delete" onclick="deleteData(@usr.UserId,'@usr.Name')"></a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (perPagerCount < count)
+{
+    <ul class="pagination" id="myPager"></ul>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        preparePager();
+    });
+</script>
+<script type="text/javascript">
+
+    @* TO - Filter / Search Table./ Strarts *@
+    $("#myInput").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+
+        if (value != '') {
+            $("#myTable tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                $('#myPager').hide();
+            });
+        } else {
+            location.reload();
+        }
+    });
+    @*./ End *@
+
+    function preparePager()
+    {
+        $('#myTable').pageMe({ pagerSelector: '#myPager', showPrevNext: true, hidePageNumbers: false, perPage: @(perPagerCount) });
+    }
+
+    function editData(id) {
+        $.get('@(Url.Action("GetDetails","CorporateUsers"))?id=' + id, function (data) {
+            $("#userdetails").html(data);
+            $("#myModal").modal('show');
+        });
+    }
+
+    function deleteData(id){
+        pname = $("#name"+id).html();
+        if(confirm("Are you sure to delete - '" + pname + "'"))
+        {
+            $.get('@Url.Action("Remove","CorporateUsers")?id='+id, function (data) {
+                $("#userlist").html(data);
+            });
+        }
+    }
+
+</script>

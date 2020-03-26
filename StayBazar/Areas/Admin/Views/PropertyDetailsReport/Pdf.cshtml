@@ -1,0 +1,75 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@{
+    ViewBag.Title = "Property Details Report";
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+}
+<div id="content" style="margin-left:40px;">
+
+
+    <div class="row" id="PropertyDetailsReportList123">
+        @{
+            StayBazar.Areas.Admin.Models.PropertyDetailsReportModel filterform = (StayBazar.Areas.Admin.Models.PropertyDetailsReportModel)ViewBag.Filter;
+
+
+            using (Html.BeginForm("Pager", "PropertyDetailsReport", FormMethod.Post, new { @id = "frmPagerProDetRep" }))
+            {
+                <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+                <input type="hidden" id="TotalRows" name="TotalRows" value="@filterform.TotalRows" />
+                <input type="hidden" id="SearchString1" name="SearchString1" value="@filterform.SearchString" />
+                <input type="hidden" id="SearchValue1" name="SearchValue1" value="@filterform.SearchValue" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+        }
+
+
+        <div class="col-md-12">
+            @if (Model != null && Model.Rows.Count > 0)
+            {
+                @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+            }
+        </div>
+
+        <div class="col-md-12">
+            <table class="table table-bordered table-hover table-striped" border="1" cellpadding="1">
+                <thead>
+                    <tr>
+                        @foreach (DataColumn col in Model.Columns)
+                        {
+                            <th>@col.Caption</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow row in Model.Rows)
+                    {
+                        <tr>
+                            @foreach (var cell in row.ItemArray)
+                            {
+                                <td>@cell.ToString()</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    function showPager(num) {
+        $("#currentPage").val(num);
+        $('#SearchString1').val($('#SearchString').val());
+        $('#SearchValue1').val($('#SearchValue').val());
+        var url = '@Url.Action("Pager", "PropertyDetailsReport", new { area = "Admin" })';
+        $.get(url, $("#frmPagerProDetRep").serialize(), function (data) {
+            $("#PropertyDetailsReportList").html(data);
+        });
+    }
+</script>

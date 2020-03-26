@@ -1,0 +1,62 @@
+﻿@model StayBazar.Areas.Admin.Models.OfferModel
+@{
+    Layout = null;
+    ViewBag.Title = "Offer For Properties";
+}
+
+<h2><a href="#" onclick="BackClick()" id="btnBacknow" class="glyphicon glyphicon-arrow-left" tabindex="6"></a>@ViewBag.Title</h2>
+@using (Html.BeginForm("GetpropertyList", "Offer", FormMethod.Post, new { area="Admin", @id = "frmFiltersGetproperty" }))
+{
+    <div class="row">     
+        <div class="col-md-4">
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                <span class="input-group-btn">
+                    <button id="btnOfferPropertySearch" class="btn btn-default" type="button" tabindex="3">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-control">
+                @foreach (StayBazar.Areas.Admin.Models.OfferModel.serchacc ruv in (StayBazar.Areas.Admin.Models.OfferModel.serchacc[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.OfferModel.serchacc)))
+                {
+                    <input type="radio" name="ruv" class="css-radiobuttonproperty" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text>      } />
+                    <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                    <text>&nbsp;&nbsp;</text>
+                }
+            </div>
+        </div>
+    </div>
+    @Html.HiddenFor(m => m.OfferId)
+    @Html.HiddenFor(m => m.SearchValueForProperty)
+}
+<hr />
+<div id="OfferPropertyList" class="row">
+    @{
+       Html.RenderPartial("~/Areas/Admin/Views/Offer/_PropertyList.cshtml");
+    }
+</div>
+<script type="text/javascript">
+    $(function () {
+        $("#SearchValueForProperty").val("1");
+        $(".css-radiobuttonproperty").change(function () {
+            $("#SearchValueForProperty").val("1");
+            $(".css-radiobuttonproperty").each(function () {
+                if (this.checked) {
+                    $("#SearchValueForProperty").val($(this).attr("id"));
+                }
+            });
+        });
+        $("#btnOfferPropertySearch").click(function () {
+            var url = '@Url.Action("GetPropertiesList", "Offer")';
+            $.post(url, $("#frmFiltersGetproperty").serialize(),
+                    function (data) {
+                        $("#OfferPropertyList").html(data);
+                    });
+        });
+    });
+</script>
+
+

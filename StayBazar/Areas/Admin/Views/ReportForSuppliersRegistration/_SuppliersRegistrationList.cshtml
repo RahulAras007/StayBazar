@@ -1,0 +1,188 @@
+﻿@*@model StayBazar.Areas.Admin.Models.ReportRoomInventoryModel*@
+@model IEnumerable<CLayer.ReportForSuppliersRegistration>
+@using System.Linq
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+      long i=0;
+}
+<div id="content" class="container-fluid">
+    <div class="row">
+        <div class="col-md-12  margin10px">
+            @{
+                StayBazar.Areas.Admin.Models.ReportForSuppliersRegistrationModel filterform = (StayBazar.Areas.Admin.Models.ReportForSuppliersRegistrationModel)ViewBag.Filter;
+                using (Html.BeginForm("Pager", "ReportForSuppliersRegistration", FormMethod.Post, new { @id = "frmPagers" }))
+                {
+                    <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                    <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                    @*<input type="hidden" id="CurrentDate" name="CurrentDate" value="@filterform.CurrentDate" />*@
+                    <input type="hidden" id="FromDate" name="FromDate" value="@filterform.FromDate" />
+                    <input type="hidden" id="ToDate" name="ToDate" value="@filterform.ToDate" />
+                    <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+                }
+                gp.RowsInAPage = filterform.Limit;
+            }
+
+            @if (Model != null && Model.Count() > 0)
+            {
+                @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+            }
+
+           
+            @{
+                List<CLayer.ReportForSuppliersRegistration> activeReg = new List<CLayer.ReportForSuppliersRegistration>();
+                if(Model != null)
+                {
+                    activeReg = Model.Where(x => x.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Active).ToList();
+                }
+            }
+            @if (activeReg.Count > 0)
+            {
+                <h4 class="left">New Suppliers/Properties</h4>
+            <table border="1" class="table table-bordered table-hover table-striped">
+                
+                @foreach (CLayer.ReportForSuppliersRegistration reportList in activeReg)
+                {
+   
+                    
+                        if (i != reportList.B2BId)
+                        {
+                            i = reportList.B2BId;
+
+                            <thead>
+                                <tr>
+                                    <th colspan="9">
+                                        Supplier @reportList.SupplierName
+
+                                        @if (@reportList.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Active)
+                                        {
+                                            <text>Active </text>
+                                        }
+                                        else if (@reportList.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Blocked)
+                                        {
+                                            <text>Blocked </text>
+                                        }
+
+                                    </th>
+                                </tr>
+                            </thead>
+                            <thead>
+                                <tr>
+                                    <th>Supplier Name</th>
+                                    <th>Registration Start Date</th>
+                                    <th>Approval Date</th>
+                                    <th>City</th>
+                                    <th>State</th>
+                                    <th>Country</th>
+                                    <th>No of properties</th>
+                                    <th>Total ACC Inventory</th>
+                                    <th>Allocation for StayBazar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@reportList.SupplierName</td>
+                                    <td>@reportList.RegistrationStartDate.ToShortDateString()</td>
+                                    <td>@reportList.ApprovalDate.ToShortDateString()</td>
+                                    <td>@reportList.City</td>
+                                    <td>@reportList.State</td>
+                                    <td>@reportList.Country</td>
+                                    <td>@reportList.Noofproperties</td>
+                                    <td>@reportList.TotalAccomodationInventory</td>
+                                    <td>@reportList.AllocationforStayBazar</td>
+                                </tr>
+                            </tbody>
+                            <thead>
+
+                                <tr>
+                                    <th colspan="9">Property Details</th>
+                                </tr>
+                            </thead>
+                        }
+                        else
+                        {
+                            <text> </text>
+                        }
+
+
+                        <tbody>
+                            <tr>
+                                <td>@reportList.PropertyName</td>
+                                <td>@reportList.PropertyState</td>
+                                <td>@reportList.PropertyCountry</td>
+                                <td>@reportList.PropertyCity</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>@reportList.PropertyLocation</td>
+                                <td>@reportList.TotalAccomodationInventory</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                        </tbody>
+
+
+
+                    
+                }
+             </table>
+            }
+            @{
+    List<CLayer.ReportForSuppliersRegistration> pendingReg = new List<CLayer.ReportForSuppliersRegistration>();
+    if (Model != null)
+    {
+        pendingReg = Model.Where(x => x.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.NotVerified).ToList();
+    }
+}
+           
+            @if (pendingReg.Count > 0)
+            {
+                 <h4>Suppliers/Properties pending Registration</h4>
+                <table border="1" class="table table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Supplier Name</th>
+                            <th>Registration Start Date</th>
+                            <th>Approval Date</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Country</th>
+                            <th>No of properties</th>
+                            <th>Total ACC Inventory</th>
+                            <th>Allocation for StayBazar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (CLayer.ReportForSuppliersRegistration reportList in pendingReg)
+                    {
+                            <tr>
+                                    <td>@reportList.SupplierName</td>
+                                    <td>@reportList.RegistrationStartDate.ToShortDateString()</td>
+                                    <td>@reportList.ApprovalDate.ToShortDateString()</td>
+                                    <td>@reportList.City</td>
+                                    <td>@reportList.State</td>
+                                    <td>@reportList.Country</td>
+                                    <td>@reportList.Noofproperties</td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            
+                    }
+                    </tbody>
+                </table>
+            }
+
+</div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+        // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "ReportForSuppliersRegistration", new { area = "Admin" })';
+        $.post(url, $("#frmPagers").serialize(), function (data) {
+            $("#SuppliersRegistration").html(data);
+        });
+    }
+</script>

@@ -1,0 +1,163 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    Layout = null;
+    long i = 0;
+    long total = 0;
+    decimal m = 0;
+    decimal tt = 0;
+    double TotalSBC = 0;
+    double TotalKKC = 0;
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" />
+        </ss:Style>
+  <ss:Style ss:ID="DateLiteral">
+         <NumberFormat ss:Format="0"/>
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="Customer Invoice Report">
+        <ss:Table>
+            <ss:Row ss:StyleID="1">
+                <ss:Cell><ss:Data ss:Type="String">Sl No </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Invoice Date </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Invoice No</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking ID </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Customer Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property City </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Guest Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Check In Date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Check Out Date </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">No Of Pax</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No Of Room </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No Of Night </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Total Room Nights</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Room Value Before ST </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Service Tax %</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Service Tax</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">SBC %</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">SBC Amount </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">KKC %</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">KKC Amount </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Other Services Before S.Tax </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Service Tax %</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Service Tax Value</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">SBC %</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">SBC Amount</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">KKC %</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">KKC Amount </ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Total Value Before S. Tax</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Total SBC</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Total KKC</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Total Service Tax</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Grand Total </ss:Data></ss:Cell>
+              
+                <ss:Cell><ss:Data ss:Type="String">Sales Person </ss:Data></ss:Cell>
+            </ss:Row>
+            @foreach (CLayer.OfflineBooking pr in Model)
+            {
+                i = i + 1;
+                if (@pr.Noofnight > 0)
+                {
+                    total = @pr.NoOfRooms * @pr.Noofnight;
+                }
+                else
+                {
+                    total = @pr.NoOfRooms;
+                }
+                m = total * @pr.AvgDailyRateBefreStaxForSalePrice;
+                tt = @pr.AvgDailyRateBefreStaxForSalePrice * total;
+
+
+                decimal amount = ((pr.AvgDailyRateBefreStaxForSalePrice * pr.Noofnight * pr.NoOfRooms));
+                decimal amountOther = @pr.BuyPriceforotherservicesForSalePrice;
+                
+                double prcntgeSwatchbharath = @pr.Swatchbharath;
+                double prcntgeKrishiKalyan = @pr.KrishiKalyan;
+                double prcntgeSwatchbharathOthers = @pr.SwatchbharathOthers;
+                double prcntgeKrishiKalyanOthers = @pr.KrishiKalyanOthers;
+                
+                double doubleValue = decimal.ToDouble(amount);
+                double doubleValueOther = decimal.ToDouble(amountOther);
+                double SwatchbharathAmount = (doubleValue * prcntgeSwatchbharath) / 100;
+                double KrishiKalyanAmount = (doubleValue * prcntgeKrishiKalyan) / 100;
+                double SwatchbharathAmountOthers = (doubleValueOther * prcntgeSwatchbharathOthers) / 100;
+                double KrishiKalyanAmountOthers = (doubleValueOther * prcntgeKrishiKalyanOthers) / 100;
+                TotalKKC = Math.Round(KrishiKalyanAmount + KrishiKalyanAmountOthers, 2);
+                TotalSBC = Math.Round(SwatchbharathAmount + SwatchbharathAmountOthers, 2);
+                KrishiKalyanAmount = Math.Round(KrishiKalyanAmount, 2);
+                KrishiKalyanAmountOthers = Math.Round(KrishiKalyanAmountOthers, 2);
+                SwatchbharathAmount = Math.Round(SwatchbharathAmount, 2);
+                SwatchbharathAmountOthers = Math.Round(SwatchbharathAmountOthers, 2);
+
+
+
+                //New corrections
+                
+                //Servicetax without sbc&kkc
+                decimal ServiceTaxWoutsbckkc = ((pr.StaxForSalePrice - Convert.ToDecimal(prcntgeSwatchbharath + prcntgeKrishiKalyan)));
+
+                //amount
+                decimal TotalAmountBeforeServiceTax = ((pr.AvgDailyRateBefreStaxForSalePrice * pr.Noofnight * pr.NoOfRooms));
+                decimal ServiceTaxAmount = ((TotalAmountBeforeServiceTax) * ServiceTaxWoutsbckkc) / 100;
+                decimal TotalAmountwithServicetax = (TotalAmountBeforeServiceTax + ServiceTaxAmount);
+
+                //OtherServicetax without sbc&kkc
+                decimal OtherServiceTaxWoutsbckkc = ((pr.StaxForotherForSalePrice - Convert.ToDecimal(prcntgeSwatchbharathOthers + prcntgeKrishiKalyanOthers)));
+                
+                //Other services amount
+                decimal Otherservicesamount = Math.Round(pr.BuyPriceforotherservicesForSalePrice, 2);
+                decimal OtherServiceTaxAmount = (((Otherservicesamount) * OtherServiceTaxWoutsbckkc) / 100);
+                decimal OtherTotalAmountwithServicetax = (OtherServiceTaxAmount + Otherservicesamount);
+
+
+                decimal GrantTotal = Math.Round(OtherTotalAmountwithServicetax + TotalAmountwithServicetax + Convert.ToDecimal(TotalSBC) + Convert.ToDecimal(TotalKKC));
+                
+                <ss:Row>
+                
+                    <ss:Cell><ss:Data ss:Type="String">@i</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.InvoiceDate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.InvoiceNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.ConfirmationNumber</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.FirstName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.PropertyName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.Guestname</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.CheckIn_date.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.CheckOut_date.ToShortDateString()</ss:Data></ss:Cell>
+                      <ss:Cell><ss:Data ss:Type="Number">@(pr.NoOfPaxAdult + pr.NoOfPaxChild)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@pr.NoOfRooms</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@pr.Noofnight</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@total</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@m,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@Convert.ToDouble(ServiceTaxWoutsbckkc).ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@ServiceTaxAmount,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.Swatchbharath.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@SwatchbharathAmount,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.KrishiKalyan.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@KrishiKalyanAmount,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@pr.BuyPriceforotherservicesForSalePrice,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@Convert.ToDouble(OtherServiceTaxWoutsbckkc).ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@OtherServiceTaxAmount,2)</ss:Data></ss:Cell>
+
+                    <ss:Cell><ss:Data ss:Type="String">@pr.SwatchbharathOthers.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@SwatchbharathAmountOthers,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@pr.KrishiKalyanOthers.ToString("G")%</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@KrishiKalyanAmountOthers,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round((TotalAmountBeforeServiceTax + Otherservicesamount), 2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@TotalSBC,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round(@TotalKKC,2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@Math.Round((ServiceTaxAmount + OtherServiceTaxAmount),2)</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="Number">@GrantTotal</ss:Data></ss:Cell>
+                   
+                    <ss:Cell><ss:Data ss:Type="String">@pr.SalesPerson</ss:Data></ss:Cell>
+</ss:Row>
+
+
+            }
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

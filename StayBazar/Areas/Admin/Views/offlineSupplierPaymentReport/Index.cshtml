@@ -1,0 +1,329 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    long i = 0;
+    decimal tt = 0;
+    decimal m = 0;
+
+
+    long totalnights = 0;
+
+    double sgst, cgst, igst;
+    double tsgst, tcgst, tigst;
+    double tbgst, togst;
+    int bookingType = 0;
+
+    double osgst, ocgst, oigst;
+    double otsgst, otcgst, otigst;
+
+    double AmountBeforeServiceTax = 0;
+    double totalAmountBeforeTax = 0;
+    double totalAmountAfterTax = 0;
+    ViewBag.Title = "Supplier Payment Report";
+    // Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+}
+
+@*<div class="col-md-12">
+    <h2 class="bold">
+       
+    </h2>
+</div>*@
+
+<input type="hidden" id="HiddenFromDate" value="@ViewBag.FromDate" />
+<input type="hidden" id="HiddenToDate" value="@ViewBag.ToDate" />
+<input type="hidden" id="HiddenSearchString" value="@ViewBag.SearchString" />
+
+<div class="page-title-container style3">
+    <div class="row">
+
+        <div class="col-md-4">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        @*<div class="col-md-10">*@
+            @using (Html.BeginForm("Filter", "offlineSupplierPaymentReport", FormMethod.Post, new { @id = "offlineSupplierPaymentReportFilter" }))
+            {
+                @*<div class="row">*@
+                    <div class="col-md-2 form-group">
+                        <label>From Date</label><input type="text" id="FromDate" name="FromDate" class="form-control input-sm" />
+                    </div>
+
+
+                    <div class="col-md-2 form-group">
+                        <label>To Date</label><input type="text" id="ToDate" name="ToDate" class="form-control input-sm" />
+                    </div>
+                    <br />
+                    <div class="col-md-1 form-group margin-top-10">
+
+                        <button id="btnSearch" class="btn btn-default margin-top-10" type="submit" tabindex="3">Search</button>
+                    </div>
+                    <div class="col-md-1 form-group hidden">
+                        <label>Customer Name/Email</label>
+                        <input type="text" id="SearchString" name="SearchString" class="form-control input-sm" />
+                    </div>
+
+
+                    <div class="col-md-2">
+                        <br />
+                        @*<div class="col-md-3 exporticons" style="TOP: -6PX;">
+                                <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6"></a>
+                            </div>*@
+                        <div class="exporticons" style="TOP: -6PX;">
+                            @*<a title="Print" href="#" onclick="printDoc()" id="btnNextClick" class="fa fa-print"> </a>*@
+                            <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o"></a>
+                            <a title="Export" onclick="Export()" id="btnNextClick" class="fa fa-file-excel-o" tabindex="6"></a>
+                        </div>
+                    </div>
+                @*</div>*@
+            }
+
+        </div>
+        @*</div>*@
+    </div>
+<br />
+<br />
+<div class="container-fluid">
+
+    <div style="padding-left: 30px;">
+        <div class="row">
+            <table border="0" class="table table-custom table-bordered table-hover table-striped" cellpadding="1">
+                <thead>
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Request Date</th>
+                        <th>Booking ID</th>
+                        <th>Customer Name</th>
+                        <th>Customer City</th>
+                        <th>Customer E-mail</th>
+                        <th>Guest Name</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Total no of Pax</th>
+                        <th>Total Room Nights</th>
+                        <th>Total customer payable incuding GST</th>
+                        <th>Customer Payment Mode</th>
+                        <th>Property Name</th>
+                        <th>Property City</th>
+                        <th>Total Supplier value</th>
+                        <th>Payment Schedule Date-1</th>
+                        <th>Payment Schedule Amount-1</th>
+                        <th>Payment Schedule Date-2</th>
+                        <th>Payment Schedule Amount-2</th>
+                        <th>Payment Schedule Date-3</th>
+                        <th>Payment Schedule Amount-3</th>
+                        <th>Bank Name</th>
+                        <th>Branch Name</th>
+                        <th>Beneficiary Name</th>
+                        <th>Account No</th>
+                        <th>Account Type</th>
+                        <th>IFSC Code</th>
+                        <th>Property E-mail ID</th>
+                        <th>Sales Person</th>
+                        <th>Payment Requester</th>
+                        <th>Region</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (CLayer.OfflineBooking pr in Model)
+                    {
+
+                        i = i + 1;
+                        //if (pr.Noofnight > 0)
+                        //{
+                        //    totalnights = pr.NoOfRooms * pr.Noofnight;
+                        //}
+                        //else
+                        //{
+                        //    totalnights = pr.NoOfRooms;
+                        //}
+                        totalnights = pr.TotalNights;
+                        m = totalnights * pr.AvgDailyRateBefreStaxForSalePrice;
+                        tt = pr.AvgDailyRateBefreStaxForSalePrice * totalnights;
+
+                        bookingType = pr.BookingTypeInt;
+
+
+                        DateTime checkin = pr.CheckIn_date;
+                        DateTime checkout = pr.CheckOut_date;
+                        TimeSpan ts = checkout - checkin;
+                        int differenceInDays = ts.Days;
+
+                        long NoOfPaxAdultS = pr.NoOfPaxAdult;
+
+                        long NoOfPaxChild = pr.NoOfPaxChild;
+                        long NOofPax = (NoOfPaxAdultS + NoOfPaxChild);
+
+                        //Customer Value -- amount without tax
+                        if (bookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                        {
+
+                            AmountBeforeServiceTax = (double)((pr.AvgDailyRateBefreStaxForSalePrice * totalnights)) + pr.VSalePriceBeforeTax;
+                            sgst = pr.SGST;
+                            cgst = pr.CGST;
+                            igst = pr.IGST;
+
+                        }
+                        else
+                        {
+                            AmountBeforeServiceTax = pr.DirectAmount + pr.VSalePriceBeforeTax;
+                            sgst = pr.btSGST;
+                            cgst = pr.btCGST;
+                            igst = pr.btIGST;
+
+                        }
+                        tsgst = AmountBeforeServiceTax * sgst * 0.01;
+                        tcgst = AmountBeforeServiceTax * cgst * 0.01;
+                        tigst = AmountBeforeServiceTax * igst * 0.01;
+                        tbgst = tsgst + tcgst + tigst + pr.vSaleGST;
+
+                        double Otherservicesamount = Math.Round((double)pr.BuyPriceforotherservicesForSalePrice, 2);
+                        ocgst = pr.oCGST;
+                        osgst = pr.oSGST;
+                        oigst = pr.oIGST;
+
+                        otcgst = Otherservicesamount * ocgst * 0.01;
+                        otsgst = Otherservicesamount * osgst * 0.01;
+                        otigst = Otherservicesamount * oigst * 0.01;
+
+                        togst = otsgst + otcgst + otigst;
+
+
+                        totalAmountAfterTax = AmountBeforeServiceTax + Otherservicesamount + togst + tbgst;
+                        totalAmountBeforeTax = AmountBeforeServiceTax + Otherservicesamount;
+
+                        var SupplierPaymentDate1 = pr.PaymentScheduleDate1.ToString(System.Globalization.CultureInfo.InvariantCulture).Contains("1900") && !pr.PaymentScheduleDate1.ToString(System.Globalization.CultureInfo.InvariantCulture).Contains("0001") ? pr.PaymentScheduleDate1.ToShortDateString() : string.Empty;
+                        var SupplierPaymentDate2 = pr.PaymentScheduleDate2.ToString(System.Globalization.CultureInfo.InvariantCulture).Contains("1900") && !pr.PaymentScheduleDate2.ToString(System.Globalization.CultureInfo.InvariantCulture).Contains("0001") ? pr.PaymentScheduleDate2.ToShortDateString() : string.Empty;
+                        var SupplierPaymentDate3 = pr.PaymentScheduleDate3.ToString(System.Globalization.CultureInfo.InvariantCulture).Contains("1900") && !pr.PaymentScheduleDate3.ToString(System.Globalization.CultureInfo.InvariantCulture).Contains("0001") ? pr.PaymentScheduleDate3.ToShortDateString() : string.Empty;
+
+                        //Supplier Value -- amount without tax
+                        // decimal TotalAmountBeforeServiceTaxSupplier = ((pr.AvgDailyRateBefreStaxForBuyPrice * total));
+                        // decimal OtherservicesamountSupplier = Math.Round(pr.BuyPriceforotherservicesForBuyprice, 2);
+
+                        //                       decimal TotalAmountBeforeServiceTaxSupplierandOtherservicesamountSupplier = TotalAmountBeforeServiceTaxSupplier + OtherservicesamountSupplier;
+
+                        //VBuyPriceBeforeTax = pr.VBuyPriceBeforeTax;
+                        //VSalePriceBeforeTax = pr.VSalePriceBeforeTax;
+                        //VBuyPriceTotal = reportList.VBuyPriceTotal;
+                        //vSalePriceTotal = reportList.vSalePriceTotal;
+                        //vBuyTax = reportList.vBuyTax;
+                        //vSaleGST = reportList.vSaleGST;
+
+                        <tr>
+                            <td align="center">@i</td><!--Sl no-->
+                            <td align="center">@DateTime.Now.ToShortDateString()</td> <!--Request Id-->
+                            <td align="center">@pr.ConfirmationNumber</td><!--Booking Id-->
+                            <td align="left">@pr.FirstName</td><!--Customer Name-->
+                            <td align="left">@pr.CustomerStatename</td> <!--Customer City-->
+                            <td align="left">@pr.CustomerEmail</td> <!--Customer Email-->
+                            <td align="left">@pr.Guestname</td> <!--Guest Name-->
+                            <td align="center">@pr.CheckIn_date.ToShortDateString()</td> <!--check in-->
+                            <td align="center">@pr.CheckOut_date.ToShortDateString()</td> <!--check out-->
+                            <td align="center">@(pr.NoOfPaxAdult + pr.NoOfPaxChild)</td> <!--Total no of pax-->
+                            <td align="right">@totalnights</td><!--Total room night-->
+                            <td align="right">@Math.Round(pr.TotalSalePrice, 2)</td><!--total customer payable including gst-->
+
+
+                            <td align="center">@pr.CustomerPayment</td><!--Customer Payment Mode-->
+                            <td align="left">@pr.PropertyName</td> <!--Property name-->
+                            <td align="left">@pr.PropertyCityname</td> <!--Property city-->
+                            <td align="right">@Math.Round(@pr.TotalBuyPrice, 2)</td> <!--Total supplier value-->
+                            @if (!pr.PaymentScheduleDate1.ToString(System.Globalization.CultureInfo.InvariantCulture).Contains("0001"))
+                            {
+                                <td align="center">@pr.PaymentScheduleDate1.ToShortDateString()</td> <!--Payment schedule date 1-->
+                                <td align="right">@Math.Round(pr.PaymentScheduleAmount1, 2)</td><!--Payment schedule amount1-->
+                            }
+                            else
+                            {
+                                <td align="center"></td>
+                                <td align="center"></td>
+                            }
+                            @if (!pr.PaymentScheduleDate2.ToString(System.Globalization.CultureInfo.InvariantCulture).Contains("0001"))
+                            {
+                                <td align="center">@pr.PaymentScheduleDate2.ToShortDateString()</td> <!--Payment schedule date 2-->
+                                <td align="right">@Math.Round(pr.PaymentScheduleAmount2, 2)</td><!--Payment schedule amount2-->
+                            }
+                            else
+                            {
+                                <td align="center"></td>
+                                <td align="center"></td>
+                            }
+                            @if (!pr.PaymentScheduleDate3.ToString(System.Globalization.CultureInfo.InvariantCulture).Contains("0001"))
+                            {
+                                <td align="center">@pr.PaymentScheduleDate3.ToShortDateString()</td> <!--Payment schedule date 3-->
+                                <td align="right">@Math.Round(pr.PaymentScheduleAmount3, 2)</td><!--Payment schedule amount3-->
+                            }
+                            else
+                            {
+                                <td align="center"></td>
+                                <td align="center"></td>
+                            }
+
+
+
+                            <td>@pr.BankName</td>
+                            <td>@pr.BranchName</td>
+                            <td>@pr.BeneficiaryName</td>
+                            <td>@pr.AccountNo</td>
+                            <td>@pr.AccountType</td>
+                            <td>@pr.IFSCcode</td>
+                            <td>@pr.PropertyEmail</td>
+                            <td>@pr.SalesPerson</td>
+                            <td>@pr.SalesPerson</td>
+                            <td>@pr.SalesRegion</td>
+
+
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+        <script>
+
+
+  var  from=   $('#HiddenFromDate').val();
+  var to = $('#HiddenToDate').val();
+  var SearchString = $('#HiddenSearchString').val();
+
+  //var f = new Date(from);
+  //var t = new Date(to);
+
+  //var from1 = f.ToShortDateString();
+  //var to1 = t.ToShortDateString();
+
+  $('#FromDate').val(from);
+  $('#ToDate').val(to);
+  $('#SearchString').val(SearchString);
+
+
+
+    $(function () {
+        $('#FromDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy"
+            });
+        $('#ToDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+                beforeShow: function () {
+                    //$(this).datepicker('option', 'minDate', $('#FromDate').val());
+                    //if ($('#FromDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+    });
+
+    function PDF() {
+        var url = '@Url.Action("PDFView", "offlineSupplierPaymentReport")?' + $('#offlineSupplierPaymentReportFilter').serialize();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function Export() {
+        window.location = '@Url.Action("ExcelReport", "offlineSupplierPaymentReport")?' +$('#offlineSupplierPaymentReportFilter').serialize();
+        //window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+
+        </script>

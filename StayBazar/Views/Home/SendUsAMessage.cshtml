@@ -1,0 +1,146 @@
+﻿@{
+    ViewBag.Title = "Send Us a Message";
+    ViewBag.BreadCrumb = " <p style='margin-top: -29px; margin-left: 38px;'> > </p> <div id='breads' style='margin-top: -30px; margin-left: 50px;'> <div itemscope itemtype='http://data-vocabulary.org/Breadcrumb'> <a href=''  itemprop='url'  class=' whitetext breadhvr' > <span class=' whitetext breadhvr'  itemprop='title'>Terms</span></a>  </div> </div>";
+
+}
+
+<div class="parent-div landing-img-send-message">
+    <section class="send-form-landing">
+
+
+        <h1 class="send-mssg-heading mt-5">SEND US A MESSAGE</h1>
+        <div id="accordion" class="myaccordion send-form">
+            <!---
+            <div class="card mssg-allgn2">
+
+              <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect"></label>
+              <select class="custom-select mr-sm-5 option-allgn" id="inlineFormCustomSelect">
+                <option selected>USER</option>
+                <option value="1">CORPORATES</option>
+                <option value="2">CORPORATE EMPLOYEES</option>
+                <option value="3">PROPERTY OWNERS</option>
+                <option value="4">TRAVEL AGENTS</option>
+                <option value="5">STAFF</option>
+                <option value="6">WEBSITE VISITORS</option>
+                <option value="7">OTHERS</option>
+              </select>
+
+            </div>
+            --->
+            <div class="card">
+                <div class="card-header form-header" id="headingfive">
+                    <h2 class="mb-0">
+                        <button class="d-flex align-items-center btn btn-link collapsed" data-toggle="collapse" data-target="#collapsefive" aria-expanded="false" aria-controls="collapsefive">
+                            <span class="fa-stack fa-2x">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-plus fa-stack-1x fa-inverse"></i>
+                            </span>
+                            <h5>  USER</h5>
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapsefive" class="collapse" aria-labelledby="headingfive" data-parent="#accordion">
+                    <div class="card-body">
+                        <div class="mssg-allgn">
+                            <div class="form-check form-check-inline mssg-allgn1">
+                                <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios1" value="option1">
+                                <label class="form-check-label pl-4" for="exampleRadios1">CORPORATES</label>
+                            </div>
+                        </div>
+                        <div class="mssg-allgn">
+                            <div class="form-check form-check-inline mssg-allgn1">
+                                <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios2" value="option2">
+                                <label class="form-check-label pl-4" for="exampleRadios2">CORPORATE EMPLOYEES</label>
+                            </div>
+                        </div>
+                        <div class="mssg-allgn">
+                            <div class="form-check form-check-inline mssg-allgn1">
+                                <input class="form-check-input" name="exampleRadios" type="radio" id="inlineCheckbox2" value="option3">
+                                <label class="form-check-label pl-4" for="inlineCheckbox2">PROPERTY OWNERS</label>
+                            </div>
+                        </div>
+                        <div class="mssg-allgn">
+                            <div class="form-check form-check-inline mssg-allgn1">
+                                <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios3" value="option4">
+                                <label class="form-check-label pl-4" for="exampleRadios3">TRAVEL AGENTS</label>
+                            </div>
+                        </div>
+                        <div class="mssg-allgn">
+                            <div class="form-check form-check-inline mssg-allgn1">
+                                <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios4" value="option5">
+                                <label class="form-check-label pl-4" for="exampleRadios4">STAFF</label>
+                            </div>
+                        </div>
+                        <div class="mssg-allgn">
+                            <div class="form-check form-check-inline mssg-allgn1">
+                                <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios5" value="option6">
+                                <label class="form-check-label pl-4" for="exampleRadios5">WEBSITE VISITORS</label>
+                            </div>
+                        </div>
+                        <div class="mssg-allgn">
+                            <div class="form-check form-check-inline mssg-allgn1">
+                                <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios6" value="option7">
+                                <label class="form-check-label pl-4" for="exampleRadios6">OTHERS</label>
+                            </div><textarea class="form-control" rows="4" cols="30" id="message" name="Message" placeholder=""></textarea>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header form-header" id="headingsix">
+                    <h2 class="mb-0">
+                        <button class="d-flex align-items-center btn btn-link collapsed" data-toggle="collapse" data-target="#collapsesix" aria-expanded="false" aria-controls="collapsesix">
+                            <span class="fa-stack fa-2x">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-plus fa-stack-1x fa-inverse"></i>
+                            </span>
+                            <h5> TYPE OF MESSAGE</h5>
+
+                        </button>
+                    </h2>
+                </div>
+                <div>
+                    <div id="collapsesix" class="collapse" aria-labelledby="headingsix" data-parent="#accordion">
+                        <div class="card-body">
+                            <div class="mssg-allgn">
+                                <div class="form-check form-check-inline mssg-allgn1">
+                                    <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios7" value="option1">
+                                    <label class="form-check-label pl-4" for="exampleRadios7">General</label>
+                                </div>
+                            </div>
+                            <div class="mssg-allgn">
+                                <div class="form-check form-check-inline mssg-allgn1">
+                                    <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios8" value="option2">
+                                    <label class="form-check-label pl-4" for="exampleRadios8">Support</label>
+                                </div>
+                            </div>
+                            <div class="mssg-allgn">
+                                <div class="form-check form-check-inline mssg-allgn1">
+                                    <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios9" value="option2">
+                                    <label class="form-check-label pl-4" for="exampleRadios9">Feedback</label>
+                                </div>
+                            </div>
+                            <div class="mssg-allgn">
+                                <div class="form-check form-check-inline mssg-allgn1">
+                                    <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios10" value="option2">
+                                    <label class="form-check-label pl-4" for="exampleRadios10">Sales</label>
+                                </div>
+                            </div>
+                            <div class="mssg-allgn">
+                                <div class="form-check form-check-inline mssg-allgn1">
+                                    <input class="form-check-input" name="exampleRadios" type="radio" id="exampleRadios11" value="option2">
+                                    <label class="form-check-label pl-4" for="exampleRadios11">Other</label>
+                                </div><textarea class="form-control" rows="4" cols="30" id="message" name="Message" placeholder=""></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary form-btn">Send</button>
+        </div>
+
+    </section>
+</div>

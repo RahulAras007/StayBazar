@@ -1,0 +1,109 @@
+﻿@model StayBazar.Areas.Admin.Models.InvoiceListModel
+@using Microsoft.AspNet.Identity;
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "OfflineshowPager";
+    gp.ColumnsInPager = 8;
+    //   gp.RowsInAPage = 25;
+    int slNo = Model.Start;
+    int pageNo = Model.Start;
+    if (pageNo < 1) { pageNo = 1; }
+
+    if (slNo < 1) { slNo = 1; }
+    slNo = slNo * StayBazar.Areas.Admin.Controllers.InvoiceListController.ROWS_PER_PAGE - StayBazar.Areas.Admin.Controllers.InvoiceListController.ROWS_PER_PAGE;
+    if (slNo <= 1)
+    { slNo = 1; }
+    else { slNo++; }
+    string email = User.Identity.GetUserName();
+    int roleId = BLayer.User.GetRole(email);
+    List<CLayer.RolePermission> perm = BLayer.RolePermissions.GetAllPermissions(roleId);
+    bool hasInvoicePermisson = perm.Exists(m => m.ModuleId == StayBazar.Common.AdminRolePermission.INVOICE_APPROVAL && m.HasAccess);
+
+}
+<div class="col-md-12">
+   
+        @if (Model.Bookings.Count() == 0)
+        {
+            <div class="height10px"></div>
+            <div class="alert alert-info">Data not found</div>
+        }
+        else
+        {
+            gp.RowsInAPage = Model.Limit;
+            <div class="col-md-12">@Html.Raw(gp.GetPager(Model.TotalRows, pageNo))</div>
+        <div class="col-lg-12">
+            <table class="table table-custom table-bordered table-hover table-striped" border="1">
+                <thead style="background-color:whitesmoke">
+                    <tr>
+                        <th class="text-center">Sl No</th>
+                        <th>Booking Number</th>
+                        <th>Invoice Number</th>
+                        <th class="text-center">Check In</th>
+                        <th class="text-center">Check Out</th>
+                        <th class="text-center">Booking Date</th>
+                        <th>Customer Name</th>
+                        <th>Property Name</th>
+                        <th>Property City</th>
+                        <th class="text-center">Total Sale Price</th>
+
+                        @if (Model.Status != 4)
+                        {
+                            <th width="208">Invoice Edit</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (CLayer.OfflineBooking item in Model.Bookings)
+                    {
+                        <tr>
+                            <td class="text-center">@slNo</td>
+                            <td>
+                                @item.ConfirmationNumber
+                            </td>
+                            <td>@item.InvoiceNumber</td>
+                            <td class="text-center">@item.CheckIn.ToString("dd/MM/yyyy")</td>
+                            <td class="text-center">@item.CheckOut.ToString("dd/MM/yyyy")</td>
+                            <td class="text-center">@item.CreatedTime.ToString("dd/MM/yyyy")</td>
+                            <td>@item.CustomerName</td>
+                            <td>@item.PropertyName</td>
+                            <td>@item.PropertyCityname</td>
+                            <td class="text-right">@item.TotalSalePrice.ToString("#,##,##0.00")</td>
+                            @if (Model.Status != 4)
+                            {
+                                <td>
+                                    @if (item.SaveStatus != (int)CLayer.OfflineBooking.Statuslist.Delete)
+                                    {
+                                        if (hasInvoicePermisson)
+                                        {
+                                            <a href="#" class="btn btn-info margin5px" onclick="showInvoice(@item.OfflineBookingId)">Invoice</a>
+                                        }
+                                        else
+                                        {
+                                            if (item.InvoiceStatus == (int)CLayer.ObjectStatus.InvoiceStatus.Submitted)
+                                            {
+                                                <a href="#" class="btn btn-info" onclick="showInvoicePreviewonly(@item.OfflineBookingId)">Invoice</a>
+                                            }
+                                        }
+                                        <a href="#" class="btn btn-info margin5px" onclick="showProforma(@item.OfflineBookingId) ">Proforma</a>
+                                        if (item.SaveStatus == (int)CLayer.OfflineBooking.Statuslist.Approved)
+                                        {
+                                            if (item.InvoiceStatus == (int)CLayer.ObjectStatus.InvoiceStatus.Submitted)
+                                            {
+                                                <a href="#" class="btn btn-success margin5px" onclick="showInvoicewithoutsign(@item.OfflineBookingId)">View Invoice Without Sign</a>
+                                            }
+                                        }
+                                    }
+                                </td>
+                            }
+                        </tr>
+                        slNo++;
+                    }
+
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-12">@Html.Raw(gp.GetPager(Model.TotalRows, pageNo))</div>
+        
+    }
+</div>

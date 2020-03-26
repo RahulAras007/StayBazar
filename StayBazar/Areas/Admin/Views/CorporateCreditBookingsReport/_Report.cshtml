@@ -1,0 +1,162 @@
+﻿@model IEnumerable<CLayer.CreditBookingReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+    long bookuserid = 0;
+    long bookuser = 0;
+    long cn1 = 0;
+    DateTime FDate = DateTime.Today.AddDays(-30);
+    DateTime TDate = DateTime.Today;
+}
+<div class="row">
+    <div class="col-md-12  margin10px">
+        @{
+            if (ViewBag.Filter != null)
+            {
+                StayBazar.Areas.Admin.Models.CreditBookingModel filterform = (StayBazar.Areas.Admin.Models.CreditBookingModel)ViewBag.Filter;
+                using (Html.BeginForm("Pager", "CorporateCreditBookingsReport", FormMethod.Post, new { @id = "frmPagersa" }))
+                {
+                    <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+                    <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                    <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                    <input type="hidden" id="FromDate" name="FromDate" value="@filterform.FromDate" />
+                    <input type="hidden" id="ToDate" name="ToDate" value="@filterform.ToDate" />
+                    <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+                    FDate = filterform.FromDate;
+                    TDate = filterform.ToDate;
+                }
+                gp.RowsInAPage = filterform.Limit;
+
+                if (Model != null && Model.Count() > 0)
+                {
+                    @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+                }
+            }
+        }
+        <div>
+
+            <div style="text-align:left">@*<h4>Credit Booking Report</h4>*@ </div>
+            <table class="table table-custom table-bordered table-hover table-striped" border="1">
+                @*<caption>@{StayBazar.Areas.Admin.Models.CollectionReportModel b = new StayBazar.Areas.Admin.Models.CollectionReportModel();<text>Page:</text> @b.currentPage }</caption>*@
+                <thead style="background-color:whitesmoke">
+                    <tr>
+                        <th>Sl No</th>
+                        <th>Corporate Name</th>
+                        <th>Customer Name</th>
+                        <th>Booking Date</th>
+                        <th>Booking Ref No</th>
+                        <th>Property Booked</th>
+                        <th>Check in</th>
+                        <th>Checkout</th>
+                        <th>Booking amount</th>
+                        <th>Payment Status</th>
+                        <th>Date Due</th>
+                        <th>Over Due</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  
+                    @foreach (CLayer.CreditBookingReport reportList in Model)
+                    {
+                  
+                        long BuserId = BLayer.Bookings.GetBookedByUserId(Convert.ToInt32(reportList.BookingId));
+                        CLayer.B2B Creditbookingdata = BLayer.B2B.GetbookingcreditforCorte(BuserId);
+
+                        i = i + 1;
+
+
+
+                        DateTime datedue = reportList.BookingDate.AddDays(Creditbookingdata.CreditDays);
+                        DateTime today = DateTime.Today;
+                        <tr>
+                            <td align="center">@i</td>
+                            <td>@reportList.CorporateName</td>
+                            <td>@reportList.CustomerName</td>
+                            <td align="center">@reportList.BookingDate.ToShortDateString()</td>
+                            <td align="center">@reportList.BookingRefNo</td>
+                            <td>@reportList.PropertyName</td>
+                            <td align="center">@reportList.CheckIn.ToShortDateString()</td>
+                            <td align="center">@reportList.CheckOut.ToShortDateString()</td>
+                            <td align="right">@reportList.TotalAmount</td>
+                            <td align="center">
+                            @if (reportList.IsCorpbookingpaid == 1)
+                            { 
+                               <text>Paid</text>
+                            }
+                            else
+                            {
+                                <text>Pending</text>
+                            }         
+                            </td>
+                            <td align="center">@datedue.ToShortDateString()</td>
+                            <td align="center">
+                                @if (datedue < today)
+                                { <text> YES </text> }
+                                else
+                                { <text> NO </text> }
+                            </td>
+                        </tr>
+                        if (bookuserid != BuserId)
+                        {
+                             bookuserid = BuserId;
+                             long countno = BLayer.CreditBooking.GetCountForBookings(bookuserid,FDate,TDate);
+                             cn1 = cn1 + countno;
+                        }
+                        if (i == cn1)
+                        {
+                            bookuser = bookuserid;
+                            CLayer.B2B Creditbookingdata1 = BLayer.B2B.GetbookingcreditforCorte(BuserId);
+                            decimal amt = BLayer.Bookings.GetTotalcreditbookamountforReport(BuserId, FDate, TDate);
+                            decimal amtforcreditblnc = BLayer.Bookings.GetTotalcreditbookamount(BuserId);
+
+                            decimal creditbalceAmt = Creditbookingdata1.TotalCreditAmount - amtforcreditblnc;
+                            <tr>
+                                <th colspan="12">Booking Summary</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3">Total Amount booked by Corporate</th>
+                                <th colspan="2">Credit Limit Total</th>
+                                <th colspan="2">Credit Limit Balance</th>
+                                <th colspan="2">Payments Due</th>
+                                <th colspan="3">Date Due</th>
+                            </tr>
+                            <tr>
+                                <td colspan="3" align="right">@amt</td>
+                                <td colspan="2" align="right">@Creditbookingdata1.TotalCreditAmount</td>
+                                <td colspan="2" align="right">@creditbalceAmt</td>
+                                <td colspan="2" align="center">
+                                    @if (creditbalceAmt < 0)
+                                { <text> YES </text> }
+                                else
+                                { <text> NO </text> }
+                                </td>
+                                <td colspan="3" align="center">
+                                    @reportList.BookingDate.AddDays(Creditbookingdata1.CreditDays).ToShortDateString()
+                                </td>
+                            </tr>
+
+                        }
+
+                        <tr style="height:10px;"></tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+        // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "CorporateCreditBookingsReport", new { area = "Admin" })';
+        $.post(url, $("#frmPagersa").serialize(), function (data) {
+            $("#CollectionReportList").html(data);
+        });
+    }
+</script>
+

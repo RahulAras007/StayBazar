@@ -1,0 +1,118 @@
+﻿@*@model StayBazar.Areas.Admin.Models.OfferModel*@
+@model IEnumerable<CLayer.Offers>
+    @{
+        Layout = null;
+        StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+        gp.JavascriptFuncName = "showPager";
+        gp.ColumnsInPager = 8;
+        gp.RowsInAPage = 25;
+    }
+<div class="col-lg-12" id="Tabledata2">
+    @{
+    StayBazar.Areas.Admin.Models.offersearch filterform = (StayBazar.Areas.Admin.Models.offersearch)ViewBag.Filter;
+    using (Html.BeginForm("Pager", "OfferList", FormMethod.Post, new { @id = "#frmPagersOfferList1x" }))
+    {
+    <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+    <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+    <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+    <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+    <input type="hidden" id="Status" name="Status" value="@filterform.Status" />
+    }
+    gp.RowsInAPage = filterform.Limit;
+}
+    @if (Model != null && Model.Count() > 0)
+    {
+        @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+    }
+    @if (Model.Count() == 0)
+{
+    <div class="alert alert-info">Data not found</div>
+}
+else
+    { 
+    <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>No.Of Days</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody id="data1">
+            @if (Model != null && Model.Count() > 0)
+            {
+                foreach (CLayer.Offers usr in Model)
+                {
+                    <tr>
+                        <td>@usr.OfferTitle </td>
+                        <td>@usr.NoOfDays</td>
+                        <td>@usr.StartDate.ToShortDateString()</td>
+                        <td>@usr.EndDate.ToShortDateString()</td>
+                        <td>
+                            <a href="#" class="@((usr.Status==(int)CLayer.ObjectStatus.StatusType.Active)? "status1":"status2")" id="status@(usr.OfferId)" title="Edit" onclick="EditStatusBT(@usr.OfferId,@usr.Status)">
+                                @{
+                    int id = usr.Status;
+                    if (id == (int)CLayer.ObjectStatus.StatusType.Active)
+                    {
+                        <text>Active</text>
+                    }
+                    else
+                    {
+                        <text>Disabled</text>
+                    }
+                                }
+                            </a>
+                        </td>
+                        <td align="center"><a href="~/Admin/Offer/Index/?OfferId=@usr.OfferId" title=" edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></td>
+                       
+                            <td align="center"><a href="#" onclick="DeleteOffer(@usr.OfferId)"><span class="glyphicon glyphicon-remove red-color fa-2x"></span></a></td>
+                    </tr>
+                }
+            }
+            else
+            { 
+                   <tr>
+                  <td><div class=" col-lg-12"> <div class="alert alert-info">Data not found</div></div></td>
+                    </tr>          
+            }
+        </tbody>
+    </table>  
+    }
+    @if (Model != null && Model.Count() > 0)
+    {
+        @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+    }
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "OfferList", new { area = "Admin" })';
+        var pSearchString = $("#SearchString").val();
+        var pcurrentPage = $("#currentPage").val();
+        var pLimit = $("#Limit").val();
+        var pSearchValue = $("#SearchValue").val();
+        var pStatus = $("#Status").val();
+       // alert(pSearchString + " " + pcurrentPage + " " + pLimit + " " + pSearchValue + " " + pStatus);
+        $.post(url, { SearchString:pSearchString, currentPage: pcurrentPage,Limit:pLimit,SearchValue:pSearchValue,Status:pStatus }, function (data) {
+       // $.post(url, $("#frmPagersOfferList1x").serialize(), function (data) {
+            $("#gridList").html(data);         
+        });
+    }
+    function DeleteOffer(OfferId) {
+        // add loading image to div  
+        confirm('Are you sure you want to delete this offer?')
+        var url = '@Url.Action("Delete", "OfferList", new { area = "Admin" })';
+        var pSearchString = $("#SearchString").val();
+        var pcurrentPage = $("#currentPage").val();
+        var pLimit = $("#Limit").val();
+        var pSearchValue = $("#SearchValue").val();
+        var pStatus = $("#Status").val();
+        $.post(url, {Id:OfferId,SearchString: pSearchString, currentPage: pcurrentPage, Limit: pLimit, SearchValue: pSearchValue, Status: pStatus }, function (data) {
+            $("#gridList").html(data);
+        });
+    }
+    </script>  

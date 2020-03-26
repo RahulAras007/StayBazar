@@ -1,0 +1,103 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@using Microsoft.AspNet.Identity
+@{
+    Layout = null;
+    CLayer.OfflineBooking Offlinedata = BLayer.OfflineBooking.GetOfflineboikingdetailsforBookDeleteRequest(Model.OfflineBookingId);
+    decimal SupplierPayment = BLayer.SupplierPayment.GetSupplierPaymentBybookingid(Model.OfflineBookingId);
+
+    //string email = User.Identity.GetUserName();
+    string username = "";
+    if (Model.LoginUserid > 0)
+    {
+        //long id = BLayer.User.GetUserId(email);
+        CLayer.User userdt = BLayer.User.Get(Model.LoginUserid);
+        if (userdt != null)
+        {
+            username = userdt.FirstName + ' ' + userdt.LastName;
+        }
+    }
+}
+@{
+    string SbEntityName = "";
+    string SbEntityAddress = "";
+    string SbEntityCountry = "";
+    string SbEntityState = "";
+    //Get Entity address
+    if (Model.OfflineBookingId > 0)
+    {
+        CLayer.OfflineBooking SbEntityBillingAddress = BLayer.OfflineBooking.GetSBEntityAddressDetailsByOffId(Model.OfflineBookingId);
+        if (SbEntityBillingAddress != null)
+        {
+            if (SbEntityBillingAddress.SbEntityBillingName != "" && SbEntityBillingAddress.SbEntityBillingName != null) { SbEntityName = SbEntityBillingAddress.SbEntityBillingName; }
+            if (SbEntityBillingAddress.SbEntityBillingAddress != "" && SbEntityBillingAddress.SbEntityBillingAddress != null) { SbEntityAddress = SbEntityBillingAddress.SbEntityBillingAddress; }
+            if (SbEntityBillingAddress.SbEntityBillingCountry != "" && SbEntityBillingAddress.SbEntityBillingCountry != null) { SbEntityCountry = SbEntityBillingAddress.SbEntityBillingCountry; }
+            if (SbEntityBillingAddress.SbEntityBillingState != "" && SbEntityBillingAddress.SbEntityBillingState != null) { SbEntityState = SbEntityBillingAddress.SbEntityBillingState; }
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>BOOKINGDELETEREQUEST</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <tr>
+            <td align="center">
+                <table width="700">
+                    <thead>
+                        <tr>
+                            <th align="left" style="padding-top: 2%;" colspan="3">
+                                <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                            </th>
+                            <th width="200" align="right" style="font-size:12px;">
+                                @*Phone: +91 80 25722898<br />*@
+                                Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" align="center">
+                                <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">BOOKING DELETE REQUEST</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <p>
+                                    User @username has tried deleting booking ID @Offlinedata.ConfirmationNumber from the system. Deletion could not be allowed since invoice no @Offlinedata.InvoiceNumber has already raised / supplier has been paid Rs. @SupplierPayment against this booking.
+                                </p>
+                            </td>
+
+                        </tr>
+                        <tr style="height:150px;"></tr>
+                    </tbody>
+                    <tfoot>
+                        @*<tr>
+                                <td align="center" colspan="4">
+                                    <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px; margin:0 0 10px !important">
+                                        View your online itinerary for additional information
+                                    </p>
+                                    <p style="font-size:14px; margin:0 0 10px !important">
+                                        Need help with your reservation? – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                                    </p>
+                                    <p style="font-size:14px; margin:0 0 10px !important">
+                                        Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                                    </p>
+                                    <p style="font-size:14px; margin:0 0 10px !important">
+                                        www.staybazar.com
+                                    </p>
+                                    <p style="font-size:14px; margin:0 0 10px !important">
+                                        <span style="font-weight:bold;">Address: </span>@SbEntityAddress,@SbEntityState,@SbEntityCountry<br />
+                                        <span style="font-weight:bold;">Phone: </span>080-2572-2898 / 4091 - 6686
+                                    </p>
+                                </td>
+                            </tr>*@
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

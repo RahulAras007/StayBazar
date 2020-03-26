@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="www.tamarindtours.in/ITamarindDataService" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="www.tamarindtours.in/ITamarindDataService" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="www.tamarindtours.in/ITamarindDataService/Imports">
+      <xsd:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?xsd=xsd0" namespace="www.tamarindtours.in/ITamarindDataService" />
+      <xsd:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" />
+      <xsd:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/TamarindDataService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ITamarindDataService_SearchHotels_InputMessage">
+    <wsdl:part name="parameters" element="tns:SearchHotels" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_SearchHotels_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SearchHotelsResponse" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_SearchHotels_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q1:InputException" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetHotels_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetHotels" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetHotels_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetHotelsResponse" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetHotels_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q2:InputException" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetHotelInfo_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetHotelInfo" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetHotelInfo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetHotelInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetHotelInfo_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q3:InputException" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetCostBreakup_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCostBreakup" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetCostBreakup_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCostBreakupResponse" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetCostBreakup_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q4:InputException" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_viewPendingApprovals_InputMessage">
+    <wsdl:part name="parameters" element="tns:viewPendingApprovals" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_viewPendingApprovals_OutputMessage">
+    <wsdl:part name="parameters" element="tns:viewPendingApprovalsResponse" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_viewPendingApprovals_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q5:InputException" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_approvalreject_InputMessage">
+    <wsdl:part name="parameters" element="tns:approvalreject" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_approvalreject_OutputMessage">
+    <wsdl:part name="parameters" element="tns:approvalrejectResponse" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_approvalreject_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q6:InputException" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetCancellationPolicies_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCancellationPolicies" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetCancellationPolicies_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCancellationPoliciesResponse" />
+  </wsdl:message>
+  <wsdl:message name="ITamarindDataService_GetCancellationPolicies_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q7:InputException" />
+  </wsdl:message>
+  <wsdl:portType name="ITamarindDataService">
+    <wsdl:operation name="SearchHotels">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/SearchHotels" message="tns:ITamarindDataService_SearchHotels_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/SearchHotelsResponse" message="tns:ITamarindDataService_SearchHotels_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/SearchHotelsInputExceptionFault" name="InputExceptionFault" message="tns:ITamarindDataService_SearchHotels_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetHotels">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetHotels" message="tns:ITamarindDataService_GetHotels_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetHotelsResponse" message="tns:ITamarindDataService_GetHotels_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetHotelsInputExceptionFault" name="InputExceptionFault" message="tns:ITamarindDataService_GetHotels_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetHotelInfo">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetHotelInfo" message="tns:ITamarindDataService_GetHotelInfo_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetHotelInfoResponse" message="tns:ITamarindDataService_GetHotelInfo_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetHotelInfoInputExceptionFault" name="InputExceptionFault" message="tns:ITamarindDataService_GetHotelInfo_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCostBreakup">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetCostBreakup" message="tns:ITamarindDataService_GetCostBreakup_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetCostBreakupResponse" message="tns:ITamarindDataService_GetCostBreakup_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetCostBreakupInputExceptionFault" name="InputExceptionFault" message="tns:ITamarindDataService_GetCostBreakup_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="viewPendingApprovals">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/viewPendingApprovals" message="tns:ITamarindDataService_viewPendingApprovals_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/viewPendingApprovalsResponse" message="tns:ITamarindDataService_viewPendingApprovals_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/viewPendingApprovalsInputExceptionFault" name="InputExceptionFault" message="tns:ITamarindDataService_viewPendingApprovals_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="approvalreject">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/approvalreject" message="tns:ITamarindDataService_approvalreject_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/approvalrejectResponse" message="tns:ITamarindDataService_approvalreject_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/approvalrejectInputExceptionFault" name="InputExceptionFault" message="tns:ITamarindDataService_approvalreject_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCancellationPolicies">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetCancellationPolicies" message="tns:ITamarindDataService_GetCancellationPolicies_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetCancellationPoliciesResponse" message="tns:ITamarindDataService_GetCancellationPolicies_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/ITamarindDataService/ITamarindDataService/GetCancellationPoliciesInputExceptionFault" name="InputExceptionFault" message="tns:ITamarindDataService_GetCancellationPolicies_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

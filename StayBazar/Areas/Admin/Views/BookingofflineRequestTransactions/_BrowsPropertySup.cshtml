@@ -1,0 +1,32 @@
+﻿@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="input-group">
+            <input type="text" id="searchpropfromsup" class="form-control">
+            <span class="input-group-btn" id="goidforsup">
+                <button class="btn btn-default" onclick="findpropertyfromsup()" type="button">Go!</button>
+            </span>
+        </div><!-- /input-group -->
+    </div>
+</div>
+<div class="row top-margin-10px" id="browseListprofromsup">
+    @Html.Partial("_PropertyList", new List<CLayer.Property>())
+</div>
+<script type="text/javascript">
+    function findpropertyfromsup()
+    {
+        if ($("#searchprop").val().trim() == "")
+        {
+            alert('Search criteria not found!');
+            return;
+        }
+        var cname2 = $("#searchprop").val();
+        $.post('@Url.Action("Searchforofflinebook", "property", new { area = "Admin" })', { name: cname2 },function (data){
+            $("#browseListprofromsup").html(data);
+        });
+    }
+    function selectCorporate() {
+    }
+</script>

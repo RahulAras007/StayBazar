@@ -1,0 +1,38 @@
+﻿@model StayBazar.Models.ConditionModel
+@using Microsoft.AspNet.Identity
+@{
+    Layout = null;
+}
+@try
+{
+    using (Html.BeginForm("Save", "Condition", FormMethod.Post, new { @id = "frmFiltersUpdate" }))
+    {
+        @*@Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)*@
+        @Html.HiddenFor(m => m.PropertyId)
+        @Html.HiddenFor(m => m.AccommodationId)
+        @Html.HiddenFor(m => m.ConditionId)
+    <div class="margin10px">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group ">
+                    @Html.LabelFor(m => m.ConditionText)<span style="color:red">*</span>
+                    @Html.TextBoxFor(m => m.ConditionText, new { @tabindex = "2", @class = "form-control input-sm" })
+                    @Html.ValidationMessageFor(m => m.ConditionText)
+                </div>
+                <div class="form-group text-right">
+                    <button type="submit" class="btn redbg whitetext border-radius0">Save</button>
+                    <a href="~/Condition/?id=@Model.AccommodationId" class="btn greybg whitetext border-radius0">Cancel</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    }
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex); 
+    Response.Redirect("~/Condition/Index");
+}
+

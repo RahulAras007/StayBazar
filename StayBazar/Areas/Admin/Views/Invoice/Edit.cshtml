@@ -1,0 +1,217 @@
+﻿@model StayBazar.Areas.Admin.Models.Invoice
+@using System.Linq
+@using Microsoft.AspNet.Identity
+@{
+    Layout = null;
+    //Get all blocked permissions
+    string email = User.Identity.GetUserName();
+    int roleId = BLayer.User.GetRole(email);
+
+    List<CLayer.RolePermission> perm = BLayer.RolePermissions.GetAllPermissions(roleId);
+    bool hasInvoicePermisson = perm.Exists(m => m.ModuleId == StayBazar.Common.AdminRolePermission.INVOICE_APPROVAL && m.HasAccess);
+    //	bool hasOfflineBookingDeletePermission = perm.Exists(m=>m.ModuleId==StayBazar.Common.AdminRolePermission.OFFLINEBOOKING_DELETE && m.HasAccess);
+   // bool approvalAllowed = true;
+    //if (BLayer.OfflineBooking.GetBookingType(Model.OfflineBookingId) != (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+    //{
+    //    approvalAllowed = true;
+    //}
+
+    int OfflineBookingType = BLayer.OfflineBooking.GetBookingType(Model.OfflineBookingId);
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Preview</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/popup.css" />
+    <link href="~/Content/jquery-ui.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery-ui.structure.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery-ui.theme.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.10.1.min.js"></script>
+    <script src="~/Scripts/jquery-ui.min.js"></script>
+</head>
+<body>
+    <div class="row tophd">
+        <div class="col-xs-3"><div class="titlebar">Invoice - Edit</div></div>
+        <div class="col-xs-2">
+            <div class="lnkbtn">
+                <a class="lnkbtn" href="Edit?obid=@Model.OfflineBookingId">Edit</a> |
+                <a class="lnkbtn" href="Preview?obid=@Model.OfflineBookingId">Preview</a>
+            </div>
+        </div>
+    </div>
+    <style>
+        .pointernone {
+            pointer-events: none;
+        }
+    </style>
+    @using (Html.BeginForm("SaveDetails", "Invoice", FormMethod.Post, new { role = "form" }))
+    {
+        <div class="container">
+            <div class="row" id="Invoice_div">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div>&nbsp;</div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="editor-field" id="HtmlSection1_id">
+                            Edit Top area of Invoice : <br />
+                            @Html.TextAreaFor(model => model.HtmlSection1)<br />
+                        </div>
+                        <div class="editor-field" id="HtmlSection2_id">
+                            Edit details area of Invoice : <br />
+                            @Html.TextAreaFor(model => model.HtmlSection2)<br />
+                        </div>
+                        <div class="editor-field" id="HtmlSection3_id">
+                            Edit bottom area of Invoice : <br />
+                            @Html.TextAreaFor(model => model.HtmlSection3)
+                        </div>
+                        @if (OfflineBookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                        {
+                            <div class="editor-field" id="HtmlSection4_id">
+                                Edit details area of Invoice : <br />
+                                @Html.TextAreaFor(model => model.HtmlSection4)
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    @Html.HiddenFor(m => m.OPType)
+                    @Html.HiddenFor(m => m.OfflineBookingId)
+                    @Html.HiddenFor(m => m.InvoiceId)
+                    @Html.HiddenFor(m => m.ShowText)
+                </div>
+                <div class="col-md-9 text-right">
+
+                    @if (@Model.Status == (int)CLayer.ObjectStatus.InvoiceStatus.Submitted)
+                    {
+
+                        <a href="InvoicePDF?obid=@Model.OfflineBookingId" target="_blank" class="btn btn-info">PDF</a>
+                        if (hasInvoicePermisson)
+                        {<input id="resetbtn" class="btn btn-danger" typeof="button" value="Reset Content" /> }
+
+                        if (OfflineBookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                        {
+                        <input id="mailbtn" class="btn btn-info" type="button" value="Send Mail" />
+                        }
+
+
+                        if (hasInvoicePermisson)
+                        { <input id="savebtn" class="btn btn-success" type="submit" value="Save" /> }
+
+                    }
+                    else
+                    {
+                        <input id="resetbtn" class="btn btn-danger" typeof="button" value="Reset Content" />
+                        <input id="savebtn" class="btn btn-success" type="submit" value="Save" />
+                        if (hasInvoicePermisson)
+                        {
+                            <input id="Submitbtn" class="btn btn-success" type="button" value="Approve" />
+                        }
+                    }
+                    <br /><br /><br />
+
+                </div>
+            </div>
+
+            <div class="row hidden">
+                <div class="col-md-4">
+                    <div>Invoice Date</div>
+                </div>
+            </div>
+
+            <div class="row hidden">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.InvoiceDate, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script src="/Scripts/tinymce/tiny_mce.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            var edit2 = ',HtmlSection2,HtmlSection4';
+            @*if(@Model.Status == 2 )
+            {
+                $("#HtmlSection2_id").hide();
+                edit2='';
+            }
+            if ($("#ShowText").val() == 2) {
+                $("#HtmlSection2_id").hide();
+                edit2='';
+            }*@
+            tinyMCE.init({
+                mode: "exact", elements: "HtmlSection1,HtmlSection3" + edit2, theme: "advanced", height: "400", width: "790", verify_html: false,
+                plugins: "pagebreak,style,layer,table,save,advhr,advimage,advlink,iespell,inlinepopups,insertdatetime,preview,searchreplace,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,advlist",
+                theme_advanced_buttons1: ",bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
+                //theme_advanced_buttons2: "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+                //theme_advanced_buttons3: "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+                //theme_advanced_buttons4: "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak,restoredraft,codehighlighting,netadvimage",
+                theme_advanced_toolbar_location: "top",
+                theme_advanced_toolbar_align: "left",
+                theme_advanced_statusbar_location: "bottom",
+                theme_advanced_resizing: false,
+
+                convert_urls: false, template_external_list_url: "lists/template_list.js",
+                external_link_list_url: "lists/link_list.js", external_image_list_url: "lists/image_list.js",
+                media_external_list_url: "lists/media_list.js",
+            });
+        });
+        $(function () {
+            var checkin = $('#InvoiceDate').datepicker(
+            {
+
+                dateFormat: "dd/mm/yy"
+            });
+            //checkin.show();
+            $("#mailbtn").click(function () {
+                $("#mailbtn").attr('disabled', 'disabled');
+                $('#OPType').val(2);
+                document.forms[0].submit();
+            });
+            $("#Submitbtn").click(function () {
+                $("#Submitbtn").attr('disabled', 'disabled');
+                $('#OPType').val(4);
+                document.forms[0].submit();
+            });
+
+
+
+            $("#resetbtn").click(function () {
+                //$("#mailbtn").css("display", "");
+                //$("#savebtn").css("display", "");
+                //$("#Submitbtn").css("display", "");
+
+                //$("#HtmlSection1_id").css("pointer-events","all");
+                //$("#HtmlSection3_id").css("pointer-events","all");
+
+                $('#OPType').val(5);
+                document.forms[0].submit();
+
+            });
+
+
+        });
+
+        //$("form").submit(function(e) {
+        //    var self = this;
+        //    e.preventDefault();
+
+        //    return false; //is superfluous, but I put it here as a fallback
+        //});
+    </script>
+</body>
+</html>

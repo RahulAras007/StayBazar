@@ -1,0 +1,126 @@
+﻿@model StayBazar.Models.CorporateCityEntitlement
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Savedetails", "CorporateCityEntitlement", FormMethod.Post, new { role = "form", id = "Entitle", name = "Entitle" }))  //@using (Html.BeginForm("SaveDetails", "CorporateUsers", FormMethod.Post, new { role = "form", id = "cuserform", name = "cuserform" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+<div class="incontainer">
+    <div class="form-group">
+        <div class="col-md-12">
+            <label>Choose Employee Grade</label>
+            @Html.DropDownListFor(m => m.GradeId, Model.empgrdaelist, "Select Employee Grade", new { @class = "form-control fname" })
+            <label style="color:red;font-family:'Times New Roman', Times, serif;font-weight:normal;" id="errorMsg"></label>
+        </div>
+        <div class="col-md-4">
+            @Html.DisplayNameFor(m => m.GradeCode)
+            @Html.TextBoxFor(m => m.GradeCode, new { @tabindex = "1", @class = "form-control input-sm", disabled = "true" })
+            <label style="color:red;font-family:'Times New Roman', Times, serif;font-weight:normal;" id="errorMsg"></label>
+        </div>
+        <div class="col-md-4">
+            @Html.DisplayNameFor(m => m.Gradedescription)
+            @Html.TextBoxFor(m => m.Gradedescription, new { @tabindex = "2", @class = "form-control input-sm", disabled = "true" })
+            <label style="color:red;font-family:'Times New Roman', Times, serif;font-weight:normal;" id="errorMsg"></label>
+        </div>
+        <div class="col-md-12">
+            @Html.DisplayNameFor(m => m.DefaultAmount)
+            @Html.TextBoxFor(m => m.DefaultAmount, new { @tabindex = "3", @class = "form-control input-sm" })
+            <label style="color:red;font-family:'Times New Roman', Times, serif;font-weight:normal;" id="errorMsg"></label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <input type="button" id="btnSave" value="Save" onclick="SaveData()" class="btn btn-sm btn-default" tabindex="3" />
+        <a href="" id="btnReset" class="btn btn-sm btn-danger" tabindex="4">Cancel</a>
+    </div>
+    <div class="form-group">
+        <table class="table" cellpadding="0" cellspacing="50">
+            <thead>
+                <tr>
+                    <th>City Class Code</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody id="tableCityEntitle"></tbody>
+        </table>
+
+    </div>
+</div>
+    }
+
+<script type="text/javascript">
+    var classID;
+    var classname;
+    @*@Html.TextBox("Amt", "", new { @class = "form-control" })*@
+
+    $('#GradeId').change(function () {
+        debugger;
+        if ($('#GradeId').val() > 0) {
+        $.get("/CorporateCityEntitlement/Details?id=" + $('#GradeId').val(), function (data) {           
+            $('#GradeCode').val(data[0].GradeCode.toString());
+            $('#Gradedescription').val(data[0].Gradedescription.toString());
+            $('#DefaultAmount').val(data[0].DefaultAmount);
+           
+            classname = ''; 
+            classID = '';
+            trv = '';
+            
+
+            for (i = 0; i < data.length; i++) {
+                var a = data[i].CityCLassName
+                trv = trv + ' <tr class="form-group"><td>' + data[i].CityCLassName + '</td><td class=' + data[i].CityCLassName + '><input class="form-control valid" type="text" value=' + data[i].CityCLassAmt +' /></td><td style="display:none" class=' + data[i].CityClassID + '>' + data[i].CityClassID + '</td></tr>';
+                classname = classname + ',' + data[i].CityCLassName
+                classID = classID + ',' + data[i].CityCLassID
+            }
+            if (classname != "") {
+                classname = classname.substring(1, classname.length)
+                classID = classID.substring(1, classID.length)
+            }
+
+
+            $("#tableCityEntitle").html(trv);
+         });
+        }
+        else {
+                $("#tableCityEntitle").html('');
+                $('#GradeCode').val('');
+            $('#Gradedescription').val('');
+            classname = "";
+            classID = "";
+            }
+        
+
+        
+    });
+    function SaveData() {
+
+        var csAmt = new Array();
+        csAmt = classname.split(',');
+        var camt;
+        camt = "";
+        
+
+        for (i = 0; i <= csAmt.length - 1; i++) {
+            camt = camt + ',' + $('.' + csAmt[i] + ' input[type="text"]').val();
+
+        }
+        if (camt != "") {
+            camt = camt.substring(1, camt.length)
+        }
+
+
+        $.post('@Url.Action("Savedetails", "CorporateCityEntitlement")?ClsID=' + classID + '&Amount=' + camt +'', $("#Entitle").serialize(), function (data) {
+                    //if (data.Result == "Success") {
+                    //    window.location.href = "/CorporateCityClass";
+                    //}
+                    //else {
+                    //    var R = new Array();
+                    //    R = data.Result.split(',');
+                    //    alert(R[1] + " Already added in this city class as " + R[0]  )
+                    //}
+            window.location.href = "/CorporateCityEntitlement";
+
+            });
+
+        }
+</script>

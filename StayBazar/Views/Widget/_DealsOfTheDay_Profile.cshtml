@@ -1,0 +1,108 @@
+﻿@{
+    int j = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_DEALSOFTHEDAYPROFILE_NO)));
+    StayBazar.Models.DealsOftheday b2 = new StayBazar.Models.DealsOftheday();
+    b2.PropertypopularList = BLayer.PropertyMostpopular.DealsofDay((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+    List<CLayer.Property> PropertypopularList1 = b2.PropertypopularList;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+}
+<div class="row">
+    <div id="owl-demo" class="owl-carousel owl-theme">
+        @*<div class="col-lg-12">*@
+            @if (PropertypopularList1.Count > 0)
+            {
+                foreach (CLayer.Property most in PropertypopularList1)
+                {
+                   
+                    <div class="item">
+
+                        @*<div class="prop">*@
+                        <div class="col-lg-4">
+                            <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                                @if (most.FileName == "")
+                                {
+                                    <img src="~/@no_image" height="103" alt="noimage" />
+                                }
+                                else
+                                { <img height="103" src="@most.FileName" alt="@most.Title serviced apartment in  @most.Location @most.City" /> }
+                                
+
+                            </a>
+                        </div>
+                        <div class="col-lg-8 tile_desc whitebg ">
+                            <div class="row height150">
+                                <div class="col-md-12">
+                                    <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                                        <span class="name">
+                                            @{
+                    string Offertitle1 = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 10);
+                                @String.Format(Offertitle1);
+                                                @* <i class="fa fa-rupee"></i>@Math.Round(most.bookingitemsTotalAmount)
+                    <p class="onwards whitetext">onwards</p> *@
+                                            }
+                                        </span>
+                                        </a>
+                                        <div class="dealspr">
+                                            <span class="fa fa-rupee cxprice"></span><span class="cxcurele">@Math.Round(most.bookingitemsTotalAmount)</span>
+                                        </div>
+</div>
+                                </div>
+                                <div class="col-md-12 ">
+                                    <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                                        <span>
+                                            @*@{
+                    string title = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 13);
+                    @String.Format(title);
+                                            }
+
+                                            <br>*@
+                                            <b>@most.City</b>@*@most.Location,*@
+                                        </span>
+                                    </a>
+                                    <div class="starbox">
+                                        @*@(Html.Raw(StayBazar.Common.Utils.GetStarRating(most.Rating)))*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                
+                    
+                }
+            }
+       @*</div>*@
+        </div>
+    <script type="text/javascript">
+
+        //$(document).ready(function () {
+
+        //    $("#owl-demo").owlCarousel({
+        //        navigation: true,
+        //        responsiveClass: true,
+        //        items:4,
+        //        responsive: {
+        //            0: {
+        //                items: 2
+        //            },
+        //            450: {
+        //                items: 3
+        //            },
+        //            767: {
+        //                items: 4
+        //            },
+        //            991: {
+        //                items: 4
+        //            },
+        //            1199: {
+        //                items: 4
+        //            }
+        //        }
+        //    });
+
+       
+        //})
+
+
+
+
+    </script>
+</div>

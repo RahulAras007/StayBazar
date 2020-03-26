@@ -1,0 +1,121 @@
+﻿@model StayBazar.Areas.Admin.Models.RecommendedModel
+@{
+    ViewBag.Title = "Manage Most Popular Properties";
+
+}
+@*<div class="row  margin10px">
+    <div class="col-lg-12">
+        <div class="row">
+            <h2>Manage Most Popular Properties</h2>
+        </div>*@
+@*Recommended*@
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-3">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+    </div>
+</div>
+<div class="col-md-12">
+    <div class="row" id="rec_details">
+        @Html.Partial("~/Areas/Admin/Views/Recommended/_Details.cshtml", Model)
+    </div>
+</div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group col-md-offset-10">
+                    For:
+                    <select name="ManageFor" id="ManageFor" onchange="Getmostpopprts()" class="form-control input-sm">
+                        <option value="2">For Customer</option>
+                        <option value="1">For Buisiness</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+   
+
+<br />
+<br />
+<div class="container-fluid">
+    <div class="row" id="rec_list">
+        @Html.Partial("~/Areas/Admin/Views/Recommended/_List.cshtml", Model.Items)
+    </div>
+</div>
+
+<div id="myModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Choose Property</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row"></div>
+                <div class="row">
+                    @using (Html.BeginForm("Search", "Recommended", FormMethod.Post, new { area = "Admin", id = "browseForm", onsubmit = "return false;" }))
+                    {
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <input type="text" id="searchText" name="searchText" class="form-control">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" onclick="searchSubmit()"><span class="glyphicon glyphicon-search"></span></button>
+                                </span>
+                            </div><!-- /input-group -->
+                        </div><!-- /.col-lg-6 -->
+                        <div class="col-md-6 topmargin5">
+                            <input type="radio" id="rad_supplier" name="srchOptions" value="supplier" checked="checked" />
+                            <label for="rad_supplier">Supplier</label>
+                            <input type="radio" id="rad_property" name="srchOptions" value="property" />
+                            <label for="rad_property">Property</label>
+                        </div>
+                    }
+                </div>
+                <div class="row browselist" id="searchListing">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+    function showBrowse() {
+        $("#myModal").modal("show");
+    }
+    function searchSubmit() {
+        if ($("#searchText").val().trim() == "") {
+            alert('Please specify what to search');
+            $("#searchText").focus();
+            return;
+        }
+        $.post("@(Url.Action("Browse", "Recommended", new { area = "Admin" }))", $("#browseForm").serialize(), function (data) {
+            $("#searchListing").html(data);
+        });
+    }
+    function Getmostpopprts() {
+        var Managefor = $("#ManageFor").val();
+
+        $.post('@Url.Action("GetMostPrts", "Recommended", new { area = "Admin" })', { Managefor: Managefor }, function (data) {
+            $("#rec_list").html(data);
+        });
+    }
+    function choosePrp(pId) {
+        var title = $("#prtit_" + pId).html();
+        $("#prop_title").html(title);
+        $("#PropertyId").val(pId);
+        $("#myModal").modal("hide");
+    }
+    function editRec(pid, mfor) {
+        $.post('@Url.Action("GetDetails","Recommended",new {area="Admin"})', { id: pid, ManageFor: mfor }, function (data) {
+            $("#rec_details").html(data);
+        });
+    }
+    function delRec(pid, mfor) {
+        if (!confirm('Are you sure to remove this item')) return;
+        $.post('@Url.Action("Delete","Recommended",new {area= "Admin"})', { id: pid, ManageFor: mfor }, function (data) {
+            $("#rec_list").html(data);
+        });
+    }
+</script>

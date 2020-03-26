@@ -1,0 +1,68 @@
+﻿@model StayBazar.Models.BookingForUserModel
+@{
+    Layout = null;
+}
+<div class="row book_addrbox">
+
+    @{
+
+        <div class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-body addrbox autoyscroll">
+                    <span id="name_@Model.UserId">@Model.ForUserFirstName @Model.ForUserLastName</span>
+                    <div>
+                        <span class="splittxt" id="Email_@Model.UserId">@Model.ForUserEmail</span><br />
+                        <span class="splittxt" id="Mob_@Model.UserId">@Model.ForUserMobile</span>
+                    </div>
+                    <div style="border-top:solid 1px #bbb; border-bottom:solid 1px #bbb; padding:5px 0px;">
+                        <span class="splittxt" id="Address_@Model.UserId">@Model.ForUserAddress</span><br />
+                        <span class="splittxt" id="City_@Model.UserId">@Model.ForCity</span><br />
+                        <span class="splittxt" id="State_@Model.UserId">@Model.ForState</span><br />
+                        <span class="splittxt" id="Country_@Model.UserId">@Model.ForCountry</span><br />
+                        Pin:-<span id="ZipCode_@Model.UserId">@Model.ZipCode</span>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="btn-toolbar ">
+                        <div class="btn-group-sm">
+                            <input type="submit" id="btnSave" onclick="FinishChooseforUser(@Model.UserId)" value="Select" class="btn btn-default" tabindex="5" />                          
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        foreach (CLayer.BookingItem data in Model.Items)
+        {
+            <div class="col-md-5">
+                <div class="panel panel-default">
+                    <div class="panel-body addrbox autoyscroll">
+                        <span id="name_@data.ForBookingUserId"> @data.ForUserFirstName @data.ForUserLastName</span>
+                        <div>
+                            <span class="splittxt" id="Email_@data.ForBookingUserId"> @data.ForUserEmail</span><br />
+                            <span class="splittxt" id="Mob_@data.ForBookingUserId"> @data.ForUserMobile</span>
+                        </div>
+                        <div style="border-top:solid 1px #bbb; border-bottom:solid 1px #bbb; padding:5px 0px;">
+                            <span class="splittxt" id="Address_@data.ForBookingUserId">@data.ForUserAddress</span><br />
+                            <span class="splittxt" id="City_@data.ForBookingUserId"> @data.ForCity</span><br />
+                            <span class="splittxt" id="State_@data.ForBookingUserId"> @data.ForState</span><br />
+                            <span class="splittxt" id="Country_@data.ForBookingUserId"> @data.ForCountry</span><br />
+                            Pin:-<span id="ZipCode_@data.ForBookingUserId"> @data.ZipCode</span>
+                        </div>
+                    </div>
+                    <div class="panel-footer  ">
+                        <div class="btn-toolbar ">
+                            <div class="btn-group-sm">
+                                <input type="submit" id="btnSave" onclick="FinishChoose(@data.ForBookingUserId)" value="Select" class="btn btn-default" tabindex="5" />
+                                <a href="~/BookingUser/Index/?BookingUserId=@data.ForBookingUserId" title="Edit"><span class="glyphicon glyphicon-edit"></span></a>
+                                <a href="~/Booking/DeleteForUser/?BookingUserId=@data.ForBookingUserId" title="Remove" onclick="return confirm('Are you sure to delete?')"><span class="glyphicon glyphicon-remove-circle"></span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+    }
+    
+</div>

@@ -1,0 +1,465 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+
+}
+<div class="container-fluid">
+    @using (Html.BeginForm("SaveProperty", "CustomProperty", FormMethod.Post, new { enctype = "multipart/form-data", id = "FormCustomProperty" }))
+    {
+
+        <div class="col-md-12 margin-top-10 margin-bot-10">
+            <div class="col-md-12 margin-top-10 margin-bot-10">
+                <div class="col-md-5">
+                    <div id="PropertyDetails">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4 class="bold">
+                                    Property Details
+                                </h4>
+                            </div>
+                        </div>
+                        <br />
+                        
+                        <div class="row" style="margin-bottom:15px;">
+
+                            <div class="col-md-12">
+
+                                @Html.HiddenFor(m => m.CustomPropertyId)
+                                @Html.LabelFor(m => m.PropertyName)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.PropertyName, new { @tabindex = "1", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.PropertyName)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyAddress)<span style="color:red">*</span>
+                            @Html.TextAreaFor(m => m.PropertyAddress, new { @tabindex = "2", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.PropertyAddress)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyCountry)<span style="color:red">*</span>
+                            @Html.DropDownListFor(m => m.PropertyCountry, Model.PropCountryList, new { @tabindex = "4", @class = "form-control input-sm" })
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyState)<span style="color:red">*</span>
+                            @Html.DropDownListFor(m => m.PropertyState, Model.PropStateList, new { @tabindex = "5", @class = "form-control input-sm", id = "PropertyState" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyCity)<span style="color:red">*</span> &nbsp;
+                            <a href="#" id="close_other_cityprop" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                            @Html.DropDownListFor(m => m.PropertyCity, Model.PropCityList, "select", new { @tabindex = "6", @class = "form-control" })
+                            <div id="other_cityprop" style="display:none;">
+                                @Html.TextBoxFor(m => m.PropertyCityname, new { @tabindex = "6", @class = "form-control input-sm" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.PropertyCity)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyPinCode)
+                            @Html.TextBoxFor(m => m.PropertyPinCode, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyEmail)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.PropertyEmail, new { @tabindex = "3", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.PropertyEmail)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyContactNo)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.PropertyContactNo, new { @tabindex = "3", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.PropertyContactNo)
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PropertyCaretakerName)
+                            @Html.TextBoxFor(m => m.PropertyCaretakerName, new { @tabindex = "3", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.PropertyCaretakerName)
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CareTakerEmail)
+                            @Html.TextBoxFor(m => m.CareTakerEmail, new { @tabindex = "3", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.CareTakerEmail)
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div id="supDetails">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4 class="bold">
+                                    Supplier Details
+                                </h4>
+                            </div>
+                        </div>
+                        <br />
+                     
+                        <div class="row" style="margin-bottom:15px;">
+
+                            <div class="col-md-12">
+
+                                @Html.LabelFor(m => m.SupplierName)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.SupplierName, new { @tabindex = "1", @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.SupplierName)
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SupplierAddress)<span style="color:red">*</span>
+                            @Html.TextAreaFor(m => m.SupplierAddress, new { @tabindex = "2", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.SupplierAddress)
+                        </div>
+
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SupplierCountry)<span style="color:red">*</span>
+                            @Html.DropDownListFor(m => m.SupplierCountry, Model.SupCountryList, new { @tabindex = "4", @class = "form-control input-sm", id = "SupplierCountry" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SupplierState)<span style="color:red">*</span>
+                            @Html.DropDownListFor(m => m.SupplierState, Model.SupStateList, "Select", new { @tabindex = "5", @class = "form-control input-sm", id = "SupplierState" })
+                            @Html.ValidationMessageFor(m => m.SupplierState)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SupplierCity)<span style="color:red">*</span> &nbsp;
+                            <a href="#" id="close_other_citysup" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                            @Html.DropDownListFor(m => m.SupplierCity, Model.SupCityList, "Select", new { @tabindex = "6", @class = "form-control", id = "SupplierCity" })
+                            @Html.ValidationMessageFor(m => m.SupplierCity)
+                            <div id="other_citysup" style="display:none;">
+                                @Html.TextBoxFor(m => m.SupplierCityname, new { @tabindex = "6", @class = "form-control input-sm", id = "SupplierCityname" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SupplierPinCode)
+                            @Html.TextBoxFor(m => m.SupplierPinCode, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SupplierEmail)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.SupplierEmail, new { @tabindex = "3", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.SupplierEmail)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.SupplierMobile)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.SupplierMobile, new { @tabindex = "3", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.SupplierMobile)
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.CareTakerPhone)
+                            @Html.TextBoxFor(m => m.CareTakerPhone, new { @tabindex = "3", @class = "form-control input-sm" })
+                            @Html.ValidationMessageFor(m => m.CareTakerPhone)
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.GSTRegistrationNo)
+                            @Html.TextBoxFor(m => m.GSTRegistrationNo, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.PAN)
+                            @Html.TextBoxFor(m => m.PAN, new { @tabindex = "3", @class = "form-control input-sm" })
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top:2px;"></div>
+
+                <div class="col-md-5">
+                    <div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4 class="bold">
+                                    Bank Details
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.AccountName)
+                            @Html.TextBoxFor(m => m.AccountName, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.AccountType)
+                            @*@Html.TextBoxFor(m => m.AccountType, new { @tabindex = "3", @class = "form-control input-sm" })*@
+                            @Html.DropDownListFor(m => m.AccountType, Model.AccountTypeList as SelectList, "Select", new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BranchName)
+                            @Html.TextBoxFor(m => m.BranchName, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.IFSCcode)
+                            @Html.TextBoxFor(m => m.IFSCcode, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div>
+                        <div class="row" style="margin-top: 29px;">
+                            <h4 class="bold">
+                                @*Bank Details*@
+                            </h4>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.AccountNumber)
+                            @Html.TextBoxFor(m => m.AccountNumber, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BankName)
+                            @Html.TextBoxFor(m => m.BankName, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BranchAddress)
+                            @Html.TextBoxFor(m => m.BranchAddress, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.MICRcode)
+                            @Html.TextBoxFor(m => m.MICRcode, new { @tabindex = "3", @class = "form-control input-sm" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="btn-toolbar margin-bot-10 col-lg-offset-2  margin-top-10">
+                        <div class="submitctr marginleft30px">
+                            <input type="submit" id="btnSave" value="Save" class="btn btn-success marginleft30px" tabindex="23" />
+                            <a href="~/Admin/CustomProperty/Index" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+        </div>
+    }
+</div>
+@if (Model.BookedpropertyList != null)
+{
+    if (Model.BookedpropertyList.Count > 0)
+    {
+        <div class="col-md-12 margin-top-10">
+            <div class="col-md-4">
+                <h4 class="bold">Bookings ( @Model.BookedpropertyList.Count )</h4>
+            </div>
+        </div>
+        <div class="col-md-12 margin-top-10">
+            <div class="col-md-12">
+                <table border="0" class="table table-condensed table-responsive table-custom table-bordered">
+                    <thead>
+                        <tr>
+                            <th>CustomerName</th>
+                            <th>CustomerEmail</th>
+                            <th>CustomerMobile</th>
+                            <th>Confirmation Number</th>
+                            <th>CheckIn</th>
+                            <th>CheckOut</th>
+                            <th>BookingDate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.BookedpropertyList.Count > 0)
+                {
+                    foreach (CLayer.OfflineBooking pr in Model.BookedpropertyList)
+                    {
+                    <tr>
+                        <td>@pr.CustomerName</td>
+                        <td>@pr.CustomerEmail</td>
+                        <td>@pr.CustomerMobile</td>
+                        <td>@pr.ConfirmationNumber</td>
+                        <td>@pr.CheckIn</td>
+                        <td>@pr.CheckOut</td>
+                        <td>@pr.BookingDate</td>
+                    </tr>
+                    }
+                }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+
+        <div class="col-md-12 margin-top-10">
+            <div class="col-md-4">
+                <h4 class="redtext"> No Bookings </h4>
+            </div>
+        </div>
+    }
+}
+
+<script>
+    // for customer
+
+    @*function SaveProperty()
+    {
+        $.post('@Url.Action("SaveCustomProperty", "property", new { area = "Admin" })', { name: cname2 },function (data){
+
+        });
+
+    }*@
+
+    // for property
+
+
+    $(function () {
+
+        
+        if ($('#PropertyCity').val() == -1) {
+            $("#PropertyCity").hide();
+            //$("#PropertyCityname").val("");
+            $("#other_cityprop").show();
+            $("#close_other_cityprop").show();
+        }
+
+        $('#PropertyCountry').change(function () {
+            $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+                if (data != "")
+                    $('#PropertyState').empty().append(data);
+                else
+                    $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+                propLoadcity()
+            });
+        });
+        $('#PropertyState').change(function () {
+            $("#PropertyCity").show();
+            $("#PropertyCityname").val("");
+            $("#other_cityprop").hide();
+            $.get("/Common/GetCity?id=" + $('#PropertyState').val(), function (data) {
+                if (data != "") {
+                    $('#PropertyCity').empty().append(data);
+                    $("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+                    if ($("select#PropertyCity option").length == 1) {
+                        $("#PropertyCity").hide();
+                        $("#PropertyCityname").val("");
+                        $("#other_cityprop").show();
+                    }
+                }
+                else {
+                    $('#PropertyCity').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+
+        });
+        $('#PropertyCity').change(function () {
+            $("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#PropertyCityname").val("");
+                $("#other_cityprop").show();
+                $("#close_other_cityprop").show();
+            }
+        });
+        $('#close_other_cityprop').click(function () {
+            $("#PropertyCity").show();
+            $("#PropertyCityname").val("");
+            $("#other_cityprop").hide();
+            $("#close_other_cityprop").hide();
+        });
+    });
+
+    function propLoadcity() {
+        $.get("/Common/GetCity?id=" + $('#PropertyState').val(), function (data) {
+            if (data != "") {
+                $('#PropertyCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+            }
+            else {
+                $('#PropertyCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    function propLoadState() {
+        $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+            if (data != "") {
+                $('#PropertyState').empty().append(data);
+            }
+            else {
+                $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+    //for supplier
+
+    $(function () {
+
+
+        if ($('#SupplierCity').val() == -1) {
+            $("#SupplierCity").hide();
+            //$("#SupplierCityname").val("");
+            $("#other_citysup").show();
+            $("#close_other_citysup").show();
+        }
+
+        $('#SupplierCountry').change(function () {
+            $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+                if (data != "")
+                    $('#SupplierState').empty().append(data);
+                else
+                    $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+                supLoadcity()
+            });
+        });
+        $('#SupplierState').change(function () {
+            $("#SupplierCity").show();
+            $("#SupplierCityname").val("");
+            $("#other_citysup").hide();
+            $.get("/Common/GetCity?id=" + $('#SupplierState').val(), function (data) {
+                if (data != "") {
+                    $('#SupplierCity').empty().append(data);
+                    $("#SupplierCityname").val($("#SupplierCity").find('option:selected').text());
+                    if ($("select#SupplierCity option").length == 1) {
+                        $("#SupplierCity").hide();
+                        $("#SupplierCityname").val("");
+                        $("#other_citysup").show();
+                    }
+                }
+                else {
+                    $('#SupplierCity').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        });
+        $('#SupplierCity').change(function () {
+
+
+            $("#SupplierCityname").val($("#SupplierCity").find('option:selected').text());
+
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#SupplierCityname").val("");
+                $("#other_citysup").show();
+                $("#close_other_citysup").show();
+            }
+        });
+        $('#close_other_citysup').click(function () {
+            $("#SupplierCity").show();
+            $("#SupplierCityname").val("");
+            $("#other_citysup").hide();
+            $("#close_other_citysup").hide();
+        });
+    });
+
+    function supLoadcity() {
+        $.get("/Common/GetCity?id=" + $('#SupplierState').val(), function (data) {
+            if (data != "") {
+                $('#SupplierCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+            }
+            else {
+                $('#SupplierCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    function supLoadState() {
+        $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+            if (data != "") {
+                $('#SupplierState').empty().append(data);
+            }
+            else {
+                $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+
+</script>

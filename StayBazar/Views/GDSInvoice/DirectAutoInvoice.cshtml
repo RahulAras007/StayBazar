@@ -1,0 +1,577 @@
+﻿@model CLayer.BookingItem
+@using Microsoft.AspNet.Identity;
+@{
+    Layout = null;
+    CLayer.Booking BillingAddressDetails = new CLayer.Booking();
+    string userid = Convert.ToString(Session["LoggedInUser"]);
+    if(userid=="")
+    {
+        userid = Convert.ToString(Request.QueryString["LoggedInUser"]);
+    }
+    int uId = Convert.ToInt32(User.Identity.GetUserId());
+    CLayer.Booking customer = BLayer.Bookings.GetAllGDSCustomerDetails(Model.BookingId, Convert.ToInt32(userid));
+    CLayer.Booking propertyDetails = BLayer.Bookings.GetAllGDSpropertyDetails(Model.BookingId);
+
+    StayBazar.Models.BookingModel GDSBookings = new StayBazar.Models.BookingModel();
+    StayBazar.Controllers.MailController objMail = new StayBazar.Controllers.MailController();
+
+    GDSBookings = objMail.LoadVal(Model.BookingId);
+
+    decimal TotalSaleAmount = BLayer.Bookings.GetTotal(GDSBookings.BookingId);
+    decimal TotalTaxAmounts = 0;
+
+
+    CLayer.Booking BookingDt = BLayer.Bookings.GetDetails(Model.BookingId);
+    if (customer.CustomerType != 0)
+    {
+        if (customer.CustomerType == 5)
+        {
+            BillingAddressDetails = BLayer.Bookings.GetAllGDSCustomerBillingaddress(Model.BookingId, Convert.ToInt32(Session["LoggedInUser"]));
+        }
+    }
+
+    double OtherPriceTotal = 0;
+    //List<CLayer.OfflineBooking> VendorDt_OfflineBooking = BLayer.OfflineBooking.getVendorDetails(Model.OfflineBookingId);
+    //decimal VendorTotal = 0;
+    string coma = ",";
+    long Duedatedays = Convert.ToInt32(BLayer.Settings.GetValue(CLayer.Settings.INVOICE_DUE_DAYS));
+    CLayer.Invoice invoice = BLayer.Invoice.GetGDSInvoiceByBookingID(Model.BookingId);
+
+    CLayer.B2B b2bdata = new CLayer.B2B();
+    string CusRefNo = "";
+    if (BookingDt != null)
+    {
+        if (BookingDt.ByUserId > 0)
+        {
+            b2bdata = BLayer.B2B.Get(BookingDt.ByUserId);
+            if (b2bdata != null)
+            {
+                CusRefNo = b2bdata.UserCode;
+            }
+        }
+    }
+
+    //CLayer.HSNCode HSNdt = BLayer.OfflineBooking.GetBookingTypeHSN(Model.OfflineBookingId);
+    //CLayer.OfflineBooking bookingFor = null;
+    //long bkId = BLayer.OfflineBooking.GetBookingForID(Model.OfflineBookingId);
+    //if(bkId > 0)
+    //{
+    //    bookingFor = BLayer.OfflineBooking.GetBookingFor(bkId);
+    //}
+
+
+    //string SbEntityName = "";
+    //string SbEntityAddress = "";
+    //string SbEntityCountry = "";
+    //string SbEntityState = "";
+    ////Get Entity address
+    //if (Model.OfflineBookingId > 0)
+    //{
+    //    CLayer.OfflineBooking SbEntityBillingAddress = BLayer.OfflineBooking.GetSBEntityAddressDetailsByOffId(Model.OfflineBookingId);
+    //    if (SbEntityBillingAddress != null)
+    //    {
+    //        if (SbEntityBillingAddress.SbEntityBillingName != "" && SbEntityBillingAddress.SbEntityBillingName != null) { SbEntityName = SbEntityBillingAddress.SbEntityBillingName; }
+    //        if (SbEntityBillingAddress.SbEntityBillingAddress != "" && SbEntityBillingAddress.SbEntityBillingAddress != null) { SbEntityAddress = SbEntityBillingAddress.SbEntityBillingAddress; }
+    //        if (SbEntityBillingAddress.SbEntityBillingCountry != "" && SbEntityBillingAddress.SbEntityBillingCountry != null) { SbEntityCountry = SbEntityBillingAddress.SbEntityBillingCountry; }
+    //        if (SbEntityBillingAddress.SbEntityBillingState != "" && SbEntityBillingAddress.SbEntityBillingState != null) { SbEntityState = SbEntityBillingAddress.SbEntityBillingState; }
+    //    }
+    //}
+    CLayer.Role.Roles roleType = CLayer.Role.Roles.Customer;
+    string titleName = "";
+    long id = 0;
+    List<CLayer.Tax> Amadeustaxrates = BLayer.Tax.GetAmadeusTaxRates(Model.PropertyId);
+    Amadeustaxrates = Amadeustaxrates.Where(x => x.BookingId == Model.BookingId).ToList();
+    try
+    {
+
+        id = BLayer.Bookings.GetBookedByUserId(Model.BookingId);
+
+        if (id > 0)
+        {
+            roleType = BLayer.User.GetRole(id);
+            if (roleType == CLayer.Role.Roles.Agent || roleType == CLayer.Role.Roles.Corporate)
+            {
+                titleName = BLayer.B2B.GetBusinessName(id);
+            }
+            else
+            {
+                if (roleType == CLayer.Role.Roles.CorporateUser)
+                {
+                    long cid = BLayer.B2B.GetCorporateIdOfUser(id);
+                    titleName = BLayer.B2B.GetBusinessName(cid);
+                }
+            }
+        }
+
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        roleType = CLayer.Role.Roles.Customer;
+    }
+    //show time
+    long PropertyId = Model.PropertyId;
+    CLayer.Property dttime = BLayer.Property.GetCheckTime(PropertyId);
+
+
+    int noOfDays = 0;
+    string ratesText = "";
+    long paymentoption = BLayer.Bookings.GetPaymentoption(Model.BookingId);
+
+    List<CLayer.Tax> taxrates = BLayer.Tax.GetAllTypeTaxRate(Model.BookingId);
+
+    CLayer.ObjectStatus.BookingStatus sts = BLayer.Bookings.GetStatus(Model.BookingId);
+    int InventoryAPIType = BLayer.Property.GetInventoryAPITypeId(BLayer.Bookings.GetPropertyId(Model.BookingId));
+
+    int ColSpan = (InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus) ? 7 : 6;
+    int noofnights =Convert.ToInt32((Model.CheckOut - Model.CheckIn).TotalDays);
+}
+
+
+@Html.Partial("_InvoiceHeaderGst", Model.BookingId)
+
+<!--#FIRSTROW_START-->
+<table id="firstrow" style="width:100%">
+    <tr>
+        <td style="width:70%;">
+            Invoice Number:<b>
+                @if (invoice != null)
+                {
+                    if (invoice.InvoiceNumber != null && invoice.InvoiceNumber != "")
+                    {
+                        @invoice.InvoiceNumber
+                    }
+                    else
+                    { <text><!--#INVOICENUMBER#--></text>}
+                }
+                else
+                { <text><!--#INVOICENUMBER#--></text>}
+            </b><br />
+            To : <br />
+            @if (customer.CustomerType == 5 && BillingAddressDetails.BillingAddress != "")
+            {
+                <b>@customer.CustomerName</b><br />
+                    @BillingAddressDetails.BillingAddress@coma<br />
+                    @BillingAddressDetails.BillingCityname@coma@BillingAddressDetails.BillingStatename<br />
+                    @BillingAddressDetails.BillingCountryname@coma@BillingAddressDetails.BillingpinCode
+
+            }
+            else
+            {
+                <b>@customer.CustomerName</b><br />
+                    @customer.CustomerAddress@coma<br />
+                    @customer.CustomerCityname@coma@customer.CustomerStatename<br />
+                    @customer.CustomerCountryname@coma@customer.CustomerpinCode
+
+            }
+            @if (customer != null && BookingDt != null)
+            {
+                @*if (BookingDt.CustomerGstRegNo != "" && OfflineBookingDt.CustomerGstRegNo != null)
+                    {
+                         <br />
+                    <b>GSTIN: @OfflineBookingDt.CustomerGstRegNo</b>
+                    }*@
+            }
+
+        </td>
+        <td valign="top" width="30%">
+            Date: @{ if (invoice.InvoiceDate != DateTime.MinValue)
+                { <text><b>@invoice.InvoiceDate.ToString("dd/MM/yyyy")</b></text>}
+                else
+                { <text><b>@DateTime.Now.ToString("dd/MM/yyyy")</b></text>}
+            }
+
+            <br /> @* *@
+            Due By: @{ if (invoice.InvoiceDate != DateTime.MinValue)
+                { <text><b>@invoice.InvoiceDate.AddDays(@Duedatedays).ToShortDateString()</b></text>}
+                else
+                { <text><b>@Model.CheckOut.AddDays(@Duedatedays).ToShortDateString()</b></text>} }
+
+            <br />
+            @*Customer Ref No:
+                @if (Model.NewCustomerReferenceNo != null)
+                {
+                   @Model.NewCustomerReferenceNo
+                }*@
+            <br />
+            <br />
+            <br />
+            <br />
+        </td>
+    </tr>
+</table>
+<!--#FIRSTROW_END-->
+<!--#SECONDROW_START-->
+<div style="padding-top:10px;padding-bottom:10px;">Service charge towards accommodation booking / event management as per details given below:<br /></div>
+<table border="1" id="secondrow" cellpadding="5" cellspacing="0" style="width:100%;">
+    <tr>
+        <td style="width: 43px;">
+            Sl No.
+        </td>
+        <td>
+            Description
+        </td>
+        <td style=" width: 100px;" align="center">
+            Rate (Rs.)
+        </td>
+        <td align="center">Quantity</td>
+        <td style="width:10%" align="center">Value (Rs.)</td>
+    
+    </tr>
+
+    @{
+        List<CLayer.BookingItem> BListGST = BLayer.BookingItem.GetAllDetails(Model.BookingId, true);
+
+        int BListGSTi = 1;
+        decimal TotalAmount = 0;
+        decimal TotalRateTax = 0;
+                }
+                @foreach (CLayer.BookingItem bookData in BListGST)
+                {
+                    TotalAmount =Convert.ToDecimal(TotalAmount) +Convert.ToDecimal(bookData.TotalAmount);
+                    TotalRateTax= TotalRateTax+ Convert.ToDecimal(bookData.TotalRateTax);
+                    TotalAmount = TotalAmount - TotalRateTax;
+
+                        <tr>
+                    <td>
+                        @BListGSTi.
+                    </td>
+                    <td>
+                        Accommodation at: @(propertyDetails.PropertyName) @(propertyDetails.PropertyCityname) <br />
+                        @bookData.AccommodationTitle<br />
+                        Booking Id: <b>@BookingDt.HotelConfirmNumber</b><br />
+                        Guest name: @bookData.ForUserFirstName<br />
+                        Check-in date:  @bookData.CheckIn.ToShortDateString()    Check-out date: @bookData.CheckOut.ToShortDateString() <br />
+                        @*No of rooms: @bookData.NoOfAccommodations &nbsp;&nbsp; No of nights:  &nbsp;&nbsp; Total room nights: @(bookData.NoOfAccommodations  * bookData.NoOfGuests)<br />*@
+                        No of rooms: @bookData.NoOfAccommodations &nbsp;&nbsp; No of nights:  &nbsp;&nbsp; Total room nights: @noofnights<br />
+                        Adult:  @bookData.NoOfAdults Children : @bookData.NoOfChildren<br />
+
+                       
+
+                      </td>
+                            <td style="text-align:right;">
+                                @(Math.Round((TotalAmount/ bookData.NoOfDays), 2))
+                            </td>
+                            @*<td style="text-align:center">@(bookData.NoOfDays * bookData.NoOfAccommodations)</td>
+                            <td style="text-align:right">@(Math.Round(TotalAmount * bookData.NoOfDays  * bookData.NoOfAccommodations, 2))</td>*@
+                            <td style="text-align:center">@(bookData.NoOfDays)</td>
+                            <td style="text-align:right">@(Math.Round(TotalAmount, 2))</td>
+
+
+                </tr>
+
+                    BListGSTi = BListGSTi + 1;
+                }
+
+
+
+    @{
+        CLayer.OfflineBooking ob = BLayer.OfflineBooking.GetBookingTypeData(Model.BookingId);
+        List<KeyValuePair<string, double>> BookTypeTax = BLayer.OfflineBooking.GetBookingTypeTaxes(Model.BookingId);
+        double TotalTaxAmount = 0;
+
+        
+    }
+    @if (ob != null)
+    {
+        if (ob.BookingTypeAmount >= 0)
+        {
+            <tr>
+                <td>&nbsp;</td>
+                <td style="text-align:right;"> <span style="font-weight:bold;">Sub Total</span></td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td style="text-align:right;">
+                    @(Math.Round(TotalAmount, 2))
+                </td>
+            </tr>
+
+
+
+            foreach (CLayer.Tax ttx in Amadeustaxrates)
+            {
+                if (string.IsNullOrEmpty(ttx.IGSTTitle))
+                {
+                    string taxtitle = ttx.CGSTTitle + "(" + ttx.CGSTTaxRate + "%)"; 
+                    TotalTaxAmounts =ttx.TotalCGSTTaxAmount;
+                    if (TotalTaxAmounts > 0)
+                    {
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>@taxtitle</td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align:right">@Math.Round(TotalTaxAmounts, 2).ToString("0.00")</td>
+                        </tr>
+                    }
+                    taxtitle = ttx.SGSTTitle + "(" + ttx.SGSTTaxRate + "%)"; 
+                    TotalTaxAmounts = ttx.TotalSGSTTaxAmount;
+                    if (TotalTaxAmounts > 0)
+                    {
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>@taxtitle</td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align:right">@Math.Round(TotalTaxAmounts, 2).ToString("0.00")</td>
+                        </tr>
+                    }
+                    TotalTaxAmounts= ttx.TotalCGSTTaxAmount + ttx.TotalSGSTTaxAmount;
+                }
+                else
+                {
+                    string taxtitle = ttx.IGSTTitle + "(" + ttx.IGSTTaxRate + "%)";
+                    TotalTaxAmounts = ttx.TotalIGSTTaxAmount;
+                    if (TotalTaxAmounts > 0)
+                    {
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>@taxtitle</td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align:right">@Math.Round(TotalTaxAmounts, 2).ToString("0.00")</td>
+                        </tr>
+                    }
+                }
+            }
+
+        }
+        <tr>
+
+            <td>&nbsp;</td>
+            <td style="text-align:right;"> <span style="font-weight:bold;">Total</span></td>
+            <td></td>
+            <td></td>
+            <td style="text-align:right">@Math.Round((TotalSaleAmount), 0).ToString("0.00")</td>
+        </tr>
+
+    }
+
+    <tr>
+        <td>&nbsp;</td>
+        <td>Reimbursements (+)</td>
+        <td></td>
+        <td></td>
+        <td style="text-align:right">&nbsp;</td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>Discount (-)</td>
+        <td></td>
+        <td></td>
+        <td style="text-align:right">&nbsp;</td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>Others (+)</td>
+        <td></td>
+        <td></td>
+        <td style="text-align:right">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:center;"><span style="font-weight:bold;">Total Invoice Value</span></td>
+        <td></td>
+        <td></td>
+        <td style="text-align:right">&nbsp;<b>@Math.Round((Convert.ToDouble(TotalSaleAmount)), 0).ToString("0.00")</b></td>
+    </tr>
+</table>
+<!--#SECONDROW_END-->
+<!--#THIRDROW_START-->
+<div id="thirdrow">
+    <br />
+    <div>Rupees :<b> @(StayBazar.Common.Utils.NumberToWords((int)(Math.Round((Convert.ToDouble(TotalSaleAmount)), 0)))) Only  </b></div>
+    <br />
+</div>
+<!--#THIRDROW_END-->
+@Html.Partial("_InvoiceFooterGst")
+<!--#FOURTHROW_START-->
+<table style="width:100%;color:black;font-size:14px;">
+    <tr>
+        <td align="center">
+            <table style="width:100%;">
+                <thead>
+                    <tr>
+                        <th align="left" style="padding-top: 2%;" colspan="3">
+                            <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                        </th>
+                        <th width="200" align="right">
+                            &nbsp;
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" align="center">
+                            <span style="font-size:18px;font-weight:bold;">Annexure to Booking ID @BookingDt.HotelConfirmNumber</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="4">
+                            <p>
+                                <br /><br />
+                                Dear @customer.CustomerName,<br /><br />
+                                Attached please find our tax invoice no.<b>
+                                    @if (invoice != null)
+                                    {
+                                        if (invoice.InvoiceNumber != null && invoice.InvoiceNumber != "")
+                                        {
+                                            @invoice.InvoiceNumber
+                                        }
+                                        else
+                                        { <text><!--#INVOICENUMBER#--></text>}
+                                    }
+                                    else
+                                    { <text><!--#INVOICENUMBER#--></text>}
+                                </b> dated
+                                @{if (invoice.InvoiceDate != DateTime.MinValue)
+                                    { <text><b>@invoice.InvoiceDate.ToString("dd/MM/yyyy")</b></text>}
+                                    else
+                                    { <text><b><!--#INVOICEDATE#--></b></text>} }
+                                for Rs. <b>@Math.Round((ob.BookingTypeAmount + TotalTaxAmount), 0)/-</b> towards services rentered to you in connection with your below accommodation booking.<br />
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td>Name</td>
+                        <td>@customer.CustomerName</td>
+                        <td>Booking Ref. Number</td>
+                        <td>@BookingDt.HotelConfirmNumber</td>
+                    </tr>
+                    <tr>
+                        <td valign="top">Address  </td>
+                        <td valign="top">
+                            @if (customer.CustomerType == 5 && BillingAddressDetails.BillingAddress != "")
+                            {
+
+
+                                <b>@customer.CustomerName</b>
+                                <br />
+                                @BillingAddressDetails.BillingAddress@coma
+                                <br />
+                                @BillingAddressDetails.BillingCityname@coma @BillingAddressDetails.BillingStatename
+
+                                <
+                                <br />
+                                @BillingAddressDetails.BillingCountryname@coma @BillingAddressDetails.BillingpinCode
+
+                            }
+                            else
+                            {
+                                <b>@customer.CustomerName</b>
+                                <br />
+                                @customer.CustomerAddress@coma
+                                <br />
+                                @customer.CustomerCityname@coma @customer.CustomerStatename
+                                <br />
+                                @customer.CustomerCountryname@coma @customer.CustomerpinCode
+
+
+                            }
+
+                        </td>
+                        <td valign="top">Booking Date</td>
+                        <td valign="top">@BookingDt.BookingDate.ToShortDateString()</td>
+                    </tr>
+
+                    <tr>
+                     
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+
+
+                    <tr>
+                        <td colspan="2"><b style="font-weight:bold;  margin: 10px 0px; display: inline-block;">Property Details </b></td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>Name </td>
+                        <td>@(propertyDetails.PropertyName)</td>
+                        <td>&nbsp;</td>
+                        <td>
+                        
+                            <text></text>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top" rowspan="2">Address  </td>
+                        <td valign="top" rowspan="2">
+                            @propertyDetails.PropertyAddress<br />
+                            @{
+
+                                <text>
+                                    @propertyDetails.PropertyCityname, @propertyDetails.PropertyStatename
+                                    <br /> @propertyDetails.PropertyCountryname
+                                </text>
+                            }
+
+                        </td>
+
+                        <td valign="top">Contact No</td>
+                        <td valign="top">
+                            @if (propertyDetails.PropertyContactNo != null)
+                            {
+                                @propertyDetails.PropertyContactNo<br />
+                            }
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top">Email</td>
+                        <td valign="top">
+                            @if (propertyDetails.PropertyEmail != null)
+                            {
+                                @propertyDetails.PropertyEmail
+                            }
+                            &nbsp;
+                        </td>
+                    </tr>
+                    @{
+                        OtherPriceTotal = 0;
+                        TotalTaxAmount = 0;
+                    }
+
+                    <tr>
+                        <td align="left" colspan="4" style="font-size:14px;">
+                            
+
+                            <!-- other text -->
+                            <br />
+                            
+
+                            Total amount due including payment done to hotel on your behalf - Rs. <b>@Math.Round(TotalSaleAmount, 0)/-</b>
+                            <div>Rupees :<b> @(StayBazar.Common.Utils.NumberToWords((int)(Math.Round(TotalSaleAmount, 0)))) Only  </b></div>
+
+                            <br /><br />
+                            <table>
+                                <tr>
+                                    <td valign="top">
+                                        Enclosures :
+                                    </td>
+                                    <td valign="top">
+
+                                        1. Hotel invoice issued in the name of booking entity<br />
+                                        2. Our service charge invoice.
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </td>
+    </tr>
+</table>
+<!--#FOURTHROW_END-->
+@Html.Partial("_InvoiceDirectFooter")
+
+
+
+
+
+

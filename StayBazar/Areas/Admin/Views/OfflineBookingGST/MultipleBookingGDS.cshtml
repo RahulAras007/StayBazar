@@ -1,0 +1,2255 @@
+﻿
+@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    int ii = 0, iii = 0;
+    int startD = 0;
+    int endD = 0;
+    int IGSTValue = 18;
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarStartDate"), out startD);
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarEndDate"), out endD);
+    int diff = endD - startD;
+
+    Model.BookingDate = Convert.ToDateTime(Model.BookingDate).ToShortDateString();
+
+    Decimal Gmp = Convert.ToDecimal(BLayer.Settings.GetValue(CLayer.Settings.Grossmarginperc));
+
+    CLayer.OfflineBooking obtacdt = BLayer.OfflineBooking.GetBookingTypeData(Model.OfflineBookingId);
+    decimal TacAmt = 0;
+    if ((int)obtacdt.BookingType == (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+    {
+        double TotalTaxPercentChk = 0;
+        double BookingTypeAmountChk = 0;
+        obtacdt.BookingTypeAmount = obtacdt.BookingTypeTAC;
+        List<KeyValuePair<string, double>> BookTypeTax = BLayer.OfflineBooking.GetBookingTypeTaxes(Model.OfflineBookingId);
+        if (obtacdt.BookingTypeGSTIncluded)
+        {
+            for (int i = 0; i < @BookTypeTax.Count; i++)
+            {
+                TotalTaxPercentChk = TotalTaxPercentChk + @BookTypeTax[i].Value;
+            }
+            BookingTypeAmountChk = @Math.Round(obtacdt.BookingTypeAmount, 2) / (1 + (TotalTaxPercentChk / 100));
+            obtacdt.BookingTypeAmount = BookingTypeAmountChk;
+        }
+        TacAmt = Convert.ToDecimal(obtacdt.BookingTypeAmount);
+    }
+    else if ((int)obtacdt.BookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+    {
+        TacAmt = Convert.ToDecimal(obtacdt.BookingTypeAmount);
+    }
+}
+<link href="~/Content/jquery.dpNumberPicker-holoLight-1.0.1.css" rel="stylesheet" />
+<link href="~/Content/datepicker.css" rel="stylesheet" />
+<script src="~/Scripts/jquery.dpNumberPicker-1.0.1.js"></script>
+<script src="~/Scripts/Moment.js"></script>
+
+
+@using (Html.BeginForm("SaveBooingDetails", "OfflineBookingGST", FormMethod.Post, new { enctype = "multipart/form-data", id = "multiplebooking" }))
+{
+    @Html.HiddenFor(m => m.BookingId)
+    @Html.HiddenFor(m => m.OfflineBookingId)
+    @Html.HiddenFor(m => m.HSNCode)
+    @Html.HiddenFor(m => m.GSTStateDiffrent)
+
+    @Html.HiddenFor(m => m.CheckIn)
+    @Html.HiddenFor(m => m.CheckOut)
+    @Html.HiddenFor(m => m.PropertyCityname)
+    @Html.HiddenFor(m => m.PropertyId)
+    @Html.HiddenFor(m => m.InventoryAPIType)
+
+
+    <input type="hidden" id="HidnSBBillingEntyState" />
+    <input type="hidden" id="BookingCustomerStateID" />
+
+    <input type="hidden" id="CustomerType" />
+    <input type="hidden" id="CustomerGstStateId" />
+    <input type="hidden" id="CustomerState" />
+    <input type="hidden" id="PropertyState" />
+    <input type="hidden" id="SupplierStateID" />
+    <input type="hidden" id="OfflineBookingType" />
+    <input type="hidden" id="PropertyGstRegNo" />
+
+
+    <div class="col-md-12  margin-top-10">
+        <div class="col-sm-6">
+            <a href="/Admin/OfflineBookingGST/OfflineEdit?OfflineBookId=@Model.OfflineBookingId" class="btn btn-sm btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+            <span class="bold" style="font-size: 18px;margin-left: 12px;">
+                Booking Details
+            </span>
+        </div>
+        <div class="col-sm-5">
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-12 margin-top-10">
+        <div class="col-md-5">
+            <label>Nature Of Service</label>
+            <select class="styleselect" style="width:100%;" name="SelectHSNCode" id="SelectHSNCode" onchange="changehsncode()">
+                @{
+                    List<CLayer.HSNCode> HSNCode = BLayer.HSNCode.GetAll();
+
+                }
+                @foreach (CLayer.HSNCode sc in HSNCode)
+                {
+                    <option value="@sc.CodeId" @if (sc.CodeId == Model.HSNCode) { <text> selected </text>    }>@sc.NatureOfService</option>
+                }
+
+            </select>
+
+        </div>
+    </div>
+    <div class="col-md-12  margin-top-10">
+        <div class="col-md-5">
+            <div class="form-group">
+
+                <div class="">
+                    <div class="col-md-6 pad0 bold" id="ChkIn">Check In</div>
+                    <div class="col-md-6 pad0 bold">Check Out</div>
+                </div>
+                <div class="col-xs-6 col-md-6 checkin">
+                    <div>
+                        <input type="text" id="CheckIn" name="CheckIn" value="@Model.CheckIn" placeholder="Check In" onchange="changecheckin()">
+                    </div>
+                </div>
+                <div class="col-xs-6 col-md-6 checkout">
+                    <div>
+                        <input type="text" id="CheckOut" name="CheckOut" value="@Model.CheckOut" onchange="changecheckout()" placeholder="Check Out">
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (Model.OfflineBookingId > 0)
+        {
+            <div id="BookingList">
+                @Html.Partial("_BookingDetailsListGDS", Model)
+            </div>
+
+        }
+
+    </div>
+
+
+
+
+
+    <div class="col-md-12 margin-bot-10">
+        <div class="col-md-5">
+            <div class="row margin-bot-10" style="margin-bottom:15px;">
+                <div class="col-xs-12 col-md-12">
+
+
+                    <div class="row">
+
+                        <div class="">
+                            <div class="col-md-6 bold">
+                                @Html.LabelFor(m => m.NoOfNight)
+                            </div>
+                            <div class="col-md-6 bold">
+                                @Html.LabelFor(m => m.NoOfRooms)
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-6">
+                            <div class="">
+                                @Html.TextBoxFor(m => m.NoOfNight, new { @class = "form-control input-sm", @minmumvalue = "1", @onchange = "chnoofnight()" })
+                                @Html.ValidationMessageFor(m => m.NoOfNight)
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-6">
+                            <div class="">
+                                @Html.TextBoxFor(m => m.NoOfRooms, new { @class = "form-control input-sm", @onchange = "changenoofrooms()" })
+                                @Html.ValidationMessageFor(m => m.NoOfRooms)
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class=""><div class="col-md-6  bold">@Html.LabelFor(m => m.NoOfPaxAdult)</div><div class="col-md-6  bold">@Html.LabelFor(m => m.NoOfPaxChild)</div></div>
+                        <div class="col-xs-6 col-md-6">
+                            <div>
+                                @Html.TextBoxFor(m => m.NoOfPaxAdult, new { @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.NoOfPaxAdult)
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-6">
+                            <div>
+                                @Html.TextBoxFor(m => m.NoOfPaxChild, new { @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.NoOfPaxChild)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="row" style="margin-bottom:15px;">
+
+                <div class="col-xs-12 col-md-12">
+
+                    <div class="row"><div class="col-md-6 bold">Stay options</div></div>
+
+
+                    <a onclick="staydivdisplay()" id="close_other_staytype" class="lnk " style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+
+                    <div id="other_staytype" style="display:none;">
+                        @Html.TextBoxFor(m => m.StayCategoryName, new { @class = "form-control input-sm" })
+                    </div>
+
+                    <div class="row" id="staydiv">
+
+                        <div class="col-md-12">
+                            @Html.HiddenFor(m => m.StayCategoryid)
+                            <select class="styleselect" style="width:100%;" name="StayType" id="StayType">
+                                @{
+                                    List<CLayer.StayCategory>
+                                        staytypes = BLayer.StayCategory.GetActiveList();
+
+                                }
+                                @foreach (CLayer.StayCategory sc in staytypes)
+                                {
+                                    <option value="@sc.CategoryId">@sc.Title</option>
+                                }
+
+                                @*<option value="-1">Other</option>*@
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom:15px;">
+                <div class="col-xs-12 col-md-12">
+
+                    <div class="row"><div class="col-md-5 bold">Accommodation Type  &nbsp; </div><a onclick="Accdivdisplay()" id="close_other_Acctype" class="lnk handpointer " style="display:none; "><span class="glyphicon glyphicon-remove"></span>choose from the list</a></div>
+
+                    <div id="other_Acctype">
+                        @Html.TextBoxFor(m => m.AccommodationTypeName, new { @class = "form-control input-sm", id = "AccommodationTypeName" })
+                        @Html.ValidationMessageFor(m => m.AccommodationTypeName)
+                    </div>
+
+                    <div class="row" style="display:none;">
+                        <div class="col-md-12">
+                            <div id="Accdiv">
+                                @Html.HiddenFor(m => m.Accommodationid)
+                                @Html.HiddenFor(m => m.Accommodationtypeid)
+                                @*chosen-select*@
+                                <select @*data-placeholder="Choose a Country..." *@ class="styleselect" style="width:100%;" name="AccommodatoinType" id="AccommodatoinType">
+                                    @{
+                                        List<CLayer.AccommodationType>
+                                            Acctypes = BLayer.AccommodationType.GetAll();
+                                    }
+                                    @foreach (CLayer.AccommodationType sc in Acctypes)
+                                    {
+                                        <option value="@sc.AccommodationTypeId">@sc.Title</option>
+                                    }
+                                    <option value="-1">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+
+                <div id="confirmBoxWindow" class="modal fade" role="dialog">
+                    <div class="modal-dialog modal-md">
+
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+
+                                <h5 class="modal-title">Sale Price is lesser than Buy Price!, Do you want to save?</h5>
+                            </div>
+
+                            <div class="modal-footer">
+
+                                <button id="btnConfirmBoxNo" type="button" class="btn btn-primary" data-dismiss="modal">NO</button>
+                                <button id="btnConfirmBoxYes" type="button" class="btn btn-primary" data-dismiss="modal">YES</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="GrossmarginconfirmBox" class="modal fade" role="dialog">
+                    <div class="modal-dialog modal-md">
+
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+
+                                <h5 class="modal-title">This booking has a lower / negative margin. Do you want to continue?</h5>
+                            </div>
+
+                            <div class="modal-footer">
+
+                                <button id="GrossmarginbtnConfirmBoxNo" type="button" class="btn btn-primary" data-dismiss="modal">NO</button>
+                                <button id="GrossmarginbtnConfirmBoxYes" type="button" class="btn btn-primary" data-dismiss="modal">YES</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-5">
+            <div class="form-group">
+                @Html.LabelFor(m => m.HotelConformationNo)
+                @Html.TextBoxFor(m => m.HotelConformationNo, new { @class = "form-control input-sm" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.GuestName)
+                @Html.TextAreaFor(m => m.GuestName, new { @class = "form-control input-sm", @cols = "55", @rows = "2" })
+                @Html.ValidationMessageFor(m => m.GuestName)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.GuestEmail)
+                @Html.TextBoxFor(m => m.GuestEmail, new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.GuestEmail)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.GuestPhone)
+                @Html.TextBoxFor(m => m.GuestPhone, new { @class = "form-control input-sm" })
+
+            </div>
+        </div>
+
+    </div>
+
+    <hr />
+    <div class="col-md-12 margin-top-10">
+        <h4 class="bold">
+            Pricing Details
+        </h4>
+    </div>
+    <div class="col-md-12 margin-bot-10" id="pricediv" style="display:none;  text-align: center; margin-top: 50px; margin-bottom: 50px;">
+        <img src="~/images/loading_spinner.gif" width="100px" height="100px" />
+    </div>
+            <div id="pricingdet">
+                @Html.Partial("~/Areas/Admin/Views/OfflineBookingGST/_PricingDetailsGST.cshtml")
+            </div>
+
+            <div id="SalePriceGSTBreakup">
+
+                <h4>   Sale Price GST Breakup     </h4>
+                <div class="col-md-12 margin-top-10 margin-bot-10">
+                    @{ int iiii = 0, iiiii = 0;
+                    }
+
+                    <div class="col-md-5 clsDivServiceTaxSplitUpValidation">
+                        <h4>GST Breakup:</h4>
+                        <h6 id="ServiceTaxSplitUpValidation" style="color:red;display:none;">Taxes spit up should be equal to GST ( % )</h6>
+                        @if (Model.TaxPercentageList_ServiceSalePrice != null && Model.TaxPercentageList_ServiceSalePrice.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.TaxPercentageList_ServiceSalePrice.Count(); i++)
+                            {
+                                ii++;
+                                <div class="row" style="margin-bottom: 4px;">
+                                    @Html.HiddenFor(m => Model.TaxPercentageList_ServiceSalePrice[i].TaxPerID)
+                                    <div class="col-md-9">
+                                        @Html.TextBoxFor(m => Model.TaxPercentageList_ServiceSalePrice[i].TaxTitle, new { @class = "form-control input-sm gst gstnameSaleprice" })
+
+                                    </div>
+                                    <div class="col-md-3" style="padding-left: 0px;">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => Model.TaxPercentageList_ServiceSalePrice[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @for (int i = ii; i < 5; i++)
+                        {
+                            string nameTxtT_Title = "TaxPercentageList_ServiceSalePrice[" + i + "].TaxTitle";
+                            string nameTxtT_Percent = "TaxPercentageList_ServiceSalePrice[" + i + "].TaxPercent";
+
+                            string ID_nameTxtT_Title = "TaxPercentageList_ServiceSalePrice" + i + "__TaxTitle";
+                            string ID_nameTxtT_Percent = "TaxPercentageList_ServiceSalePrice" + i + "__TaxPercent";
+
+                            <div class="row" style="margin-bottom: 4px;">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control input-sm gst gstnameSaleprice" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                </div>
+                                <div class="col-md-3" style="padding-left: 0px;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+
+                    <div class="col-md-5 clsDivServiceTaxOthersSplitUpValidation">
+                        <h4>GST Breakup - Other services:</h4>
+                        <h6 id="ServiceTaxOthersSplitUpValidation" style="color:red;display:none;">Taxes spit up should be equal to GST - other services  ( % )</h6>
+                        @if (Model.TaxPercentageList_OthersSalePrice != null && Model.TaxPercentageList_OthersSalePrice.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.TaxPercentageList_OthersSalePrice.Count(); i++)
+                            {
+                                iiiii++;
+                                <div class="row" style="margin-bottom: 4px;">
+                                    @Html.HiddenFor(m => Model.TaxPercentageList_OthersSalePrice[i].TaxPerID)
+                                    <div class="col-md-9">
+                                        @Html.TextBoxFor(m => Model.TaxPercentageList_OthersSalePrice[i].TaxTitle, new { @class = "form-control input-sm gst gstname" })
+                                    </div>
+                                    <div class="col-md-3" style="padding-left: 0px;">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => Model.TaxPercentageList_OthersSalePrice[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @for (int i = iiiii; i < 5; i++)
+                        {
+                            string nameTxtT_Title = "TaxPercentageList_OthersSalePrice[" + i + "].TaxTitle";
+                            string nameTxtT_Percent = "TaxPercentageList_OthersSalePrice[" + i + "].TaxPercent";
+
+                            string ID_nameTxtT_Title = "TaxPercentageList_OthersSalePrice" + i + "__TaxTitle";
+                            string ID_nameTxtT_Percent = "TaxPercentageList_OthersSalePrice" + i + "__TaxPercent";
+
+                            <div class="row" style="margin-bottom: 4px;">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control input-sm gst gstname" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                </div>
+                                <div class="col-md-3" style="padding-left: 0px;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="BuyPriceGSTBreakup">
+
+
+                <h4>  Buy Price GST Breakup   </h4>
+                <div class="col-md-12 margin-top-10 margin-bot-10">
+
+                    <div class="col-md-5 clsDivServiceTaxSplitUpValidationBuyPrice">
+                        <h4>GST Breakup:</h4>
+                        <h6 id="ServiceTaxSplitUpValidation1" style="color:red;display:none;">Taxes spit up should be equal to GST ( % )</h6>
+                        @if (Model.TaxPercentageList_ServiceByPrice != null && Model.TaxPercentageList_ServiceByPrice.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.TaxPercentageList_ServiceByPrice.Count(); i++)
+                            {
+                                iiii++;
+                                <div class="row" style="margin-bottom: 4px;">
+                                    @Html.HiddenFor(m => Model.TaxPercentageList_ServiceByPrice[i].TaxPerID)
+                                    <div class="col-md-9">
+                                        @Html.TextBoxFor(m => Model.TaxPercentageList_ServiceByPrice[i].TaxTitle, new { @class = "form-control input-sm gst gstname" })
+                                    </div>
+                                    <div class="col-md-3" style="padding-left: 0px;">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => Model.TaxPercentageList_ServiceByPrice[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @for (int i = iiii; i < 5; i++)
+                        {
+                            string nameTxtT_Title = "TaxPercentageList_ServiceByPrice[" + i + "].TaxTitle";
+                            string nameTxtT_Percent = "TaxPercentageList_ServiceByPrice[" + i + "].TaxPercent";
+
+                            string ID_nameTxtT_Title = "TaxPercentageList_ServiceByPrice" + i + "__TaxTitle";
+                            string ID_nameTxtT_Percent = "TaxPercentageList_ServiceByPrice" + i + "__TaxPercent";
+
+                            <div class="row" style="margin-bottom: 4px;">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control input-sm gst gstname" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                </div>
+                                <div class="col-md-3" style="padding-left: 0px;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-md-5 clsDivServiceTaxOthersSplitUpValidationBuyPrice1">
+                        <h4>GST Breakup - Other services:</h4>
+                        <h6 id="ServiceTaxOthersSplitUpValidation1" style="color:red;display:none;">Taxes spit up should be equal to GST - other services  ( % )</h6>
+                        @if (Model.TaxPercentageList_OthersByPrice != null && Model.TaxPercentageList_OthersByPrice.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.TaxPercentageList_OthersByPrice.Count(); i++)
+                            {
+                                iii++;
+                                <div class="row" style="margin-bottom: 4px;">
+                                    @Html.HiddenFor(m => Model.TaxPercentageList_OthersByPrice[i].TaxPerID)
+                                    <div class="col-md-9">
+                                        @Html.TextBoxFor(m => Model.TaxPercentageList_OthersByPrice[i].TaxTitle, new { @class = "form-control input-sm gst gstname" })
+                                    </div>
+                                    <div class="col-md-3" style="padding-left: 0px;">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => Model.TaxPercentageList_OthersByPrice[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @for (int i = iii; i < 5; i++)
+                        {
+                            string nameTxtT_Title = "TaxPercentageList_OthersByPrice[" + i + "].TaxTitle";
+                            string nameTxtT_Percent = "TaxPercentageList_OthersByPrice[" + i + "].TaxPercent";
+
+                            string ID_nameTxtT_Title = "TaxPercentageList_OthersByPrice" + i + "__TaxTitle";
+                            string ID_nameTxtT_Percent = "TaxPercentageList_OthersByPrice" + i + "__TaxPercent";
+
+                            <div class="row" style="margin-bottom: 4px;">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control input-sm gst gstname" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                </div>
+                                <div class="col-md-3" style="padding-left: 0px;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="modal fade" id="gstcheckinofflinebookingDIV" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Wrong GST Catogery choosen under Buy Price GST breackup !</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div id="gstcheckinofflinebooking">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                @*<input type="button" id="btnSave" value="Save" onclick="SaveOffline()" class="btn btn-success marginleft30px" tabindex="23" />*@
+                                <input type="button" id="btnSave" value="Save Booking Details" onclick="SaveBookingDetails()" class="btn btn-success " tabindex="23" />
+                            </div>
+                            <div class="col-md-4">
+
+                            </div>
+                            @if (Model.OfflineBookingId > 0)
+                            {
+                                <div class="col-md-4">
+                                    <button id="Continue" class="btn btn-info" tabindex="24" onclick="offlinebookingCheckIgst()">Continue</button>
+                                    <a href="~/Admin/OfflineBookingGST/OfflineBooking" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+                                </div>
+                            }
+
+
+                        </div>
+
+
+                        }
+
+<script>
+    function dates(date){
+        var dateString = date.substr(6);
+        var currentTime = new Date(parseInt(dateString ));
+        var month = currentTime.getMonth() + 1;
+        var day = currentTime.getDate();
+        var year = currentTime.getFullYear();
+        var date = day + "/" + month + "/" + year;
+        return date
+
+    }
+
+    function offlinebookingCheckIgst(){
+        var TAC = @((int)@CLayer.ObjectStatus.OfflineBookingType.TAC); //2
+        var Direct=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Direct); // 3
+        var OfflineBookingType = $("#OfflineBookingType").val();
+        if(OfflineBookingType == TAC || OfflineBookingType == Direct)
+        {
+            window.location.href = "/Admin/OfflineBookingGST/VendorDetails?OfflineBookingId=@Model.OfflineBookingId";
+            return ;
+        }
+        else{
+            var HidnSBBillingEntyState= $('#HidnSBBillingEntyState').val();
+            var BookingCustomerStateID= $('#BookingCustomerStateID').val();
+            if(HidnSBBillingEntyState==BookingCustomerStateID)
+            {
+                window.location.href = "/Admin/OfflineBookingGST/VendorDetails?OfflineBookingId=@Model.OfflineBookingId";
+                return ;
+            }
+            else{
+                var OfflineBookingId=@Model.OfflineBookingId;
+                $.ajax({
+                    url: "/OfflineBookingGST/getIGSTdetails",
+                    data:{'OfflineBookingId':OfflineBookingId},
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        var aaa = response.length;
+                        //karthikms comment on 19-10-2019
+                        window.location.href = "/Admin/OfflineBookingGST/VendorDetails?OfflineBookingId=@Model.OfflineBookingId";
+                        @*if(aaa!=0)
+                        {
+                            $('#gstcheckinofflinebookingDIV').modal('show');
+                            for(i=0;i<aaa;i++){
+                                var CheckIn =dates(response[i].CheckIn);
+                                var CheckOut=  dates(response[i].CheckOut);
+
+                                var ss=" <div class='row'> <div class='col-md-3'>Check In</div>"+
+                                       "<div class='col-md-3'>"+CheckIn+"</div>"+
+                                       "<div class='col-md-3'>Check Out</div>"+
+                                       "<div class='col-md-3'>"+CheckOut+"</div>"+
+                                       "<div class='col-md-3'> Hotel Confirmation No</div>"+
+                                        "<div class='col-md-3' style='word-wrap: break-word;'>"+response[i].HotelConfirmationNo+"</div>"+
+                                           "<div class='col-md-3'>Guest Name</div>"+
+                                               "<div class='col-md-3'>"+response[i].GuestName+"</div> </div>";
+                            }
+                            $("#gstcheckinofflinebooking").html(ss);
+                        }
+                        else{
+                            window.location.href = "/Admin/OfflineBookingGST/VendorDetails?OfflineBookingId=@Model.OfflineBookingId";
+                        }*@
+                    }
+                });
+            }
+        }
+
+
+
+    }
+</script>
+
+<script src="~/Scripts/tinymce/tiny_mce.js"></script>
+
+<script>
+    // for GST Splitup autocomplete
+                    $(function() {
+                        $('.gst').autocomplete({
+                            source: ["SGST", "UTGST", "CGST", "IGST"],
+                            minLength: 0
+                        }).focus(function(){
+                            $(this).autocomplete("search");
+                        })
+
+                    });
+</script>
+
+<script>
+      // on load data set script
+    if (@Model.OfflineBookingId > 0)
+    {5
+        if(@Model.StayCategoryid>0)  // for Stay Category
+        {
+            $("#StayType").val(@Model.StayCategoryid);
+        }
+
+        if(@Model.HSNCode>0)  // for Nature Of Service
+        {
+            $("#SelectHSNCode").val(@Model.HSNCode);
+        }
+
+    }
+</script>
+
+<script>
+
+
+
+
+
+    if (@Model.OfflineBookingId > 0)
+    {
+        if (@Model.AvgDailyRateBefreStaxForBuyPrice > 0 && @Model.StaxForBuyPrice>0 )
+        {
+            var StaxForBuyPriceamount = parseFloat((@Model.AvgDailyRateBefreStaxForBuyPrice * @Model.StaxForBuyPrice / 100) * @Model.NoOfNight * @Model.NoOfRooms);
+            $("#StaxForBuyPriceamount").val(StaxForBuyPriceamount)
+        }
+        if (@Model.AvgDailyRateBefreStaxForSalePrice > 0 && @Model.StaxForSalePrice>0)
+        {
+            var StaxForSalePriceamount = parseFloat((@Model.AvgDailyRateBefreStaxForSalePrice * @Model.StaxForSalePrice / 100) * @Model.NoOfNight * @Model.NoOfRooms);
+            $("#StaxForSalePriceamount").val(StaxForSalePriceamount)
+        }
+    }
+
+    function BookingDate()
+    {
+        re = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+        var date=  $("#Bookingdate").val()
+        if(date==null||date=="")
+        {
+            var curDate = new Date();
+            curDate.setDate(curDate.getDate());
+            var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+            $("#Bookingdate").val(idat);
+        }
+        else if(date != '' && !date.match(re)) {
+            var curDate = new Date();
+            curDate.setDate(curDate.getDate());
+            var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+            $("#Bookingdate").val(idat);
+         }
+        else{
+            return true;
+        }
+    }
+
+
+    tinyMCE.init({
+        mode: "textareas",
+        theme: "simple",
+        force_br_newlines : true,
+        force_p_newlines : false,
+        theme_simple_toolbar_location: "top",
+        height: "100", width: "420",
+        editor_selector: "mceSimple"
+
+    });
+
+</script>
+
+<script type="text/javascript">
+
+    $(window).load(function () {
+
+        if(@Model.InventoryAPIType==2)
+        {
+       //     alert("api");
+
+        }
+
+        $.get("/OfflineBookingGST/StaybazarBookingEntity?bookingid=" + @Model.OfflineBookingId , function (data) {
+            if (data != "") {
+                $("#HidnSBBillingEntyState").val(data);
+                checkGSTStateDiffrentDiv();
+                $.get("/OfflineBookingGST/GetBookingCustomerStateID?bookingid=" + @Model.OfflineBookingId , function (data) {
+                    if (data != "") {
+                        $("#BookingCustomerStateID").val(data);
+
+                        if(@Model.BookingId==0)
+                        {
+
+                            var HidnSBBillingEntyState= $('#HidnSBBillingEntyState').val();
+                            var BookingCustomerStateID= $('#BookingCustomerStateID').val();
+                            var OfflineBookingType = $("#OfflineBookingType").val();
+
+                            var Regular=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Regular);//1
+                            if(HidnSBBillingEntyState!=BookingCustomerStateID &&  OfflineBookingType == Regular)
+                            {
+                                $("#StaxForSalePrice").val(18);
+                                $("#TaxPercentageList_ServiceSalePrice0__TaxTitle").val("IGST");
+                                $("#TaxPercentageList_ServiceSalePrice0__TaxPercent").val(18);
+
+                                $("#TaxPercentageList_OthersSalePrice0__TaxTitle").val("IGST");
+                                $("#TaxPercentageList_OthersSalePrice0__TaxPercent").val(0);
+                            }
+                        }
+                    }
+                });
+                CheckBuyPriceShowHideWhenSupplierCancelCheck();
+            }
+        })
+
+        if(@Model.BookingId!=0){
+
+            $.ajax({
+                type: "Get",
+                url: "/OfflineBookingGST/GetInvoiceIDByOfflineBookingID?OfflineBookingId=" + @Model.OfflineBookingId,
+                success: function (data) {
+                    if(data!=null && data!="" && data!=0 && data.trim() != "0" )
+                    {
+                        $("#CheckIn").prop("disabled", true);
+                        $("#CheckOut").prop("disabled", true);
+                        $('#CheckIn').attr('readonly', true);
+                        $('#CheckOut').attr('readonly', true);
+                        $('#NoOfNight').attr('readonly', true);
+                        $('#NoOfRooms').attr('readonly', true);
+                        $('#NoOfPaxAdult').attr('readonly', true);
+                        $('#NoOfPaxChild').attr('readonly', true);
+
+                        //$('#AccommodationTypeName').attr('readonly', true);
+                        //$("#StayType").prop("disabled", true);
+                        //$('#GuestName').attr('readonly', true);
+                        //$('#GuestEmail').attr('readonly', true);
+                        //$('#GuestPhone').attr('readonly', true);
+
+
+                        $('#AvgDailyRateBefreStaxForBuyPrice').attr('readonly', true);
+                        $('#BuyPriceforotherservicesForBuyprice').attr('readonly', true);
+                        $('#StaxForBuyPrice').attr('readonly', true);
+                        $('#TotalAmtForBuyPrice').attr('readonly', true);
+                        $('#TotalBuyPrice').attr('readonly', true);
+                        $('#BuyPriceforotherservicesForBuyprice').attr('readonly', true);
+                        $('#StaxForotherBuyPrice').attr('readonly', true);
+                        $('#TotalAmtotherForBuyPrice').attr('readonly', true);
+                        $('#AvgDailyRateBefreStaxForSalePrice').attr('readonly', true);
+                        $('#BuyPriceforotherservicesForSalePrice').attr('readonly', true);
+                        $('#StaxForSalePrice').attr('readonly', true);
+                        $('#StaxForotherForSalePrice').attr('readonly', true);
+                        $('#TotalAmtForSalePrice').attr('readonly', true);
+                        $('#TotalAmtotherForSalePrice').attr('readonly', true);
+                        $('#TotalSalePrice').attr('readonly', true);
+                        $('div.clsDivServiceTaxSplitUpValidationBuyPrice :input.numberboxTaxPerccent').attr('readonly', true);
+                        $('div.clsDivServiceTaxOthersSplitUpValidationBuyPrice1 :input.numberboxTaxPerccent').attr('readonly', true);
+                        $('div.clsDivServiceTaxOthersSplitUpValidation :input.numberboxTaxPerccent').attr('readonly', true);
+                        $('div.clsDivServiceTaxSplitUpValidation :input.numberboxTaxPerccent').attr('readonly', true);
+
+                        $('div.clsDivServiceTaxSplitUpValidationBuyPrice :input.gst').attr('readonly', true);
+                        $('div.clsDivServiceTaxOthersSplitUpValidationBuyPrice1 :input.gst').attr('readonly', true);
+                        $('div.clsDivServiceTaxOthersSplitUpValidation :input.gst').attr('readonly', true);
+                        $('div.clsDivServiceTaxSplitUpValidation :input.gst').attr('readonly', true);
+
+                    }
+                }
+            })
+        }
+
+    });
+    function checkGSTStateDiffrentDiv()
+    {
+        $.get("/OfflineBookingGST/GetStateIDsTypeDetails?bookingid=" + @Model.OfflineBookingId, function (data) {
+            if (data != "") {
+                var myString = data;
+                var arr = myString.split(',');
+                $("#CustomerType").val(arr[0]);
+                $("#CustomerGstStateId").val(arr[1]);
+                $("#CustomerState").val(arr[2]);
+                $("#PropertyState").val(arr[3]);
+                $("#SupplierStateID").val(arr[4]);
+                $("#OfflineBookingType").val(arr[5]);
+                $("#PropertyGstRegNo").val(arr[6]);
+
+                var Regular=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Regular);//1
+                var TAC = @((int)@CLayer.ObjectStatus.OfflineBookingType.TAC); //2
+                var Direct=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Direct); // 3
+                if(arr[5]==TAC ||arr[5]==Direct)
+                {
+                    $("#BuyPriceGSTBreakup").hide();
+                    $("#SalePriceGSTBreakup").hide();
+
+                    $("#StaxForSalePrice").val(0);
+                    $("#StaxForBuyPrice").val(0);
+                    $("#StaxForotherBuyPrice").val(0);
+                    $("#StaxForotherForSalePrice").val(0);
+
+                    $("#StaxForSalePrice").prop("readonly", true);
+                    $("#StaxForBuyPrice").prop("readonly", true);
+                    $("#StaxForotherBuyPrice").prop("readonly", true);
+                    $("#StaxForotherForSalePrice").prop("readonly", true);
+                }
+                if(arr[5]==Regular)
+                {
+                    if(arr[6]=="NOT__REGISTERED")
+                    {
+                        $("#BuyPriceGSTBreakup").hide();
+
+                        $("#StaxForotherBuyPrice").val(0);
+                        $("#StaxForBuyPrice").val(0);
+
+                        $("#StaxForBuyPrice").prop("readonly", true);
+                        $("#StaxForotherBuyPrice").prop("readonly", true);
+                    }
+                }
+                var CORPORATE=@((int)@CLayer.Role.Roles.Corporate);
+                if (arr[0] == CORPORATE)
+                {
+                    if (arr[3] != arr[1] && arr[3] != $("#HidnSBBillingEntyState").val())
+                    {
+                        $("#BuyPriceGSTBreakup").hide();
+                    }
+                }
+            }
+        });
+    }
+
+
+
+</script>
+
+<script type="text/javascript">
+
+    @*$(document).ready(function(){
+        if(@Model.OfficeBookingID > 0)
+        {
+
+            $('#BookingList').hide();
+            var url = '@Url.Action("_BookingDetailsList", "OfflineBookingGST")' + "?OfflineBookingId=" + @Model.OfflineBookingId;
+            $.get(url, function (data) {
+                if(data!=null)
+                {
+                    $('#BookingList').html(data);
+                    $('#BookingList').show();
+                }
+
+            });
+
+        }
+    });*@
+
+
+    @*alert(@Model.PropertyId);
+    alert(@Model.CheckIn);
+    alert(@Model.CheckOut);
+    alert('@Model.PropertyCityname');*@
+
+    $("#AccommodationTypeName").autocomplete({
+         source: "/Admin/OfflineBookingGST/GetAccommodationTypeNameGDS",
+                    data:{ PropertyId :@Model.PropertyId, CheckIn: @Model.CheckIn, CheckOut:@Model.CheckOut,  place:'@Model.PropertyCityname'},
+                    minLength: 1,
+                    select: function (event, ui) {
+                        if (ui.item) {
+                            $("#AccommodationTypeName").val(ui.item.value);
+                            $("#Accommodationtypeid").val(ui.item.id);
+
+                            var id = ui.item.id;
+                        }
+                    }
+       });
+
+
+
+
+
+
+
+    function changecheckout()
+    {
+        var CheckOutdt =   moment( $("#CheckOut").val(), "DD/MM/YYYY");
+        var Checkindt =    moment( $("#CheckIn").val(), "DD/MM/YYYY");
+
+        var days = daydiff(Checkindt, CheckOutdt );
+        $("#NoOfNight").val(Math.round(days));
+
+        onchangestaxbuyprice();
+        onchangestaxsaleprice();
+        ChangesForEMS();
+    }
+
+    function changenoofnight()
+    {
+        var CheckOutdt =   moment( $("#CheckOut").val(), "DD/MM/YYYY");
+        var Checkindt  =    moment( $("#CheckIn").val(), "DD/MM/YYYY");
+        var Noofnight  =   $("#NoOfNight").val();
+        if(isNaN(parseFloat(Noofnight))){ Noofnight = 0;}
+        var updatecheckoutdt =moment( Checkindt.add("days",Noofnight),"DD/MM/YYYY" ).format("DD/MM/YYYY");
+        //$("#CheckOut").val(updatecheckoutdt);
+
+        onchangestaxbuyprice();
+        onchangestaxsaleprice();
+    }
+
+    function changecheckin()
+    {
+        var CheckOutdt =   moment( $("#CheckOut").val(), "DD/MM/YYYY");
+        var Checkindt =    moment( $("#CheckIn").val(), "DD/MM/YYYY");
+
+        var days = daydiff(Checkindt, CheckOutdt );
+        $("#NoOfNight").val(Math.round(days));
+
+        onchangestaxbuyprice();
+        onchangestaxsaleprice();
+        ChangesForEMS();
+    }
+    function changenoofrooms()
+    {
+        onchangestaxbuyprice();
+        onchangestaxsaleprice();
+    }
+    function chnoofnight()
+    {
+        onchangestaxbuyprice();
+        onchangestaxsaleprice();
+    }
+    function CheckBuyValueifsuppliernotequalentitystateValid()
+    {
+        var SupplierStateID = $("#SupplierStateID").val();
+        var HidnSBBillingEntyState = $("#HidnSBBillingEntyState").val();
+
+        if( SupplierStateID  == HidnSBBillingEntyState)
+        {
+            return true;
+
+        }
+        else
+        {
+            var BuyValuegstpercentage = parseFloat($("#StaxForBuyPrice").val());
+            var StaxForBuyPriceamount = parseFloat($("#StaxForBuyPriceamount").val());
+            if(BuyValuegstpercentage == 0 && StaxForBuyPriceamount == 0)
+            {
+                return true;
+            }
+            else
+            {
+                alert("You cannot take input tax credit in unregistered state");
+                return false;
+
+            }
+        }
+
+    }
+    function CheckBookingTypewithSupplierGST()
+    {
+        var TAC = @((int)@CLayer.ObjectStatus.OfflineBookingType.TAC); //2
+        var Direct=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Direct); // 3
+        var OfflineBookingType = $("#OfflineBookingType").val();
+        if(OfflineBookingType == TAC || OfflineBookingType == Direct)
+        {
+            var BuyValuegstpercentage = parseFloat($("#StaxForBuyPrice").val());
+            var StaxForBuyPriceamount = parseFloat($("#StaxForBuyPriceamount").val());
+
+            if (isNaN(BuyValuegstpercentage)) {
+                BuyValuegstpercentage = 0;
+            }
+            if (isNaN(StaxForBuyPriceamount)) {
+                StaxForBuyPriceamount = 0;
+            }
+            if(BuyValuegstpercentage == 0 && StaxForBuyPriceamount == 0)
+            {
+                return true;
+
+            }
+            else
+            {
+                alert("You cannot take input tax credit for booking when the hotel is not billing you");
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+    function CheckBuyValueifpropertynotequalentitystateValid()
+    {
+        var PropertyState = $("#PropertyState").val();
+        var HidnSBBillingEntyState = $("#HidnSBBillingEntyState").val();
+
+        if( PropertyState  == HidnSBBillingEntyState)
+        {
+            return true;
+
+        }
+        else
+        {
+            var BuyValuegstpercentage = parseFloat($("#StaxForBuyPrice").val());
+            var StaxForBuyPriceamount = parseFloat($("#StaxForBuyPriceamount").val());
+
+            if(isNaN(BuyValuegstpercentage))
+            {
+                BuyValuegstpercentage=0;
+            }
+            if(isNaN(StaxForBuyPriceamount))
+            {
+                StaxForBuyPriceamount=0;
+            }
+
+
+            if(BuyValuegstpercentage == 0 && StaxForBuyPriceamount == 0)
+            {
+                return true;
+
+            }
+            else
+            {
+                alert("Cannot take input tax credit in unregistered State");
+                return false;
+
+            }
+        }
+    }
+
+    function validateSalePrice()
+    {
+        var TAC = @((int)@CLayer.ObjectStatus.OfflineBookingType.TAC); //2
+        var Direct=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Direct); // 3
+        var OfflineBookingType = $("#OfflineBookingType").val();
+        if(OfflineBookingType == TAC || OfflineBookingType == Direct)
+        {
+            var StaxForSalePrice = $("#StaxForSalePrice").val();
+            if(StaxForSalePrice==0){return true;}
+            else{$("#StaxForSalePrice").focus();  alert("Sale Price GST% should be zero.");  return false;}
+        }
+        else{
+            var servTax=$('#StaxForSalePrice').val();
+            var servOtherTax=$('#StaxForotherForSalePrice').val();
+
+            if(isNaN(servTax))
+            {
+                servTax=0.0;
+            }
+            if(isNaN(servOtherTax))
+            {
+                servOtherTax=0.0;
+            }
+
+            var StaxForSalePrice = parseFloat(servTax);
+            var StaxForotherForSalePrice= parseFloat(servOtherTax);
+
+            var sumOFServiceTax =0.0; var sumOFServiceTaxOthers=0.0;
+
+            $('div.clsDivServiceTaxSplitUpValidation :input.numberboxTaxPerccent').each(function(){
+                //console.log($(this).val());
+                if( !isNaN(parseFloat($(this).val())) )
+                {
+                    sumOFServiceTax = 0 + sumOFServiceTax + parseFloat($(this).val());
+                }
+                else
+                {
+                    console.log('null1 clsDivServiceTaxSplitUpValidation');
+                }
+
+            });
+
+            $('div.clsDivServiceTaxOthersSplitUpValidation :input.numberboxTaxPerccent').each(function(){
+                //console.log($(this).val());
+                if(  !isNaN(parseFloat($(this).val())) ) //$(this).val().match(intRegex)
+                {
+                    sumOFServiceTaxOthers = 0 + sumOFServiceTaxOthers + parseFloat($(this).val());
+                }
+
+                else
+                {
+                    console.log('null2 clsDivServiceTaxOthersSplitUpValidation');
+                }
+
+            });
+
+            if(sumOFServiceTax.toFixed(4) == StaxForSalePrice.toFixed(4) && sumOFServiceTaxOthers.toFixed(4) == StaxForotherForSalePrice.toFixed(4))
+            {
+
+                return true;
+
+            }
+            else{
+                alert("GST % breakup for sale price does not match !");
+                return false;
+            }
+        }
+
+
+    }
+
+    function validateBuyPriceCheck(){
+        var servTaxBuyprice=$('#StaxForBuyPrice').val();
+        var servOtherTaxBuyprice=$('#StaxForotherBuyPrice').val();
+
+        if(isNaN(servTaxBuyprice))
+        {
+            servTaxBuyprice=0.0;
+        }
+        if(isNaN(servOtherTaxBuyprice))
+        {
+            servOtherTaxBuyprice=0.0;
+        }
+
+        var StaxForBuyprice = parseFloat(servTaxBuyprice);
+        var StaxForotherForBuyprice= parseFloat(servOtherTaxBuyprice);
+
+        var sumOFBuyprice =0.0; var sumOFBuypriceOthers=0.0;
+        // buyprice
+        $('div.clsDivServiceTaxSplitUpValidationBuyPrice :input.numberboxTaxPerccent').each(function(){
+            //console.log($(this).val());
+            if( !isNaN(parseFloat($(this).val())) )
+            { sumOFBuyprice = 0 + sumOFBuyprice + parseFloat($(this).val());
+            }
+            else
+            {
+                console.log('null1 clsDivServiceTaxSplitUpValidationBuyPrice');
+            }
+        });
+        // buyprice
+        $('div.clsDivServiceTaxOthersSplitUpValidationBuyPrice1 :input.numberboxTaxPerccent').each(function(){
+            //console.log($(this).val());
+            if(  !isNaN(parseFloat($(this).val())) ) //$(this).val().match(intRegex)
+            {
+                sumOFBuypriceOthers = 0 + sumOFBuypriceOthers + parseFloat($(this).val());
+            }
+            else
+            {
+                console.log('null2 clsDivServiceTaxOthersSplitUpValidationBuyPrice1');
+            }
+
+        });
+
+        if(sumOFBuyprice.toFixed(4) == StaxForBuyprice.toFixed(4) && sumOFBuypriceOthers.toFixed(4) == StaxForotherForBuyprice.toFixed(4) )
+        {
+            return true;
+        }
+        else{
+            alert("GST % breakup for buy price does not match !")
+            return false;
+        }
+
+    }
+
+    function validateBuyPrice()
+    {
+        var Regular=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Regular);//1
+        var TAC = @((int)@CLayer.ObjectStatus.OfflineBookingType.TAC); //2
+        var Direct=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Direct); // 3
+
+        var OfflineBookingType = $("#OfflineBookingType").val();
+        if(OfflineBookingType == TAC || OfflineBookingType == Direct)
+        {
+            var StaxForBuyPrice = $("#StaxForBuyPrice").val();
+            if(StaxForBuyPrice==0) {return true; }
+            else{ $("#StaxForBuyPrice").focus(); alert("Buy Price GST % should be zero."); return false;}
+        }
+        else {// OfflineBookingType == Regular)
+            debugger
+            if($('#SupplierCancellationDone').attr('checked')) {
+                return true;
+            }
+            else{
+                var PropertyGstRegNo = $("#PropertyGstRegNo").val();
+                if(PropertyGstRegNo!=""&& PropertyGstRegNo=="NOT__REGISTERED")
+                {
+                    return true;
+                }
+                else{
+                    var CORPORATE=@((int)@CLayer.Role.Roles.Corporate);
+                    if ($("#CustomerType").val() == CORPORATE)
+                    {
+                        if ($("#PropertyState").val() != $("#CustomerGstStateId").val() && $("#PropertyState").val() != $("#HidnSBBillingEntyState").val())
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            if(validateBuyPriceCheck()==true){ return true;}else{return false;}
+                        }
+                    }
+                    else{
+                        if(validateBuyPriceCheck()==true){return true;}else{return false;}
+                    }
+                }
+            }
+
+
+
+
+        }
+
+    }
+    function validateigst()
+    {
+        debugger
+
+        var TAC = @((int)@CLayer.ObjectStatus.OfflineBookingType.TAC); //2
+        var Direct=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Direct); // 3
+        var OfflineBookingType = $("#OfflineBookingType").val();
+        if(OfflineBookingType == TAC || OfflineBookingType == Direct)
+        {
+            return true;
+        }
+        else{
+            var HidnSBBillingEntyState= $('#HidnSBBillingEntyState').val();
+            var BookingCustomerStateID= $('#BookingCustomerStateID').val();
+            if(HidnSBBillingEntyState==BookingCustomerStateID)
+            {
+                return true;
+            }
+            else{
+                var a=0;
+                var s=0;
+                var sumOFServiceTax =0.0;
+                $('div.clsDivServiceTaxSplitUpValidation :input.gstnameSaleprice').each(function(){
+                    if($(this).val()=="IGST"){a =1;}
+                });
+
+                $('div.clsDivServiceTaxSplitUpValidation :input.numberboxTaxPerccent').each(function(){
+                    if( !isNaN(parseFloat($(this).val())) )
+                    {
+                        sumOFServiceTax = 0 + sumOFServiceTax + parseFloat($(this).val());
+                    }
+                });
+                if(sumOFServiceTax<18){s=1;}
+
+                //karthik 19-oct-2019
+                //if(a==0 || s==1)
+                //{
+                //    alert("When Customer is outside billing State, IGST is applicable !")
+                //}
+                //else
+                //{
+                //    return true;
+                //}
+                return true;
+
+            }
+        }
+    }
+
+    function SaveBookingDetails()
+    {
+        if( @Model.OfflineBookingId>0)
+        {
+            if($('#multiplebooking').valid()){
+                var byPrice = parseFloat($('#TotalBuyPrice').val()) > 0 ? parseFloat($('#TotalBuyPrice').val()) : 0;
+                var salePrice = parseFloat($('#TotalSalePrice').val()) > 0 ? parseFloat($('#TotalSalePrice').val()) : 0;
+
+                var staycategoryid =$("#StayType").find('option:selected').attr('value');
+                $("#StayCategoryid").val($("#StayType").find('option:selected').attr('value'));
+                $("#StayCategoryName").val($("#StayType option:selected").text());
+                $("#HSNCode").val($("#SelectHSNCode").find('option:selected').attr('value'));
+                //CheckBuyValueifsuppliernotequalentitystateValid()==true
+                debugger
+                if(validateBuyPrice()== true && validateSalePrice() == true && CheckBuyValueifpropertynotequalentitystateValid()==true &&  validateigst()==true &&  CheckBookingTypewithSupplierGST()==true )
+                {
+                    if(byPrice > salePrice  )
+                    {
+                        $('#confirmBoxWindow').modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        })
+                        .one('click', '#btnConfirmBoxYes', function(e) {
+                            if(Getgrossmargin() < @Gmp)
+                            {
+
+                                $('#GrossmarginconfirmBox').modal({
+                                backdrop: 'static',
+                                keyboard: false
+                            })
+                                      .one('click', '#GrossmarginbtnConfirmBoxYes', function(e) {
+                                          saveMultiplebooking();
+                            });
+                        }
+                        else{
+                                saveMultiplebooking();
+                    }
+                });
+            }else{
+                if(Getgrossmargin() < @Gmp)
+                {
+
+                            $('#GrossmarginconfirmBox').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                })
+                                  .one('click', '#GrossmarginbtnConfirmBoxYes', function(e) {
+                                      saveMultiplebooking();
+                });
+            }
+        else{
+                            saveMultiplebooking();
+        }
+    }
+    }
+
+    }
+    }
+    }
+
+    function saveMultiplebooking()
+    {
+        $('#multiplebooking').attr('action', "/Admin/OfflineBookingGST/SaveBooingDetails").submit();
+
+    }
+
+
+    //$("#SupplierCancellationDone").change(function() {
+    //    if(this.checked) {
+
+    //        $("#BuyPriceGSTBreakup").hide();
+    //        $("#StaxForotherBuyPrice").val(0);
+    //        $("#StaxForBuyPrice").val(0);
+
+    //    }
+    //    else{
+
+    //    }
+
+    //});
+
+
+    function onchangestaxbuyprice()
+    {
+
+        var avgdailyrate = parseFloat( $("#AvgDailyRateBefreStaxForBuyPrice").val());
+        var noofnight = parseFloat($("#NoOfNight").val());
+        var noofrooms = parseFloat($("#NoOfRooms").val());
+        var Stax  =parseFloat( $("#StaxForBuyPrice").val());
+
+        var avgdailyrateother = parseFloat( $("#BuyPriceforotherservicesForBuyprice").val());
+        var Staxother  =parseFloat( $("#StaxForotherBuyPrice").val());
+
+        if(isNaN(parseFloat(avgdailyrate))){ avgdailyrate = 0;}
+        if(isNaN(parseFloat(avgdailyrateother))){ avgdailyrateother = 0;}
+        if(isNaN(parseFloat(noofnight))){ noofnight = 0;}
+        if(isNaN(parseFloat(noofrooms))){ noofrooms = 0;}
+        if(isNaN(parseFloat(Stax))){ Stax = 0;}
+        if(isNaN(parseFloat(Staxother))){ Staxother = 0;}
+        var StaxForBuyPriceamount=  parseFloat((avgdailyrate*Stax/100) * noofnight * noofrooms);
+        var total =parseFloat( ( avgdailyrate + (avgdailyrate*Stax/100)) * noofnight * noofrooms );
+        $("#StaxForBuyPriceamount").val(Math.round(StaxForBuyPriceamount));
+        $("#TotalAmtForBuyPrice").val(Math.round(total));
+
+
+        var totalbuyamount =  parseFloat ($("#TotalAmtForBuyPrice").val() );
+
+
+        var totalbuyotheramount = parseFloat(avgdailyrateother + (avgdailyrateother * Staxother /100) );
+        $("#TotalAmtotherForBuyPrice").val(totalbuyotheramount);
+
+        if(isNaN(parseFloat(totalbuyamount))){ totalbuyamount = 0;}
+        if(isNaN(parseFloat(totalbuyotheramount))){ totalbuyotheramount = 0;}
+
+        var totalbuy = parseFloat( ( totalbuyamount + totalbuyotheramount));
+        $("#TotalBuyPrice").val(totalbuy);
+
+    }
+
+
+    function onchangestaxsaleprice()
+    {
+        var avgdailyrate =parseFloat( $("#AvgDailyRateBefreStaxForSalePrice").val());
+        var noofnight = parseFloat($("#NoOfNight").val());
+        var noofrooms = parseFloat($("#NoOfRooms").val());
+        var Stax  =parseFloat( $("#StaxForSalePrice").val());
+
+        var avgdailyrateother =parseFloat( $("#BuyPriceforotherservicesForSalePrice").val());
+        var Staxother  =parseFloat( $("#StaxForotherForSalePrice").val());
+
+
+        if(isNaN(parseFloat(avgdailyrate))){ avgdailyrate = 0;}
+        if(isNaN(parseFloat(avgdailyrateother))){ avgdailyrateother = 0;}
+        if(isNaN(parseFloat(noofnight))){ noofnight = 0;}
+        if(isNaN(parseFloat(noofrooms))){ noofrooms = 0;}
+        if(isNaN(parseFloat(Stax))){ Stax = 0;}
+        if(isNaN(parseFloat(Staxother))){ Staxother = 0;}
+
+
+        var total =parseFloat( ( avgdailyrate + (avgdailyrate * Stax / 100 )) * noofnight * noofrooms );
+
+        $("#TotalAmtForSalePrice").val(Math.round(total));
+
+        var StaxForSalePriceamount=  parseFloat((avgdailyrate*Stax/100) * noofnight * noofrooms);
+        $("#StaxForSalePriceamount").val(Math.round(StaxForSalePriceamount));
+        var totalbuyamount = parseFloat ($("#TotalAmtForSalePrice").val());
+
+        var totalbuyotheramount =parseFloat(avgdailyrateother + ( avgdailyrateother * Staxother /100) );
+
+        $("#TotalAmtotherForSalePrice").val(totalbuyotheramount) ;
+
+
+
+        $("#TotalSalePrice").val(totalbuyamount + totalbuyotheramount);
+
+    }
+
+    function onchangestaxbuypriceforotherservice()
+    {
+        var avgdailyrateother = parseFloat( $("#BuyPriceforotherservicesForBuyprice").val());
+        var noofnight = parseFloat($("#NoOfNight").val());
+        var noofrooms = parseFloat($("#NoOfRooms").val());
+        var Staxother  =parseFloat( $("#StaxForotherBuyPrice").val());
+
+        var avgdailyrate = parseFloat( $("#AvgDailyRateBefreStaxForBuyPrice").val());
+        var Stax  =parseFloat( $("#StaxForBuyPrice").val());
+
+        if(isNaN(parseFloat(avgdailyrate))){ avgdailyrate = 0;}
+        if(isNaN(parseFloat(Stax))){ Stax = 0;}
+
+
+        if(isNaN(parseFloat(avgdailyrateother))){ avgdailyrateother = 0;}
+        if(isNaN(parseFloat(Staxother))){ Staxother = 0;}
+
+        var total = parseFloat( ( avgdailyrateother + Staxother));
+
+        $("#TotalAmtotherForBuyPrice").val(Math.round( total));
+
+
+        var totalbuyamount =parseFloat( avgdailyrate + Stax);
+        $("#TotalAmtForBuyPrice").val(totalbuyamount);
+
+        var totalbuyotheramount =parseFloat( $("#TotalAmtotherForBuyPrice").val() );
+        $("#TotalBuyPrice").val(totalbuyamount + totalbuyotheramount);
+
+
+    }
+
+
+    function onchangestaxsalepriceforotherservice()
+    {
+        var avgdailyrateother =parseFloat( $("#BuyPriceforotherservicesForSalePrice").val());
+        var noofnight = parseFloat($("#NoOfNight").val());
+        var noofrooms = parseFloat($("#NoOfRooms").val());
+        var Staxother =parseFloat( $("#StaxForotherForSalePrice").val());
+
+        var avgdailyrate =parseFloat( $("#AvgDailyRateBefreStaxForSalePrice").val());
+        var Stax  =parseFloat( $("#StaxForSalePrice").val());
+
+        if(isNaN(parseFloat(avgdailyrate))){ avgdailyrate = 0;}
+        if(isNaN(parseFloat(Stax))){ Stax = 0;}
+
+        if(isNaN(parseFloat(avgdailyrateother))){ avgdailyrateother = 0;}
+        if(isNaN(parseFloat(Staxother))){ Staxother = 0;}
+
+        var total = parseFloat( ( avgdailyrateother + Staxother));
+
+        $("#TotalAmtotherForSalePrice").val(Math.round(total));
+
+
+        var totalbuyamount = parseFloat(avgdailyrate + Stax );
+        $("#TotalAmtForSalePrice").val(totalbuyamount);
+        var totalbuyotheramount =parseFloat( $("#TotalAmtotherForSalePrice").val() );
+
+
+        $("#TotalSalePrice").val(parseFloat (totalbuyamount) + parseFloat (totalbuyotheramount));
+    }
+
+
+    function onchangetotalbuyprice()
+    {
+        var totalbuyamount =  parseFloat ($("#TotalAmtForBuyPrice").val() );
+        var totalbuyotheramount =parseFloat( $("#TotalAmtotherForBuyPrice").val());
+
+        if(isNaN(parseFloat(totalbuyamount))){ totalbuyamount = 0;}
+        if(isNaN(parseFloat(totalbuyotheramount))){ totalbuyotheramount = 0;}
+
+        var totalbuy = parseFloat( ( totalbuyamount + totalbuyotheramount));
+        $("#TotalBuyPrice").val(totalbuy);
+
+          @*var GSTTaxPercent = '@ViewBag.StaxForBuyPrice';
+        var GSTTaxAmount = '@ViewBag.StaxForBuyPriceamount';
+        $("#StaxForBuyPrice").val(GSTTaxPercent);
+        $("#StaxForBuyPriceamount").val(GSTTaxAmount);*@
+
+    }
+
+    function onchangetotalsaleprice()
+    {
+
+
+
+
+        var totalbuyamount = parseFloat ($("#TotalAmtForSalePrice").val());
+        var totalbuyotheramount = parseFloat( $("#TotalAmtotherForSalePrice").val());
+
+        if(isNaN(parseFloat(totalbuyamount))){ totalbuyamount = 0;}
+        if(isNaN(parseFloat(totalbuyotheramount))){ totalbuyotheramount = 0;}
+
+        var totalbuy = parseFloat( ( totalbuyamount + totalbuyotheramount));
+        $("#TotalSalePrice").val(totalbuy);
+
+
+
+
+    }
+
+
+
+
+
+
+</script>
+
+<script type="text/javascript">
+                                // for customer
+
+    $(function () {
+        ChangesForEMS();
+
+
+                                    if ($('#CustomerCity').val() == -1) {
+                                        $("#CustomerCity").hide();
+                                        @*if(@offid < 1)
+                                {
+                                    $("#CustomerCityname").val("");
+                                }*@
+                                        $("#other_citycus").show();
+                                    }
+
+                                    $('#CustomerCountry').change(function () {
+                                        $.get("/Common/GetState?id=" + $('#CustomerCountry').val(), function (data) {
+                                            if (data != "")
+                                                $('#CustomerState').empty().append(data);
+                                            else
+                                                $('#CustomerState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            cusLoadcity()
+                                        });
+                                    });
+
+                                    $('#CustomerState').change(function () {
+                                        $("#CustomerCity").show();
+                                        $("#CustomerCityname").val("");
+                                        $("#other_citycus").hide();
+                                        $.get("/Common/GetCity?id=" + $('#CustomerState').val(), function (data) {
+                                            if (data != "") {
+                                                $('#CustomerCity').empty().append(data);
+                                                $("#CustomerCityname").val($("#CustomerCity").find('option:selected').text());
+                                                if ($("select#CustomerCity option").length == 1) {
+                                                    $("#CustomerCity").hide();
+                                                    $("#CustomerCityname").val("");
+                                                    $("#other_citycus").show();
+                                                }
+                                            }
+                                            else {
+                                                $('#CustomerCity').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            }
+                                        });
+
+                                    });
+
+                                    $('#CustomerCity').change(function () {
+                                        $("#CustomerCityname").val($("#CustomerCity").find('option:selected').text());
+                                        if ($(this).val() == -1) {
+                                            $(this).hide();
+
+                                            $("#CustomerCityname").val("");
+
+                                            $("#other_citycus").show();
+                                            $("#close_other_citycus").show();
+                                        }
+                                    });
+                                    $('#close_other_citycus').click(function () {
+                                        $("#CustomerCity").show();
+                                        $("#CustomerCityname").val("");
+                                        $("#other_citycus").hide();
+                                        $("#close_other_citycus").hide();
+                                    });
+                                });
+
+                                function cusLoadcity() {
+                                    $.get("/Common/GetCity?id=" + $('#CustomerState').val(), function (data) {
+                                        if (data != "") {
+                                            $('#CustomerCity').html(data);
+                                        }
+                                        else {
+                                            $('#CustomerCity').html('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+                                function cusLoadState() {
+                                    $.get("/Common/GetState?id=" + $('#CustomerCountry').val(), function (data) {
+                                        if (data != "") {
+                                            $('#CustomerState').empty().append(data);
+                                        }
+                                        else {
+                                            $('#CustomerState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+
+
+                                // for property
+
+
+                                $(function () {
+
+
+                                    if ($('#PropertyCity').val() == -1) {
+                                        $("#PropertyCity").hide();
+                                        @*if(@offid < 1)
+                                {
+                                    $("#PropertyCityname").val("");
+                                }*@
+
+                                        $("#other_cityprop").show();
+                                    }
+
+                                    $('#PropertyCountry').change(function () {
+                                        $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+                                            if (data != "")
+                                                $('#PropertyState').empty().append(data);
+                                            else
+                                                $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            propLoadcity()
+                                        });
+                                    });
+                                    $('#PropertyState').change(function () {
+                                        $("#PropertyCity").show();
+                                        $("#PropertyCityname").val("");
+                                        $("#other_cityprop").hide();
+                                        $.get("/Common/GetCity?id=" + $('#PropertyState').val(), function (data) {
+                                            if (data != "") {
+                                                $('#PropertyCity').empty().append(data);
+                                                $("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+                                                if ($("select#PropertyCity option").length == 1) {
+                                                    $("#PropertyCity").hide();
+                                                    $("#PropertyCityname").val("");
+                                                    $("#other_cityprop").show();
+                                                }
+                                            }
+                                            else {
+                                                $('#PropertyCity').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            }
+                                        });
+
+                                    });
+                                    $('#PropertyCity').change(function () {
+                                        $("#PropertyCityname").val($("#PropertyCity").find('option:selected').text());
+                                        if ($(this).val() == -1) {
+                                            $(this).hide();
+                                            $("#PropertyCityname").val("");
+                                            $("#other_cityprop").show();
+                                            $("#close_other_cityprop").show();
+                                        }
+                                    });
+                                    $('#close_other_cityprop').click(function () {
+                                        $("#PropertyCity").show();
+                                        $("#PropertyCityname").val("");
+                                        $("#other_cityprop").hide();
+                                        $("#close_other_cityprop").hide();
+                                    });
+                                });
+
+                                function propLoadcity() {
+                                    $.get("/Common/GetCity?id=" + $('#PropertyState').val(), function (data) {
+                                        if (data != "") {
+                                            $('#PropertyCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                                        }
+                                        else {
+                                            $('#PropertyCity').html('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+                                function propLoadState() {
+                                    $.get("/Common/GetState?id=" + $('#PropertyCountry').val(), function (data) {
+                                        if (data != "") {
+                                            $('#PropertyState').empty().append(data);
+                                        }
+                                        else {
+                                            $('#PropertyState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+
+                                //for supplier
+
+                                $(function () {
+
+
+                                    if ($('#SupplierCity').val() == -1) {
+                                        $("#SupplierCity").hide();
+                                        $("#SupplierCityname").val("");
+                                        $("#other_citysup").show();
+                                    }
+
+                                    $('#SupplierCountry').change(function () {
+                                        $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+                                            if (data != "")
+                                                $('#SupplierState').empty().append(data);
+                                            else
+                                                $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            supLoadcity()
+                                        });
+                                    });
+                                    $('#SupplierState').change(function () {
+                                        $("#SupplierCity").show();
+                                        $("#SupplierCityname").val("");
+                                        $("#other_citysup").hide();
+                                        $.get("/Common/GetCity?id=" + $('#SupplierState').val(), function (data) {
+                                            if (data != "") {
+                                                $('#SupplierCity').empty().append(data);
+                                                if ($("select#SupplierCity option").length == 1) {
+                                                    $("#SupplierCity").hide();
+                                                    $("#SupplierCityname").val("");
+                                                    $("#other_citysup").show();
+                                                }
+                                            }
+                                            else {
+                                                $('#SupplierCity').empty().append('<option selected="selected" value="0">not available...</option>');
+                                            }
+                                        });
+                                    });
+                                    $('#SupplierCity').change(function () {
+
+
+                                        $("#SupplierCityname").val($("#SupplierCity").find('option:selected').text());
+
+                                        if ($(this).val() == -1) {
+                                            $(this).hide();
+                                            $("#SupplierCityname").val("");
+                                            $("#other_citysup").show();
+                                            $("#close_other_citysup").show();
+                                        }
+                                    });
+                                    $('#close_other_citysup').click(function () {
+                                        $("#SupplierCity").show();
+                                        $("#SupplierCityname").val("");
+                                        $("#other_citysup").hide();
+                                        $("#close_other_citysup").hide();
+                                    });
+                                });
+
+                                function supLoadcity() {
+                                    $.get("/Common/GetCity?id=" + $('#SupplierState').val(), function (data) {
+                                        if (data != "") {
+                                            $('#SupplierCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+                                        }
+                                        else {
+                                            $('#SupplierCity').html('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+                                function supLoadState() {
+                                    $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+                                        if (data != "") {
+                                            $('#SupplierState').empty().append(data);
+                                        }
+                                        else {
+                                            $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                        }
+                                    });
+                                }
+
+                                $(function () {
+
+                                    // $('#most-popular1').show();
+                                    $('#most-popular12').show();
+                                    $('#most-popular123').show();
+
+                                    // for Start Date
+                                    var now = new Date();
+                                    now.setDate(now.getDate() + @startD );
+
+                                    var mnth = pad(now.getMonth() + 1, 2);
+                                    var sdate = pad(now.getDate(), 2) + "/" + mnth + "/" + now.getFullYear();
+
+                                    //$("#CheckIn").val(sdate);
+
+                                    //    var now = nowTemp; // new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDay(), 0, 0, 0, 0);
+                                    //var Bookingdate = $('#Bookingdate').datepicker(
+                                    //    {
+                                    //        minDate:$("#hiddenmindate").val(),
+                                    //        defaultDate: now,
+                                    //        numberOfMonths: 2,
+                                    //        dateFormat: "dd/mm/yy"
+                                    //    });
+
+
+
+                                    $(".Bookingdate div").click(function () { $("#Bookingdate").datepicker('show'); });
+
+
+                                    var checkin = $('#CheckIn').datepicker(
+                                        {
+                                            minDate:$("#hiddenmindate").val(),
+                                            defaultDate: now,
+                                            numberOfMonths: 2,
+                                            dateFormat: "dd/mm/yy"
+                                        });
+
+
+
+                                    //$(".checkin div").click(function () { $("#CheckIn").datepicker('show'); });
+                                    //$(".checkout div").click(function () { $("#CheckOut").datepicker('show'); });
+
+                                    // for end date
+                                    now.setDate(now.getDate() + @diff);
+
+                                    var mnth1 = pad(now.getMonth() + 1, 2);
+                                    var edate = pad(now.getDate(), 2) + "/" + mnth1 + "/" + now.getFullYear();
+
+                                    //$("#CheckOut").val(edate);
+
+                                    var checkout = $('#CheckOut').datepicker(
+                                         {
+                                             minDate:$("#hiddenmindate").val(),
+                                             numberOfMonths: 2,
+                                             defaultDate: now,
+                                             dateFormat: "dd/mm/yy"
+                                         });
+
+                                    $("#CheckIn").change(function () {
+                                        var v = $(this).val().trim();
+
+                                        var curDate = new Date();
+                                        curDate.setDate(curDate.getDate() + 1);
+                                        var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+                                        curDate.setDate(curDate.getDate() + 2);
+                                        var odat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+
+                                        if (checkDate(v)) {
+                                            re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                                            if (regs = v.match(re)) {
+                                                var day, mnt, yr;
+                                                yr = parseInt(regs[3]);
+                                                mnt = parseInt(regs[2]);
+                                                dy = parseInt(regs[1]);
+                                                if (mnt > 0) mnt = mnt - 1;
+                                                var cd = new Date(Date.UTC(yr, mnt, dy));
+                                                cd.setDate(cd.getDate() + 1);
+                                                var mn = cd.getMonth() + 1; //parseInt(cd.getMonth()) + 1;
+                                                var chgDt = pad(cd.getDate(), 2) + "/" + pad(mn, 2) + "/" + cd.getFullYear();
+                                                // alert(chgDt);
+                                                var cs = new Date(Date.UTC(yr, mnt, dy));
+                                                var mind = new Date(Date.UTC(yr, mnt, dy));
+                                                mind.setDate(mind.getDate() + 1);
+                                                var mindx = pad(mind.getDate(), 2) + "/" + pad(parseInt(mind.getMonth()) + 1, 2) + "/" + mind.getFullYear();
+                                                var xo = $("#CheckOut").val();
+                                                //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                                                if (checkDate(xo)) {
+                                                    if (regss = xo.match(re)) {
+                                                        yr = parseInt(regss[3]);
+                                                        mnt = parseInt(regss[2]);
+                                                        dy = parseInt(regss[1]);
+                                                        if (mnt > 0) mnt = mnt - 1;
+                                                        var co = new Date(Date.UTC(yr, mnt, dy));
+                                                        if (co <= cs) {
+                                                            $("#CheckOut").val(chgDt);
+                                                            // $("#CheckOut").datepicker("option", "setDate", cd);
+                                                        }
+                                                    }
+                                                    else {
+                                                        // $("#CheckOut").datepicker("option", "setDate", cd);
+                                                        $("#CheckOut").val(chgDt);
+                                                    }
+                                                }
+                                                else {
+                                                    // $("#CheckOut").datepicker("option", "setDate", cd);
+                                                    $("#CheckOut").val(chgDt);
+                                                }
+                                                //checkout.minDate = n;
+                                                $("#CheckOut").datepicker("option", "minDate", mindx);
+                                                //$("#CheckOut").datepicker("show");
+                                            }
+                                            else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+                                        }
+                                        else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+                                    });
+
+
+
+                                });
+
+                                function valdInOutDates() {
+                                    var v = $.trim($("#CheckIn").val());
+                                    if (checkDate(v)) {
+                                        re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                                        if (regs = v.match(re)) {
+                                            var cs = new Date(parseInt(regs[3]), parseInt(regs[2])-1, parseInt(regs[1]));
+                                            var xo = $("#CheckOut").val();
+                                            //                    $("#CheckOut").datepicker("option", "minDate", mind);
+                                            if (checkDate(xo)) {
+                                                if (regss = xo.match(re)) {
+                                                    var co = new Date(parseInt(regss[3]), parseInt(regss[2])-1, parseInt(regss[1]));
+                                                    if (co <= cs) {
+
+                                                        $("#DestinationAlert").html('Please enter a checkout date which falls after checkin date');
+                                                        $("#CheckOut").focus();
+                                                        return false;
+                                                    }
+                                                }
+                                                else {
+                                                    $("#DestinationAlert").html('Invalid Check Out date');
+                                                    $("#CheckOut").focus();
+                                                    return false;
+                                                }
+                                            }
+                                            else {
+                                                $("#DestinationAlert").html('Invalid Check Out date');
+                                                $("#CheckOut").focus();
+                                                return false;
+                                            }
+                                        }
+                                        else {
+                                            $("#DestinationAlert").html('Invalid Check In date');
+                                            $("#CheckIn").focus();
+                                            return false;
+                                        }
+                                    } else {
+                                        $("#DestinationAlert").html('Invalid Check In date');
+                                        $("#CheckIn").focus();
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                                function pad(num, size) {
+                                    var s = num + "";
+                                    while (s.length < size) s = "0" + s;
+                                    return s;
+                                }
+                                function checkDate(field)
+                                { var allowBlank = true; var minYear = 2014; var maxYear = (new Date()).getFullYear()+ 1;
+                                    // regular expression to match required date format
+                                    re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                                    if (field != '') {
+                                        if (regs = field.match(re)) {
+                                            if (regs[1] < 1 || regs[1] > 31)
+                                            { return false;}
+                                            else if (regs[2] < 1 || regs[2] > 12)
+                                            { return false; }
+                                            else if (regs[3] < minYear || regs[3] > maxYear)
+                                            { return false; }
+                                        } else { return false; }
+                                    } else { return false; }
+                                    return true;
+                                }
+                                function daydiff(first, second) {
+                                    return (second - first) / (1000 * 60 * 60 * 24);
+                                }
+
+                                $(function () {
+
+                                    $("#Destination").autocomplete({
+                                        minLength: 0,
+                                        source: "/Common/GetDestination",
+                                        focus: function (event, ui) {
+                                            $("#Destination").val(ui.item.value);
+                                            return false;
+                                        }
+                                    })
+                                    .autocomplete("instance")._renderItem = function (ul, item) {
+                                        ul.addClass("custom");
+                                        return $("<li>") //.addClass("custom")
+                                        .append("<a>" + item.label + "<br>" + item.desc + "</a>")
+                                        .appendTo(ul);
+                                    };
+                                });
+
+</script>
+
+
+
+<script type="text/javascript">
+
+    $('.numberboxTaxPerccent').keyup(function(event){
+        if($(this).val().substr(0, 1) == ".")
+        {
+            this.value = this.value.replace('.','0.');
+        }
+        this.value = this.value.replace(/[^0-9\.]/g, '');
+        if ($(this).val() > 100){
+            $(this).val('100');
+        }
+    });
+
+
+
+
+
+    //$('.gstname').change(function(event){
+    //    var HidnSBBillingEntyState= $('#HidnSBBillingEntyState').val();
+    //    var BookingCustomerStateID= $('#BookingCustomerStateID').val();
+    //    if(HidnSBBillingEntyState==BookingCustomerStateID)
+    //    {
+
+
+
+    //    }
+    //});
+
+
+
+</script>
+
+<script type="text/javascript">
+    function CheckBuyPriceShowHideWhenSupplierCancelCheck()
+    {
+        if($('#SupplierCancellationDone').is(":checked"))
+        {
+            $('#AvgDailyRateBefreStaxForBuyPrice').val(0);
+            $('#StaxForBuyPrice').val(0);
+            $('#StaxForBuyPriceamount').val(0);
+            $('#TotalAmtForBuyPrice').val(0);
+            $('#TotalBuyPrice').val(0);
+            $('#BuyPriceforotherservicesForBuyprice').val(0);
+            $('#StaxForotherBuyPrice').val(0);
+            $('#TotalAmtotherForBuyPrice').val(0);
+            ClearBuyValueandSplitupVaue();
+
+            $('#DivBuyPrice').hide();
+            $("#BuyPriceGSTBreakup").hide();
+        }
+        else
+        {
+             $('#DivBuyPrice').show();
+             $("#BuyPriceGSTBreakup").show();
+             CheckBuyPricesectionShowHide();
+        }
+    }
+
+    $('#SupplierCancellationDone').change(function () {
+        if ($(this).is(":checked")) {
+            $('#AvgDailyRateBefreStaxForBuyPrice').val(0);
+            $('#StaxForBuyPrice').val(0);
+            $('#StaxForBuyPriceamount').val(0);
+            $('#TotalAmtForBuyPrice').val(0);
+            $('#TotalBuyPrice').val(0);
+            $('#BuyPriceforotherservicesForBuyprice').val(0);
+            $('#StaxForotherBuyPrice').val(0);
+            $('#TotalAmtotherForBuyPrice').val(0);
+            ClearBuyValueandSplitupVaue();
+
+            $('#DivBuyPrice').hide();
+            $("#BuyPriceGSTBreakup").hide();
+        }
+        else {
+            $('#DivBuyPrice').show();
+            $("#BuyPriceGSTBreakup").show();
+
+            CheckBuyPricesectionShowHide();
+        }
+    });
+
+
+    function CheckBuyPricesectionShowHide()
+    {
+        var Regular=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Regular);//1
+        var TAC = @((int)@CLayer.ObjectStatus.OfflineBookingType.TAC); //2
+        var Direct=  @((int)@CLayer.ObjectStatus.OfflineBookingType.Direct); // 3
+        if($("#OfflineBookingType").val() ==TAC || $("#OfflineBookingType").val()==Direct )
+        {
+            $("#BuyPriceGSTBreakup").hide();
+        }
+        else//REGULAR
+        {
+            if($("#PropertyGstRegNo").val() == "NOT__REGISTERED")
+            {
+                $("#BuyPriceGSTBreakup").hide();
+            }
+        }
+    }
+    function ClearBuyValueandSplitupVaue()
+    {
+        $('div.clsDivServiceTaxSplitUpValidationBuyPrice :input.numberboxTaxPerccent').each(function(){
+            $(this).val(0);
+        });
+        $('div.clsDivServiceTaxSplitUpValidationBuyPrice :input.gstname').each(function(){
+            $(this).val('');
+        });
+
+        $('div.clsDivServiceTaxOthersSplitUpValidationBuyPrice1 :input.numberboxTaxPerccent').each(function(){
+            $(this).val(0);
+        });
+        $('div.clsDivServiceTaxOthersSplitUpValidationBuyPrice1 :input.gstname').each(function(){
+            $(this).val('');
+        });
+
+
+    }
+
+</script>
+
+<script>
+
+                function changehsncode()
+                {
+                    $("#HSNCode").val($("#SelectHSNCode").val());
+                    ChangesForEMS();
+
+                }
+                function ChangesForEMS()
+                {
+                    if($("#SelectHSNCode :selected").text() == 'Event Management Service')
+                    {
+                        $("#ChkIn").html('Check in / Event Date');
+                        //$("#CheckOut").val($("#CheckIn").val());
+                        //$("#CheckOut").css("pointer-events","none");
+                        //$("#CheckOut").css("background-color","#eee");
+                        chnoofnight();
+                    }
+                    else
+                    {
+                        $("#ChkIn").html('Check in');
+                        //$("#CheckOut").css("pointer-events","all");
+                        //$("#CheckOut").css("background-color","#fff");
+                    }
+
+
+
+                }
+</script>
+
+<script>
+
+    //Gross Margin
+    function Getgrossmargin()
+    {
+        var NoOfNight=  $("#NoOfNight").val();
+        var NoOfRooms= $("#NoOfRooms").val();
+
+        var AvgDailyRateBefreStaxForSalePrice = $("#AvgDailyRateBefreStaxForSalePrice").val();
+        var BuyPriceforotherservicesForSalePrice=$("#BuyPriceforotherservicesForSalePrice").val();
+        var AvgDailyRateBefreStaxForBuyPrice = $("#AvgDailyRateBefreStaxForBuyPrice").val();
+        var BuyPriceforotherservicesForBuyprice=$("#BuyPriceforotherservicesForBuyprice").val();
+
+
+        if(isNaN(NoOfNight))
+        {
+            NoOfNight=0;
+        }
+        if(isNaN(NoOfRooms))
+        {
+            NoOfRooms=0;
+        }
+        if(isNaN(AvgDailyRateBefreStaxForSalePrice))
+        {
+            AvgDailyRateBefreStaxForSalePrice=0;
+        }
+        if(isNaN(BuyPriceforotherservicesForSalePrice))
+        {
+            BuyPriceforotherservicesForSalePrice=0;
+        }
+        if(isNaN(AvgDailyRateBefreStaxForBuyPrice))
+        {
+            AvgDailyRateBefreStaxForBuyPrice=0;
+        }
+        if(isNaN(BuyPriceforotherservicesForBuyprice))
+        {
+            BuyPriceforotherservicesForBuyprice=0;
+        }
+
+
+
+
+        var grossmarginamtcustomer= (( parseFloat(AvgDailyRateBefreStaxForSalePrice) * NoOfNight * NoOfRooms) + parseFloat(BuyPriceforotherservicesForSalePrice))
+        var grossmarginamtsupplier= (( parseFloat(AvgDailyRateBefreStaxForBuyPrice) * NoOfNight * NoOfRooms) + parseFloat(BuyPriceforotherservicesForBuyprice))
+        var grossmarginamt = Number(parseFloat(grossmarginamtcustomer) - parseFloat(grossmarginamtsupplier) + parseFloat(@TacAmt));
+        var grossmarginPerc = (parseFloat(grossmarginamt)/parseFloat(grossmarginamtcustomer)) * 100;
+        return grossmarginPerc;
+    }
+
+
+</script>
+
+

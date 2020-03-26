@@ -1,0 +1,117 @@
+﻿@model StayBazar.Areas.Admin.Models.TransactionListModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Final Payment Attempts/Failures";
+}
+<div class="container">
+    <div id="content" class="body-content">
+        <h2>@ViewBag.Title</h2>
+        <ul class="nav nav-tabs" id="myTab" data-tabs="tabs">
+            <li class="active"><a href="#Pending" data-toggle="tab">Waiting for verification</a></li>
+            <li><a href="#Verified" data-toggle="tab" id="Verified1">Verified</a></li>
+        </ul>
+        <div class="tab-content" id="my-tab-content">
+            <div class="tab-pane active" id="Pending">
+                <div id="pendinglist">
+                    @Html.Partial("_List", Model.Bookinglist)
+                </div>
+            </div>
+            <div class="tab-pane" id="Verified">            
+                <div class="row">
+                    <div class=" col-md-12">
+                    <div class="form-group">
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.StartDate) @Html.TextBoxFor(m => m.StartDate, new { @class = "form-control input-sm" }) @Html.ValidationMessageFor(m => m.StartDate)
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(m => m.EndDate)
+                            <div class="form-group ">
+                                @Html.TextBoxFor(m => m.EndDate, new { @class = "form-control input-sm" }) @Html.ValidationMessageFor(m => m.EndDate)
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <br />
+                            <span class="input-group-btn">
+                                <button id="btnSearch" class="btn btn-default" type="button" tabindex="3" onclick="SearchData()"> Search</button>
+                                <span class="glyphicon glyphicon-search"></span>
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="form-group">
+                                <br />
+
+                            </span>
+                        </div>
+                    </div>
+                </div>                      
+                    </div>          
+                <div id="VerifiedListnow">
+                    @Html.Partial("_Verifiedlist",Model.Bookinglist)
+                </div>
+                </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="restoreBox" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+
+                <h4 class="modal-title" id="myModalLabel">Restore Booking</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div id="cprogress"><p><img src="/content/ajax11-loader.gif" /> Loading...</p></div>
+                        <div id="cancelBox"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="restoreclose" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+        <script type="text/javascript">
+            function showRestore(bookId) {
+                $("#cprogress").show();
+                $("#cancelBox").hide();
+                $('#restoreBox').modal('show');
+
+                var url = '@Url.Action("RestoreInfo","TransactionList",new {Area = "Admin"})?bookingId=' + bookId;
+                $.get(url, function (data) {
+                    $("#cprogress").hide();
+                    $("#cancelBox").html(data);
+                    $("#cancelBox").show();
+                });
+            }
+            function restoreBooking() {
+                $("#cprogress").show();
+                $("#cancelBox").hide();
+                
+                var url = '@Url.Action("RestoreBooking","TransactionList",new {Area = "Admin"})';
+                $.post(url,$("#restoreform").serialize(), function (data) {
+                    $("#cprogress").hide();
+                    $("#cancelBox").html(data);
+                    $("#cancelBox").show();
+                });
+            }
+            $("#restoreclose").click(function () { location.reload(); })
+
+
+            $("#Verified1").click(function () {
+                // alert("Verified click");
+                var url = '@Url.Action("VerifiedView", "TransactionList")';
+                $.post(url, function (data) {
+                    $("#VerifiedListnow").html(data);
+                });
+            });
+
+        </script>

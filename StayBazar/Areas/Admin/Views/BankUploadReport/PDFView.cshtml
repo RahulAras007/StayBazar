@@ -1,0 +1,59 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    long i = 0;
+    long total = 0;
+   
+    Layout = null;
+
+}
+
+<div class="row" style="padding-left: 4%;">
+    <h2 class="bold">
+       Bank Upload Report
+    </h2>
+</div>
+<div class="col-md-12 margin-top-10">
+    <div class="col-md-12">
+        <table border="1" class="table table-condensed table-responsive table-custom" style="border:1px solid #ddd!important;">
+            <thead>
+                <tr>
+                    <th>Property Bank</th>
+                    <th>Amount Payable</th>
+                    <th>Date</th>
+                    <th>Beneficiary</th>
+                    <th>Account No</th>
+                    <th>Property E-mail</th>
+                    <th>@string.Empty</th>
+                    <th>@string.Empty</th>
+                    <th>@string.Empty</th>
+                    <th>IFSC Code</th>
+                    <th>Account Type Code</th>
+                    <th>@string.Empty</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (CLayer.OfflineBooking pr in Model)
+                {
+                    var amountPayable = string.Format("{0:n0}", pr.TotalSalePrice);
+                    <tr>
+                        <td align="center">@pr.PropertyBank</td><!--Propertry Bank-->
+                        <td align="right">@pr.AmountPayableValue</td><!--Amount Payable-->
+                        <td align="left" style="width:100px">@pr.BankUploadReportDate</td> <!--Request Id-->
+                        <td align="left">@pr.BeneficiaryName</td><!--Customer Name-->
+                        <td align="left">@pr.AccountNumber</td> <!--Customer City-->
+                        <td align="left">@pr.PropertyEmail</td> <!--Customer Email-->
+                        <td align="left">@pr.BankUploadText1 </td> <!--Guest Name-->
+                        <td align="left">@pr.BankUploadText2</td> <!--check in-->
+                        <td align="center">@string.Empty</td> <!--check out-->
+                        <td align="left">@pr.IFSCCode</td> <!--Total no of pax-->
+                        <td align="center">@(pr.AccountTypeCode == "0" ? "" : pr.AccountTypeCode)</td><!--Total room night-->
+                        <td align="right">@pr.StayBazarWebsite</td><!--total customer payable including gst-->
+
+                        <td></td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>

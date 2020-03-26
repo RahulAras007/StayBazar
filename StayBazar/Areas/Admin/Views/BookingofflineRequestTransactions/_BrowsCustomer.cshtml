@@ -1,0 +1,41 @@
+﻿@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-lg-10">
+
+        <div class="input-group">
+
+            <input type="text" id="searchcust" class="form-control">
+            <span class="input-group-btn" id="goid">
+                <button class="btn btn-default" onclick="findcustomer()" type="button">Go!</button>
+            </span>
+        </div><!-- /input-group -->
+    </div>
+</div>
+<div class="row top-margin-10px" id="browseListcust">
+    @*@Html.Partial("_PropertyList", new List<CLayer.Property>())*@
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("input[id=Defaultcheck]").is(":checked") == true;
+    });
+
+    function findcustomer() {
+        if ($("#searchcust").val().trim() == "") {
+            alert('Search criteria not found!');
+            return;
+        }
+
+        var cname2 = $("#searchcust").val();
+
+        $.post('@Url.Action("Searchforofflinebookcustomers", "OfflineBooking", new { area = "Admin" })', { name: cname2 }, function (data) {
+            $("#browseListcust").html("");
+            $("#browseListcust").html(data);
+        });
+
+    }
+    function selectCorporate() {
+    }
+</script>

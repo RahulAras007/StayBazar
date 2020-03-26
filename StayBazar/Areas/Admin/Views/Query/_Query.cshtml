@@ -1,0 +1,43 @@
+﻿@model StayBazar.Areas.Admin.Models.QueryModel
+@{
+    int mtype = 1;
+    if (ViewBag.MsgType != null)
+    {
+        mtype = ViewBag.MsgType;
+    }
+    if (ViewBag.Head == null)
+    {
+        ViewBag.Head = "Query";
+    }       
+}
+
+    @*@ViewBag.Head&nbsp;*@
+<div class="page-title-container style3">
+    <div class="row">
+        @*<div class="h2">*@
+            <div class="btn-group">
+                @if (Model.Status != (int)StayBazar.Areas.Admin.Models.QueryModel.status.Archived)
+                {
+                    <a href="/Admin/Query/Inbox?id=@mtype" class="btn btn-default" title="back"><span class="glyphicon glyphicon-arrow-left green-color"></span></a>
+                    <a href="/Admin/Query/Archive/@Model.QueryId" class="btn btn-default" onclick="return confirm('Are you sure you want to send the query to archive?')">Send to Archive</a>
+                    <a href="/Admin/Query/Unread/@Model.QueryId" class="btn btn-default" onclick="return confirm('Are you sure you want to mark the query as read?')">Mark as Unread</a>
+                }
+                else
+                {
+                    <a href="/Admin/Query/Archivebox?id=@mtype" class="btn btn-default" title="back"><span class="glyphicon glyphicon-arrow-left green-color"></span></a>
+                    <a href="/Admin/Query/Unarchive/@Model.QueryId" class="btn btn-default" onclick="return confirm('Are you sure you want to restore the query?')">Restore to Inbox</a>
+                }
+                <a href="/Admin/Query/Delete/@Model.QueryId" class="btn btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete the query?')">delete</a>
+            </div>
+        @*</div>*@
+    </div>
+</div>
+    <hr />
+    <div class="col-md-12">
+        <h3>@Model.Subject</h3>
+        <div>@Model.Name</div>
+        <div>@Model.Email</div>
+        <div>@Model.Phone</div>
+        <div>@Model.CreatedOn</div>
+        <p>@Model.Body</p>
+    </div>

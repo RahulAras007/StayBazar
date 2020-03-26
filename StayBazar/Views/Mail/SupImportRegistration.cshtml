@@ -1,0 +1,160 @@
+﻿@model List<object>
+@{
+    long userId = (long)Model[0];
+    string pass = (string)Model[1];
+
+    Layout = null;
+    CLayer.User usr = BLayer.User.Get(userId);
+    if (usr == null) { usr = new CLayer.User(); }
+    string bname = BLayer.B2B.GetBusinessName(userId);
+    CLayer.Role.Roles rle = BLayer.User.GetRole(userId);
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>B2B Registration</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+
+        <thead>
+            <tr>
+                <th style="padding-top: 2%;" align="left">
+                    <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                </th>
+
+                <th width="70" align="left" style="font-weight:normal; font-size:12px;color: #1a1a1a;">
+                    Phone<br />
+                    Email
+                </th>
+                <th align="left" style="font-weight: normal; font-size: 12px;color: #1a1a1a;">
+                    @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                    @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="3">
+                    <p style="font-size: 13px; color: #666;">Dear @bname,</p>
+                    <p style="font-size: 13px; color: #666;">
+                        @usr.FirstName
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">
+                        Thank you very much for your interest in being part of Staybazar.com and we value your partnership.
+                        @*karthikms changed on 27-11-2019*@
+                        @*As you are aware, Staybazar.com
+                            is an online reservation platform dedicated for alternate accommodations (non-hotels).*@
+                        As you are aware, Staybazar.com is an online accommodation discovery and booking platform, with focus on business travel.
+                    </p>
+                    <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">
+                        @*karthikms changed on 27-11-2019*@
+                        @*Our portal is currently active, though we are yet to do a formal launch.
+                            We have so far listed about 250 plus properties on our portal. These properties are geographically spread across North,
+                            West and South of India, with the numbers increasing day by day through continuous sign ups.
+                            We are humbled with the overwhelming response we have been receiving from the properties across the country.*@
+                        It is a one stop solution for corporate for all their accommodation and conferencing requirements.
+                        Besides connected to 800000 plus hotels &other accommodation options around the world.
+                    </p>
+                    <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">
+                        @*karthikms changed on 27-11-2019*@
+                        @*Staybazar.com portal has gone through extensive testing and security certification,
+                            done independently by a professionally renowned testing company. The payment gateway integration is also complete,
+                            ensuring that online reservation can be done from the portal.
+                            To sum it up, we are ready to service our customers both instantly and efficiently.*@
+                    </p>
+                    <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">
+                        @*karthikms changed on 27-11-2019*@
+                        @*Staybazar.com has already set up offices in Bangalore, Delhi and Mumbai,
+                            with specific sales team focusing on singing up with corporate customers
+                            to meet the accommodation requirements of their travelling employees.*@
+                    </p>
+                    <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">
+                        @*karthikms changed on 27-11-2019*@
+                        @*We have set up our partner support desk, which can be reached anytime during office hours at 080-2572 2898/080-40916686.
+                            We will also have a toll free support number soon, which will enable us to gradually extend 24X7 support desk.
+                            You can contact us at these numbers or by e-mail tosupport@staybazar.com
+                            for any query regarding reservation, payment, suggestions, complaints, etc; and our support team would be happy to assist.*@
+                        We have set up our partner support desk, which can be reached anytime during office hours at 080-2572 2898/080-40916686.
+                        Toll Free – 1800 425 2393
+
+                        You can contact us at these numbers or by e-mail to support@staybazar.com
+                        for any query regarding reservation, payment, suggestions, complaints, etc; and our support team would be happy to assist.
+                    </p>
+                    <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">
+                        Please note that, the partner login portion on the portal is now active and you can logon to
+                        Staybazar.com to check various information in connection with your property.
+                        Your user name and password is given below:-
+                    </p>
+                </td>
+            </tr>
+            <tr>
+
+                <td colspan="3">
+                    <table border="0" style="font-size: 13px; color: #666;">
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td width="100">&nbsp;</td>
+                            <td width="100">User Name :</td>
+                            <td>@usr.Email</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td width="100">&nbsp;</td>
+                            <td width="70">Password :</td>
+                            <td>@pass</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">You are requested to change the above password on your first login.</p>
+
+                    @if (rle == CLayer.Role.Roles.Supplier)
+                    {
+                        <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">
+                            We have enclosed herewith a supplier user manual, which will help you to login and navigate through Staybazar.com
+                            supplier function page. We request you to log on to the supplier functionality page and verify the property details,
+                            inventory and pricing available on the portal and let us know immediately of any discrepancies noticed,
+                            to avoid any inconvenience with reservation’s in future.
+                        </p>
+                    }
+
+                    <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">
+                        We once again thank for your interest and confidence shown in Staybazar.com.
+                        We value your business and look forward to an exciting and mutually beneficial association with you.
+                    </p>
+
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td align="center" colspan="3">
+                    <p style="border-top: 1px solid #1a1a1a; padding:2% 0; text-align:center; font-size:13px;">
+                        <a href="https://www.staybazar.com/Home/TermsOfUse" style="color:#1a1a1a; text-decoration: none;">Terms & Conditions</a><br /><br />
+
+                        <span>
+                            <span style="font-weight:bold;">Staybazar,</span><br />Division of <span style="font-weight:bold;">Southern Ecommerce  Solutions Pvt Ltd</span>
+                        </span><br />
+
+                        <span style="font-weight:bold;">No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India</span><br />
+                        <a href="https://www.staybazar.com">www.staybazar.com</a><br />
+                    </p>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>
+

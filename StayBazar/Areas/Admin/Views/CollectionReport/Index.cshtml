@@ -1,0 +1,48 @@
+﻿@model StayBazar.Areas.Admin.Models.CollectionReportModel
+@{
+    ViewBag.Title = "Collection Report";
+    //Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+}
+
+@*<h2>@ViewBag.Title</h2>*@
+<div id="content">
+    <div class="page-title-container style3">
+        @*Roles&nbsp;*@
+
+        <div class="row">
+            <div class="col-md-6">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+
+
+            <div class="col-md-4">
+                @*    <div class="row" id="Filter">
+                <div class="col-md-12">
+                    <div class="row margin10px" id="Details">*@
+                @Html.Partial("_Filter", Model)
+            </div>
+        </div>
+    </div>
+        @*</div>
+    </div>
+        </div>*@
+    <br />
+    <br />
+    <div class="container-fluid">
+        <div class="row" id="Collection">
+            <div class="col-md-12">
+                <div class="row margin10px" id="CollectionReportList">
+                    @Html.Partial("_Report", Model.CollectionReportList)
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    @*<div class="col-md-1"></div>*@
+    
+    @*</div>*@
+@*</div>*@
+        <script type="text/javascript">
+            $(".container").removeClass("container").addClass("container-fluid");
+
+        </script>

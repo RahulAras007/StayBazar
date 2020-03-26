@@ -1,0 +1,89 @@
+﻿@model StayBazar.Areas.Admin.Models.RecommendedModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Save", "Recommended", new { area = "Admin" }, FormMethod.Post, new { id = "recform" }))
+{
+<div class="container-fluid">
+    <div class="col-md-1"></div>
+    <div class="col-md-8">
+        @*<div class="panel">*@
+            <div class="row">
+                <div class="col-md-4">
+                    @*<div class="form-group">*@
+                    For:
+                    <select name="ManageFor" class="form-control input-sm">
+                        <option value="2" @if (Model.ManageFor == ((int)CLayer.ObjectStatus.ManageFor.Customer)) { <text> selected </text> }>For Customer</option>
+                        <option value="1" @if (Model.ManageFor == ((int)CLayer.ObjectStatus.ManageFor.Business)) { <text> selected </text> }>For Buisiness</option>
+                    </select>
+                    @Html.HiddenFor(m => m.InventoryAPIType)
+                    @*@Html.DropDownListFor(m => m.Status, Model.StatusList, new { @class = "form-control input-sm" })*@
+                    @*</div>*@
+                </div>
+            </div>
+            <br />
+
+            @Html.ValidationSummary(true)
+            <div class="row">
+                <div class="col-md-6"><input type="button" value="Choose Property" class="btn" onclick="showBrowse()" /></div>
+                <div class="col-md-6"><span id="prop_title">@Model.Title</span>@Html.HiddenFor(m => m.PropertyId) @Html.ValidationMessageFor(m => m.PropertyId)</div>
+            </div>
+            <div class="row">
+                <div class="col-md-4" style="display:none">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.StartDate) @Html.TextBoxFor(m => m.StartDate, new { @class = "form-control input-sm" }) @Html.ValidationMessageFor(m => m.StartDate)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.EndDate) @Html.TextBoxFor(m => m.EndDate, new { @class = "form-control input-sm" }) @Html.ValidationMessageFor(m => m.EndDate)
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Order) @Html.TextBoxFor(m => m.Order, new { @class = "form-control input-sm" }) @Html.ValidationMessageFor(m => m.Order)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Status) @Html.DropDownListFor(m => m.Status, Model.StatusList, new { @class = "form-control input-sm" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="btn-group">
+                        <input type="submit" id="btnSave" value="Save" onclick="javascript:return Confirm();" class="btn btn-success" />
+                        <a href="~/Admin/Recommended" id="btnReset" class="btn btn-danger">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        @*</div>*@
+    </div>
+    <div class="col-md-3"></div>
+</div>
+    }
+
+    <script type="text/javascript">
+        function Confirm() {
+            var result = confirm("Are you sure. Do you want to submit?");
+            if (result) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        $(function () {
+            $('#StartDate').datepicker({
+                dateFormat: "dd/mm/yy"
+            });
+            $('#EndDate').datepicker({
+                dateFormat: "dd/mm/yy"
+            });
+
+            //$("#btnSave").click(function (){
+            //    if ($("#PropertyId").val().trim() == "0")
+            //    {
+            //        alert('Please choose a property');
+            //        return;
+            //    }
+            //    $("#recform").submit();
+            //});
+        });
+    </script>

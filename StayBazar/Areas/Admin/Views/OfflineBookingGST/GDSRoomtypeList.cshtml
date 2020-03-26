@@ -1,0 +1,104 @@
+﻿@model StayBazar.Models.PropertyModel
+@{
+    Layout = null;
+    var ZipCode = Model.ZipCode;
+    var StateName = Model.StateName;
+    var City = Model.City;
+    var Location = Model.Location;
+    var address = Model.Address;
+    var Mobile = Model.Mobile;
+    var PropertyId = Model.PropertyId;
+    var PropertyName = Model.Title;
+    var SecurityToken = Model.SecurityToken;
+    var SessionId = Model.SessionId ;
+    var SequenceNumber = Model.SequenceNumber;
+    var hotelcode = Model.hotelcode ;
+    var CountryName = Model.CountryName;
+    var Email = Model.Email;
+
+
+
+}
+
+
+
+<div class="col-lg-12">
+        <div class="height-popup">
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th>Room Type</th>
+                        <th>Amount After Tax</th> 
+                        <th>City</th>
+                        <th>Choose</th>
+                     
+
+                    </tr>
+                </thead>
+
+                <tbody>
+               @if (Model.Accommodations.Accommodations.Count > 0)
+               {
+
+
+                   foreach (CLayer.Accommodation ac in Model.Accommodations.Accommodations)
+                   {
+                       var AccomID = ac.AccommodationId;
+                        <tr>
+                            <td>
+                                @*<span id="GDSName_@ac.AccommodationId">@ac.AccommodationType</span>*@
+                                <span id="GDSName_@ac.AccommodationId">@ac.RoomTypeDecription</span>
+                            @if (ac.cancel != null && ac.cancel!="")
+                            {
+                               
+
+                                <a href="#" title="@ac.cancel">
+                                    <span class="glyphicon glyphicon-info-sign"></span>
+                                </a>
+                            }
+                                    
+                                
+                            </td>
+                            <td><span id="GDSRate_@ac.AccommodationId">@Math.Round(ac.Rate,0)</span></td>
+                            <td><span id="GDSCity_@ac.AccommodationId">@City</span></td>
+
+                            @*<td>@item.BusinessName</td>*@
+                            <td style="display:none;"><span id="GDSproZipCode_@ac.AccommodationId">@ZipCode</span></td>
+                            <td style="display:none;"><span id="GDSAccommodationId_@ac.AccommodationId">@AccomID</span></td>
+                            <td style="display:none;"><input type="hidden"  id="GDSAccommodationId_@ac.AccommodationId" value="@AccomID"/></td>
+                            <td style="display:none;"><span id="GDSproStateName_@ac.AccommodationId">@StateName</span></td>
+                            <td style="display:none;"><span id="GDSproCountryName_@ac.AccommodationId">@CountryName</span></td>
+                            <td style="display:none;"><span id="GDSproCity_@ac.AccommodationId">@City</span></td>
+                            <td style="display:none;"><span id="GDSproLocation_@ac.AccommodationId">@Location</span></td>
+                            <td style="display:none;"><span id="GDSproaddress_@ac.AccommodationId">@address</span></td>
+                            <td style="display:none;"><span id="GDSproMobile_@ac.AccommodationId">@Mobile</span></td>
+                            <td style="display:none;"><span id="GDSproPropertyId_@ac.AccommodationId">@PropertyId</span></td>
+                            <td style="display:none;"><span id="GDSproPropertyName_@ac.AccommodationId">@PropertyName</span></td>
+                            <td style="display:none;"><span id="GDSproPropertyEmail_@ac.AccommodationId">@Email</span></td>
+
+                            <td style="display:none;"><span id="GDSSecurityToken_@SecurityToken">@address</span></td>
+                            <td style="display:none;"><span id="GDSSessionId_@SessionId">@Mobile</span></td>
+                            <td style="display:none;"><span id="GDSSequenceNumber_@SequenceNumber">@PropertyId</span></td>
+                            <td style="display:none;"><span id="GDShotelcode_@hotelcode">@PropertyName</span></td>
+                           
+                            
+                            <td><a href="#" onclick="proSelectedgdsRoomType(@ac.AccommodationId)">Choose</a></td>
+                        </tr>
+
+                   }
+               }
+
+                </tbody>
+            </table>
+          
+        </div>
+    <span style="font-size:10px">*Based on the availability at the time of check-in</span>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#loading').hide();
+    });
+</script>

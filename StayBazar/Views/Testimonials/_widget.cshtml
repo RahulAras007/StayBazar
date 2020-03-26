@@ -1,0 +1,32 @@
+﻿@{
+    List<CLayer.Testimonial> testimonials = BLayer.Testimonial.GetForWidget();
+    string url = Request.Url.ToString().ToLower();
+    string eleClass = "whitebg";
+    if (url.IndexOf("/account") > -1) { eleClass = "pattern"; }
+}
+<div class="col-sm-12 col-md-4">
+    <div class="line">
+        <div class="pull-left leftside @eleClass">Testimonials</div>
+    </div>
+    <div class="wrap">
+        <div class="tbadge">
+            <img src="~/images/badge.png" alt="Badge">
+        </div>
+        <div id="testimonials" class="owl-carousel">
+            @foreach (CLayer.Testimonial t in testimonials)
+            {
+                <div class="testimonial">
+                    <h4 class="bold">@t.Title</h4>
+                    <p>@t.Description</p>
+                    <p class="redtext">
+                        @t.Name
+                        <br />@t.Company
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="margin10px text-right">
+        <a href="/testimonials" class="redtext underline">Read All Testimonials</a>
+    </div>
+</div>

@@ -1,0 +1,605 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    Layout = null;
+    int noOfDays = 0;
+
+    CLayer.OfflineBooking CustomerDetails = BLayer.OfflineBooking.GetAllCustomerDetails(Model.OfflineBookingId);
+    CLayer.OfflineBooking OfflinePropertydata = BLayer.OfflineBooking.GetAllpropertyDetails(Model.OfflineBookingId);
+
+    //Offline Details
+    CLayer.OfflineBooking OfflinedataMain = BLayer.OfflineBooking.GetAllDetailsById(Model.OfflineBookingId);
+
+    //Booking Details
+    CLayer.OfflineBooking Offlinedata = BLayer.OfflineBooking.GetBookingDetailsGST(Model.BookingDetailsId);
+
+    Offlinedata.PropertyId = OfflinedataMain.PropertyId;
+    Offlinedata.PropertyId = OfflinedataMain.PropertyId;
+    Offlinedata.SupplierId = OfflinedataMain.SupplierId;
+    Offlinedata.CustomerId = OfflinedataMain.CustomerId;
+    Offlinedata.CustomPropertyId = OfflinedataMain.CustomPropertyId;
+    Offlinedata.CreatedTime = OfflinedataMain.CreatedTime;
+    Offlinedata.SaveStatus = OfflinedataMain.SaveStatus;
+    Offlinedata.sendmailtocustomer = OfflinedataMain.sendmailtocustomer;
+    Offlinedata.sendmailtosupplier = OfflinedataMain.sendmailtosupplier;
+    Offlinedata.ConfirmationNumber = OfflinedataMain.ConfirmationNumber;
+    Offlinedata.OtherService = OfflinedataMain.OtherService;
+    Offlinedata.SalesPersonId = OfflinedataMain.SalesPersonId;
+    Offlinedata.SalesRegion = OfflinedataMain.SalesRegion;
+    Offlinedata.NewCustomerReferenceNo = OfflinedataMain.NewCustomerReferenceNo;
+    Offlinedata.MailContent = OfflinedataMain.MailContent;
+    Offlinedata.CustomPropertyId = OfflinedataMain.CustomPropertyId;
+    Offlinedata.HotelFacility = OfflinedataMain.HotelFacility;
+
+    Offlinedata.cancellationpolicy = OfflinedataMain.cancellationpolicy;
+    CLayer.Property dttime = BLayer.Property.GetCheckTime(Offlinedata.PropertyId);
+    CLayer.StayCategory Staycategorydetails = new CLayer.StayCategory();
+    Staycategorydetails.Title = "";
+    if (Offlinedata.StayCategory > 0)
+    {
+        Staycategorydetails = BLayer.StayCategory.Get(Convert.ToInt32(Offlinedata.StayCategory));
+    }
+    CLayer.AccommodationType AccommodationTypedetails = new CLayer.AccommodationType();
+    string AccommodationTypeTitle = "";
+    if (Offlinedata.Accommodationtypeid != -1 && Offlinedata.Accommodationtypeid != 0)
+    {
+        AccommodationTypedetails = BLayer.AccommodationType.Get(Convert.ToInt32(Offlinedata.Accommodationtypeid));
+        AccommodationTypeTitle = AccommodationTypedetails.Title;
+    }
+    else
+    {
+        AccommodationTypeTitle = Offlinedata.AccommodatoinTypename;
+    }
+    decimal amountacc = Offlinedata.AvgDailyRateBefreStaxForSalePrice * Offlinedata.NoOfNight * Offlinedata.NoOfRooms;
+    decimal tstax = Math.Round((Offlinedata.AvgDailyRateBefreStaxForSalePrice * Offlinedata.StaxForSalePrice / 100) * Offlinedata.NoOfNight * Offlinedata.NoOfRooms, 2);
+    decimal tothertax = Math.Round((Offlinedata.StaxForotherForSalePrice * Offlinedata.BuyPriceforotherservicesForSalePrice) / 100, 2);
+}
+@{
+    string SbEntityName = "";
+    string SbEntityAddress = "";
+    string SbEntityCountry = "";
+    string SbEntityState = "";
+    //Get Entity address
+    if (Model.OfflineBookingId > 0)
+    {
+        CLayer.OfflineBooking SbEntityBillingAddress = BLayer.OfflineBooking.GetSBEntityAddressDetailsByOffId(Model.OfflineBookingId);
+        if (SbEntityBillingAddress != null)
+        {
+            if (SbEntityBillingAddress.SbEntityBillingName != "" && SbEntityBillingAddress.SbEntityBillingName != null) { SbEntityName = SbEntityBillingAddress.SbEntityBillingName; }
+            if (SbEntityBillingAddress.SbEntityBillingAddress != "" && SbEntityBillingAddress.SbEntityBillingAddress != null) { SbEntityAddress = SbEntityBillingAddress.SbEntityBillingAddress; }
+            if (SbEntityBillingAddress.SbEntityBillingCountry != "" && SbEntityBillingAddress.SbEntityBillingCountry != null) { SbEntityCountry = SbEntityBillingAddress.SbEntityBillingCountry; }
+            if (SbEntityBillingAddress.SbEntityBillingState != "" && SbEntityBillingAddress.SbEntityBillingState != null) { SbEntityState = SbEntityBillingAddress.SbEntityBillingState; }
+        }
+    }
+
+    CLayer.HSNCode HSNdata = new CLayer.HSNCode();
+    if (Model.BookingDetailsId > 0)
+    {
+        long HSNCodeid = BLayer.OfflineBooking.GetBookingDetailHSN(Model.BookingDetailsId);
+        if (HSNCodeid > 0)
+        {
+            HSNdata = BLayer.HSNCode.Get(HSNCodeid);
+        }
+    }
+
+}
+@{ 
+
+    //Get Staff Details result.SalesPersonId
+    string SalespersonPhone = "";
+    string SalespersonName = "";
+    if (OfflinedataMain != null)
+    {
+        if (OfflinedataMain.SalesPersonId >0)
+        {
+            CLayer.User userdata = BLayer.User.Get(OfflinedataMain.SalesPersonId);
+            CLayer.User userAddressdata = BLayer.User.getuserAddressdata(OfflinedataMain.SalesPersonId);
+            if (userAddressdata != null)
+            {
+                SalespersonPhone = userAddressdata.Phone;
+            }
+            if (userdata != null)
+            {
+                SalespersonName = userdata.FirstName + ' ' + userdata.LastName;
+            }
+        }
+
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>BConfirmation</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <tr>
+            <td align="center">
+                <table width="700">
+                    <thead>
+                        <tr>
+                            <th align="left" style="padding-top: 2%;" colspan="3">
+                                <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                            </th>
+                            <th width="200" align="right" style="font-size:12px;">
+                                Phone: +91 80 25722898 @*@BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)*@<br />
+                                Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" align="center">
+                                <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">BOOKING CONFIRMATION</h5>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <p style="line-height: 35px; font-size: 12px; color: #666;">
+                                    Dear @CustomerDetails.CustomerName,<br />
+                                    Thank you for your booking.  Booking  summary is given below. Wish you pleasant stay !
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><b style="font-weight:bold; font-size: 13px; margin: 10px 0px; display: inline-block;">Customer Details</b></td>
+                            <td colspan="2">&nbsp;</td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Name</td>
+                            <td>@CustomerDetails.CustomerName</td>
+                            <td>Booking Ref. Number</td>
+                            <td>@Offlinedata.ConfirmationNumber</td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td valign="top">Address : </td>
+                            <td valign="top">@CustomerDetails.CustomerAddress <br /> @CustomerDetails.CustomerCityname ,@CustomerDetails.CustomerStatename<br /> @CustomerDetails.CustomerCountryname</td>
+                            <td valign="top">Booking Date</td>
+                            <td valign="top">@Offlinedata.CreatedTime.ToShortDateString()</td>
+                        </tr>
+                        @if (@Offlinedata.HotelConfirmationNo != null && Offlinedata.HotelConfirmationNo != "")
+                        {
+                            <text>
+                                <tr style="font-size:12px;">
+                                    <td valign="top">&nbsp;</td>
+                                    <td valign="top">&nbsp;</td>
+                                    <td valign="top" style="font-weight:bold;">Hotel Conf. Number</td>
+                                    <td valign="top" style="font-weight:bold;">@Offlinedata.HotelConfirmationNo</td>
+                                </tr>
+                            </text>
+                        }
+                        <tr style="font-size:12px;">
+                            <td>Email</td>
+                            <td>@CustomerDetails.CustomerEmail</td>
+                            <td>
+                                @if (@Offlinedata.GuestName != null && Offlinedata.GuestName != "")
+                                {
+                                    <text>Guest Name</text>
+                                }
+                            </td>
+                            <td>
+                                @if (@Offlinedata.GuestName != null && Offlinedata.GuestName != "")
+                                {
+                                    @Offlinedata.GuestName
+                                }
+                            </td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Mobile</td>
+                            <td>@CustomerDetails.CustomerMobile</td>
+                            <td>
+                                @if (@Offlinedata.GuestEmail != null && Offlinedata.GuestEmail != "")
+                                {
+                                    <text> Guest Email</text>
+                                }
+                            </td>
+                            <td>
+                                @if (@Offlinedata.GuestEmail != null && Offlinedata.GuestEmail != "")
+                                {
+                                    @Offlinedata.GuestEmail
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><b style="font-weight:bold; font-size: 13px; margin: 10px 0px; display: inline-block;">Property Details</b></td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td>Name</td>
+                            <td>@OfflinePropertydata.PropertyName</td>
+                            <td>&nbsp;</td>
+                            <td>
+                                @*@if (OfflinePropertydata.SupplierName != "" && OfflinePropertydata.SupplierName != null)
+                                    {
+                                        <text> @OfflinePropertydata.SupplierName </text>
+                                    }*@
+                            </td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td valign="top" rowspan="2">Address :</td>
+                            <td valign="top" rowspan="2">
+                                @OfflinePropertydata.PropertyAddress<br />
+                                @{
+
+                                    <text>
+                                        @OfflinePropertydata.PropertyCityname, @OfflinePropertydata.PropertyStatename
+                                        <br /> @OfflinePropertydata.PropertyCountryname
+                                    </text>
+                                }
+
+                            </td>
+
+                            <td valign="top">Contact No</td>
+                            <td valign="top">
+                                @if (OfflinePropertydata.PropertyContactNo != null)
+                                {
+                                    if (OfflinePropertydata.PropertyContactNo.Trim() != "")
+                                    {
+                                        string[] ContactNo = OfflinePropertydata.PropertyContactNo.Split(',');
+                                        for (int i = 0; i < ContactNo.Length; ++i)
+                                        {
+                                            <text> @ContactNo[i] </text> <br />
+                                        }
+                                    }                                  
+                                }
+                            </td>
+                        </tr>
+                        <tr style="font-size:12px;">
+                            <td valign="top">Email</td>
+                            <td valign="top">
+                                @if (OfflinePropertydata.PropertyEmail != null)
+                                {
+                                    @OfflinePropertydata.PropertyEmail
+                                }
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td colspan="2"><b style="font-weight:bold; font-size: 13px; margin: 10px 0px; display: inline-block;">Pricing Details</b></td>
+                        </tr>
+
+                        <tr style="font-size:12px;">
+
+                            <td nowrap>
+                                Average Daily Rate  :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.AvgDailyRateBefreStaxForSalePrice
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+
+                            </td>
+
+                            <td nowrap>
+                                Other Service :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.BuyPriceforotherservicesForSalePrice
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+
+                        </tr>
+
+                        <tr style="font-size:12px;">
+
+                            <td nowrap>
+                                Total Value before GST :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @amountacc
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td nowrap>
+                                GST @@ @Math.Round(Offlinedata.StaxForotherForSalePrice, 2) % (other service) :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @tothertax
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+
+
+                            </td>
+                        </tr>
+
+
+                        <tr style="font-size:12px;">
+
+                            <td>
+                                GST @@ @Math.Round(Offlinedata.StaxForSalePrice, 2) % :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @tstax
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+                            <td nowrap>
+                                Total Amount (other service) :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.TotalAmtotherForSalePrice
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+
+
+                            </td>
+                        </tr>
+
+                        <tr style="font-size:12px;">
+
+                            <td>
+
+                                Total Amount :
+                            </td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.TotalAmtForSalePrice
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+                            <td></td>
+                            <td>
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right"></td>
+                                        <td width="50%"></td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+                        </tr>
+
+                        <tr style="font-size:12px;">
+
+                            <td style="font-weight:bold;">
+                                Grand Total :
+                            </td>
+                            <td style="font-weight:bold;">
+
+                                <table width="100%">
+                                    <tr>
+                                        <td align="right">
+                                            @Offlinedata.TotalSalePrice
+                                        </td>
+                                        <td width="50%"></td>
+                                    </tr>
+                                </table>
+
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+
+                        <tr></tr>
+
+
+
+
+                        <tr>
+                            <td align="left" colspan="4" style="font-size:14px;">
+                                <table width="100%" cellpadding="5" border="1" cellspacing="0" title="Booking and Payment Details">
+                                    <thead>
+                                        <tr style="background-color: #a51e22;color:white; height:30px; font-size:12px;">
+                                            <th style="background-color: #a51e22; padding: 10px;">Stay Category</th>
+                                            <th colspan="2">Accommodation Type</th>
+                                            @if (HSNdata.NatureOfService == "Event Management Service")
+                                            {
+                                                <th>Event Date</th>
+                                            }
+                                            else
+                                            {
+                                                <th>Check In</th>
+                                                <th>Check Out</th>
+                                            }
+
+                                            <th>No Of rooms</th>
+                                            <th>No. of nights</th>
+                                            <th align="right" style="padding-right: 5px;"><span class="bold">Avg. daily rate (INR)&nbsp;</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (noOfDays == 0) { noOfDays = (Offlinedata.CheckOut - Offlinedata.CheckIn).Days; }
+                                        <tr style="font-size: 12px; height: 35px;">
+                                            <td style="padding: 10px;">@Staycategorydetails.Title</td>
+                                            <td colspan="2">@Offlinedata.AccommodatoinTypename</td>
+@if (HSNdata.NatureOfService == "Event Management Service")
+{
+    if (Offlinedata.CheckIn == Offlinedata.CheckOut)
+    {
+        <td>@Offlinedata.CheckIn.ToShortDateString()</td>
+    }
+    else
+    {
+        <td>@Offlinedata.CheckIn.ToShortDateString()  To  @Offlinedata.CheckOut.ToShortDateString()</td>
+    }
+}
+else
+{
+                                            <td>@Offlinedata.CheckIn.ToShortDateString()</td>
+                                            <td>@Offlinedata.CheckOut.ToShortDateString()</td>
+}
+
+                                            <td>@Offlinedata.NoOfRooms</td>
+                                            <td>@Offlinedata.NoOfNight</td>
+                                            <td align="right" style="padding-right: 5px;">
+                                                @(Offlinedata.AvgDailyRateBefreStaxForSalePrice)
+                                            </td>
+                                        </tr>
+
+                                        <tr style="font-size: 12px; height: 30px; border-bottom: 1px solid #CCC;">
+                                            <td colspan="5">
+                                                Adults: @if (Offlinedata.NoOfPaxAdult > 0)
+                                                { @Offlinedata.NoOfPaxAdult }
+                                                else
+                                                {<text>None</text>},
+                                                Children: @if (Offlinedata.NoOfPaxChild > 0)
+                                                { @Offlinedata.NoOfPaxChild }
+                                                else
+                                                {<text>None</text>}
+                                                @*Guest Name : @Offlinedata.GuestName*@
+                                            </td>
+                                            <td align="right" colspan="3" style="padding-right: 5px;"><b>Total: @(Math.Round(Offlinedata.TotalAmtForSalePrice))</b></td>
+                                        </tr>
+
+                                        @if (Offlinedata.TotalAmtotherForSalePrice > 0)
+                                        {
+                                            <tr style="font-size:12px;">
+                                                <td colspan="5"></td>
+                                                <td align="right" colspan="3">
+                                                    <text>
+                                                        <b>
+                                                            Total Amount Of Other Service : @Math.Round(@Offlinedata.TotalAmtotherForSalePrice, 0)
+                                                        </b>
+                                                    </text><br />
+                                                </td>
+                                            </tr>
+                                        }
+
+                                        <tr style="border-top: 1px solid #a51e22;  ">
+                                            <td colspan="5">&nbsp;</td>
+                                            <td align="right" colspan="3" style="padding-right: 5px;">
+                                                <b>
+                                                    @{
+
+                                                        decimal totalsaleprice = Math.Round(Offlinedata.TotalSalePrice);
+                                                    }
+                                                    Grand Total(INR):   @totalsaleprice
+                                                </b>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                @if (dttime != null)
+                                {
+                                    string CheckInTime = dttime.CheckInTime;
+                                    string CheckOutTime = dttime.CheckOutTime;
+                                    if (CheckInTime != "" || CheckOutTime != "")
+                                    {
+                                        <p style="font-size:12px;">
+                                            <label>Check-in Time</label>:@CheckInTime &nbsp;&nbsp; <label>Check-out Time:</label>@CheckOutTime
+                                        </p>
+                                    }
+                                }
+
+                                <br />
+                                <b style="text-decoration:underline; font-size: 14px; font-weight: bold; display: inline-block;">Cancelation Policy</b>
+                                @if (Offlinedata.cancellationpolicy != null && Offlinedata.cancellationpolicy != "")
+                                {                          
+                                    <p>@Offlinedata.cancellationpolicy</p>
+                                }
+                                else
+                                {
+                                    <p>Cancelation of this booking would be subject to the cancelation policy of the hotel</p>
+                                }
+
+                                @if (Offlinedata.HotelFacility != null && Offlinedata.HotelFacility != "")
+                                {
+                                    <br />
+                                    <b style="text-decoration:underline; font-size: 14px; display: inline-block;">Inclusions</b>
+                                    <div style="margin-left:10px;">@Html.Raw(Offlinedata.HotelFacility)</div>
+                                }
+                                @*<p style="font-size:12px;">
+                                        Rates and Amounts are all Inclusive
+                                    </p>*@
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td align="center" colspan="4">
+                                <p style="margin-top: 20px; margin-bottom: 10px;font-size:12px;">
+                                    Thank you for choosing Staybazar!<br />
+                                    <a href="https://www.staybazar.com/Home/TermsOfUse">Terms & Conditions</a>
+                                    | <a href="https://www.staybazar.com/Home/Privacy">Privacy Policy</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td align="center" colspan="4">
+                                <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px; margin:0 0 10px !important">
+                                    View your online itinerary for additional information
+                                </p>
+                                <p style="font-size:14px; margin:0 0 10px !important">
+                                    Need help with your reservation? – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                                </p>
+                                <p style="font-size:14px; margin:0 0 10px !important">
+                                    Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                                </p>
+                                <p style="font-size:14px; margin:0 0 10px !important">
+                                    www.staybazar.com
+                                </p>
+                                <p style="font-size:14px; margin:0 0 10px !important">
+                                    <span style="font-weight:bold;">Address: </span>@SbEntityAddress,@SbEntityState,@SbEntityCountry<br />
+                                    <span style="font-weight:bold;">Phone: </span>080-2572-2898 / 4091 - 6686
+                                </p>
+                                @if (SalespersonName != "" && SalespersonPhone != "")
+                                {
+                                <p style="font-weight:bold;">Emergency & after office Contact  :   Mr.@SalespersonName , @SalespersonPhone</p>
+                                }
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

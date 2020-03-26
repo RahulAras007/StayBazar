@@ -1,0 +1,173 @@
+﻿@model StayBazar.Areas.Admin.Models.CustomerDetailModel
+
+@{
+    ViewBag.Title = "Customer | " + Model.Name;
+
+}
+<div id="content">
+    <div class="page-title-container style3">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 style="color:white">
+                    <a href="/Admin/PaymentListToCustomer" class="btn btn-sm btn-default" title="back to list"><span class="glyphicon glyphicon-arrow-left green-color fa-2x"></span></a>&nbsp;@ViewBag.Title
+                </h3>
+            </div>
+            @*<div class="col-lg-2">
+                    <div class="form-group text-left" style="padding-top:23px;text-align:right" >
+                        <button type="submit" id="btn_cancel" class="btn redbg whitetext border-radius0" disabled>Cancel</button>
+
+                    </div>
+                </div>*@
+            <hr />
+        </div>
+        </div>
+    <br />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="row">
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger">
+                            @ViewBag.Message.
+                        </div>
+                    }
+                    <div class="col-lg-1">
+                        <label>Booking:</label>
+                        @*@Html.TextBoxFor(m => (m.OfflineBookingList.First().SumTotalSalePrice), new { @class = "form-control", @readonly = "readonly" })*@
+                        <table>
+                            <tr>
+                                <td id="totalvolume">
+                                <td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-lg-1">
+                        <label>Advance:</label>
+                        @*@Html.TextBoxFor(m => (m.OfflineBookingList.First().SumTotalSalePrice), new { @class = "form-control", @readonly = "readonly" })*@
+                        <table>
+                            <tr>
+                                <td id="totalARcvd">
+                                <td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-lg-1">
+                        <label>Payable:</label>
+                        @*@Html.TextBoxFor(m => (m.OfflineBookingList.First().SumTotalSalePrice), new { @class = "form-control", @readonly = "readonly" })*@
+                        <table>
+                            <tr>
+                                <td id="totalPSalePrice">
+                                <td>
+                            </tr>
+                        </table>
+                    </div>
+                    @*<div class="col-lg-1" style="padding-top:23px">
+                        <text>
+                            <div class="btn-group" id="div-actions">
+                                <text>
+                                    <button id="btnContinue" class="btn btn-default">Calculate</button>
+                                </text>
+                            </div>
+
+                        </text>
+                    </div>*@
+                    @using (Html.BeginForm("Sendemail", "PaymentListToCustomer"))
+                    {
+                        <div class="col-lg-6">
+                            @Html.LabelFor(m => m.Email)
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @id = "useremailid" })
+                            @Html.HiddenFor(m => m.UserId, new { @class = "form-control" })
+                        </div>
+                        @*<div class="col-lg-2">
+                            <label>Total Advance Received :</label>
+                            @Html.TextBoxFor(m => (m.AdvanceReceived), new { @class = "form-control" })
+                        </div>*@
+                        <div class="col-lg-1" style="padding-top:23px">
+                            <div class="btn-group" id="div-actions">
+                                <text>
+                                    <button type="submit" class="btn btn-success">Send email to customer</button>
+                                    @*<a href="/Admin/JoinRequests/Corporate" class="btn greybg whitetext border-radius0">Cancel</a>*@
+                                </text>
+                            </div>
+                        </div>
+                        @*<div class="col-lg-2" style="padding-top:23px">
+
+                            <a href="#" id="status@(Model.OfflineBookingId)" title="Sendemail" class="btn btn-success" onclick="Sendemail(@Model.UserId)">
+                                Send email to customer
+                            </a>
+
+                        </div>*@
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="row">
+            <div id="List" class="col-md-12">
+                @{
+                    Html.RenderPartial("~/Areas/Admin/Views/PaymentListToCustomer/_BookingList.cshtml", Model.OfflineBookingList);
+                }
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="restoreBox" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+
+                        <h4 class="modal-title" id="myModalLabel">Restore Booking</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="cprogress"><p><img src="/content/ajax11-loader.gif" /> Loading...</p></div>
+                                <div id="cancelBox1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="restoreclose" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+    </div>
+    <script type="text/javascript">
+    function Sendemail(id) {
+        @*if ($('#btn_cancel').is(':disabled')) {
+            var r = confirm("disable ")
+        }
+        else
+        {
+            var r = confirm("Are you sure you want to send the mail? ")
+            if (r == true) {
+                var url = '@Url.Action("Sendemail", "PaymentListToCustomer")?UserId=' + id;
+
+                $.post(url, function (data) {
+
+                });
+                }
+                else {
+                return false
+                }
+        }*@
+        //alert($("#useremailid").val());
+        var r = confirm("Are you sure you want to send the mail? ")
+            if (r == true) {
+                var url = '@Url.Action("Sendemail", "PaymentListToCustomer")?UserId=' + id + '&useremailid=' + $("#useremailid").val() ;
+
+                $.post(url, function (data) {
+
+                });
+                }
+                else {
+                return false
+                }
+    }
+    </script>
+
+
+

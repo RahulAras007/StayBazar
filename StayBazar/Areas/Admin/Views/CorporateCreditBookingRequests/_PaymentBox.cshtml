@@ -1,0 +1,16 @@
+﻿@model StayBazar.Areas.Admin.Models.TranRestoreModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Restore", "TransactionList", new { Area = "Admin" }, FormMethod.Post, new { onsubmit = "return false;", id = "restoreform" }))
+{
+    <div class="row topmargin5">
+        <div class="col-md-3">Amount</div><div class="col-md-2">@Html.TextBoxFor(m => m.TransactionId)@Html.HiddenFor(m => m.BookingId)</div>
+    </div>
+    <div class="row topmargin5">
+        <div class="col-md-3">Credit Comment</div><div class="col-md-2">@Html.TextBoxFor(m => m.PaymentId)</div>
+    </div>
+}
+
+
+

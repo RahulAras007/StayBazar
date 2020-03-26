@@ -1,0 +1,78 @@
+﻿@{
+    int j = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_MOST_POPULAR_NO)));
+    StayBazar.Models.PropertyMostpopularModel b = new StayBazar.Models.PropertyMostpopularModel();
+    b.PropertypopularList = BLayer.PropertyMostpopular.MostpopularForb2bGet((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+    List<CLayer.Property> PropertypopularList = b.PropertypopularList;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+}
+<div class="container ctrpad">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="line">
+                <div class="pull-left leftside whitebg">Most Popular</div>
+                <div class="pull-right rightside whitebg">
+                    <a href="javascript:void(0)" class="pplr prev">
+                        <img src="../images/arrow-left.png" title="Left" alt="Left">
+                    </a>
+                    <a href="javascript:void(0)" class="pplr next">
+                        <img src="../images/arrow-right.png" title="Right" alt="Right">
+                    </a>
+                </div>
+            </div>
+            <div id="most-popular" class="owl-carousel">
+                @if (PropertypopularList.Count >0)
+{
+    foreach (CLayer.Property most in PropertypopularList)
+        {
+            <Text>
+                <div class="prop">
+                    <div class="prop-image">
+                        <a href="~/property/bproperty/@most.PropertyId">
+                            @if(most.FileName == "")
+                            {
+                                 <img src="~/@no_image" height="177" alt="noimage" />
+                            }
+                            else
+                            { <img src="@most.FileName" height="177"  alt="@most.Title serviced apartment in  @most.Location @most.City" /> }
+                            @*<span class="price">
+                <i class="fa cxprice fa-rupee"></i>@Math.Round(most.bookingitemsTotalAmount)<small>00</small>
+                <p class="onwards whitetext">onwards</p>
+            </span>*@
+                        </a>
+                    </div>
+                    <div class="tile_desc">
+                        <a href="~/property/bproperty/@most.PropertyId">
+                            <span class="name">
+                                @{
+            string title = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 20);
+                    @String.Format(title);
+                                }
+
+                                <br>
+                                <b>@most.Location, @most.City</b>
+                            </span>
+                        </a>
+                        <div class="starbox">
+                            @*@(Html.Raw(StayBazar.Common.Utils.GetStarRating(most.Rating)))*@
+                        </div>
+                        <a href="~/property/bproperty/@most.PropertyId" class="redtext">
+                            <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                        </a>
+                        <a href="~/property/bproperty/@most.PropertyId" class="pull-right redtext">
+                            <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                        </a>
+                    </div>
+                    <a href="~/property/bproperty/@most.PropertyId">
+                        <div class="text-center redbg whitetext book">Book now</div>
+                    </a>
+                </div>
+            </text>
+        }
+}
+            </div>
+            <div class="row col-md-offset-10 redtext pad30px" >
+                Taxes extra as applicable
+            </div>
+        </div>
+    </div>
+</div>

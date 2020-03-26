@@ -1,0 +1,509 @@
+@model StayBazar.Models.SearchModel
+@using Microsoft.AspNet.Identity
+@{
+    Layout = null;
+    int allowmindate = 1;
+    if (User.IsInRole("Administrator"))
+    {
+        allowmindate = 0;
+    }
+
+
+    //set mindate  forcorporate
+    long userid = Convert.ToInt32(User.Identity.GetUserId());
+    if (userid > 0)
+    {
+        CLayer.Role.Roles urole = BLayer.User.GetRole(userid);
+        if (urole == CLayer.Role.Roles.Corporate)
+        {
+            DateTime Credirbookingsmedayexp = BLayer.B2B.GetbookingsmedayforCorp(userid);
+            if (Credirbookingsmedayexp < DateTime.Now)
+            {
+                allowmindate = 1;
+            }
+            else
+            {
+                allowmindate = 0;
+            }
+        }
+    }
+
+}
+
+@*<div class="col-xs-12 advsearchbox">
+    <div class="greyborder whitebg pull-left">
+        <div class="col-xs-12 col-md-12 darkredbg whitetext">
+            <p class="heading">Search</p>
+        </div>*@
+@using (Html.BeginForm("Index", "Search", FormMethod.Post, new { id = "searchform", onsubmit = "submitSForm()" }))
+{
+
+        <h4 class="panel-title">
+            <a data-toggle="collapse" href="#modify-search-panel" class="collapsed">Modify Search</a>
+        </h4>
+        <div id="modify-search-panel" class="panel-collapse collapse">
+            <div class="panel-content">
+
+                <div class="form-group">
+                    <label>destination</label>
+                    <input type="text" id="Destination" class="input-text full-width" name="Destination" placeholder="" value="@Model.SearchCoordinates.Destination" onkeypress="return isINLetters(event)" />
+                </div>
+
+                <div class="form-group">
+                    <label>check in</label>
+                    <div class="datepicker-wrap">
+                        <input type="text" id="CheckIn" name="CheckIn" value="@Model.SearchCoordinates.CheckIn.ToShortDateString()" class="input-text full-width" placeholder="mm/dd/yy" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>check out</label>
+                    <div class="datepicker-wrap">
+                        <input type="text" id="CheckOut" name="CheckOut" value="@Model.SearchCoordinates.CheckOut.ToShortDateString()" class="input-text full-width" placeholder="mm/dd/yy" />
+                    </div>
+                </div>
+
+                <br />
+                <button type="button" class="btn-medium icon-check uppercase full-width" onclick="submitSForm()">search again</button>
+
+            </div>
+        </div>
+
+
+    @*<div class="col-xs-12 col-md-12">
+        <span>Destination</span>*@
+    @*<input type="text" class="destination" name="Destination" id="Destination" value="@Model.SearchCoordinates.Destination" placeholder="Enter your destination">*@
+    @*<div class=" destination" style="padding: 0px !important; border: 0px;">
+                <input type="text" id="Destination" class="destination" name="Destination" placeholder="Enter your destination" value="@Model.SearchCoordinates.Destination" onkeypress="return isINLetters(event)" />
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-12">
+            <div class="col-xs-6 col-md-6 checkin">
+                <span>Check in</span>
+                <div>
+                    <input type="text" id="CheckIn" name="CheckIn" value="@Model.SearchCoordinates.CheckIn.ToShortDateString()" placeholder="Check In">
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-6 checkout">
+                <span>Check out</span>
+                <div>
+                    <input type="text" id="CheckOut" name="CheckOut" value="@Model.SearchCoordinates.CheckOut.ToShortDateString()" placeholder="Check Out">
+                </div>
+            </div>
+        </div>*@
+
+    @*<div class="col-xs-12 col-md-12">
+            <div class="col-xs-6 col-md-6 selectspacer">
+                <span>Adults (10+ yrs)</span>
+                <input type="hidden" id="Adults" name="Adults" value="@Model.SearchCoordinates.Adults" />
+                <div class="specSpin"><div id="spnrAd"></div></div>
+            </div>
+            <div class="col-xs-6 col-md-6 pad0">
+                <span>Children( &lt;10 yrs )</span>
+                <div class="specSpin">
+                    <div id="spnrCd"></div>
+                </div>
+                <input type="hidden" id="Children" name="Children" value="@Model.SearchCoordinates.Children" />
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-12">
+            <div class="col-xs-6 col-md-6 selectspacer" style="display:none;">
+                <span>Stay options</span>
+                <select class="styleselect" name="StayType" id="StayType">
+                    <option value="0">Any</option>
+                    @{
+                        List<CLayer.StayCategory> staytypes = BLayer.StayCategory.GetActiveList();
+                    }
+                    @foreach (CLayer.StayCategory sc in staytypes)
+                    {
+                        <option value="@sc.CategoryId" @if (Model.SearchCoordinates.StayType == sc.CategoryId.ToString()) { <text> selected </text> }>@sc.Title</option>
+                    }
+                </select>
+            </div>
+            <div class="col-xs-6 col-md-6 pad0">
+                <span>Rooms</span>
+                <div class="specSpin">
+                    <div id="spnrBed"></div>
+                </div><input type="hidden" name="BedRooms" id="BedRooms" value="@Model.SearchCoordinates.Bedrooms" />
+
+            </div>
+            <div class="col-xs-6 col-md-6 modifysrch pad0 align-t">*@
+    @* <div class="col-xs-6 col-md-6 text-center pad0 custmargin">
+        <a href="#" class="blacktext underline">Advanced Search</a>
+                            </div>*@
+    @*<div class="col-xs-12 col-md-12  pad0">
+                    <button type="button" class="redbg whitetext" onclick="submitSForm()">Modify Search</button>
+                </div>
+                <div class="hidden">
+
+                    <input type="text" id="rangeBudgetMax" name="rangeBudgetMax" value="@Model.SearchCoordinates.rangeBudgetMax" />
+                    <input type="text" id="rangeBudgetMin" name="rangeBudgetMin" value="@Model.SearchCoordinates.rangeBudgetMin" />
+                    <input type="text" id="starRatingRange" name="starRatingRange" value="@Model.SearchCoordinates.starRatingRange" />
+                    <input type="text" id="distanceInKm" name="distanceInKm" value="@Model.SearchCoordinates.distanceInKm" />
+                    <input type="text" id="features" name="features" value="@Model.SearchCoordinates.features" />
+                    <input type="text" id="beds" name="beds" value="@Model.SearchCoordinates.Bedrooms" />
+                    <input type="text" id="CurrentPage" name="CurrentPage" value="@Model.SearchCoordinates.CurrentPage">
+                    <input type="text" id="OrderBy" name="OrderBy" value="@Model.SearchCoordinates.OrderBy" />
+                    <input type="hidden" id="Location" name="Location" value="@Model.SearchCoordinates.Location" />
+                    <input type="hidden" id="PropertyId" name="PropertyId" />
+                    <input type="hidden" id="filtdestination" value="@Model.SearchCoordinates.HiddenDestination" />
+                    <input type="hidden" id="HiddenDestination" name="HiddenDestination" value="@Model.SearchCoordinates.HiddenDestination" />
+                    <input type="hidden" id="HiddenCheckIn" name="HiddenCheckIn" value="@Model.SearchCoordinates.HiddenCheckIn" />
+                    <input type="hidden" id="HiddenCheckOut" name="HiddenCheckOut" value="@Model.SearchCoordinates.HiddenCheckOut" />
+                    <input type="hidden" id="HidAdults" name="HidAdults" value="@Model.SearchCoordinates.HidAdults" />
+                    <input type="hidden" id="HidChildren" name="HidChildren" value="@Model.SearchCoordinates.HidChildren" />
+                    <input type="hidden" id="HidStayType" name="HidStayType" value="@Model.SearchCoordinates.HidStayType" />
+                    <input type="hidden" id="HidBedrooms" name="HidBedrooms" value="@Model.SearchCoordinates.HidBedrooms" />
+                </div>
+
+            </div>
+        </div>*@
+
+
+
+}
+@*</div>
+        <input type="text" id="hiddenmindate" style="display:none;" name="hiddenmindate" value="@allowmindate" />
+        <input type="hidden" id="hdHotelName" name="hdHotelName" />
+        <input type="hidden" id="hdPropertyID" name="hdPropertyID" />
+        <input type="hidden" id="hdDestination" name="hdDestination" />
+    </div>*@
+
+@*<div class="col-xs-12 advsearchbox" style="display:none">
+    <div class="greyborder whitebg pull-left">
+        <div class="col-xs-12 col-md-12 darkredbg whitetext">
+            <p class="heading">Filter Hotels</p>
+        </div>
+        <div class="col-xs-12 col-md-12">
+            <span>Hotel Name</span>
+            <input type="text" id="HotelName" class="destination" name="HotelName" placeholder="Enter hotel name" value="" onkeypress="return isINLetters(event)" />
+        </div>
+        <div class="col-xs-6 col-md-6 pad0" style="opacity:0">*@
+@*<span>Rooms</span>*@
+@*<div class="specSpin">
+                <div id="spnrBed1"></div>
+            </div>
+        </div>
+        <div class="col-xs-6 col-md-6 modifysrch pad0 align-t modifyhotelsrch">
+            <div class="col-xs-12 col-md-12  pad0">
+                <button type="button" class="redbg whitetext" onclick="FilterHotelNames()">Search hotel</button>
+            </div>
+        </div>
+    </div>*@
+
+
+
+
+@*</div>*@
+
+<script type="text/javascript">
+    $(function () {
+
+        var now = new Date();
+        now.setDate(now.getDate() + 7);
+        //    var now = nowTemp; // new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDay(), 0, 0, 0, 0);
+        var checkin = $('#CheckIn').datepicker(
+            {
+                minDate: $("#hiddenmindate").val(),
+                defaultDate: now,
+                numberOfMonths: 2,
+                dateFormat: "dd/mm/yy",
+             //   maxDate: "06/07/2019"
+            });
+        $("#CheckIn").click(function () { $("#CheckIn").datepicker('show'); });
+        now.setDate(now.getDate() + 2);
+        var checkout = $('#CheckOut').datepicker(
+             {
+                 minDate: 2,
+                 numberOfMonths: 2,
+                 defaultDate: now,
+                 dateFormat: "dd/mm/yy",
+           //      maxDate: "06/07/2019"
+             });
+        $("#CheckIn").change(function () {
+            var v = $(this).val().trim();
+
+            var curDate = new Date();
+            curDate.setDate(curDate.getDate() + 1);
+            var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+            curDate.setDate(curDate.getDate() + 2);
+            var odat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+
+            if (checkDate(v)) {
+                re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                if (regs = v.match(re)) {
+                    var day, mnt, yr;
+                    yr = parseInt(regs[3]);
+                    mnt = parseInt(regs[2]);
+                    dy = parseInt(regs[1]);
+                    if (mnt > 0) mnt = mnt - 1;
+                    var cd = new Date(Date.UTC(yr, mnt, dy));
+                    cd.setDate(cd.getDate() + 2);
+                    var mn = cd.getMonth() + 1; //parseInt(cd.getMonth()) + 1;
+                    var chgDt = pad(cd.getDate(), 2) + "/" + pad(mn, 2) + "/" + cd.getFullYear();
+                    // alert(chgDt);
+                    var cs = new Date(Date.UTC(yr, mnt, dy));
+                    var mind = new Date(Date.UTC(yr, mnt, dy));
+                    mind.setDate(mind.getDate() + 1);
+                    var mindx = pad(mind.getDate(), 2) + "/" + pad(parseInt(mind.getMonth()) + 1, 2) + "/" + mind.getFullYear();
+                    var xo = $("#CheckOut").val();
+                    //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                    if (checkDate(xo)) {
+                        if (regss = xo.match(re)) {
+                            yr = parseInt(regss[3]);
+                            mnt = parseInt(regss[2]);
+                            dy = parseInt(regss[1]);
+                            if (mnt > 0) mnt = mnt - 1;
+                            var co = new Date(Date.UTC(yr, mnt, dy));
+                            if (co <= cs) {
+                                $("#CheckOut").val(chgDt);
+                                // $("#CheckOut").datepicker("option", "setDate", cd);
+                            }
+                        }
+                        else {
+                            // $("#CheckOut").datepicker("option", "setDate", cd);
+                            $("#CheckOut").val(chgDt);
+                        }
+                    }
+                    else {
+                        // $("#CheckOut").datepicker("option", "setDate", cd);
+                        $("#CheckOut").val(chgDt);
+                    }
+                    //checkout.minDate = n;
+                    $("#CheckOut").datepicker("option", "minDate", mindx);
+                    //$("#CheckOut").datepicker("show");
+                }
+                else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+            }
+            else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+        });
+
+
+
+        $("#spnrAd").dpNumberPicker({
+            value:@{if (Model.SearchCoordinates.Adults == null || Model.SearchCoordinates.Adults == "")
+                    {<text>1</text>} else {<text>@Model.SearchCoordinates.Adults</text>}},
+            min: 1,
+            max: 8,
+            step: 1,
+            afterChange: function () { $("#Adults").val(this.options.value); }
+        });
+        $("#spnrCd").dpNumberPicker({
+            value: @{if (Model.SearchCoordinates.Children == null || Model.SearchCoordinates.Children == "")
+                     {<text>0</text>} else {<text>@Model.SearchCoordinates.Children</text>}},
+            min: 0,
+            max: 8,
+            step: 1,
+            afterChange: function () { $("#Children").val(this.options.value); }
+        });
+        $("#spnrBed").dpNumberPicker({
+            value: @{if (Model.SearchCoordinates.Bedrooms == null || Model.SearchCoordinates.Bedrooms == "")
+                     {<text>0</text>} else {<text>@Model.SearchCoordinates.Bedrooms</text>}},
+            min: 0,
+            max: 6,
+            step: 1,
+            afterChange: function () { $("#BedRooms").val(this.options.value); }
+        });
+        // disabling dates
+        @* var nowTemp = new Date();
+        var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+
+        var checkin = $('#CheckIn').datepicker({
+            format: "dd/mm/yyyy",
+            onRender: function (date) {
+                return date.valueOf() < now.valueOf() ? 'disabled' : '';
+            }
+        }).on('changeDate', function (ev) {
+            if (ev.date.valueOf() > checkout.date.valueOf()) {
+                var newDate = new Date(ev.date)
+                newDate.setDate(newDate.getDate() + 1);
+                checkout.setValue(newDate);
+            }
+            checkin.hide();
+            $('#CheckOut')[0].focus();
+        }).data('datepicker');
+        var checkout = $('#CheckOut').datepicker({
+            format: "dd/mm/yyyy",
+            onRender: function (date) {
+                return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
+            }
+        }).on('changeDate', function (ev) {
+    checkout.hide();
+    }).data('datepicker');*@
+    });
+
+    //$(function () {
+
+    //    $("#Destination").autocomplete({
+    //        minLength: 0,
+    //        source: "/Common/GetDestination",
+    //        focus: function (event, ui) {
+    //            $("#Destination").val(ui.item.value);
+    //            return false;
+    //        }
+    //    })
+    //    .autocomplete("instance")._renderItem = function (ul, item) {
+    //        ul.addClass("custom");
+    //        return $("<li>") //.addClass("custom")
+    //            //.append("<a>" + item.label + "<br>" + item.desc + "</a>")
+    //            .append("<a>" + item.desc + "</a>")
+    //        .appendTo(ul);
+
+    //    };
+    //});
+
+    $(function () {
+
+        $("#Destination").autocomplete({
+            minLength: 0,
+            source: "/Common/GetDestination",
+            focus: function (event, ui) {
+
+                $("#Destination").val(ui.item.value);
+                $("#hdDestination").val(ui.item.City);
+                $("#hdPropertyID").val(ui.item.PropertyId);
+                if ((ui.item.bHotelName == true)) {
+                    $("#hdHotelName").val('1');
+                }
+                else {
+                    $("#hdHotelName").val('0');
+                }
+                return false;
+            }
+        })
+            .autocomplete("instance")._renderItem = function (ul, item) {
+                ul.addClass("custom");
+                //debugger;;
+                var RedirectUrl = "/serviced-apartments/" + item.City + "/" + item.Location + "/" + item.PropertyId;//+ "?start=" + $("#CheckIn").val() + "&end=" + $("#CheckOut").val() + "";
+                $("#hdDestination").val(item.City);
+                $("#hdPropertyID").val(item.PropertyId);
+
+                //   alert(item.PropertyId);
+                if ((item.bHotelName == true)) {
+                  //  $("#hdHotelName").val('1');
+
+                    return $("<li class='hotel'>")
+                        //.addClass("custom")
+                        //.append("<a>" + item.label + "<br>" + item.desc + "</a>")
+                        .append('<a>' + item.desc + '</a>')
+                        .appendTo(ul);
+                }
+                else {
+                 //   $("#hdHotelName").val('0');
+                    return $("<li class='location'>")
+                        //.addClass("custom")
+                        //.append("<a>" + item.label + "<br>" + item.desc + "</a>")
+                        .append("<a>" + item.desc + "</a>")
+                        .appendTo(ul);
+
+                }
+
+            };
+
+
+        $('#Destination').bind('input', function () {
+            StopHotelLoading();
+        });
+    });
+
+    function submitSForm() {
+        //debugger;;
+        StopHotelLoading();
+
+        if ($.trim($("#Destination").val()) == '') {
+            alert("Please enter a valid city, location or property name to search");
+            $("#Destination").val('').focus();
+            return false;
+        }
+        else {
+            if (!valdInOutDates()) return false;
+        }
+        //var url = "/Search/Index" + "?Destination=" + $("#Destination").val() + "&CheckIn=" + $("#CheckIn").val() + "&CheckOut=" + $("#CheckOut").val() + "&Adults=" + $("#Adults").val() + "&Children=" + $("#Children").val() + "&BedRooms=" + $("#BedRooms").val() + "&StayType=" + $("#StayType").val();
+        //window.location.href = url;
+        //debugger;;
+
+
+
+
+        var url = "/search/Index" + "?Destination=" + $("#Destination").val() + "&CheckIn=" + $("#CheckIn").val() + "&CheckOut=" + $("#CheckOut").val() + "&Adults=" + $("#Adults").val() + "&Children=" + $("#Children").val() + "&BedRooms=" + $("#BedRooms").val() + "&StayType=" + $("#StayType").val() ;
+        if ($("#hdHotelName").val() == "1") {
+
+            url = "/property/property?propertyid=" + $("#hdPropertyID").val() + "&adults=" + $("#Adults").val() + "&destination=" + $("#hdDestination").val() + "&checkIn=" + $("#CheckIn").val() + "&checkout=" + $("#CheckOut").val() + "&children=" + $("#Children").val() + "&staytype=" + $("#StayType").val() + "&bedrooms=" + $("#BedRooms").val() + "&rangebudgetmax=0&rangebudgetmin=0&starratingrange=0&beds=0&distanceInKm=0";
+            window.location.href = url;
+        }
+        else {
+            //$("#hdDestination").val();
+            //$("#hdPropertyID").val();
+            window.location.href = url;
+        }
+        return true;
+    }
+    function valdInOutDates() {
+        var v = $.trim($("#CheckIn").val());
+        if (checkDate(v)) {
+            re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            if (regs = v.match(re)) {
+                var cs = new Date(parseInt(regs[3]), parseInt(regs[2]) - 1, parseInt(regs[1]));
+                var xo = $("#CheckOut").val();
+                //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                if (checkDate(xo)) {
+                    if (regss = xo.match(re)) {
+                        var co = new Date(parseInt(regss[3]), parseInt(regss[2]) - 1, parseInt(regss[1]));
+                        if (co <= cs) {
+                            alert('Please enter a checkout date which falls after checkin date');
+                            $("#CheckOut").focus();
+                            return false;
+                        }
+                    }
+                    else {
+                        alert('Invalid Check Out date');
+                        $("#CheckOut").focus();
+                        return false;
+                    }
+                }
+                else {
+                    alert('Invalid Check Out date');
+                    $("#CheckOut").focus();
+                    return false;
+                }
+            }
+            else {
+                alert('Invalid Check In date');
+                $("#CheckIn").focus();
+                return false;
+            }
+        } else {
+            alert('Invalid Check In date');
+            $("#CheckIn").focus();
+            return false;
+        }
+        return true;
+    }
+    function pad(num, size) {
+        var s = num + "";
+        while (s.length < size) s = "0" + s;
+        return s;
+    }
+    function checkDate(field) {
+        var allowBlank = true; var minYear = 2014; var maxYear = (new Date()).getFullYear() + 1;
+        // regular expression to match required date format
+        re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        if (field != '') {
+            if (regs = field.match(re)) {
+                if (regs[1] < 1 || regs[1] > 31)
+                { return false; }
+                else if (regs[2] < 1 || regs[2] > 12)
+                { return false; }
+                else if (regs[3] < minYear || regs[3] > maxYear)
+                { return false; }
+            } else { return false; }
+        } else { return false; }
+        return true;
+    }
+    function daydiff(first, second) {
+        return (second - first) / (1000 * 60 * 60 * 24);
+    }
+
+</script>

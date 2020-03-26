@@ -1,0 +1,49 @@
+﻿@model StayBazar.Areas.Admin.Models.CorporateDiscountsModel
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+   
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" /> >
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="CreditBooking">
+        <ss:Table>
+            <ss:Row ss:Styleid="1">
+                <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Corporate Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Standared Short Term Discounts</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Standared Long Term Discounts</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Mark up Short Term</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Mark up Long Term</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Additional Short Term Discounts</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Additional Long Term Discounts</ss:Data></ss:Cell>
+              
+            </ss:Row>
+            @foreach (CLayer.CorporateDiscounts reportList in Model.ReportList)
+            {
+
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">@Model.Suppliername</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.Corporatename </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.B2bStdShortDiscounts </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.B2bStdLongDiscounts </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.B2BMarkupShortTerm </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.B2BMarkupLongTerm </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.AddShortTerm </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.AddLongTerm </ss:Data></ss:Cell>
+                </ss:Row>
+            }
+            
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>
+

@@ -1,0 +1,40 @@
+﻿@model IEnumerable<CLayer.Query>
+@{
+    ViewBag.Title = ViewBag.Head;
+
+    int mgtpid = ViewBag.MsgType;
+    @*<h2>@ViewBag.Title</h2>*@
+    try
+    {
+        StayBazar.Areas.Admin.Models.QueryModel data = (StayBazar.Areas.Admin.Models.QueryModel)ViewBag.Query;
+        <text>
+            <div id="mail-list">
+                @{
+                    Html.RenderPartial("~/Areas/Admin/Views/Query/_List.cshtml");
+                }
+            </div>
+            <div id="mail-read">
+                @{
+                    Html.RenderPartial("~/Areas/Admin/Views/Query/_Query.cshtml", data, ViewData);
+                }
+            </div>
+            <script type="text/javascript">
+                function Edit(id) {
+                    $.get("/Admin/Query/Edit?id=" + id + "&mgid=" + @mgtpid, function (data) {
+                        $("#mail-read").html(data);
+                        $("#mail-list").hide();
+                        $("#mail-read").show();
+                    });
+                }
+                $(function () {
+                    $("#mail-read").hide();
+                });
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}

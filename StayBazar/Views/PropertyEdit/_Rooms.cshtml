@@ -1,0 +1,106 @@
+﻿@model StayBazar.Models.PropertyAccommmodationModel
+@{
+    var grid = new WebGrid(Model.Accommodations, canSort: true, canPage: true, rowsPerPage: 25, pageFieldName: "pagerfield");
+}
+@try
+{
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <input type="button" class="btn redbg whitetext border-radius0" value="ADD NEW" id="AddNew" title="Add New Accommodation" />
+        </div>
+    </div>
+    <div class="row">
+        <div id="acc_list" class="col-md-12">
+            @grid.GetHtml(tableStyle: "table table-striped table-condensed table-responsive table-hover",
+                columns: grid.Columns(
+                grid.Column("StayCategory", "Category"),
+                grid.Column("AccommodationType", "Type"),
+                grid.Column("View Rates", format: @<text><a onclick="View(@item.AccommodationId)" href="#"><span class="glyphicon glyphicon-arrow-right"></span></a></text>),
+                grid.Column("AccommodationCount", "No. Of Accomodations"),
+                grid.Column("Terms/ Condition", format: @<text><a href="~/Condition/Index/@item.AccommodationId"><span class="glyphicon glyphicon-edit"></span></a></text>),
+                grid.Column("Inventory",format:@<text><a href="~/Inventory/Index/@item.AccommodationId"><span class="glyphicon glyphicon-edit"></span></a></text>),
+                grid.Column("Status", format: @<text>@if (item.Status == (int)StayBazar.Models.AccommodationModel.StatusTypes.Enabled)
+                {
+                    <text>Enabled</text>
+                }
+                else
+                {
+                    <text>Disabled</text>
+                }</text>),
+                grid.Column("Edit", format: @<text>
+                <span class="glyphicon glyphicon-edit" title="Edit" onclick="EditACC(@item.AccommodationId)" style="color:blue; cursor: pointer;"></span>
+                </text>),
+              grid.Column("Delete", format: @<text>
+            <span class="glyphicon glyphicon-trash" title="Delete" onclick="AccommodationDelete(@item.AccommodationId)" style="color:blue; cursor: pointer;"></span>
+            </text>)
+))
+        </div>
+        <div id="acc_details" class="col-md-5 marginleft30px hided">
+            @Html.Partial("~/Views/PropertyEdit/_Accommodation.cshtml", Model.Accommodation)
+        </div>
+
+        <div id="myModal" class="modal fade">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" style="border:none;">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title"></h4>
+                    </div>
+                    <div class="modal-body" id="rateDetailsDiv">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeEdit()">Close</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        function AccommodationDelete(accid) {
+            if (confirm("Are you sure, you want to delete?")) {
+                window.location = "@Url.Action("AccommodationDelete", "PropertyEdit")?id=" + accid;
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        function View(AccommodationId) {
+            $.get("/Rate/Index?accommodationId=" + AccommodationId, function (data) {
+
+                $("#rateDetailsDiv").html(data);
+                $("#myModal").modal("show");
+            });
+
+        }
+        function EditACC(id) {
+            $.get("/PropertyEdit/AccommodationEdit?id=" + id, function (data) {
+                $("#acc_details").html(data);
+            });
+            $("#AddNew").removeClass("redbg");
+            //$("#acc_list").removeClass("col-md-12");
+            //$("#acc_list").addClass("col-md-6");
+            //$("#acc_details").removeClass("hide");
+            $("#acc_list").removeClass("col-md-12").addClass("col-md-6");;
+            $("#acc_details").fadeIn(800).removeClass("hided");
+        }
+        $(function () {
+            $('#AddNew').click(function () {
+                $.get("/PropertyEdit/AccommodationNew?propertyid=" + '@Model.PropertyId', function (data) {
+                    $("#acc_details").html(data);
+                });
+                $(this).removeClass("redbg");
+                //$("#acc_list").removeClass("col-md-12");
+                //$("#acc_list").addClass("col-md-6");
+                //$("#acc_details").removeClass("hide");
+                $("#acc_list").removeClass("col-md-6").addClass("col-md-12");
+                $("#acc_details").hide();
+            });
+        });
+    </script>
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+    Response.Redirect("~/ErrorPage");
+}

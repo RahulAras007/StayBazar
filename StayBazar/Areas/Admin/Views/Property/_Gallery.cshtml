@@ -1,0 +1,86 @@
+﻿@model StayBazar.Areas.Admin.Models.PropertyPicturesModel
+@using System.Configuration;
+@try
+{
+    int max_no_files = Convert.ToInt32(BLayer.Settings.GetValue(CLayer.Settings.GALLERY_MAX_FILES));
+    if (Model.Pictures.Count < max_no_files)
+    {
+        <div class="row">
+            <div class="col-md-12 fileupload">
+                @using (Html.BeginForm("PictureSave", "Property", FormMethod.Post, new { enctype = "multipart/form-data", id = "upload" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    @Html.HiddenFor(m => m.FileId)
+                    @Html.HiddenFor(m => m.PropertyId)
+                    <span>Add picture</span><br />
+                    <input type="file" id="Picture" name="photo" tabindex="1" /><br />
+                    <input type="submit" id="btnSave" value="Save" disabled="disabled" class="btn btn-success" tabindex="2" />
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-danger">Maximum No. of files reached. Please remove some files if you want to add new files.</div>
+            </div>
+        </div>
+    }
+    <div class="row property-gallery">
+        @foreach (CLayer.PropertyFiles rm in Model.Pictures)
+        {
+            if (System.IO.File.Exists(Server.MapPath("~/Files/Property/" + rm.PropertyId + "/" + rm.FileName)))
+            {
+                string src = "/Files/Property/" + @rm.PropertyId + "/" + @rm.FileName;
+                <div class="col-xs-6 col-md-3">
+                    <div class="thumbnail border-radius0">
+                        <div class="hover-outer">
+                            <div class="hover-inner">
+                                <div class="hover">
+                                    <a href="/Admin/Property/PictureDelete/@rm.FileId" title="Delete" onclick="return confirm('Are you sure you want to delete this image?')"
+                                       class="glyphicon glyphicon-trash"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <img src="@src" alt="@rm.FileName">
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#Picture").focus();
+            $("#Picture").change(function () {
+                if ($("#Picture").val() != "") {
+                    $("#btnSave").removeAttr("disabled");
+                }
+            });
+        });
+
+
+        //filesize configeration 
+        @*@using System.Configuration;*@
+         @{
+             int fi= Convert.ToInt32(ConfigurationManager.AppSettings.Get("FileUploadSizeInMB"));
+        long by = fi * 1024 * 1024;
+        }
+
+        $('#Picture').bind('change', function (){                   
+            var filesizeget = this.files[0].size;
+            //alert(filesizeget + "bytes");
+            if (filesizeget > @by) {
+                alert("Please Upload below @(fi)MB file size");
+            $('#Picture').val("");
+            return false;
+            }
+        });
+    </script>
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+    Response.Redirect("~/ErrorPage");
+}

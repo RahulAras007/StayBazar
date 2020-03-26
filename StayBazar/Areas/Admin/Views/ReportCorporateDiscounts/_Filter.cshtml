@@ -1,0 +1,129 @@
+﻿@model StayBazar.Areas.Admin.Models.CorporateDiscountsModel
+@{
+    Layout = null;
+}
+<link href="~/Content/multiple-select.css" rel="stylesheet" />
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("Filter", "ReportCorporateDiscounts", FormMethod.Post, new { @id = "frmFiltersReportCorporateDiscounts", onsubmit = "return runSearch();" }))
+        {
+        <div class="row ">
+            <div class="col-md-3">
+                @Html.HiddenFor(m => m.SupplierId) @Html.HiddenFor(m => m.PropertyId)
+                <input type="button" onclick="browseSupplier()" value="Choose Supplier" class="btn btn-default" />
+                 <span id="suppliername"></span>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+
+                    <input id="btnSearch" class="btn btn-success" value="Search" type="button" />
+                    @*<span class="input-group-btn">
+                        <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </span>*@
+                </div>
+            </div>
+            <div class="col-md-5 exporticons">
+                <a title="Print" href="#" onclick="printDoc()" id="btnNextClickprt" style="display:none; float:left; margin-left:5px;" class="fa fa-print"> </a>
+                <a title="Pdf" href="#" onclick="PDF()" id="btnNextClickpdf" style="display:none; float:left; margin-left:5px;" class="fa fa-file-pdf-o"></a>
+                <a title="Export" href="#" onclick="Export()" style="display:none; float:left; margin-left:5px;" id="btnNextClickex" class="fa fa-file-excel-o"></a>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+<script src="~/Scripts/jquery.multiple.select.js"></script>
+<script type="text/javascript">
+    $("#properties").multipleSelect({
+        placeholder: "Select",
+        width: "100%"
+    });
+    function browseSupplier() {
+        $('#chooseCorporate').modal('show');
+    }
+    function corpSelected(corpId) {
+        $("#suppliername").html($("#corpname_" + corpId).html());
+
+        $("#SupplierId").val(corpId);
+        $('#chooseCorporate').modal('hide');
+
+        @*$.get('@Url.Action("GetProperties", "ReportCorporateDiscounts", new { Area = "Admin" })?supplierId=' + corpId, function (data) {
+            if (data != "") {
+                $("#ReportCorporateDiscounts").html(data);
+            }
+        });*@
+
+    }
+
+    $(function () {
+     
+        $('#FromDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy"
+            });
+        $('#ToDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+                beforeShow: function () {
+                    $(this).datepicker('option', 'minDate', $('#FromDate').val());
+                    if ($('#FromDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+
+    });
+    $("#btnSearch").click(function () {
+
+        var url = '@Url.Action("Filter", "ReportCorporateDiscounts", new { area = "Admin" })?' + "properties=" + $("#properties").val();
+        $.post(url, $("#frmFiltersReportCorporateDiscounts").serialize(),
+                function (data) {
+                    document.getElementById("btnNextClickprt").style.display = "block";
+                    document.getElementById("btnNextClickpdf").style.display = "block";
+                    document.getElementById("btnNextClickex").style.display = "block";
+                    // aler(data);
+                    $("#ReportCorporateDiscounts").html(data);
+                });
+        runSearch();
+    });
+
+    function runSearch() {
+        return true;
+    }
+
+
+    function PDF() {
+
+        var pfromdate = $("#FromDate").val();
+        var ptodate = $("#ToDate").val();
+        //    var pLimit = $("#Limit").val();
+        //    var pcurrentPage = $("#currentPage").val();
+        var pSupplierId = $("#SupplierId").val();
+        var formdata = $("#frmFiltersReportCorporateDiscounts").serialize();
+        var url = '@Url.Action("ReportPdf", "ReportCorporateDiscounts")?' + "fromDate=" + pfromdate + "&toDate=" + ptodate + "&propertyId=" + $("#PropertyId").val() + "&supplierId=" + pSupplierId + "&list=" + $("#properties").val();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+
+        //$.get(url, $("#frmFiltersReportDailyInventoryAndBooking").serialize(), function (data) {
+        //    if (data != "") {
+        //        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+        //    }
+        //});
+    }
+    function Export() {
+        var pfromdate = $("#FromDate").val();
+        var ptodate = $("#ToDate").val();
+        var pSupplierId = $("#SupplierId").val();
+        var url = '@Url.Action("ExcelReport", "ReportCorporateDiscounts", new { area = "Admin" })?' + "fromDate=" + pfromdate + "&toDate=" + ptodate + "&propertyId=" + $("#PropertyId").val() + "&supplierId=" + pSupplierId + "&list=" + $("#properties").val();
+        window.open(url, "_blank");
+
+    }
+    function printDoc() {
+        var pfromdate = $("#FromDate").val();
+        var ptodate = $("#ToDate").val();
+        var pSupplierId = $("#SupplierId").val();
+        var url = '@Url.Action("ReportPrint", "ReportCorporateDiscounts")?' + "fromDate=" + pfromdate + "&toDate=" + ptodate + "&propertyId=" + $("#PropertyId").val() + "&supplierId=" + pSupplierId + "&list=" + $("#properties").val();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+
+    }
+</script>
+

@@ -1,0 +1,114 @@
+﻿@model StayBazar.Areas.Admin.Models.BookingListModel
+@using Microsoft.AspNet.Identity
+@if (Model.Bookinglist != null && Model.Bookinglist.Count() > 0)
+{
+    <div class="panel-group" id="accordion">
+        @{
+    long i = 0;
+    }
+   @foreach (CLayer.Booking usr in Model.Bookinglist)
+    {
+         if (i != usr.BookingId)
+                    {  
+                        if(i!=0)
+                        { @Html.Raw("</div></div></div>")}
+                        i = usr.BookingId;
+        
+        <text>
+                <div class="panel panel-default">
+                    <div class="btn-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#i_@usr.BookingId">
+                                    <span class="glyphicon glyphicon-collapse-down"></span> Title:@usr.Title  Check In : @usr.CheckIn.ToShortDateString() Check Out: @usr.CheckOut.ToShortDateString()
+                                </a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div id="i_@usr.BookingId" class="panel-collapse collapse ">
+                        <div class="panel-body">
+                            </text>
+             }
+                  else { 
+                      <text> <hr /></text>
+                    }
+
+                    <text>            
+            <div class="row">
+
+                <div class="col-md-3">
+                    <td align="justify">
+                        Supplier:<br />
+                        Title:@usr.PropertyTitle<br />
+                        Name:  @usr.FirstName <br />
+                        @*Last Name: @usr.LastName<br /*@>
+                        Address:@usr.Address<br />
+                        City:@usr.City<br />
+                        State: @usr.StateName<br />
+                        Country:@usr.CountryName<br />
+                        Phone:@usr.Phone,@usr.Mobile<br />
+                        Email:@usr.Email<br />
+                    </td>
+                </div>
+                <div class="col-md-3">
+                    Item:    @usr.CategoryName  @usr.AccommodationType  Location: @usr.Location
+                </div>
+                <div class="col-md-3">
+                    Booking Date   @usr.BookingDate<br />
+                    <tr>
+                        <td>@usr.AccommodationTypeTitle</td>
+                        <td>@usr.CheckIn.ToShortDateString()</td>
+                        <td>@usr.CheckOut.ToShortDateString()</td>
+                        <td>@usr.Quantity</td>
+                        <td>@usr.NoOfAdults</td>
+                        <td>@usr.NoOfChildren</td>
+                        <td>@usr.NoOfGuests</td>
+                        <td>@usr.bookingitemsTotalAmount</td>
+                    </tr>
+                </div>
+                <div class="col-md-3">
+                    Booking  Id:@usr.BookingId<br />
+                    Booking Date:  @usr.BookingDate.ToShortDateString()<br />
+                    Property Address: @usr.propertyAddress<br />
+                    Status:
+                    @{
+                int id = usr.BookingStatus;
+                if (id == (int)CLayer.ObjectStatus.BookingStatus.Success)
+                {
+                    <text>Successes</text>
+                }
+                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Cancelled)
+                {
+                    <text>Cancelled</text>
+                }
+                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Cart)
+                {
+                    <text>Cart</text>
+                }
+                else if (id == (int)CLayer.ObjectStatus.BookingStatus.CheckOut)
+                {
+                    <text>CheckOut</text>
+                }
+                else if (id == (int)CLayer.ObjectStatus.BookingStatus.Failed)
+                {
+                    <text>Failure</text>
+                }
+                    }
+                    <br />
+                    Total  Amount: @usr.bookingTotalAmount<br />
+                </div>
+            </div>
+
+                </text>
+        }  
+            
+     @Html.Raw("</div></div></div>")
+ 
+</div>
+}
+else
+{
+    <div class="alert alert-info">Sorry, We haven't found any Booking History!</div>
+}
+
+

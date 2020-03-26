@@ -1,0 +1,200 @@
+﻿@model StayBazar.Areas.Admin.Models.PropertyModel
+@{
+    Layout = null;
+    StayBazar.Areas.Admin.Models.RateCommissionModel rc = new StayBazar.Areas.Admin.Models.RateCommissionModel();
+    //Get commission details
+    CLayer.RateCommission crc = BLayer.Property.GetCommission(Model.PropertyId);
+    CLayer.Property canc = BLayer.Property.GetCancellationCharges(Model.PropertyId);
+
+
+    CLayer.Property Paymentperc = BLayer.Property.GetPartialPayment(Model.PropertyId);
+    Model.B2CPartialPaymentsPcte = Paymentperc.B2CPartialPaymentsPcte;
+    Model.B2BPartialPaymentsPcte = Paymentperc.B2BPartialPaymentsPcte;
+    rc.TakeCopy(crc);
+    rc.CancellationCharges = canc.CancellationCharge;
+    rc.CancellationPeriod = canc.CancellationPeriod;
+    rc.CancellationType = (int)canc.CancellationMethod;
+    rc.AppliesToRefund = canc.IsChargeAppliesToRefund;
+
+    //CLayer.Tax tax = BLayer.Tax.GetPropertyTaxById(Model.PropertyId);
+    //if (tax != null)
+    //{
+    //    Model.TaxTitleId = tax.TaxTitleId;
+    //}
+    //else
+    //{
+    //    Model.TaxTitleId = 1;
+    //}
+    //if (tax != null)
+    //{
+    //    Model.Rate = tax.Rate;
+    //}
+    //else
+    //{
+    //    Model.Rate = 0;
+    //}
+
+
+}
+<div class="col-md-12">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#tabRateMarkup" role="tab" data-toggle="tab">Markup</a></li>
+        <li><a href="#tabRateDiscount" role="tab" data-toggle="tab">Corporate Discounts</a></li>
+        <li><a href="#tabstdDiscount" role="tab" data-toggle="tab">Standard Discount</a></li>
+        <li><a href="#tabTaxRate" role="tab" data-toggle="tab">Tax</a></li>
+        <li><a href="#PartialPayments" role="tab" data-toggle="tab">Partial Payment Options </a></li>
+    </ul>
+</div>
+<br />
+<br />
+<div class="tab-content">
+    <div class="tab-pane active" id="tabRateMarkup">@Html.Partial("_Commission", rc)</div>
+    <div class="tab-pane" id="tabRateDiscount">@Html.Partial("_Corporate", Model.PropertyId)</div>
+    <div class="tab-pane" id="tabstdDiscount">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-lg-4 ">
+                    <h3>Standard Discount</h3>
+                    @{
+
+                        CLayer.Discount std = BLayer.Discount.GetStdDiscount(Model.PropertyId);
+                        if (std == null) { std = new CLayer.Discount(); }}
+                    <table border="0" class="table">
+                        <tbody>
+                            <tr>
+                                <td><label for="stdShort">Short Term (%)</label></td>
+                                <td><input type="text" id="stdShortVal" value="@std.ShortTermRate" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="stdlong">Long Term (%)</label></td>
+                                <td><input type="text" id="stdLongVal" value="@std.LongTermRate" /></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td><input type="button" value="Save" class="btn btn-primary" onclick="saveStd()" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane" id="tabTaxRate">
+        <div class="row">
+            <div class="col-md-12">
+                @using (Html.BeginForm("SaveTaxProperty", "TaxProperty", new { area = "Admin" }, FormMethod.Post, new { id = "Taxform" }))
+                {
+                    <div class="col-md-12">
+                        <h3>Add Tax</h3>
+                        @Html.HiddenFor(m => m.PropertyId)
+                        <table border="0" class="table">
+                            <tbody>
+                                <tr>
+                                    <td><label for="stdShort">Tax Title</label></td>
+                                    <td>@Html.DropDownListFor(m => m.TaxTitleId, Model.TaxTitleList, new { @tabindex = "7", @class = "col-md-4" })</td>
+                                </tr>
+                                <tr>
+                                    <td><label for="stdlong">Tax Rate(%)</label></td>
+                                    <td>@Html.TextBoxFor(m => m.Rate, new { @class = "col-md-4", @onkeypress = "return isINNumbers(event)" })                              
+                                    </td>                             
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td><input type="button" value="Save" onclick="saveTax()" class="btn btn-primary" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                <div class="row" id="taxlist">
+                    @Html.Partial("_TaxList", Model.PropertyId)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane" id="PartialPayments">
+        <div class="row">
+            <div class="col-md-12">
+                @using (Html.BeginForm("SaveTaxProperty", "TaxProperty", new { area = "Admin" }, FormMethod.Post, new { id = "PartialPayform" }))
+                {
+                    <div class="col-lg-4">
+                        @Html.HiddenFor(m => m.PropertyId)
+                     
+                        <table border="0" class="table">
+                            <tbody>
+                                <tr>
+                                    <td><input id="ForB2C" type="checkbox" @if(Model.B2CPartialPaymentsPcte > 0){<text> checked </text> } name="ForB2C" onclick="ClickB2C()" /></td>
+                                    <td><label for="stdShort">For B2C</label></td>
+                                    <td>@Html.TextBoxFor(m => m.B2CPartialPaymentsPcte, new { @class = "form-control col-md-4" })</td>
+                                </tr>
+                                <tr>
+                                    <td><input id="ForB2B" type="checkbox" name="ForB2B" @if (Model.B2BPartialPaymentsPcte > 0) { <text> checked </text>  } onclick="ClickB2B()" /></td>
+                                    <td><label for="stdlong">For B2B</label></td>
+                                    <td>@Html.TextBoxFor(m => m.B2BPartialPaymentsPcte, new { @class = "form-control col-md-4" })</td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td><input type="button" value="Save" onclick="savepartialpay()" class="btn btn-primary" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function ClickB2C() {
+        var enb = $('#ForB2C').prop('checked');
+        if (enb == true) {
+            $('#B2CPartialPaymentsPcte').prop("disabled", false);
+        }
+        else {
+            $('#B2CPartialPaymentsPcte').val(0);
+            $('#B2CPartialPaymentsPcte').prop("disabled", true);
+        }
+    }
+    function ClickB2B() {
+        var enb = $('#ForB2B').prop('checked');
+        if (enb == true) {
+            $('#B2BPartialPaymentsPcte').prop("disabled", false);
+        }
+        else {
+            $('#B2BPartialPaymentsPcte').val(0);
+            $('#B2BPartialPaymentsPcte').prop("disabled", true);
+        }
+
+    }
+    function savepartialpay() {
+
+        $.post('@Url.Action("SavePartialPay", "Property", new { area = "Admin" })', $("#PartialPayform").serialize(), function (data) {
+
+        });
+    }
+    function saveTax() {
+
+        var rateval = $('#Rate').val();      
+        if (rateval > 200) {
+            alert("Enter valid rate");
+        }
+        else {
+            $.post('@Url.Action("SaveTaxProperty", "Property", new { area = "Admin" })', $("#Taxform").serialize(), function (data) {
+                $("#taxlist").html(data);
+            });
+        }
+    }
+</script>

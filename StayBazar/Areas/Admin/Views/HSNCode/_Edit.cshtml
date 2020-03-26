@@ -1,0 +1,47 @@
+﻿@model StayBazar.Areas.Admin.Models.HSNCodeModel
+@{
+    Layout = null;
+
+}
+@using (Html.BeginForm("Save", "HSNCode"))
+{
+    @*<h2>HSN Code / Nature of services</h2>*@
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @*<div class="incontainer">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">*@
+    <div class="page-title-container style3">
+        <div class="row">
+            <div class="col-md-3">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+            <div class="col-md-3">
+                @Html.DisplayNameFor(m => m.NatureOfService)
+                @Html.TextBoxFor(m => m.NatureOfService, new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.NatureOfService)
+                </div>
+                <div class="col-md-3">
+                    @*<div class="form-group">*@
+                    @Html.DisplayNameFor(m => m.HSNCode)
+                    @Html.TextBoxFor(m => m.HSNCode, new { @class = "form-control input-sm" })
+                    @Html.ValidationMessageFor(m => m.HSNCode)
+                </div>
+
+            <br />
+                <div class="col-md-3">
+                    <div class="btn-toolbar">
+                        <div class="btn-group">
+                            <input type="submit" id="btnSave" value="Save" class="btn btn-default" tabindex="3" />
+                            <a href="/Admin/HSNCode" id="btnReset" class="btn btn-danger" tabindex="4">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <br />
+    @Html.HiddenFor(m => m.CodeId)
+
+}

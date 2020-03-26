@@ -1,0 +1,41 @@
+﻿@{
+    Layout = null;
+    string image = BLayer.Settings.GetValue(CLayer.Settings.SIGNATURE_IMAGE);
+}
+<table id="thirdrow" style="width:100%">
+    <tr>
+        <td>
+            <div style="text-decoration:underline;">
+                <u>Please pay this invoice to our below bank account on due date:</u>
+            </div>
+            <table border="0">
+                <tr>
+                    <td width="100">Bank Name  :</td>
+                    <td width="200">HDFC Bank Ltd</td>
+                    <td width="100">Branch  :</td>
+                    <td width="200">HSR 7th Sector</td>
+                </tr>
+                <tr>
+                    <td width="100">IFSC Code  :</td>
+                    <td>HDFC0004094</td>
+                    <td width="100">A/c No	:</td>
+                    <td>50200034932689</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Beneficiary Name :	Southern E-Commerce Solutions Pvt Ltd</td>
+                </tr>
+            </table>
+            <table style="width:100%">
+                <tr><td style="text-align:right;">For Southern E-Commerce Solutions Pvt Ltd</td></tr>
+                <tr><td style="text-align:right;"><img src="~/@image" /></td></tr>
+                <tr><td style="text-align:right;">(Authorised Signatory)</td></tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style="border-top:1px  black solid">
+            <p style="text-align:center;font-size:smaller"> Regd off:  # S-2, EXSULTARE, No. 38-A, 2nd Avenue, Shubh Enclave, Haralur Road, Bangalore – 560102, India </p>
+            <p style="text-align:center; font-weight:bold;font-size:smaller"> CIN  :  U74900KA2014PTC073050</p>
+        </td>
+    </tr>
+</table>

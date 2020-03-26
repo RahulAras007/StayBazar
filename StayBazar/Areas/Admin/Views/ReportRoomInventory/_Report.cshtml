@@ -1,0 +1,107 @@
+﻿@*@model StayBazar.Areas.Admin.Models.ReportRoomInventoryModel*@
+@model IEnumerable<CLayer.ReportRoomInventory>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25; 
+    long i=0;
+}
+    <div class="row">
+        <div class="col-md-12  margin10px">       
+            @{
+                StayBazar.Areas.Admin.Models.ReportRoomInventoryModel filterform = (StayBazar.Areas.Admin.Models.ReportRoomInventoryModel)ViewBag.Filter;
+                using (Html.BeginForm("Pager","ReportRoomInventory", FormMethod.Post, new { @id ="frmPagers" }))
+                {
+                    <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+                    <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                    <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                    <input type="hidden" id="FromDate" name="FromDate" value="@filterform.FromDate" />
+                    <input type="hidden" id="ToDate" name="ToDate" value="@filterform.ToDate" />
+                   <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+                }
+                gp.RowsInAPage = filterform.Limit;
+            }
+            @if (Model != null && Model.Count() > 0)
+            {
+                @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+            }      
+            
+            @*<h4 style="text-align:left">Room Inventory Availability by City/Supplier/Property</h4>*@                  
+            <table class="table table-bordered table-hover table-striped">
+                @foreach (CLayer.ReportRoomInventory reportList in Model)
+                {
+                    if (i != reportList.PropertyId)
+                    {
+                        i = reportList.PropertyId;
+                        <thead>
+                            <tr>
+                                <th>Supplier Name</th>
+                                <td colspan="4">@reportList.SupplierName</td>
+                            </tr>
+                            <tr>
+                                <th>Property Name</th>
+                                <td colspan="4">@reportList.PropertyName</td>
+                            </tr>
+                            <tr>
+                                <th>Address of Property</th>
+                                <td colspan="4">@reportList.AddressOfProperty @reportList.PropertyCity @reportList.State @reportList.PropertyZipCode, @reportList.PropertyEmail </td>
+                            </tr>
+                        </thead>
+
+                        <thead>
+                            <tr>
+                                <th>Accomodation Type</th>
+                                <th>Date</th>
+                                <th>Total Inventory Allocated</th>
+                                <th>Inventory Booked</th>
+                                <th>Inventory Available</th>
+                            </tr>
+                        </thead>
+                    }
+                    else
+                    {
+                        <text>  </text>
+                    }
+                    <tbody>
+                        <tr>
+                            <td>@reportList.AccomodationType</td>
+                            <td>@reportList.BookingDate.ToShortDateString()</td>
+                            <td>@reportList.TotalInventoryAllocated</td>
+                            <td>@reportList.InventoryBooked</td>
+                            <td>
+                                @{
+                    long total = reportList.TotalInventoryAllocated;
+                    long booked = reportList.InventoryBooked;
+                    long avilable = total - booked;
+                    if (avilable < 0) { avilable = 0; }
+                                }
+                                @avilable
+                            </td>
+                        </tr>
+                    </tbody>
+                    @*<tbody>
+                    <tr>
+                        <th style="background-color:whitesmoke"></th>
+                        <th style="background-color:whitesmoke"></th>
+                        <th style="background-color:whitesmoke"></th>
+                        <th style="background-color:whitesmoke"></th>
+                        <th style="background-color:whitesmoke"></th>
+                    </tr>
+                </tbody>*@
+                }
+            </table>        
+        </div>
+    </div>
+
+<script type="text/javascript">
+    function showPager(num) {
+      // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager","ReportRoomInventory", new { area = "Admin" })';
+        $.post(url, $("#frmPagers").serialize(), function (data) {
+            $("#ReportRoomInventory").html(data);
+        });
+    }
+</script>

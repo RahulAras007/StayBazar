@@ -1,0 +1,164 @@
+﻿@model StayBazar.Areas.Admin.Models.UserDocumentsModel
+
+@{
+    string extensions = System.Configuration.ConfigurationManager.AppSettings.Get("NonImageDocumentFileTypes");
+    string[] allowedFileExtensions = extensions.Split(',');
+}
+<style>
+    #lblErrorMessageAuthorImage {
+        color: red;
+        font: bold;
+    }
+
+    .uploadedImg {
+        width: 250px;
+        height: 80px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+    }
+
+    p {
+        display: inline;
+        color: red;
+        font: bold;
+    }
+</style>
+@using System.Configuration;
+@using (Html.BeginForm("UserDocumentdataSave", "Custom", FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadServiceTaxRege" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.UserType)
+    <div class=" panel panel-body">
+        <h4>Corporate Logo</h4>
+        <div class="form-group col-md-12">
+            <p>(Maximum size of logo should be 250 x 80-pixel)</p>
+        </div>
+        <div class="form-group col-md-12">
+            @{CLayer.UserFiles corporatelogo = BLayer.UserFiles.GetOnUserAndType(Model.UserId, (int)CLayer.UserFiles.Documents.CorporateLogo);}
+            <input type="file" id="CorporateLogo" name="CorporateLogo" style="border: 0px;" /><br />
+            <img id="newImg" class="uploadedImg" src="#" alt="your image" />
+            @if (corporatelogo != null)
+            {
+                if (corporatelogo.FileName != "0")
+                {
+                    if (allowedFileExtensions.Contains(corporatelogo.FileName.Substring(corporatelogo.FileName.LastIndexOf('.'))))
+                    {
+                        if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + corporatelogo.FileName)))
+                        {
+                            <a href="~/Files/Users/@Model.UserId/@corporatelogo.FileName" class="btn btn-lg" target="_blank"><span class="glyphicon glyphicon-download-alt"></span>Download file</a>
+                        }
+                        else
+                        {
+                            <span class="danger">File not found</span>
+                        }
+                    }
+                    else
+                    {
+                        if (File.Exists(Server.MapPath("~/Files/Users/" + Model.UserId + "/" + corporatelogo.FileName)))
+                        {
+                            <div id="div_ImgCorporateLogo" class="thumbnail col-md-4 col-xs-4">
+                                <a href="~/Files/Users/@Model.UserId/@corporatelogo.FileName" target="_blank">
+                                    <img src="~/Files/Users/@Model.UserId/@corporatelogo.FileName" alt="CorporateLogo" class="img img-responsive uploadedImg" />
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="danger">File not found</span>
+                        }
+                    }
+                }
+            }
+            <span class="panel-heading" id="lblErrorMessageAuthorImage"></span>
+        </div>
+        <div class="form-group col-md-12 btnSave">
+            <input type="submit" id="btnSave" value="Save" class="btn btn-success" />
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+     @{
+        int fi = Convert.ToInt32(ConfigurationManager.AppSettings.Get("FileSizeInMB"));
+        long by = fi * 1024 * 1024;
+      }
+
+    $('input[type=file]').change(function (event, obj) {
+        ValidateAuthorImage(event, obj);
+        readURL(this);
+    });
+
+    // A $( document ).ready() block.
+    $(document).ready(function () {
+        $('#newImg').hide();
+        $('#lblErrorMessageAuthorImage').hide();
+    });
+
+    //Upload corporate logo validation ./ start
+    $('#CorporateLogo').bind('change', function () {
+        var filesizeget = this.files[0].size;
+        if (filesizeget > @by) {
+            alert("Please Upload below @(fi)MB file size");
+            $('#CorporateLogo').val("");
+        return false;
+        }
+        //Extension validation
+        var ext = $('#CorporateLogo').val().split('.').pop().toLowerCase();
+        if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+            $('.btnSave').hide();
+            $('#lblErrorMessageAuthorImage').show();
+            $("#lblErrorMessageAuthorImage").html("Invalid extension!");
+        }
+    });
+    //  ./end
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            $('#div_ImgCorporateLogo').hide();
+            $('#newImg').show();
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#newImg')
+                    .attr('src', e.target.result);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    //Validation for logo Height and Width  ./start
+    function ValidateAuthorImage(event, obj) {
+        var files = event.target.files;
+        var valid = true;
+        var height = 0;
+        var width = 0;
+        var _URL = window.URL || window.webkitURL;
+        for (var i = 0; i < files.length; i++) {
+            var img = new Image();
+            img.onload = function () {
+                height = img.height;
+                width = img.width;
+                if (width != 250 || height != 80)  {
+                    $('#div_ImgCorporateLogo').hide();
+                    $('.btnSave').hide();
+                    $('#newImg').show();
+                    $('#lblErrorMessageAuthorImage').show();
+                    $("#lblErrorMessageAuthorImage").html("Maximum size of logo should be 250 x 80-pixel");
+                    obj.value = "";
+                    return false;
+                } else {
+                    $('.btnSave').show();
+                    $("#lblErrorMessageAuthorImage").html("");
+                }
+            }
+            img.src = _URL.createObjectURL(files[i]);
+        }
+    }
+    //  ./end
+
+</script>
+

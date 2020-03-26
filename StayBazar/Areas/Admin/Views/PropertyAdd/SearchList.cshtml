@@ -1,0 +1,398 @@
+﻿@model StayBazar.Areas.Admin.Models.StaticHtmlPageModel
+@{  
+    double km;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+    Layout = null;
+
+    int noOfRows = Model.PropertyList.Count;
+
+    bool rowsNotFound = (noOfRows == 0);
+    
+    StayBazar.Lib.GridPager pager = new StayBazar.Lib.GridPager();
+    pager.ColumnsInPager = 10;
+    pager.JavascriptFuncName = "SearchPager";
+    int rip = 0;
+  
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get(StayBazar.Common.Utils.SERARCH_MAX_ROWS), out rip);
+    pager.RowsInAPage = rip;
+    string gridPage = pager.GetPager(Model.MaxCount, Model.CurrentPage);
+    
+}
+<script type="text/javascript">
+    $(function () {
+        cx_reloadRates();
+        var v = $("#curPick").val();
+        $("#srchcur").val(v);
+        cx_removeDefault();
+        cx_ChangeCurRate(v);
+    });
+</script>
+@if (noOfRows > 0)
+{ 
+<div class="container">
+    @using (Html.BeginForm("AddProperty", "PropertyAdd"))
+    {
+          @Html.HiddenFor(m=>m.City)
+          @Html.HiddenFor(m=>m.CurrentPage)
+          @Html.HiddenFor(m=>m.Destination)
+          @Html.HiddenFor(m=>m.MaxCount)
+          @Html.HiddenFor(m => m.PageTitle)
+        @Html.HiddenFor(m => m.PageId)
+        <div class="col-md-8 ">
+            <h3>Property List</h3>
+            <div class="row">
+                <div class="col-md-2 padbtm10px">
+                    <br />  
+                    <input type="submit" class="btn btn-info" value="Add" />
+                </div>
+                <div class="col-md-7">
+                    @Html.Raw(gridPage)
+                </div>
+            </div>
+            <div class="margin10px"></div>           
+            @foreach (CLayer.SearchResult rst in Model.PropertyList)
+            {
+                <div class="col-md-12 listingbox">
+                    <div class="listing">
+                        <div class="col-md-2 statibchkbx">
+                            <input type="checkbox" class="checkbox" id="Propertyselected" name="Propertyselected" value="@rst.PropertyId" />
+                            @*<input type="checkbox" class="checkbox" value="@rst.PropertyId" />*@
+                        </div>
+                        <div class="col-md-4 pad0">
+                            <a href="~/serviced-apartments/@rst.City/@rst.Location/@rst.PropertyId" onclick="getBooking(@rst.PropertyId)">
+                                <div class="img-thumb">
+                                    @if (rst.ImageFile == "Empty")
+                                    {<img src="~/@no_image" alt="noimage" /> }
+                                    else
+                                    {<img src="~/Files/Property/@rst.PropertyId/@rst.ImageFile" />}
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4 listingctr">
+                            <span class="name">@rst.Title</span>
+                            @Html.Raw(StayBazar.Common.Utils.GetStarRating(rst.StarRate))
+                            <div class="clear">@rst.Location, @rst.City</div>
+                            <div class="mapnreview">
+
+                            </div>
+                            <div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 morebook">
+                            @if (rst.Distance >= 0)
+                            {
+                                if (rst.Distance > 0) { km = (double)rst.Distance; } else { km = 0; }
+                                <div class="km bold">@km</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="col-md-7">
+                @Html.Raw(gridPage)
+            </div>
+        </div>
+
+    }
+    </div>
+}
+    <script type='text/javascript'>
+
+        function SearchPager(idx) {
+          
+        $('#CurrentPage').val(idx);
+        $.post('@(Url.Action("ApplyFilter", "PropertyAdd"))', $("#searchform").serialize(), function (data) {
+            $("#resultlisting").html(data);
+        });
+    }
+
+    $().ready(function () {
+        $('.trunc').jTruncate({
+            length: 120,
+            minTrail: 0,
+            moreText: "",
+            lessText: "",
+            moreAni: "fast",
+            lessAni: 1000,
+            ellipsisText: "",
+        });
+    });
+    </script>
+    <script type='text/javascript'>
+    $(window).resize(function () {
+        imgadj();
+    });
+    $(function () { imgadj(); });
+    function imgadj() {
+        $(".img-thumb").each(function () {
+            var refH = $(this).height();
+            var refW = $(this).width();
+            var refRatio = refW / refH;
+            var imgH = $(this).children("img").height();
+            var imgW = $(this).children("img").width();
+
+            if ((imgW / imgH) < refRatio) {
+                $(this).addClass("portrait");
+            } else {
+                $(this).addClass("landscape");
+            }
+        })
+    }
+    </script>
+
+    <script type="text/javascript">
+
+    $(function () {
+        // $('#most-popular1').show();
+        $('#most-popular12').show();
+        $('#most-popular123').show();
+
+        // disabling dates
+        var now = new Date();
+        now.setDate(now.getDate() + 7);
+        //    var now = nowTemp; // new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDay(), 0, 0, 0, 0);
+        var checkin = $('#CheckIn').datepicker(
+            {
+                minDate: 1,
+                defaultDate: now,
+                numberOfMonths: 2,
+                dateFormat: "dd/mm/yy"
+            });
+        $(".checkin div").click(function () { $("#CheckIn").datepicker('show'); });
+        $(".checkout div").click(function () { $("#CheckOut").datepicker('show'); });
+
+        now.setDate(now.getDate() + 2);
+        var checkout = $('#CheckOut').datepicker(
+             {
+                 minDate: 2,
+                 numberOfMonths: 2,
+                 defaultDate: now,
+                 dateFormat: "dd/mm/yy"
+             });
+
+        $("#CheckIn").change(function () {
+            var v = $(this).val().trim();
+
+            var curDate = new Date();
+            curDate.setDate(curDate.getDate() + 1);
+            var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+            curDate.setDate(curDate.getDate() + 2);
+            var odat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+
+            if (checkDate(v)) {
+                re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                if (regs = v.match(re)) {
+                    var day, mnt, yr;
+                    yr = parseInt(regs[3]);
+                    mnt = parseInt(regs[2]);
+                    dy = parseInt(regs[1]);
+                    if (mnt > 0) mnt = mnt - 1;
+                    var cd = new Date(Date.UTC(yr, mnt, dy));
+                    cd.setDate(cd.getDate() + 2);
+                    var mn = cd.getMonth() + 1; //parseInt(cd.getMonth()) + 1;
+                    var chgDt = pad(cd.getDate(), 2) + "/" + pad(mn, 2) + "/" + cd.getFullYear();
+                    // alert(chgDt);
+                    var cs = new Date(Date.UTC(yr, mnt, dy));
+                    var mind = new Date(Date.UTC(yr, mnt, dy));
+                    mind.setDate(mind.getDate() + 1);
+                    var mindx = pad(mind.getDate(), 2) + "/" + pad(parseInt(mind.getMonth()) + 1, 2) + "/" + mind.getFullYear();
+                    var xo = $("#CheckOut").val();
+                    //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                    if (checkDate(xo)) {
+                        if (regss = xo.match(re)) {
+                            yr = parseInt(regss[3]);
+                            mnt = parseInt(regss[2]);
+                            dy = parseInt(regss[1]);
+                            if (mnt > 0) mnt = mnt - 1;
+                            var co = new Date(Date.UTC(yr, mnt, dy));
+                            if (co <= cs) {
+                                $("#CheckOut").val(chgDt);
+                                // $("#CheckOut").datepicker("option", "setDate", cd);
+                            }
+                        }
+                        else {
+                            // $("#CheckOut").datepicker("option", "setDate", cd);
+                            $("#CheckOut").val(chgDt);
+                        }
+                    }
+                    else {
+                        // $("#CheckOut").datepicker("option", "setDate", cd);
+                        $("#CheckOut").val(chgDt);
+                    }
+                    //checkout.minDate = n;
+                    $("#CheckOut").datepicker("option", "minDate", mindx);
+                    //$("#CheckOut").datepicker("show");
+                }
+                else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+            }
+            else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+        });
+
+
+        $("#spnrAd").dpNumberPicker({
+            value: 1,
+            min: 1,
+            max: 8,
+            step: 1,
+            afterChange: function () { $("#Adults").val(this.options.value); }
+        });
+        $("#spnrCd").dpNumberPicker({
+            value: 0,
+            min: 0,
+            max: 8,
+            step: 1,
+            afterChange: function () { $("#Children").val(this.options.value); }
+        });
+
+        $("#spnrBed").dpNumberPicker({
+            value: 0,
+            min: 0,
+            max: 6,
+            step: 1,
+            afterChange: function () { $("#BedRooms").val(this.options.value); }
+        });
+    });
+
+    function valdInOutDates() {
+        var v = $.trim($("#CheckIn").val());
+        if (checkDate(v)) {
+            re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            if (regs = v.match(re)) {
+                var cs = new Date(regs[3], regs[2], regs[1]);
+                var xo = $("#CheckOut").val();
+                //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                if (checkDate(xo)) {
+                    if (regss = xo.match(re)) {
+                        var co = new Date(regss[3], regss[2], regss[1]);
+                        if (co <= cs) {
+                            $("#DestinationAlert").html('Please enter a checkout date which falls after checkin date');
+                            $("#CheckOut").focus();
+                            return false;
+                        }
+                    }
+                    else {
+                        $("#DestinationAlert").html('Invalid Check Out date');
+                        $("#CheckOut").focus();
+                        return false;
+                    }
+                }
+                else {
+                    $("#DestinationAlert").html('Invalid Check Out date');
+                    $("#CheckOut").focus();
+                    return false;
+                }
+            }
+            else {
+                $("#DestinationAlert").html('Invalid Check In date');
+                $("#CheckIn").focus();
+                return false;
+            }
+        } else {
+            $("#DestinationAlert").html('Invalid Check In date');
+            $("#CheckIn").focus();
+            return false;
+        }
+        return true;
+    }
+    function pad(num, size) {
+        var s = num + "";
+        while (s.length < size) s = "0" + s;
+        return s;
+    }
+    function checkDate(field) {
+        var allowBlank = true; var minYear = 2014; var maxYear = (new Date()).getFullYear() + 1;
+        // regular expression to match required date format
+        re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        if (field != '') {
+            if (regs = field.match(re)) {
+                if (regs[1] < 1 || regs[1] > 31)
+                { return false; }
+                else if (regs[2] < 1 || regs[2] > 12)
+                { return false; }
+                else if (regs[3] < minYear || regs[3] > maxYear)
+                { return false; }
+            } else { return false; }
+        } else { return false; }
+        return true;
+    }
+    function daydiff(first, second) {
+        return (second - first) / (1000 * 60 * 60 * 24);
+    }
+    $(function () {
+
+        $("#Destination").autocomplete({
+            minLength: 0,
+            source: "/Common/GetDestination",
+            focus: function (event, ui) {
+                $("#Destination").val(ui.item.value);
+                return false;
+            }
+        })
+        .autocomplete("instance")._renderItem = function (ul, item) {
+            ul.addClass("custom");
+            return $("<li>") //.addClass("custom")
+            .append("<a>" + item.label + "<br>" + item.desc + "</a>")
+            .appendTo(ul);
+        };
+    });
+    </script>
+
+    <script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#owl-demo").owlCarousel({
+            navigation: true,
+            responsiveClass: true,
+            responsive: {
+                0: {
+                    items: 2
+                },
+                450: {
+                    items: 3
+                },
+                767: {
+                    items: 4
+                },
+                991: {
+                    items: 4
+                },
+                1199: {
+                    items: 4
+                }
+            }
+        });
+
+        $("#owl-demo2").owlCarousel({
+            navigation: true,
+            responsiveClass: true,
+            responsive: {
+                0: {
+                    items: 2
+                },
+                450: {
+                    items: 3
+                },
+                767: {
+                    items: 4
+                },
+                991: {
+                    items: 5
+                },
+                1199: {
+                    items: 5
+                }
+            }
+        });
+
+    });
+
+
+
+    </script>
+
+
+
+

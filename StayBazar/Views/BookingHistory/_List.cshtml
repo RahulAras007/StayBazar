@@ -1,0 +1,455 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "OfflineshowPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+}
+<div class="body-content">
+    @if (Model.Count() == 0)
+    {
+        <div class="alert alert-info">Data not found</div>
+    }
+
+    <div class="panel-group" id="accordion">
+        @{
+            StayBazar.Areas.Admin.Models.OfflineBookingModel filterform = (StayBazar.Areas.Admin.Models.OfflineBookingModel)ViewBag.Filter_offline;
+            using (Html.BeginForm("Pagerforothers", "BookingHistory", FormMethod.Post, new { @id = "frmPagers" }))
+            {
+                <input type="hidden" id="SearchString" name="SearchString" value="@ViewBag.SearchString" />
+                <input type="hidden" id="SearchValue" name="SearchValue" value="@ViewBag.SearchValue" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@ViewBag.currentPage" />
+                <input type="hidden" id="Limit" name="Limit" value="@ViewBag.Limit" />
+            }
+            gp.RowsInAPage = @ViewBag.Limit;
+        }
+        @if (Model != null && Model.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)@ViewBag.TotalRows, @ViewBag.currentPage))
+        }
+        @foreach (CLayer.OfflineBooking usr in Model)
+        {
+
+            string AccommodationTypeTitle = "";
+            if (@usr.Accommodationtypeid != -1)
+            {
+                CLayer.OfflineBooking getacctitle = BLayer.OfflineBooking.GetAllDetailsById(@usr.OfflineBookingId);
+                AccommodationTypeTitle = @getacctitle.AccommodatoinTypename;
+            }
+            else
+            {
+
+                AccommodationTypeTitle = @usr.AccommodatoinTypename;
+            }
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#i_@usr.OfflineBookingId">
+                        <div class="row">
+                            <div class="col-md-2"><span></span>Date: @usr.CreatedTime.ToShortDateString()</div>
+                            <div class="col-md-4">
+                                Property: @usr.PropertyName @if (@usr.PropertyCityname != "" && @usr.PropertyCityname != "select")
+                                {<text>, @usr.PropertyCityname</text>}
+                            </div>
+
+                            <div class="col-md-2">  Confirm No: @usr.ConfirmationNumber </div>
+                            <div class="col-md-2">  Staff: @usr.CreatedName </div>
+                            <div class="col-md-2">
+                                status:
+                                @if (usr.SaveStatus == 1)
+                                {
+                                    <text> Saved </text>
+                                }
+                                else if (usr.SaveStatus == 2)
+                                {
+                                    <text> Submitted </text>
+                                }
+                                else if (usr.SaveStatus == 3)
+                                {
+                                    <text> Cancelled </text>
+                                }
+
+                                else if (usr.SaveStatus == 5)
+                                {
+                                    <text> Approved </text>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div id="i_@usr.OfflineBookingId" class="panel-collapse collapse ">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-3" id="databuyer_@usr.CustomerId">
+                                <b>Property Details</b><br />
+                                Title:@usr.PropertyName<br />
+                                @if (usr.SupplierName != "" && usr.SupplierName != null)
+                                {
+                                    <text> Supplier Name : @usr.SupplierName <br /> </text>
+                                }
+                                Address:@usr.PropertyAddress<br />
+                                City:@usr.PropertyCityname<br />
+                                State: @usr.PropertyStatename<br />
+                                Country:@usr.PropertyCountryname<br />
+                                Phone:@usr.PropertyContactNo<br />
+                                Email:@usr.PropertyEmail<br />
+                            </div>
+
+                            <div class="col-md-3">
+                                <b>Booking Details</b>
+                                <br />
+                                Booking Date:  @usr.CreatedTime.ToShortDateString()<br />
+                                Property Address: @usr.PropertyAddress<br />
+                                Total  Amount: @usr.TotalSalePrice<br />
+                            </div>
+
+                            <div class="col-md-3" id="databuyer_@usr.CustomerId">
+                                <b>Customer Details</b><br />
+                                Name:  @usr.CustomerName <br />
+                                Address:@usr.CustomerAddress<br />
+                                City:@usr.CustomerCityname<br />
+                                State: @usr.CustomerStatename<br />
+                                Country:@usr.CustomerCountryname<br />
+                                Phone:@usr.CustomerMobile<br />
+                                Email:@usr.CustomerEmail<br />
+                            </div>
+
+
+                            @*@if (usr.CreatedTime.AddDays(10) > DateTime.Now)
+                                {
+                                    <div class="col-md-1">
+                                        <a class="btn btn-success handpointer" onclick="Open(@usr.OfflineBookingId)"> Edit </a>
+                                    </div>
+                                }
+                                @if (usr.SaveStatus != 2)
+                                {
+                                    <div class="col-md-1">
+                                        <a class="btn btn-success handpointer" onclick="Open(@usr.OfflineBookingId)">Open</a>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <a class="btn btn-success handpointer" onclick="Delete(@usr.OfflineBookingId)">Delete</a>
+                                    </div>
+                                }*@
+
+
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-5">
+                                <b>Buy Price</b><br />
+                                <table>
+                                    <tr>
+                                        <td>
+                                            Average Daily Rate Before Service tax:
+                                        </td>
+                                        <td align="right">
+                                            @usr.AvgDailyRateBefreStaxForBuyPrice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Service tax <span>( % )</span> :
+                                        </td>
+                                        <td align="right">
+                                            @usr.StaxForBuyPrice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Total Amount - Accommodation
+                                        </td>
+                                        <td align="right">
+                                            @usr.TotalAmtForBuyPrice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Buy Price for other services
+                                        </td>
+                                        <td align="right">
+                                            @usr.BuyPriceforotherservicesForBuyprice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Service tax - other services <span>( % )</span> :
+                                        </td>
+                                        <td align="right">
+                                            @usr.StaxForotherBuyPrice
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Total Amount - other services
+                                        </td>
+                                        <td align="right">
+                                            @usr.TotalAmtotherForBuyPrice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="font-weight:bold;">
+                                            Total Buy Price
+                                        </td>
+                                        <td align="right" style="font-weight:bold;">
+                                            @usr.TotalBuyPrice
+
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-5">
+                                <b>Sale Price</b><br />
+                                <table>
+                                    <tr>
+                                        <td>
+                                            Average Daily Rate Before Service tax:
+                                        </td>
+                                        <td align="right">
+                                            @usr.AvgDailyRateBefreStaxForSalePrice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Service tax <span>( % )</span> :
+                                        </td>
+                                        <td align="right">
+                                            @usr.StaxForSalePrice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Total Amount - Accommodation
+                                        </td>
+                                        <td align="right">
+                                            @usr.TotalAmtForSalePrice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Sale Price for other services
+                                        </td>
+                                        <td align="right">
+                                            @usr.BuyPriceforotherservicesForSalePrice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Service tax - other services <span>( % )</span> :
+                                        </td>
+                                        <td align="right">
+                                            @usr.StaxForotherForSalePrice
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Total Amount - other services:
+                                        </td>
+                                        <td align="right">
+                                            @usr.TotalAmtotherForSalePrice
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="font-weight:bold;">
+                                            Total Sale Price :
+                                        </td>
+                                        <td align="right" style="font-weight:bold;">
+                                            @usr.TotalSalePrice
+
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>Accommodation</th>
+                                        <th>CheckIn</th>
+                                        <th>Check out</th>
+                                        <th>No Of Night</th>
+                                        <th>No Of rooms</th>
+                                        <th>Adults</th>
+                                        <th>Children</th>
+                                        <th>Guests Name</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>@usr.AccommodatoinTypename</td>
+                                        <td>@usr.CheckIn.ToShortDateString()</td>
+                                        <td>@usr.CheckOut.ToShortDateString()</td>
+                                        <td>@usr.NoOfNight</td>
+                                        <td>@usr.NoOfRooms</td>
+                                        <td>@usr.NoOfPaxAdult</td>
+                                        <td>@usr.NoOfPaxChild</td>
+                                        <td>@usr.GuestName</td>
+                                        <td>@usr.TotalSalePrice</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            @if (usr.SaveStatus == 5)
+                            {
+                                <a href="#" title="Resendemail" class="btn btn-success" onclick="ViewBill(@usr.OfflineBookingId)">
+                                    View Pdf
+                                </a>
+                            }
+                            else
+                            {
+                                <text>Pending Approval</text>
+                            }
+                            @{
+                            int sts = 0;
+                            CLayer.Invoice data = BLayer.Invoice.GetInvoiceByOfflineBooking(usr.OfflineBookingId);
+
+                            if (data != null)
+                            {
+                                sts = data.Status;
+                            }
+                            }
+
+                            @if (sts == (int)CLayer.ObjectStatus.InvoiceStatus.Submitted)
+                            {
+                                <a href="#" class="btn btn-info" onclick="showInvoice(@usr.OfflineBookingId)">Invoice</a>
+                            }
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+
+        }
+    </div>
+</div>
+<script type="text/javascript">
+    function showInvoice(obid) {
+        var p1 = 'scrollbars=yes,resizable=yes,status=yes,location=no,menubar=no';
+        var p2 = 'width=500,height=400';
+        window.open('/BookingHistory/InvoicePDF?obid=' + obid);
+    }
+
+    function OfflineshowPager(num) {
+        $("#currentPage").val(num);
+        alert($("#SearchValue").val());
+
+        var url = '@Url.Action("Pagerforothers", "BookingHistory")';
+        $.post(url, data = { searchString: $("#SearchString").val(), searchItem: $("#SearchValue").val(), start: $("#currentPage").val(), limit: 10, Status: 0, Userid: 1 }, function (data) {
+            $("#List").html(data);
+        });
+    }
+    function ViewBill(OffId) {
+
+        window.location.href = '/BookingHistory/ViewBill?OfflineBookingId=' + OffId;
+
+    }
+    function SetApproved(OffId) {
+        var url = '@Url.Action("SetApproved", "ManageOfflineBooking", new { area = "Admin" })?OfflineBookingId=' + OffId;
+        $.post(url, function (data) {
+            $("#List").html(data);
+            alert("Approved successfully");
+        });
+    }
+
+    function Open(OffId) {
+        window.location.href = '/Admin/OfflineBooking/OfflineEdit?OfflineBookId=' + OffId;
+    }
+    function Delete(OffId) {
+        var answer = confirm("Are you sure you want to delete this Saved booking ?");
+
+        if (answer == true) {
+            var url = '@Url.Action("DeleteOfflineSavedData", "ManageOfflineBooking", new { area = "Admin" })?OfflineBookingId=' + OffId;
+            $.post(url, $("#frmPagers").serialize(), function (data) {
+                $("#List").html(data);
+            });
+        }
+        //window.location.href = '/Admin/OfflineBooking/DeleteOfflineSavedData?OfflineBookId=' + OffId;
+    }
+
+    function OfflineBookEdit(OffId) {
+        var url = '@Url.Action("OfflineEdit", "OfflineBooking", new { area = "Admin" })';
+        $.post(url, { OfflineBookId: OffId }, function (data) {
+            alert(data);
+            window.location(data);
+        });
+    }
+
+    function ResendemailC(id) {
+        var r = confirm("Are you sure you want to resend confirmation mail? ")
+        if (r == true) {
+            var url = '@Url.Action("ResendemailC", "ManageOfflineBooking")?OfflineBookingId=' + id;
+            $.post(url, function (data) {
+
+                alert("Resend email was sent successfully");
+            });
+        }
+        else {
+            return false
+        }
+    }
+    function ResendemailS(id) {
+        var r = confirm("Are you sure you want to resend confirmation mail? ")
+        if (r == true) {
+            var url = '@Url.Action("ResendemailS", "ManageOfflineBooking")?OfflineBookingId=' + id;
+            $.post(url, function (data) {
+
+                alert("Resend email was sent successfully");
+            });
+        }
+        else {
+            return false
+        }
+    }
+
+    function Cancelbtn(Id) {
+        var r = confirm("Are you sure you want to Cancel? ")
+        // alert(Id);
+        if (r == true) {
+            $.post('@Url.Action("StatusCancel", "CorporateCreditBookings", new { area = "Admin" })', { BookingId: Id }, function (data) {
+
+            });
+        }
+        else {
+            return false
+        }
+    }
+
+
+    function PDF(OffId) {
+        var url = '@Url.Action("ReportPdf", "ManageOfflineBooking")?OfflineBookingId=' + OffId;
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+</script>
+
+
+

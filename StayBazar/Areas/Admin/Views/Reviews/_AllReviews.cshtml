@@ -1,0 +1,62 @@
+﻿@model StayBazar.Areas.Admin.Models.ReviewsModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("FilterAllName", "Reviews", FormMethod.Post, new { @id = "frmFilters", onsubmit = "return false;" }))
+{
+    <div class="row">
+        <div class="col-md-4">           
+                <div class="form-control">
+                    @foreach (StayBazar.Areas.Admin.Models.ReviewsModel.ReviewSearchValues ruv in (StayBazar.Areas.Admin.Models.ReviewsModel.ReviewSearchValues[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.ReviewsModel.ReviewSearchValues)))
+                    {
+                        <input type="radio" name="ruv" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text>     } />
+                        <label for="@((int)ruv)" class="css-label">@ruv.ToString() </label>
+                        <text>&nbsp;&nbsp;</text>
+                    }
+                </div>        
+        </div>
+        <div class="col-md-4">
+            <div class1="form-control">
+                Type @Html.DropDownListFor(m => m.ViewType, new SelectList(Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.ReviewsModel.ReviewType))), "Select")
+
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                <span class="input-group-btn">
+                    <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                        <span class="glyphicon glyphicon-search green-color fa-2x"></span>
+                    </button>
+                </span>
+            </div>
+        </div>                        
+    </div>
+      @Html.HiddenFor(m => m.SearchValue)
+}
+<hr />
+    <div id="AllListName">
+        @Html.Partial("_AllReviewsList", Model)
+    </div>
+    
+    <script type="text/javascript">
+
+
+    $(function () {
+        $("#SearchValue").val("1");
+        $(".css-radiobutton").change(function () {
+            $("#SearchValue").val("1");
+            $(".css-radiobutton").each(function () {
+                if (this.checked) {
+                    $("#SearchValue").val($(this).attr("id"));
+                }
+            });
+        });
+            $("#btnSearch").click(function () {
+                var url = '@Url.Action("FilterAllName", "Reviews", new { area = "Admin"})';
+                $.post(url, $("#frmFilters").serialize(), function (data) {
+                    $("#AllListName").html(data);
+                });
+            });
+    });
+</script>

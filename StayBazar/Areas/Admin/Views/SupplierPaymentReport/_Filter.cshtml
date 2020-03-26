@@ -1,0 +1,108 @@
+﻿@model StayBazar.Areas.Admin.Models.SupplierPaymentReportModel
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("Filter", "SupplierPaymentReport", FormMethod.Post, new { @id = "frmFiltersSupplierPayment" }))
+        {
+            <div class="row">
+                <div class="col-md-2" style="width: 142px;">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.FromDate)
+                        @Html.TextBoxFor(m => m.FromDate, "{0:dd/MM/yyyy}", new { @class = "form-control input-sm", Title = "From Date" }) 
+                    </div>
+                </div>
+                <div class="col-md-2" style="width: 180px;">
+                    @Html.LabelFor(m => m.ToDate)
+                    <div class="input-group ">                    
+                        @Html.TextBoxFor(m => m.ToDate, "{0:dd/MM/yyyy}", new { @class = "form-control ", Title = " Date" })
+                        <span class="input-group-btn">
+                            <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </span>
+                    </div>
+                </div>                
+                <div class="col-md-6">
+                    <br />
+                    <div class="col-md-2 exporticons">
+                        <a title="Print" href="#" onclick="printDoc()" id="btnNextClick" class="fa fa-print white-color fa-2x" tabindex="6"> </a>
+                        <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6"></a>
+                        <a title="Export" href="#" onclick="Export()" id="btnNextClick" class="fa fa-file-excel-o" tabindex="6"></a>
+                    </div>
+                </div>
+            </div>
+            @Html.HiddenFor(m => m.SearchValue)
+        }
+
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(function () {
+
+        //$('#FromDate').datepicker({
+        //    dateFormat: "dd/mm/yy"
+        //});
+        //$('#ToDate').datepicker({
+        //    dateFormat: "dd/mm/yy"
+        //});
+
+        $('#FromDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy"
+            });
+        $('#ToDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+                beforeShow: function () {
+                    $(this).datepicker('option', 'minDate', $('#FromDate').val());
+                    if ($('#FromDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+    });
+
+        $("#btnSearch").click(function () {
+            var url = '@Url.Action("Filter", "SupplierPaymentReport", new { area = "Admin" })';
+          // alert("hai");
+            $.post(url, $("#frmFiltersSupplierPayment").serialize(),
+                    function (data) {
+                        $("#SupplierPaymentList").html(data);
+                    });
+        });
+
+    function PDF() {
+        //var pSearchValue = $("#SearchValue").val();
+        var pfromdate = $("#FromDate").val();
+        var pToDate = $("#ToDate").val();
+        var pLimit = $("#Limit").val();
+        var pcurrentPage = $("#currentPage").val();
+        //alert(pSearchValue);
+       // alert(pfromdate);
+       // alert(pToDate);
+        var url = '@Url.Action("ReportPdf", "SupplierPaymentReport")?' +"FromDate=" + pfromdate + "&" + "ToDate=" + pToDate + "&" + "Limit=" + pLimit + "&" + "currentPage=" + pcurrentPage;
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function Export() {
+        var pfromdate = $("#FromDate").val();
+        var pToDate = $("#ToDate").val();
+        var pLimit = $("#Limit").val();
+        var pcurrentPage = $("#currentPage").val();
+        window.location = '@Url.Action("ExcelReport", "SupplierPaymentReport")?' + "FromDate=" + pfromdate + "&" + "ToDate=" + pToDate + "&" + "Limit=" + pLimit + "&" + "currentPage=" + pcurrentPage;
+       // window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function printDoc() {
+       // var pSearchValue = $("#SearchValue").val();
+        var pfromdate = $("#FromDate").val();
+        var pToDate = $("#ToDate").val();
+        var pLimit = $("#Limit").val();
+        var pcurrentPage = $("#currentPage").val();
+        //alert(pSearchValue);
+       // alert(pfromdate);
+       // alert(pToDate);
+        var url = '@Url.Action("ReportPrint", "SupplierPaymentReport")?' +"FromDate=" + pfromdate + "&" + "ToDate=" + pToDate + "&" + "Limit=" + pLimit + "&" + "currentPage=" + pcurrentPage;
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+</script>

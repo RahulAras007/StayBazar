@@ -1,0 +1,206 @@
+﻿@model StayBazar.Models.CorporateUserModel
+@{
+    Layout = null;
+}
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">User Details</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs">
+                    @*<li class="active"><a href="#cudetails" data-toggle="tab">General</a></li>*@
+                    @*<li><a href="#cutransactions" data-toggle="tab">Transactions</a></li>*@
+                </ul>
+                <div class="tab-pane active" id="cudetails">
+                    @using (Html.BeginForm("SaveDetails", "CorporateUsers", FormMethod.Post, new { role = "form", id = "cuserform", name = "cuserform" }))
+                    {
+                        @*@Html.AntiForgeryToken()*@
+                        @Html.ValidationSummary(true)
+                        @Html.HiddenFor(m => m.UserTypeId)
+                        <div class=" row">
+                            @*<div class=" col-lg-12">*@
+                            <div class="form-group  col-lg-3">
+                                @Html.LabelFor(m => m.Salutations)
+                                @Html.DropDownListFor(m => m.SalutationId, Model.Salutations, new { @class = "form-control" })
+                                @Html.HiddenFor(m => m.UserId)
+                                @Html.HiddenFor(m => m.AddressId)
+                            </div>
+                            <div class="form-group  col-lg-5">
+                                @Html.LabelFor(m => m.FirstName) <span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", required = "required" })
+                                @Html.ValidationMessageFor(m => m.FirstName)
+                            </div>
+                            <div class="form-group  col-lg-4">
+                                @Html.LabelFor(m => m.LastName)@*<span style="color:red">*</span>*@
+                                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                            </div>
+                            @*</div>*@
+                        </div>
+                        <div class=" row">
+
+                            <div class=" col-md-6">
+
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Email)<span style="color:red">*</span>
+                                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Email)
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Password)
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Password)
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Mobile)@*<span style="color:red">*</span>*@
+                                    @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
+                                    @Html.ValidationMessageFor(m => m.Mobile)
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.StatusId)<span style="color:red">*</span>
+                                    @Html.DropDownListFor(m => m.StatusId, Model.Status, new { @class = "form-control" })
+                                </div>
+
+                            </div>
+                            <div class=" col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                                    @Html.TextAreaFor(m => m.Address, new { @class = "form-control", required = "required" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+                                    @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "4", @class = "form-control input-sm" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.State)<span style="color:red">*</span>
+                                    @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "5", @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.State)
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.CityId)<span style="color:red">*</span>
+                                    <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                    @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "6", @class = "form-control input-sm" })
+                                    <div id="other_city" style="display:none;">
+                                        @Html.TextBoxFor(m => m.City, new { @tabindex = "6", @class = "form-control input-sm" })
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="tab-pane" id="cutransactions">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="SaveData()">Save changes</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+    function SaveData() {
+        //$("#msgs").innerHtml
+        if ($('#cuserform').validate().form() == false) return;
+        $.post('@Url.Action("SaveDetails","CorporateUsers")', $("#cuserform").serialize(), function (data) {
+            //hide the messages
+            if ($('#Email').val() == "") {
+
+                alert("Enter Email Id");
+                return;
+
+            }
+            if ($.trim(data) == "-2") {
+                alert("The Email Id is already taken");
+                return;
+            }
+            var Emailids = $("#Email").val();
+            var emailfrmt = /\w+([-+.']\w+)*@@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+            if (emailfrmt.test(Emailids)) {
+
+            }
+            else {
+                alert("Enter Valid Email");
+                return;
+            }
+
+            $("#myModal").modal('hide');
+            $("#userlist").html(data);
+        }); //.fail(function () { alert("Sorry the request failed. Please try after some time") });
+
+    }
+</script>
+<script type="text/javascript">
+    $(function () {
+        if ($('#CityId').val() == -1) {
+            $("#CityId").hide();
+            $("#other_city").show();
+            if ($("select#CityId option").length > 1) {
+                $("#close_other_city").show();
+            }
+        }
+        $('#CountryId').change(function () {
+            $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                if (data != "")
+                    $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                else
+                    $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                loadcity();
+            });
+        });
+        $('#State').change(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                if (data != "") {
+                    $('#CityId').empty().append(data);
+                    if ($("select#CityId option").length == 1) {
+                        $("#CityId").hide();
+                        $("#City").val("");
+                        $("#other_city").show();
+                    }
+                }
+                else {
+                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        });
+        $('#CityId').change(function () {
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#City").val($("#hdnCity").val());
+                $("#other_city").show();
+                $("#close_other_city").show();
+            }
+        });
+        $('#close_other_city').click(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+        });
+    });
+
+
+    function loadcity() {
+        $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+            if (data != "") {
+                $('#CityId').empty().append(data);
+                if ($("select#CityId option").length == 1) {
+                    $("#CityId").hide();
+                    $("#City").val("");
+                    $("#other_city").show();
+                }
+            }
+            else {
+                $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+</script>

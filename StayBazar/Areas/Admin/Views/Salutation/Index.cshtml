@@ -1,0 +1,67 @@
+﻿@{
+    ViewBag.Title = "Salutation";
+    //try
+    //{
+        var grid = new WebGrid(Model, defaultSort: "Name", canPage: true, rowsPerPage: 25,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Areas.Admin.Models.SalutationModel salutation = (StayBazar.Areas.Admin.Models.SalutationModel)ViewBag.Salutation;
+        <text>
+
+            <div id="bodycontent">
+                <div id="divEdit">
+                    @{
+        Html.RenderPartial("~/Areas/Admin/Views/Salutation/_Edit.cshtml", salutation, ViewData);
+                    }
+                </div>
+                @if (Model.Count > 0)
+                {
+                <div id="gridContent">
+                    <div class="container-fluid">
+                        @grid.GetHtml(tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered",
+            headerStyle: "header",
+            alternatingRowStyle: "alt",
+            selectedRowStyle: "select",
+            columns: grid.Columns(grid.Column("Title", "Title"),
+            grid.Column("Edit", style: "gridcellstyle",format: @<text><a href="#" onclick="Edit(@item.SalutationId)" title="Edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>),
+            grid.Column("Delete", style: "gridcellstyle", format: (item) =>
+            {
+                if (item.CanDelete)
+                {
+                    return Html.Raw("<a title='Delete' class='lnk' href='/Admin/Salutation/Delete?id=" + item.SalutationId + "' onclick=\"return confirm('Are you sure you want to delete?')\"><span class='glyphicon glyphicon-remove red-color fa-2x'></span></a>");
+                }
+                else
+                {
+                    return Html.Raw("<a title='Delete' href=\"#\" onclick=\"alert('Cannot delete, already in use.')\"><span class='glyphicon glyphicon-remove red-color fa-2x'></span></a>");
+                }
+            })
+            ))
+                    </div>
+                    </div>
+                    }
+                    else
+                    {
+                    <div class="bottom">&nbsp;</div>
+                    <div class="alert alert-info">is Empty</div>
+                    }
+                </div>
+            <script type="text/javascript">
+                function Edit(id) {
+                    $.get("Salutation/Edit?id=" + id, function (data) {
+                        $("#divEdit").html(data);
+                    });
+                }
+            </script>
+        </text>
+    }
+    @*catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}*@
+            <style>
+                .gridcellstyle {
+                    text-align: center;
+                }
+            </style>

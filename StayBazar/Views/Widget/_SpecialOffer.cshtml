@@ -1,0 +1,83 @@
+﻿@{
+    int j = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_SPECIAL_OFFERS)));
+    StayBazar.Models.PropertyMostpopularModel soffer = new StayBazar.Models.PropertyMostpopularModel();
+    List<CLayer.Property> PropertypopularList = BLayer.PropertyMostpopular.SpecialOffers((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+}
+
+<div class="pattern">
+    <div class="container ctrpad">
+        <div class="row">
+            @if (PropertypopularList.Count > 0)
+            {
+                <div class="col-md-12">
+                    <div class="line">
+                        <div class="pull-left leftside pattern">Special offers</div>
+                        <div class="pull-right rightside pattern">
+                            <a href="javascript:void(0)" class="spl prev">
+                                <img src="../images/arrow-left.png" alt="Left">
+                            </a>
+                            <a href="javascript:void(0)" class="spl next">
+                                <img src="../images/arrow-right.png" alt="Right">
+                            </a>
+                        </div>
+                    </div>
+                    <div id="special-offers" class="owl-carousel">
+                        @foreach (CLayer.Property Special in PropertypopularList)
+                        {
+                            <text>
+                                <div class="prop">
+                                    <div class="prop-image">
+                                        <a href="~/serviced-apartments/@Special.City.ToLower().Replace(" ", "-")/@Special.Location.ToLower().Replace(" ", "-")/@Special.PropertyId">
+                                            @if (Special.FileName == "")
+                                            {
+                                                <img src="~/@no_image" height="177" alt="noimage" />
+                                            }
+                                            else
+                                            { <img src="~/Files/Property/@Special.PropertyId/@Special.FileName" height="177" alt="@Special.Title serviced apartment in  @Special.Location @Special.City" /> }
+
+                                            <div class="price">
+                                                <i class="fa cxprice fa-rupee"></i><span class="cxcurele">
+                                                    @Math.Round(Special.bookingitemsTotalAmount)
+                                                </span>@*<small>00</small>*@
+                                                <p class="onwards whitetext">onwards</p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="tile_desc">
+                                        <a href="~/serviced-apartments/@Special.City.ToLower().Replace(" ", "-")/@Special.Location.ToLower().Replace(" ", "-")/@Special.PropertyId">
+                                            <span class="name">
+                                                @{
+                            string title = StayBazar.Common.Utils.ConvertShortLengthString(@Special.Title, 20);
+                            @String.Format(title);
+                                                }
+
+                                                <br>
+                                                <b>@Special.Location, @Special.City</b>
+                                            </span>
+                                        </a>
+                                        <div class="starbox">
+                                            @*<div class="starr"  data-score="@most.Rating"></div>
+            <div id="result"></div>*@
+                                            @*@(Html.Raw(StayBazar.Common.Utils.GetStarRating(Special.Rating)))*@
+                                        </div>
+                                        <a href="~/serviced-apartments/@Special.City.ToLower().Replace(" ", "-")/@Special.Location.ToLower().Replace(" ", "-")/@Special.PropertyId" class="redtext">
+                                            <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                                        </a>
+                                        <a href="~/serviced-apartments/@Special.City.ToLower().Replace(" ", "-")/@Special.Location.ToLower().Replace(" ", "-")/@Special.PropertyId" class="pull-right redtext">
+                                            <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                                        </a>
+                                    </div>
+                                    <a href="~/serviced-apartments/@Special.City.ToLower().Replace(" ", "-")/@Special.Location.ToLower().Replace(" ", "-")/@Special.PropertyId">
+                                        <div class="text-center redbg whitetext book">Book now</div>
+                                    </a>
+                                </div>
+                            </text>
+                        }
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

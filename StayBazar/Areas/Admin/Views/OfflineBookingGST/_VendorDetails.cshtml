@@ -1,0 +1,653 @@
+﻿@model  StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+   
+}
+<style>
+    .txtHeight {
+        height: 120px !important;
+    }
+
+    .modal-body {
+        padding: 0 !important;
+    }
+</style>
+<!DOCTYPE html>
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="form-header">
+            Offline Booking Form
+        </h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h4><b>Additional Services From Third Party Vendor</b></h4>
+    </div>
+ 
+</div>
+
+            <div class="modal-body">
+                <div class="col-md-12">
+
+                    @using (Html.BeginForm("VendorPaymentSubmit", "OfflineBookingGST", FormMethod.Post, new { enctype = "multipart/form-data", id = "ventor_FormOfflineBooking" }))
+                    {
+                        @Html.HiddenFor(m => m.OfflineBookingId)
+                        @Html.HiddenFor(m => m.vendorId)
+                        @Html.HiddenFor(m => m.VendorpaymentsId)
+                        @Html.HiddenFor(m => m.HSNCode)
+                        @Html.HiddenFor(m => m.PlaceOfSupply)
+                        <div class="formcontainer border-radius" id="formoff">
+
+                            <div class="col-md-12  margin-top-10">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.vendorname)<span style="color:red">*</span>
+                                                    @Html.TextBoxFor(m => m.vendorname, new { @class = "form-control input-sm" })
+                                                    @*@Html.ValidationMessageFor(m => m.vendorname)*@
+                                                    <span id="spanValidvendorname" style="display:none;" class="field-validation-error" data-valmsg-for="vendorname" data-valmsg-replace="true">
+                                                        <span for="vendorname" class="">Enter Vendor Name</span>
+                                                    </span>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(m => m.City)
+                                                    @Html.TextBoxFor(m => m.City, new { @class = "form-control input-sm" })
+                                                    @Html.ValidationMessageFor(m => m.City)
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div id="List" style="height: 150px;overflow-y: auto;width: 627px;">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.vendoraddress)<span style="color:red">*</span>
+                                            @Html.TextAreaFor(m => m.vendoraddress, new { @class = "form-control input-sm txtHeight" })
+                                            @Html.ValidationMessageFor(m => m.vendoraddress)
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5" style="display:none">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.address1)<span style="color:red">*</span>
+                                            @Html.TextAreaFor(m => m.address1, new { @class = "form-control input-sm txtHeight" })
+                                            @Html.ValidationMessageFor(m => m.address1)
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5" style="display:none">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.address2)
+                                            @Html.TextAreaFor(m => m.address2, new { @class = "form-control input-sm txtHeight" })
+                                            @Html.ValidationMessageFor(m => m.address2)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+
+                                    </div>
+
+                                </div>
+                                <div class="row ">
+                                    <div class="col-md-5">
+
+
+
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.pin)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.pin, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.pin)
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.ContactPerson)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.ContactPerson, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.ContactPerson)
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.contactno)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.contactno, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.contactno)
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.emailaddress)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.emailaddress, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.emailaddress)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label>Nature Of Service</label>
+                                            <select class="styleselect" style="width:100%;" name="SelectHSNCode" id="SelectHSNCode">
+                                                @{
+                                                    List<CLayer.HSNCode> HSNCode = BLayer.HSNCode.GetAll();
+
+                                                }
+                                                @foreach (CLayer.HSNCode sc in HSNCode)
+                                                {
+                                                    <option value="@sc.CodeId">@sc.NatureOfService</option>
+                                                }
+
+                                            </select>
+
+                                        </div>
+                                      
+                                    </div>
+                                    <div class="col-md-5">
+                                     
+                                            <label>Place Of Supply</label>
+                                            <select class="styleselect" style="width:100%;" name="SelectStateCode" id="SelectStateCode">
+                                                @{
+                                                    List<CLayer.State> State = BLayer.State.GetAllState();
+                                                }
+                                                @foreach (CLayer.State sc in State)
+                                                {
+                                                    <option value="@sc.StateId"  @if (sc.StateId == Model.PlaceOfSupply) { <text> selected </text> }>@sc.Name</option>
+                                                }
+                                            </select>
+                                       
+                                        @*<div class="form-group">
+            @Html.LabelFor(m => m.valuebeforeservicetax)<span style="color:red">*</span>
+            @Html.TextBoxFor(m => m.valuebeforeservicetax, new { @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.valuebeforeservicetax)
+        </div>*@
+                                    </div>
+                                    @*<div class="col-md-5">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.servicetaxamount)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.servicetaxamount, new { @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.servicetaxamount)
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.totalamountpayable)<span style="color:red">*</span>
+                                @Html.TextBoxFor(m => m.totalamountpayable, new { @class = "form-control input-sm" })
+                                @Html.ValidationMessageFor(m => m.totalamountpayable)
+                            </div>
+                        </div>*@
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.ByPriceBeforeTax)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.ByPriceBeforeTax, new { @class = "form-control input-sm", @onchange = "onchangeSalePriceGST()" })
+                                            @Html.ValidationMessageFor(m => m.ByPriceBeforeTax)
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.SalePriceBeforeTax)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.SalePriceBeforeTax, new { @class = "form-control input-sm", @onchange = "onchangeByPriceGST()" })
+                                            @Html.ValidationMessageFor(m => m.SalePriceBeforeTax)
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-5">
+
+
+
+
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        @Html.Label("GST ") <span class="bold"> ( % )</span> <span style="color:red">*</span>
+                                                        @Html.TextBoxFor(m => m.SalePriceGST, new { @class = "form-control input-sm", @onchange = "onchangeSalePriceGST()" })
+                                                        @Html.ValidationMessageFor(m => m.SalePriceGST)
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>GST Value</label>
+                                                        <input type="text" id="SalePriceGSTamount" readonly="readonly" class="form-control input-sm" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-5">
+
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        @Html.Label("GST ") <span class="bold"> ( % )</span> <span style="color:red">*</span>
+                                                        @Html.TextBoxFor(m => m.ByPriceGST, new { @class = "form-control input-sm", @onchange = "onchangeByPriceGST()" })
+                                                        @Html.ValidationMessageFor(m => m.ByPriceGST)
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>GST Value</label>
+                                                        <input type="text" id="ByPriceGSTeamount" readonly="readonly" class="form-control input-sm" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.ByPriceTotal)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.ByPriceTotal, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.ByPriceTotal)
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.SalePriceTotal)<span style="color:red">*</span>
+                                            @Html.TextBoxFor(m => m.SalePriceTotal, new { @class = "form-control input-sm" })
+                                            @Html.ValidationMessageFor(m => m.SalePriceTotal)
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*<h4>  Buy price GST breakup   </h4>
+                <div class="col-md-12 margin-top-10 margin-bot-10">
+                    @{ int ii = 0, iii = 0;
+                    }
+
+                    <div class="col-md-5 clsDivServiceTaxSplitUpValidation">
+                        <h4>GST Breakup:</h4>
+                        <h6 id="ServiceTaxSplitUpValidation" style="color:red;display:none;">Taxes spit up should be equal to GST ( % )</h6>
+                        @if (Model.TaxPercentageList_ServiceByPrice != null && Model.TaxPercentageList_ServiceByPrice.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.TaxPercentageList_ServiceByPrice.Count(); i++)
+                            {
+                                ii++;
+                                <div class="row" style="margin-bottom: 4px;">
+                                    @Html.HiddenFor(m => Model.TaxPercentageList_ServiceByPrice[i].TaxPerID)
+                                    <div class="col-md-9">
+                                        @Html.TextBoxFor(m => Model.TaxPercentageList_ServiceByPrice[i].TaxTitle, new { @class = "form-control input-sm" })
+                                    </div>
+                                    <div class="col-md-3" style="padding-left: 0px;">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => Model.TaxPercentageList_ServiceByPrice[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @for (int i = ii; i < 5; i++)
+                        {
+                            string nameTxtT_Title = "TaxPercentageList_ServiceByPrice[" + i + "].TaxTitle";
+                            string nameTxtT_Percent = "TaxPercentageList_ServiceByPrice[" + i + "].TaxPercent";
+
+                            string ID_nameTxtT_Title = "TaxPercentageList_ServiceByPrice" + i + "__TaxTitle";
+                            string ID_nameTxtT_Percent = "TaxPercentageList_ServiceByPrice" + i + "__TaxPercent";
+
+                            <div class="row" style="margin-bottom: 4px;">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control input-sm" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                </div>
+                                <div class="col-md-3" style="padding-left: 0px;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-md-5 clsDivServiceTaxOthersSplitUpValidation">
+                        <h4>GST Breakup - Others Service :</h4>
+                        <h6 id="ServiceTaxOthersSplitUpValidation" style="color:red;display:none;">Taxes spit up should be equal to GST - other services  ( % )</h6>
+                        @if (Model.TaxPercentageList_OthersByPrice != null && Model.TaxPercentageList_OthersByPrice.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.TaxPercentageList_OthersByPrice.Count(); i++)
+                            {
+                                iii++;
+                                <div class="row" style="margin-bottom: 4px;">
+                                    @Html.HiddenFor(m => Model.TaxPercentageList_OthersByPrice[i].TaxPerID)
+                                    <div class="col-md-9">
+                                        @Html.TextBoxFor(m => Model.TaxPercentageList_OthersByPrice[i].TaxTitle, new { @class = "form-control input-sm" })
+                                    </div>
+                                    <div class="col-md-3" style="padding-left: 0px;">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => Model.TaxPercentageList_OthersByPrice[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @for (int i = iii; i < 5; i++)
+                        {
+                            string nameTxtT_Title = "TaxPercentageList_OthersByPrice[" + i + "].TaxTitle";
+                            string nameTxtT_Percent = "TaxPercentageList_OthersByPrice[" + i + "].TaxPercent";
+
+                            string ID_nameTxtT_Title = "TaxPercentageList_OthersByPrice" + i + "__TaxTitle";
+                            string ID_nameTxtT_Percent = "TaxPercentageList_OthersByPrice" + i + "__TaxPercent";
+
+                            <div class="row" style="margin-bottom: 4px;">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control input-sm" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                </div>
+                                <div class="col-md-3" style="padding-left: 0px;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+
+
+                <h4>   Sale Price GST breakup     </h4>
+                <div class="col-md-12 margin-top-10 margin-bot-10">
+                    @{ int iiii = 0, iiiii = 0;
+                    }
+
+                    <div class="col-md-5 clsDivServiceTaxSplitUpValidation">
+                        <h4>GST Breakup:</h4>
+                        <h6 id="ServiceTaxSplitUpValidation" style="color:red;display:none;">Taxes spit up should be equal to GST ( % )</h6>
+                        @if (Model.TaxPercentageList_ServiceSalePrice != null && Model.TaxPercentageList_Service.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.TaxPercentageList_ServiceSalePrice.Count(); i++)
+                            {
+                                iiii++;
+                                <div class="row" style="margin-bottom: 4px;">
+                                    @Html.HiddenFor(m => Model.TaxPercentageList_ServiceSalePrice[i].TaxPerID)
+                                    <div class="col-md-9">
+                                        @Html.TextBoxFor(m => Model.TaxPercentageList_ServiceSalePrice[i].TaxTitle, new { @class = "form-control input-sm" })
+                                    </div>
+                                    <div class="col-md-3" style="padding-left: 0px;">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => Model.TaxPercentageList_ServiceSalePrice[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @for (int i = ii; i < 5; i++)
+                        {
+                            string nameTxtT_Title = "TaxPercentageList_ServiceSalePrice[" + i + "].TaxTitle";
+                            string nameTxtT_Percent = "TaxPercentageList_ServiceSalePrice[" + i + "].TaxPercent";
+
+                            string ID_nameTxtT_Title = "TaxPercentageList_ServiceSalePrice" + i + "__TaxTitle";
+                            string ID_nameTxtT_Percent = "TaxPercentageList_ServiceSalePrice" + i + "__TaxPercent";
+
+                            <div class="row" style="margin-bottom: 4px;">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control input-sm" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                </div>
+                                <div class="col-md-3" style="padding-left: 0px;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-md-5 clsDivServiceTaxOthersSplitUpValidation">
+                        <h4>GST Breakup - Others Service :</h4>
+                        <h6 id="ServiceTaxOthersSplitUpValidation" style="color:red;display:none;">Taxes spit up should be equal to GST - other services  ( % )</h6>
+                        @if (Model.TaxPercentageList_OthersSalePrice != null && Model.TaxPercentageList_Others.Count() > 0)
+                        {
+                            for (int i = 0; i < Model.TaxPercentageList_OthersSalePrice.Count(); i++)
+                            {
+                                iiiii++;
+                                <div class="row" style="margin-bottom: 4px;">
+                                    @Html.HiddenFor(m => Model.TaxPercentageList_OthersSalePrice[i].TaxPerID)
+                                    <div class="col-md-9">
+                                        @Html.TextBoxFor(m => Model.TaxPercentageList_OthersSalePrice[i].TaxTitle, new { @class = "form-control input-sm" })
+                                    </div>
+                                    <div class="col-md-3" style="padding-left: 0px;">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => Model.TaxPercentageList_OthersSalePrice[i].TaxPercent, new { @class = "form-control input-sm numberboxTaxPerccent", @style = "text-align: right;" })
+                                            <span class="input-group-addon">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @for (int i = iiiii; i < 5; i++)
+                        {
+                            string nameTxtT_Title = "TaxPercentageList_OthersSalePrice[" + i + "].TaxTitle";
+                            string nameTxtT_Percent = "TaxPercentageList_OthersSalePrice[" + i + "].TaxPercent";
+
+                            string ID_nameTxtT_Title = "TaxPercentageList_OthersSalePrice" + i + "__TaxTitle";
+                            string ID_nameTxtT_Percent = "TaxPercentageList_OthersSalePrice" + i + "__TaxPercent";
+
+                            <div class="row" style="margin-bottom: 4px;">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control input-sm" id="@ID_nameTxtT_Title" name="@nameTxtT_Title" />
+                                </div>
+                                <div class="col-md-3" style="padding-left: 0px;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm numberboxTaxPerccent" style="text-align: right;" id="@ID_nameTxtT_Percent" name="@nameTxtT_Percent" />
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </div>*@
+
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <input type="submit" id="btnSave" value="Save" onclick="SaveVendorDetails()" style="float: left; margin-right: 20px;" class="btn btn-success marginleft30px" tabindex="23" />
+                                        @*<input type="button" id="btnSave" value="Submit" onclick="SubmitOffline()" class="btn btn-success " tabindex="23" />
+                            <a href="~/Admin/OfflineBooking/OfflineBooking" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>*@
+                                        @*<button type="button" class="btn btn-danger" data-dismiss="modal" style="float: left; margin-right: 20px;" tabindex="23">Cancel</button>*@
+
+                                    </div>
+                                    <div class="col-md-4">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <a href="~/Admin/OfflineBookingGST/NewCostCentre?OfflineBookId=@Model.OfflineBookingId" id="btnReset" class="btn btn-info" tabindex="24">Continue</a>
+                                        @*<a href="~/Admin/OfflineBookingGST/BookingDetailsPreview?OfflineBookId=@Model.OfflineBookingId" id="btnReset" class="btn btn-info" tabindex="24">Continue</a>*@
+                                        <a href="~/Admin/OfflineBookingGST/OfflineBooking" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+                    }
+
+                </div>
+                        </div>
+            <div class="modal-footer">
+
+            </div>
+
+<script type="text/javascript">
+
+    function onchangeSalePriceGST() {
+        var ByPriceBeforeTax = parseFloat($("#ByPriceBeforeTax").val());
+        var SalePriceGST = parseFloat($("#SalePriceGST").val());
+
+
+        if (isNaN(parseFloat(ByPriceBeforeTax))) { ByPriceBeforeTax = 0; }
+        if (isNaN(parseFloat(SalePriceGST))) { SalePriceGST = 0; }
+
+        var SalePriceGSTamount = parseFloat(ByPriceBeforeTax * SalePriceGST / 100);
+        var total = parseFloat(ByPriceBeforeTax + SalePriceGSTamount);
+        $("#SalePriceGSTamount").val(Math.round(SalePriceGSTamount));
+        $("#ByPriceTotal").val(Math.round(total));
+
+
+    }
+
+    function onchangeByPriceGST() {
+        var SalePriceBeforeTax = parseFloat($("#SalePriceBeforeTax").val());
+        var ByPriceGST = parseFloat($("#ByPriceGST").val());
+
+
+        if (isNaN(parseFloat(SalePriceBeforeTax))) { SalePriceBeforeTax = 0; }
+        if (isNaN(parseFloat(ByPriceGST))) { ByPriceGST = 0; }
+
+        var ByPriceGSTeamount = parseFloat(SalePriceBeforeTax * ByPriceGST / 100);
+        var total = parseFloat(SalePriceBeforeTax + ByPriceGSTeamount);
+        $("#ByPriceGSTeamount").val(Math.round(ByPriceGSTeamount));
+        $("#SalePriceTotal").val(Math.round(total));
+
+
+    }
+
+
+
+    function SaveVendorDetails() {
+
+        $("#HSNCode").val($("#SelectHSNCode").find('option:selected').attr('value'));
+        $("#PlaceOfSupply").val($("#SelectStateCode").find('option:selected').attr('value'));
+
+    }
+
+
+    var url = '@Url.Action("_vendorList", "OfflineBookingGST")' + "?OfflineBookingId=" +@Model.OfflineBookingId
+    $.get(url, function (data) {
+        if(data!=null)
+        {
+            $('#List').html(data);
+        }
+
+    });
+    $(function () {
+        $("#vendorname").autocomplete({
+            source: "/Admin/OfflineBookingGST/GetVendor",
+            minLength: 1,
+            select: function (event, ui) {
+                if (ui.item) {
+                    $("#vendorname").val(ui.item.value);
+                    var id = ui.item.id;
+                    $.get("/Admin/OfflineBookingGST/GetVendorDetailsAutoComplete?id=" + id, function (data) {
+                        $("#vendorId").val(data.vendorId);
+                        $("#vendorname").val(data.vendorname);
+                        $("#vendoraddress").val(data.vendoraddress);
+                        $("#address1").val(data.address1);
+                        $("#address2").val(data.address2);
+                        $("#City").val(data.City);
+                        $("#pin").val(data.pin);
+                        $("#ContactPerson").val(data.ContactPerson);
+                        $("#contactno").val(data.contactno);
+                        $("#emailaddress").val(data.emailaddress);
+                    });
+                }
+            }
+        });
+    });
+
+
+
+
+
+    $(window).load(function () {
+        debugger
+        if(@Model.VendorpaymentsId!=0){
+
+            $.ajax({
+                type: "Get",
+                url: "/OfflineBookingGST/GetInvoiceIDByOfflineBookingID?OfflineBookingId=" + @Model.OfflineBookingId,
+                success: function (data) {
+                    if(data!=null && data!="" && data!=0 && data.trim() != "0" )
+                    {
+                        $('#ByPriceBeforeTax').attr('readonly', true);
+                        $('#SalePriceBeforeTax').attr('readonly', true);
+                        $('#SalePriceGST').attr('readonly', true);
+                        $('#ByPriceGST').attr('readonly', true);
+                        $('#ByPriceTotal').attr('readonly', true);
+                        $('#SalePriceTotal').attr('readonly', true);
+
+                    }
+                }
+            })
+        }
+    })
+</script>
+
+
+@*<script>
+
+    function keychange() {
+
+        if($('#vendorname').val()==null || $('#vendorname').val()=="" ||$('#vendorname').val().trim()=="" )
+        {
+            $('#vendorname').addClass("input-validation-error");
+            $('#spanValidvendorname').css("display","block");
+        }
+        else{
+            $('#vendorname').removeClass("input-validation-error");
+            $('#spanValidvendorname').css("display", "none");
+        }}
+
+    function SaveOffline() {
+
+        if($('#vendorname').val()==null || $('#vendorname').val()=="")
+        {
+            $('#vendorname').addClass("input-validation-error");
+            $('#spanValidvendorname').css("display","block");
+        }
+        else{
+            $('#vendorname').removeClass("input-validation-error");
+            $('#spanValidvendorname').css("display", "none");
+            //if ($("#ventor_FormOfflineBooking").valid()) {
+
+            $.get("/OfflineBookingGST/NewVendorPayment?Offlinebookingid=" + @Model.OfflineBookingId, function (data) {
+                if (data != "") {
+                    $("#VendorPayment").html(data);
+                }
+            });
+
+            $.post("/OfflineBookingGST/VendorPayment", $("#ventor_FormOfflineBooking").serialize(), function (data) {
+                if (data != "") {
+                    if (data != 0) {
+                        $('#myModalVendor').modal('hide');
+
+                        $(".modal-backdrop").css("display","none");
+
+                        alert("Saved Successfully");
+                        $("#VendorPaymentList").html(data);
+                    }
+                }
+            });
+            //} else {
+            //    alert('Enter Vendor Details');
+            //}
+        }
+    }
+
+</script>*@
+
+

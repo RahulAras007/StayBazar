@@ -1,0 +1,138 @@
+﻿
+@model StayBazar.Areas.Admin.Models.APIPriceMarkupModel
+@using Microsoft.AspNet.Identity
+@{
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    int idx = 1;
+    int count = Model.API.Count;
+    int perPagerCount = 10;
+}
+<div class="col-lg-12">
+    @{
+        StayBazar.Areas.Admin.Models.APIPriceMarkupModel filterform = (StayBazar.Areas.Admin.Models.APIPriceMarkupModel)ViewBag.Filter;
+        using (Html.BeginForm("Pager1", "APIPriceMarkup", FormMethod.Post, new { @id = "frmPagers" }))
+        {
+            @*<input type="hidden" id="Status" name="Status" value="@filterform.Status" />*@
+            @*<input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />*@
+            @*<input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />*@
+            <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+            <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+        }
+        gp.RowsInAPage = filterform.Limit;
+    }
+   
+    <br />
+            @*<div class="page-title-container style3">*@
+                <div class="row top-margin-10px">
+                    <div class="col-md-8">
+                        <input class="form-control" type="text" id="myInput" placeholder="Search for names" title="Type in a name">
+                    </div>
+                    <div class="col-md-4">
+                        @{
+                            <input type="button" value="Create a new PriceMarkup" class="btn btn-primary" onclick="editData(0)" />
+                        }
+                    </div>
+                </div>
+                @*</div>*@
+                <br />
+                <table class="table table-hover table-condensed table-responsive table-striped table-custom table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Customer Name</th>
+                            <th>API PriceMarkup Description</th>
+                            <th>Sell Markup</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myTable">
+                        @if (Model != null && Model.API.Count() > 0)
+                        {
+                            foreach (CLayer.APIPriceMarkup usr in Model.API)
+                            {
+                                <tr>
+                                    <td>@(idx++)</td>
+
+                                    <td>
+                                        <span id="name@(usr.APIPriceMarkupCode)">@usr.CustomerName</span>
+
+                                    </td>
+                                    <td>
+                                        @*@usr.APIDescription*@
+                                        @{ if (usr.DescriptionId == (int)CLayer.ObjectStatus.APIPriceMarkup.TamarindAPI)
+                                            { <text>TamarindAPI</text>}
+                                        else
+                                        { <text>TBOAPI</text>}
+                                        }
+                                    </td>
+                                    <td>
+                                        @usr.SellMarkup
+                                    </td>
+                                    <td align="center"><a href="#" class="glyphicon glyphicon-edit green-color fa-2x" title="Edit" onclick="editData(@usr.APIPriceMarkupCode)"></a></td>
+                                    <td align="center"><a href="#" class="glyphicon glyphicon-trash red-color fa-2x" title="Delete" onclick="deleteData(@usr.APIPriceMarkupCode,'@usr.CustomerName')"></a></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+                @if ((Model != null && Model.API.Count() > 0) || filterform.currentPage > 1)
+                {
+                    @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+                }
+            </div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        preparePager();
+    });
+</script>
+<script type="text/javascript">
+    function editData(id) {
+        $.get('@(Url.Action("GetDetails", "APIPriceMarkup"))?id=' + id, function (data) {
+        $("#userdetails").html(data);
+        $("#myModal").modal('show');
+        });
+    }
+    function deleteData(id){
+        pname = $("#name"+id).html();
+        if(confirm("Are you sure to delete - '" + pname + "'"))
+        {
+            $.get('@Url.Action("Remove", "APIPriceMarkup")?id='+id, function (data) {
+                $("#userlist").html(data);
+            });
+        }
+    }
+    @* TO - Filter / Search Table./ Strarts *@
+    $("#myInput").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+
+        if (value != '') {
+            $("#myTable tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                $('#myPager').hide();
+            });
+        } else {
+            location.reload();
+        }
+    });
+    @*./ End *@
+     @*function preparePager()
+    {
+        $('#myTable').pageMe({ pagerSelector: '#myPager', showPrevNext: true, hidePageNumbers: false, perPage: @(perPagerCount) });
+    }*@
+</script>
+<script type="text/javascript">
+     function showPager(num)
+    {
+        //alert('here is it ' + num);
+        $("#currentPage").val(num);
+         var url = '@Url.Action("Pager1", "APIPriceMarkup")';
+         $.post(url, $("#frmPagers").serialize(),
+                function (data) {
+                    $("#userlist").html(data); 
+            });
+    }
+</script>

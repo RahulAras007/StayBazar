@@ -1,0 +1,135 @@
+﻿@model IEnumerable<CLayer.CollectionReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+    string mtype = "";
+    string type = "";
+    decimal NoofAccomodations1 = 0, NoofNights1 = 0, TotalBookingValue1 = 0, PaymentGatewayCharges1 = 0, NetCreditReceivableBankAccount1 = 0;
+    decimal gNoofAccomodations = 0, gNoofNights = 0, gTotalBookingValue = 0, gPaymentGatewayCharges = 0, gNetCreditReceivableBankAccount = 0;
+}<?xml version="1.0" ?>
+<ss:workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:styles>
+        <ss:style ss:id="1">
+            <ss:Font ss:Bold="1" / >
+        </ss:style>
+    </ss:styles>
+    <ss:worksheet ss:name="CollectionReport">
+        <ss:table>
+            <ss:row ss:styleid="1">
+                <ss:cell><ss:data ss:type="String">Sl No </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Booking Date </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Booking Ref No </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Property Name </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">City </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">State </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Accommodation Type </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">No of Accommodation </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Period of Stay </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">No of Nights </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">CustomerType </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Customer Name </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Total Booking Value </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Customer Payment Mode </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Payment gateway commission % </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Payment gateway charges (Rs) </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">Net Credit Receivable in bank account </ss:data></ss:cell>
+            </ss:row>
+            @foreach (CLayer.CollectionReport reportList in Model)
+            {
+                i = i + 1;
+                DateTime checkin = reportList.CheckIn;
+                DateTime checkout = reportList.CheckOut;
+                TimeSpan ts = checkout - checkin;
+                int differenceInDays = ts.Days;
+                string differenceAsString = differenceInDays.ToString();
+
+                mtype = reportList.CustomeType;
+                if (type != mtype)
+                {
+                    if (type != "")
+                    {
+                        <ss:row ss:styleid="1">
+                            <ss:cell ss:mergeacross="6"><ss:data ss:type="String">@type Totals</ss:data></ss:cell>
+                            <ss:cell><ss:data ss:type="String">@NoofAccomodations1</ss:data></ss:cell>
+                            <ss:cell><ss:data ss:type="String"> </ss:data></ss:cell>
+                            <ss:cell><ss:data ss:type="String">@NoofNights1 </ss:data></ss:cell>
+                            <ss:cell ss:mergeacross="1"><ss:data ss:type="String"> </ss:data></ss:cell>
+                            <ss:cell><ss:data ss:type="String">@TotalBookingValue1.ToString("N0")</ss:data></ss:cell>
+                            <ss:cell ss:mergeacross="1"><ss:data ss:type="String"> </ss:data></ss:cell>
+                            <ss:cell><ss:data ss:type="String">@PaymentGatewayCharges1.ToString("N0")</ss:data></ss:cell>
+                            <ss:cell><ss:data ss:type="String">@NetCreditReceivableBankAccount1.ToString("N0")</ss:data></ss:cell>
+
+                        </ss:row>
+                        NoofNights1 = 0;
+                        TotalBookingValue1 = 0;
+                        PaymentGatewayCharges1 = 0;
+                        NetCreditReceivableBankAccount1 = 0;
+                        NoofAccomodations1 = 0;
+                    }
+                    type = reportList.CustomeType;
+                }
+                <ss:row>
+                    <ss:cell><ss:data ss:type="String">@i</ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.BookingDate.ToShortDateString() </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.BookingRefNo </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.PropertyName </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.City </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.State </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.AccomodationType </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.NumberofAccomodation </ss:data></ss:cell>
+                    <ss:cell>
+                        <ss:data ss:type="String">
+                            @reportList.CheckIn.ToShortDateString() - @reportList.CheckOut.ToShortDateString()
+                        </ss:data>
+                    </ss:cell>
+                    <ss:cell><ss:data ss:type="String">@differenceAsString </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.CustomeType </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.CustomerName </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.TotalSupplierValue </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.CustomerPaymenMode </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.Paymentgatewaycommission </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.Paymentgatewaycharges </ss:data></ss:cell>
+                    <ss:cell><ss:data ss:type="String">@reportList.NetCreditReceivableinbankaccount </ss:data></ss:cell>
+                </ss:row>
+                NoofNights1 = NoofNights1 + differenceInDays;
+                TotalBookingValue1 = TotalBookingValue1 + reportList.TotalSupplierValue;
+                PaymentGatewayCharges1 = PaymentGatewayCharges1 + reportList.Paymentgatewaycharges;
+                NetCreditReceivableBankAccount1 = NetCreditReceivableBankAccount1 + reportList.NetCreditReceivableinbankaccount;
+                NoofAccomodations1 = NoofAccomodations1 + reportList.NumberofAccomodation;
+
+                gNoofAccomodations += reportList.NumberofAccomodation;
+                gNoofNights = gNoofNights + differenceInDays;
+                gTotalBookingValue = gTotalBookingValue + reportList.TotalSupplierValue;
+                gPaymentGatewayCharges = gPaymentGatewayCharges + reportList.Paymentgatewaycharges;
+                gNetCreditReceivableBankAccount = gNetCreditReceivableBankAccount + reportList.NetCreditReceivableinbankaccount;
+
+            }
+            <ss:row ss:styleid="1">
+                <ss:cell ss:mergeacross="6"><ss:data ss:type="String">@type Totals</ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@NoofAccomodations1</ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String"> </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@NoofNights1 </ss:data></ss:cell>
+                <ss:cell ss:mergeacross="1"><ss:data ss:type="String"> </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@TotalBookingValue1.ToString("N0")</ss:data></ss:cell>
+                <ss:cell ss:mergeacross="1"><ss:data ss:type="String"> </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@PaymentGatewayCharges1.ToString("N0")</ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@NetCreditReceivableBankAccount1.ToString("N0")</ss:data></ss:cell>
+            </ss:row>
+            <ss:row ss:styleid="1">
+                <ss:cell ss:mergeacross="6"><ss:data ss:type="String">Grand Totals</ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@gNoofAccomodations</ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String"> </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@gNoofNights </ss:data></ss:cell>
+                <ss:cell ss:mergeacross="1"><ss:data ss:type="String"> </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@gTotalBookingValue.ToString("N0")</ss:data></ss:cell>
+                <ss:cell ss:mergeacross="1"><ss:data ss:type="String"> </ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@gPaymentGatewayCharges.ToString("N0")</ss:data></ss:cell>
+                <ss:cell><ss:data ss:type="String">@gNetCreditReceivableBankAccount.ToString("N0")</ss:data></ss:cell>
+            </ss:row>
+        </ss:table>
+    </ss:worksheet>
+</ss:workbook>

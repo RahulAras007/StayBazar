@@ -1,0 +1,38 @@
+﻿@model StayBazar.Areas.Admin.Models.InventoryModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Inventory";
+    StayBazar.Areas.Admin.Models.InventoryModel rv = new StayBazar.Areas.Admin.Models.InventoryModel();
+    rv.AccommodationId = Model.AccommodationId;
+    string accTitle = BLayer.Accommodation.GetAccommodationTitle((long)Model.AccommodationId);
+    string prpTitle = BLayer.Accommodation.GetPropertyTitle((long)Model.AccommodationId);
+}
+<div class="row margin10px"><h2>Inventory/<a href="~/Admin/Property/Index/@Model.PropertyId">@prpTitle</a>/@accTitle</h2></div>
+<div id="content">
+    @*<h2>@ViewBag.Title</h2>*@
+    @Html.HiddenFor(m => m.AccommodationId)
+    @Html.HiddenFor(m => m.PropertyId)
+    <hr />
+    <div id="Detailsone" class="row">
+        @{
+            Html.RenderPartial("~/Areas/Admin/Views/Inventory/_Details.cshtml");
+        }
+    </div>
+  
+    <hr/>
+    <div id="list" class="row">
+        @{
+            Html.RenderPartial("~/Areas/Admin/Views/Inventory/_List.cshtml", Model);
+        }
+    </div>
+</div>
+<script type="text/javascript">   
+    $("#AccommodationId").change(function () {
+        var id = $("#AccommodationId").val();
+        alert("Value=" + id);
+        var url = '@Url.Action("Filter", "Inventory", new { area = "Admin" })';
+        $.post(url,{ AccommodationId:id}, function (data) { $("#list").html(data);});
+    });
+
+    
+</script>

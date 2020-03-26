@@ -1,0 +1,194 @@
+﻿@model List<object>
+@{
+    long userId = (long)Model[0];
+    string pass = (string)Model[1];
+    Layout = null;
+    CLayer.User usr = BLayer.User.Get(userId);
+    if (usr == null) { usr = new CLayer.User(); }
+    string bname = BLayer.B2B.GetBusinessName(userId);
+    bname = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(bname.ToLower());
+    bool supplier = false;
+    CLayer.Role.Roles rle = BLayer.User.GetRole(userId);
+    if (rle == CLayer.Role.Roles.Supplier) { supplier = true; }
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>B2B Registration</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <thead>
+            <tr>
+                <th style="padding-top: 2%;" align="left">
+                    <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                </th>
+@if (rle == CLayer.Role.Roles.Corporate){
+                <th width="70" align="left" style="font-weight:normal; font-size:12px;color: #1a1a1a;">
+                    @*Phone<br />
+                    Email*@&nbsp;
+                </th>
+                <th align="left" style="font-weight: normal; font-size: 12px;color: #1a1a1a;">
+                    @*@BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                    @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)*@&nbsp;
+                </th>
+}
+else
+{
+    <th width="70" align="left" style="font-weight:normal; font-size:12px;color: #1a1a1a;">
+        Phone<br />
+            Email
+    </th>
+    <th align="left" style="font-weight: normal; font-size: 12px;color: #1a1a1a;">
+        @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+            @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+    </th>
+}
+            </tr>
+        </thead>
+        @if (rle == CLayer.Role.Roles.Corporate){
+        <tbody>
+
+            <tr>
+                <td colspan="3">
+                    <p style="font-size: 13px; color: #666;">Dear @bname,</p>
+                    <p style="font-size: 13px; color: #666;">
+                        @*karthikms changed on 27-11-2019*@
+                        Welcome to Staybazar.com!<br />
+<br />Your Staybazar account has been activated, find below the login details:
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <table border="0" style="font-size: 13px; color: #666;">
+                        <tr><td width="100">&nbsp;</td><td width="70">User Id </td><td width="10"> : </td><td>@usr.Email</td></tr>
+                        <tr><td width="100">&nbsp;</td><td width="70">Password </td><td width="10"> : </td><td>@pass</td></tr>
+                    </table>
+                </td>
+            </tr>
+            
+            <tr>
+                <td colspan="3">
+                    <p style="font-size: 13px;margin-bottom:10px; color: #666;text-align:justify;">
+                        Please log on to Staybazar as a Corporate user, using above credential. User manual for easy
+                        navigation through Staybazar has already been shared / will shortly be shared with you. Logging on
+                        to Staybazar using above credential will give you access to a large pool of corporate accommodation
+                        options across India at preferential pricing.
+                    </p>
+                    <p style="font-size: 13px;margin-bottom:10px;  color: #666;text-align:justify;">
+                        For any query or support, please feel free to write to us at <a href="mailto:support@staybazar.com" style="color:#a51e22;text-decoration:none;">support@staybazar.com</a> or call us at 080-
+   25702898 / 080-4091-6686.
+                    </p>
+                    <p style="font-size: 13px;margin-bottom:10px;  color: #666;text-align:justify;">
+                        We at Staybazar are excited to work with your esteemed organisation.
+                    </p>
+                    <p style="font-size: 13px; color: #666;">
+                        Warm Regards<br />
+                        Team Staybazar
+                    </p>
+                </td>
+            </tr>
+</tbody>
+    <tfoot>
+        <tr>
+            <td align="center" colspan="3">
+                <p style="border-top: 1px solid #1a1a1a; padding:2% 0; text-align:center; font-size:13px;">
+                    <a href="https://www.staybazar.com/Home/TermsOfUse" style="color:#1a1a1a; text-decoration: none;">Terms & Conditions</a><br /><br />
+                    
+                    <span >
+                        <span style="font-weight:bold;">Staybazar,</span><br />Division of <span style="font-weight:bold;">Southern Ecommerce  Solutions Pvt Ltd</span>
+                    </span><br />
+                    
+                    <span style="font-weight:bold;">No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India</span><br />
+                    <a href="https://www.staybazar.com">www.staybazar.com</a><br />
+                </p>
+            </td>
+        </tr>
+    </tfoot>
+
+
+        }
+        else
+        {
+            <tbody>
+                <tr>
+                    <td align="center" colspan="3">
+                        <h3 style="border-bottom: 1px solid #000; padding: 10px 0; display:inline-block;">Welcome to Staybazar.com</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;">Attention:<br /> @bname,</p>
+
+                        <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;">
+                            Welcome to Staybazar.com. Your staybazar account request has been accepted.
+                        </p>
+                        @if (supplier)
+                        {
+                            <text>
+                                <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;"><a href="https://www.staybazar.com">Staybazar.com</a>  a division of  Southern Ecommerce Solutions Pvt Ltd, focuses on creating an online platform exclusively for listing and reservation of Serviced Apartments and other alternate stay options such as Home Stays and Theme Stays. <a href="https://www.staybazar.com">Staybazar.com</a>  is an internet based reservation portal which would provide a comprehensive range of alternate stay options with focus on Serviced Apartments and will fully help to sell your accommodation options to all types of travelers.</p>
+
+                            </text>
+                        }
+                        else
+                        {
+                            <text><p style="padding: 1% 5%; line-height: 35px; font-size: 14px; color: #666;">
+                                    Staybazar is online marketplace for alternate stay options and is committed to providing you multiple options and solutions  for your corporate travel needs. Please access your
+                                    @if (rle == CLayer.Role.Roles.Affiliate)
+                                    {
+                                        <text> Affiliate </text>
+                                    }
+                                    else
+                                    { <text> corporate </text> }
+                                    account using following login information
+                                </p></text>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" colspan="3">
+                        <p style="padding: 1% 5%; line-height: 30px; font-size: 14px; color: #666;">
+                            @if (supplier)
+                            { <text>You can now access <a href="https://www.staybazar.com">www.staybazar.com</a> using following credentials.<br /></text>}
+                            User Id: @usr.Email <br />
+                            Password: @pass <br />
+                        </p>
+                        @if (supplier)
+                        {
+                            <text>
+                                <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;">You can review and update your property details or inventory allocated to Staybazar using this account. We have also put a set of FAQs for your reference on the web site bottom section for Service Apt Owners.</p>
+                            </text>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="3">
+                        <p style="font-size:14px;font-weight:bold;">Thank you for joining Staybazar!</p>
+                    </td>
+                </tr>
+            </tbody>
+        <tfoot>
+            <tr>
+                <td align="center" colspan="3">
+                    <p style="border-top: 1px solid #CCC; padding:1% 0;">
+
+                        <a href="https://www.staybazar.com/Home/TermsOfUse" style="color:#a51e22; text-decoration: none;">Terms & Conditions</a><br />
+                        <span style="font-weight:bold;">Need any help or clarifications?</span> – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                        <span style="font-weight:bold;">
+                            Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                        </span><br />
+                        <a href="https://www.staybazar.com">www.staybazar.com</a><br />
+                        <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                        <span style="font-weight:bold;">Phone: </span>080-2572-2898 / 4091 - 6686
+                    </p>
+                </td>
+            </tr>
+        </tfoot>
+       
+        }
+    </table>
+</body>
+</html>

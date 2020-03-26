@@ -1,0 +1,49 @@
+﻿@model StayBazar.Areas.Admin.Models.costcentre
+
+@{
+    ViewBag.Title = "CostCentreDetails";
+}
+
+<h2>CostCentreDetails</h2>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <table>
+            <tr>
+                <td>
+                    @Html.Label("Cost Centre")
+                </td>
+                <td style="padding-left:10px;">
+                    @Html.DropDownList("Cost Centre Code", new List<SelectListItem>
+        {
+            new SelectListItem {Text = "01", Value="1"  },
+            new SelectListItem {Text = "02", Value="2"  },
+            new SelectListItem {Text = "03", Value="3"  },
+            new SelectListItem {Text = "04", Value="4"  },
+            new SelectListItem {Text = "05", Value="5"  },
+            new SelectListItem {Text = "06", Value="6"  },
+            new SelectListItem {Text = "07", Value="7"  },
+            new SelectListItem {Text = "08", Value="8"  },
+            new SelectListItem {Text = "09", Value="9"  },
+            new SelectListItem {Text = "10", Value="10"  },
+            new SelectListItem {Text = "11", Value="11"  },
+            new SelectListItem {Text = "12", Value="12"  }
+        }, new {@class="form-control"})
+
+
+                </td>
+                <td style="padding-left:10px;">%</td>
+                <td style="padding-left:10px;"><input type="text" id="percentage" /></td>
+                <td style="padding-left:10px;">
+                    @Html.ActionLink("Save", "CostCentreDetails", "OfflineBookingGSTController", new { area = "Admin" }, new { @class = "btn btn-primary" })
+                </td>
+            </tr>
+            <tr>
+                
+            </tr>
+        </table>
+
+    </div>
+    <div class="col-md-3"></div>
+</div>
+

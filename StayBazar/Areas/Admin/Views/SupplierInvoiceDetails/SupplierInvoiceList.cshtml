@@ -1,0 +1,112 @@
+﻿@model StayBazar.Areas.Admin.Models.SuppierInvoiceModel
+@{
+    ViewBag.Title = "Supplier Invoice";
+}
+
+
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-2">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+        @*<h2>@ViewBag.Title</h2>*@
+        @*<div class="row">
+            <div class="col-md-12">*@
+                @using (Html.BeginForm("Filter", "SupplierInvoiceDetails", FormMethod.Post, new { @id = "frmFiltersSupplierInvoice" }))
+                {
+                    @*<div class="row">*@
+                        <div class="col-md-2">
+                            @Html.DropDownListFor(m => m.Status, Model.StatusTypes, new { @tabindex = "1", @class = "form-control" })
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                @Html.HiddenFor(m => m.searchType)
+                                @Html.HiddenFor(m => m.TaxType)
+                                @*@Html.HiddenFor(m => m.currentPage1)
+                                    @Html.HiddenFor(m => m.TotalRows1)*@
+                                @Html.TextBoxFor(m => m.searchText, new { @class = "form-control" })
+                                <span class="input-group-btn">
+                                    <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group ">
+                                <div class="form-control">
+                                    @foreach (StayBazar.Areas.Admin.Models.SuppierInvoiceModel.SearchTypeValues ruv in (StayBazar.Areas.Admin.Models.SuppierInvoiceModel.SearchTypeValues[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.SuppierInvoiceModel.SearchTypeValues)))
+                                    {
+                                        <input type="radio" name="ruv" class="css-radiobutton" value="@((int)ruv)" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text> } />
+                                        <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                                        <text>&nbsp;&nbsp;</text>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    @*</div>*@
+                }
+
+            @*</div>
+        </div>*@
+    </div>
+</div>
+
+
+@*<hr />*@
+
+<div class="container-fluid">
+    <div class="row">
+    @*<div class="col-md-12">*@
+        <div id="DivSuppInvList" class="row">
+            @Html.Partial("~/Areas/Admin/Views/SupplierInvoiceDetails/_List.cshtml", Model)
+        </div>
+    @*</div>*@
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $("#Status").change(function () {
+            var url = '@Url.Action("Filter", "SupplierInvoiceDetails")';
+            $.post(url, $("#frmFiltersSupplierInvoice").serialize(),
+                    function (data) {
+                        $("#DivSuppInvList").html(data);
+                    });
+        });
+    });
+</script>
+
+
+
+<script type="text/javascript">
+
+    $('#btnSearch').click(function () {
+        $('#searchType').val($('input[name="ruv"]:checked').val());
+        var url = '@Url.Action("Filter", "SupplierInvoiceDetails")?' + $('#frmFiltersSupplierInvoice').serialize();
+        $.get(url, function (data) {
+            $('#DivSuppInvList').html(data);
+        });
+    });
+
+    function onClickEdit(id) {
+        var url = '@Url.Action("Details", "SupplierInvoiceDetails")?ID=' + id + '&isFromList=' + $('#isFromList').val();
+        window.location.href = url;
+    }
+
+    function onClickDelete(id) {
+
+        var currentPage = $('#currentPage').val();
+        var TotalRows = $('#TotalRows').val();
+
+        if (confirm('Are you sure you want to delete this Invoice?')) {
+            var url = '@Url.Action("DeleteSupplierInvoice", "SupplierInvoiceDetails")?ID=' + id + '&currentPage=' + currentPage + '&TotalRows=' + TotalRows;
+            //window.location.href = url;
+            $.get(url, function (data) {
+                $('#DivSuppInvList').html(data);
+            });
+        }
+    }
+
+</script>

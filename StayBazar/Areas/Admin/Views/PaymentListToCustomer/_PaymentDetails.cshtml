@@ -1,0 +1,63 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+
+<div class="body-content" style="padding-left:30px;padding-right:30px">
+   
+    @if (Model.Count() == 0)
+    {
+        <div class="alert alert-info">Data not found</div>
+    }
+    @if (Model != null && Model.Count() > 0)
+    {
+        <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+            <thead>
+                <tr>
+                    <th>Booking Id</th>
+                    <th>Property Name</th>
+                    <th>Property City</th>
+                    <th>Guest Name</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Total Booking Value Including GST</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count() > 0)
+                {
+                    foreach (CLayer.OfflineBooking usr in Model)
+                    {
+                        CLayer.OfflineBooking MinDates = BLayer.OfflineBooking.GetOfflinebookingMinDatesIsGST(@usr.OfflineBookingId);
+                    <tr>
+                    <td>
+                        @usr.OfflineBookingId
+                    </td>
+                    <td>
+                        @usr.PropertyName
+                    </td>
+                    <td>
+                        @usr.PropertyCityname
+                    </td>
+                    <td>
+                        @usr.GuestName 
+                    </td>
+                    <td>
+                        @usr.CheckIn.ToShortDateString()
+                    </td>
+                    <td>
+                        @usr.CheckOut.ToShortDateString()
+                    </td>                
+                    <td>
+                        @usr.TotalSalePrice
+                    </td>
+                </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @*<div class="row">
+                <div class="col-sm-2" style="left: 14px;"><label>Customer</label></div>
+                <div class="col-sm-1"><label>Advance Received</label></div>
+                <div class="col-sm-1"><label>Total Sale Price</label></div>
+            </div>*@
+    }
+</div>
+

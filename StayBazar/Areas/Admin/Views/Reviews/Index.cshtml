@@ -1,0 +1,104 @@
+﻿@model StayBazar.Areas.Admin.Models.ReviewsModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Reviews ";
+}
+<script src="~/Content/raty27/jquery.raty.js"></script>
+<link href="~/Content/raty27/jquery.raty.css" rel="stylesheet" property="" />
+@*<div id="content">*@
+<div class="page-title-container style3">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+    </div>
+</div>
+<br />
+<br />
+<div class="container-fluid">
+    @*<h2>@ViewBag.Title</h2>*@
+    <ul class="nav nav-tabs" id="myTab" data-tabs="tabs">
+        <li class="active"><a href="#All" data-toggle="tab">All</a></li>
+        <li><a href="#Waiting" data-toggle="tab">Waiting</a></li>
+        <li><a href="#Recommended" data-toggle="tab">Recommended</a></li>
+    </ul>
+
+    <div class="tab-content" id="my-tab-content">
+        @{
+            StayBazar.Areas.Admin.Models.ReviewsModel a = new StayBazar.Areas.Admin.Models.ReviewsModel();
+            a.ReviewList = BLayer.Review.GetAll(0, 25);
+        }
+        <div class="tab-pane active" id="All">
+            @Html.Partial("_AllReviews", a)
+        </div>
+        @{
+            StayBazar.Areas.Admin.Models.ReviewsModel b = new StayBazar.Areas.Admin.Models.ReviewsModel();
+            b.ReviewList = BLayer.Review.RecommendedByStatus("", (int)CLayer.ObjectStatus.StatusType.NotVerified, false, 0, 25);
+        }
+        <div class="tab-pane " id="Waiting">
+            @Html.Partial("_Waiting", b)
+        </div>
+        @{
+            StayBazar.Areas.Admin.Models.ReviewsModel re = new StayBazar.Areas.Admin.Models.ReviewsModel();
+            re.ReviewList = BLayer.Review.RecommendedByStatus("", (int)CLayer.ObjectStatus.StatusType.Verified, true, 0, 25);
+        }
+        <div class="tab-pane " id="Recommended">
+            @Html.Partial("_Recommended", re)
+        </div>
+    </div>
+</div>
+<br />
+<br />
+    <div class="modal fade" id="chooseReviewData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog " style="width:60%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h3 class="modal-title" id="myModalLabel">Review</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-11" id="DetailsShow">
+                            @Html.Partial("_Details");
+                        </div>
+                    </div>
+                    <div id="loadingreview"><img src="~/Content/ajax11-loader.gif" /></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="btnSave" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+    //Popup display
+    function SearchDatafill(propertyId, UserId, BookingId) {
+       // add loading image to div
+        $('#DetailsShow').css("display", "none");
+        $('#loadingreview').css("display", "block");
+        $("#chooseReviewData").modal('show');
+       var url = '@Url.Action("Details", "Reviews", new { area = "Admin" })';
+        $.post(url, { propertyId: propertyId, UserId: UserId, BookingId: BookingId }, function (data) {
+            $("#DetailsShow").html(data);
+            $('#DetailsShow').css("display", "block");
+            $('#loadingreview').css("display", "none");
+        });
+    }
+    //Update
+    $("#btnSave").click(function () {
+        var url = '@Url.Action("Verify", "Reviews", new { area = "Admin" })';
+
+        $.post(url, $("#frmFiltersUpdate").serialize(), function (data) {
+            if (data != null)
+            {
+                $("#chooseReviewData").modal('hide');
+                window.location.href = "/Admin/Reviews";
+            }
+            // $("#DetailsShow").html(data);
+            // $("#chooseReviewData").modal('close');
+            //$("#AllListName").html(data);
+        });
+    });
+</script>

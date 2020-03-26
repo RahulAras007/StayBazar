@@ -1,0 +1,98 @@
+﻿@model StayBazar.Areas.Admin.Models.RateValueModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveRate", "Rate", FormMethod.Post, new { id = "rateform", onsubmit = "saveRate()" }))
+{
+    <div class="row">
+        <div class="col-lg-4">
+            Start Date: Month @Html.DropDownListFor(m => m.StartMonth, Model.Months) Day @Html.DropDownListFor(m => m.StartDay, Model.DaysInMonth)
+        </div>
+        <div class="col-lg-4">
+            End Date: Month @Html.DropDownListFor(m => m.EndMonth, Model.Months) Day @Html.DropDownListFor(m => m.EndDay, Model.DaysInMonth)
+            @Html.HiddenFor(m => m.AccommodationId)
+            @Html.HiddenFor(m => m.RRateId) @Html.HiddenFor(m => m.CRateId)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Rates</th>
+                        <th>B2C</th>
+                        <th>B2B (Corporate)</th>
+                        @*<th>Monthly</th>
+                            <th>Guest</th>*@
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Daily</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.RCDaily, new { @class = "form-control input-sm raterrval" }) <span style="background-color: aliceblue;" id="sRCDailyWTax" class="input-group-addon">0.00</span> <span id="sRCDaily" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.RCDaily)</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.CCDaily, new { @class = "form-control input-sm rateccval" }) <span style="background-color: aliceblue;" id="sCCDailyWTax" class="input-group-addon">0.00</span> <span id="sCCDaily" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.CCDaily)</td>
+                        @*<td><div class="input-group">@Html.TextBoxFor(m => m.RCMonthly, new { @class = "form-control input-sm txtrateval" })<span id="sRCMonthly" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.RCMonthly)</td>
+                            <td><div class="input-group">@Html.TextBoxFor(m => m.RCGuest, new { @class = "form-control input-sm txtrateval" })<span id="sRCGuest" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.RCGuest)</td>*@
+                    </tr>
+                    <tr>
+                        <td>Weekly</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.RCWeekly, new { @class = "form-control input-sm raterrval" }) <span style="background-color: aliceblue;" id="sRCWeeklyWTax" class="input-group-addon">0.00</span> <span id="sRCWeekly" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.RCWeekly)</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.CCWeekly, new { @class = "form-control input-sm rateccval" }) <span style="background-color: aliceblue;" id="sCCWeeklyWTax" class="input-group-addon">0.00</span> <span id="sCCWeekly" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.CCWeekly)</td>
+                        @*<td><div class="input-group">@Html.TextBoxFor(m => m.CCMonthly, new { @class = "form-control input-sm txtratecval" })<span id="sCCMonthly" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.CCMonthly)</td>
+                            <td><div class="input-group">@Html.TextBoxFor(m => m.CCGuest, new { @class = "form-control input-sm txtratecval" })<span id="sCCGuest" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.CCGuest)</td>*@
+                    </tr>
+                    <tr>
+                        <td>Monthly</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.RCMonthly, new { @class = "form-control input-sm raterval" }) <span style="background-color: aliceblue;" id="sRCMonthlyWTax" class="input-group-addon">0.00</span> <span id="sRCMonthly" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.RCMonthly)</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.CCMonthly, new { @class = "form-control input-sm ratecval" }) <span style="background-color: aliceblue;" id="sCCMonthlyWTax" class="input-group-addon">0.00</span> <span id="sCCMonthly" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.CCMonthly)</td>
+                        @*<td><div class="input-group">@Html.TextBoxFor(m => m.SCMonthly, new { @class = "form-control input-sm txtratesval" })<span id="sSCMonthly" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.SCMonthly)</td>
+                            <td><div class="input-group">@Html.TextBoxFor(m => m.SCGuest, new { @class = "form-control input-sm txtratesval" })<span id="sSCGuest" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.SCGuest)</td>*@
+                    </tr>
+                    <tr>
+                        <td>Long Term (90 Days)</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.RCLong, new { @class = "form-control input-sm raterval" })<span style="background-color: aliceblue;" id="sRCLongWTax" class="input-group-addon">0.00</span>  <span id="sRCLong" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.RCLong)</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.CCLong, new { @class = "form-control input-sm ratecval" }) <span style="background-color: aliceblue;" id="sCCLongWTax" class="input-group-addon">0.00</span> <span id="sCCLong" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.CCLong)</td>
+                        @*<td><div class="input-group">@Html.TextBoxFor(m => m.TCMonthly, new { @class = "form-control input-sm txtratetval" })<span id="sTCMonthly" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.TCMonthly)</td>
+                            <td><div class="input-group">@Html.TextBoxFor(m => m.TCGuest, new { @class = "form-control input-sm txtratetval" })<span id="sTCGuest" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.TCGuest)</td>*@
+                    </tr>
+                    <tr>
+                        <td>Guest</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.RCGuest, new { @class = "form-control input-sm raterrval" }) <span style="background-color: aliceblue;" id="sRCGuestWTax" class="input-group-addon">0.00</span> <span id="sRCGuest" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.RCGuest)</td>
+                        <td><div class="input-group">@Html.TextBoxFor(m => m.CCGuest, new { @class = "form-control input-sm rateccval" })<span style="background-color: aliceblue;" id="sCCGuestWTax" class="input-group-addon">0.00</span>  <span id="sCCGuest" class="input-group-addon">0.00</span></div>@Html.ValidationMessageFor(m => m.CCGuest)</td>
+                        @*<td><div class="input-group">@Html.TextBoxFor(m => m.TCMonthly, new { @class = "form-control input-sm txtratetval" })<span id="sTCMonthly" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.TCMonthly)</td>
+                            <td><div class="input-group">@Html.TextBoxFor(m => m.TCGuest, new { @class = "form-control input-sm txtratetval" })<span id="sTCGuest" class="input-group-addon">3000.00</span></div>@Html.ValidationMessageFor(m => m.TCGuest)</td>*@
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="width:25px; height:15px; background-color:aliceblue; border:1px solid; float: right;"></div><br />
+                            <div style="width:25px; height:15px; background-color:#eee; border:1px solid; float: right;"></div>
+                        </td>
+                        <td>
+                        <b>Supplier Rate with taxes deducted</b><br />
+                            <b>Total Amount with taxes excluded</b>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td colspan="3">Note: Total Rate including StayBazar Markup is shown with every rate. For Guest rate, the total rate shown here is calculated using Short-term Markup. The Corporate rate is calculated using standard discount and markup rate.</td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(function () {
+
+        $(".raterrval, .raterval").change(function () {
+            calcReg();
+        });
+
+        $(".ratecval,.rateccval").change(function () {
+            calcCorp();
+        });
+
+    });
+</script>

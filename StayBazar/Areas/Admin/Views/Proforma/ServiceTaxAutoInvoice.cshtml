@@ -1,0 +1,313 @@
+﻿@model CLayer.OfflineBooking
+@{
+    Layout = null;
+    CLayer.OfflineBooking customer = BLayer.OfflineBooking.GetAllCustomerDetails(Model.OfflineBookingId);
+    CLayer.OfflineBooking propertyDetails = BLayer.OfflineBooking.GetAllpropertyDetails(Model.OfflineBookingId);
+    CLayer.OfflineBooking OfflineBookingDt = BLayer.OfflineBooking.GetAllDetailsById(Model.OfflineBookingId);
+
+    long Duedatedays = Convert.ToInt32(BLayer.Settings.GetValue(CLayer.Settings.INVOICE_DUE_DAYS));
+
+    CLayer.Invoice invoice = BLayer.Invoice.GetProformaByOfflineBooking(Model.OfflineBookingId);
+
+    CLayer.B2B b2bdata = new CLayer.B2B();
+    string CusRefNo = "";
+    if (OfflineBookingDt != null)
+    {
+        if (OfflineBookingDt.CustomerId > 0)
+        {
+            b2bdata = BLayer.B2B.Get(OfflineBookingDt.CustomerId);
+            if (b2bdata != null)
+            {
+                CusRefNo = b2bdata.UserCode;
+            }
+        }
+    }
+}
+<style>
+    td {
+        padding: 2px !important;
+    }
+</style>
+
+
+    @Html.Partial("_InvoiceHeader")
+    <!--#FIRSTROW_START-->
+    <table id="firstrow" style="width:100%">
+        <tr>
+            <td style="width:70%;">
+                Invoice Number: <b>
+                    @if (invoice != null)
+                    {
+                        if (invoice.InvoiceNumber != null)
+                        {
+                            @invoice.InvoiceNumber
+                        }
+                    }
+
+                </b><br />
+                To : <br />
+                <b>@customer.CustomerName</b><br />
+                @customer.CustomerAddress,<br />
+                @customer.CustomerCityname, @customer.CustomerStatename,<br />
+                @customer.CustomerCountryname
+            </td>
+            <td width="30%">
+                Date: <b>@DateTime.Today.ToString("dd/MM/yyyy")</b><br />
+                Due By: @Model.CheckOut.AddDays(@Duedatedays).ToShortDateString()<br />
+                Customer Ref No:
+                @if (Model.NewCustomerReferenceNo != null)
+                { 
+                 @Model.NewCustomerReferenceNo
+                }
+
+                <br />
+                <br />
+                <br />
+                <br />
+            </td>
+        </tr>
+    </table>
+        <!--#FIRSTROW_END-->
+        <!--#SECONDROW_START-->
+    <table border="1" id="secondrow" cellpadding="5" cellspacing="0" style="width:100%;">
+        <tr>
+            <td style="width: 43px;">
+                Sl No.
+            </td>
+            <td>
+                Description
+            </td>
+            <td style=" width: 100px;" align="center">
+                Rate (Rs.)
+            </td>
+            <td align="center">Quantity</td>
+            <td style="width:10%" align="center">Value (Rs.)</td>
+        </tr>
+        <tr>
+            <td>
+                1.
+            </td>
+            <td>
+                Accommodation at: <br />
+                @(propertyDetails.PropertyName) @(propertyDetails.PropertyCityname)<br />
+                @Model.AccommodatoinTypename<br />
+                Booking Id:<b> @Model.ConfirmationNumber</b><br />
+                Guest name: @Model.GuestName<br />
+                Check-in date:  @Model.CheckIn.ToShortDateString()    Check-out date: @Model.CheckOut.ToShortDateString() <br />
+                No of rooms: @Model.NoOfRooms &nbsp;&nbsp; No of nights: @Model.NoOfNight &nbsp;&nbsp; Total room nights: @(Model.NoOfRooms * Model.NoOfNight)<br />
+                Adult:  @Model.NoOfPaxAdult Children : @Model.NoOfPaxChild
+            </td>
+            <td style="text-align:right;">
+                @(Math.Round(Model.AvgDailyRateBefreStaxForSalePrice, 2))
+            </td>
+            <td style="text-align:center">@(Model.NoOfNight * Model.NoOfRooms)</td>
+            <td style="text-align:right">@(Math.Round(Model.AvgDailyRateBefreStaxForSalePrice * Model.NoOfNight * Model.NoOfRooms, 2))</td>  @*@(Model.TotalAmtForSalePrice)*@
+        </tr>
+
+        <tr>
+            <td>&nbsp;</td>
+            <td style="text-align:right;"> <span style="font-weight:bold;">Sub-Total</span></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align:right">@(Math.Round(Model.AvgDailyRateBefreStaxForSalePrice * Model.NoOfNight * Model.NoOfRooms, 2))</td>
+        </tr>
+
+        @*Service Tax*@
+
+        @{
+                    List<CLayer.TaxPercentage> ServiceTax = new List<CLayer.TaxPercentage>();
+                    List<CLayer.TaxPercentage> ServiceTaxOther = new List<CLayer.TaxPercentage>();
+                    ServiceTax = BLayer.OfflineBooking.GetAll_OfflineBookingTaxes(@Model.OfflineBookingId, "Service Tax");
+                    ServiceTaxOther = BLayer.OfflineBooking.GetAll_OfflineBookingTaxes(@Model.OfflineBookingId, "Service Tax - Others");
+        }
+
+        @{
+    decimal ServiceTaxAmount = 0;
+        }
+
+
+        @if (ServiceTax.Count > 0)
+        {
+            {
+                decimal Ttax = 0;
+                foreach (var item in ServiceTax)
+                {
+                    if (item.TaxPercent != null && item.TaxTitle != null)
+                    {
+                        if (item.TaxPercent != "" && item.TaxTitle != "")
+                        {
+                            Ttax = (Ttax + Convert.ToDecimal(item.TaxPercent));
+                        }
+                    }
+                }
+                ServiceTaxAmount = ((Model.AvgDailyRateBefreStaxForSalePrice * Model.NoOfNight * Model.NoOfRooms) * Ttax) / 100;
+            }
+
+            foreach (var item in ServiceTax)
+            {
+                if (item.TaxPercent != null && item.TaxTitle != null)
+                {
+                    if (item.TaxPercent != "" && item.TaxTitle != "")
+                    {
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                @item.TaxTitle  @item.TaxPercent %
+                            </td>
+                            <td></td>
+                            <td style="text-align:center"></td>
+                            <td style="text-align:right">@(Math.Round(Model.AvgDailyRateBefreStaxForSalePrice * Model.NoOfNight * Model.NoOfRooms * Convert.ToDecimal(item.TaxPercent) / 100, 2)) </td>@*@ServiceTaxAmount*@
+                        </tr>
+                    }
+                }
+            }
+        }
+
+
+
+        @{
+    decimal TotalAmountwithServicetax = ((Model.AvgDailyRateBefreStaxForSalePrice * Model.NoOfNight * Model.NoOfRooms) + ServiceTaxAmount);
+        }
+
+
+        <tr>
+            <td>&nbsp;</td>
+            <td style="text-align:right;"> <span style="font-weight:bold;">Total</span></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align:right">@(Math.Round(TotalAmountwithServicetax, 2))</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align:center">&nbsp;</td>
+            <td style="text-align:right">&nbsp;</td>
+        </tr>
+
+        <tr>
+            <td>&nbsp;</td>
+            <td>
+                Other Service
+            </td>
+            <td>&nbsp;</td>
+            <td style="text-align:center">&nbsp;</td>
+            <td style="text-align:right">@(Math.Round(OfflineBookingDt.BuyPriceforotherservicesForSalePrice, 2))</td> @*OfflineBookingDt.TotalAmtotherForSalePrice*@
+        </tr>
+
+        @{
+    decimal OtherTotalAmountwithServicetax = 0;
+    decimal OtherServiceTaxAmount = 0;
+
+        }
+
+        @if ((Math.Round(OfflineBookingDt.BuyPriceforotherservicesForSalePrice, 2)) > 0)
+        {
+
+            @*Service Tax other*@
+            if (ServiceTax.Count > 0)
+            {
+                {
+                    decimal OtherTtax = 0;
+                    foreach (var item in ServiceTaxOther)
+                    {
+                        if (item.TaxPercent != null && item.TaxTitle != null)
+                        {
+                            if (item.TaxPercent != "" && item.TaxTitle != "")
+                            {
+                                OtherTtax = (OtherTtax + Convert.ToDecimal(item.TaxPercent));
+                            }
+                        }
+                    }
+                    OtherServiceTaxAmount = ((Model.BuyPriceforotherservicesForSalePrice) * OtherTtax) / 100;
+                }
+
+                foreach (var item in ServiceTaxOther)
+                {
+                    if (item.TaxPercent != null && item.TaxTitle != null)
+                    {
+                        if (item.TaxPercent != "" && item.TaxTitle != "")
+                        {
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>  @item.TaxTitle  @item.TaxPercent % </td>
+                                <td>&nbsp;</td>
+                                <td style="text-align:center;">&nbsp;</td>
+                                <td style="text-align:right;">
+                                    &nbsp;@(Math.Round(Model.BuyPriceforotherservicesForSalePrice * Convert.ToDecimal(item.TaxPercent) / 100, 2))
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            }
+
+           
+            OtherTotalAmountwithServicetax = ((Model.BuyPriceforotherservicesForSalePrice) + OtherServiceTaxAmount);
+            <tr>
+                <td>&nbsp;</td>
+                <td style="text-align:right;"><span style="font-weight:bold;">Total (Other Service)</span></td>
+                <td>&nbsp;</td>
+                <td style="text-align:center">&nbsp;</td>
+                <td style="text-align:right">&nbsp;@Math.Round(@OtherTotalAmountwithServicetax, 2)</td>
+            </tr>
+
+        }
+
+
+
+
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align:center">&nbsp;</td>
+            <td style="text-align:right">&nbsp;</td>
+        </tr>
+
+
+
+        <tr>
+            <td>&nbsp;</td>
+            <td style="text-align:right;"><span style="font-weight:bold;">Total</span></td>
+            <td>&nbsp;</td>
+            <td style="text-align:center">&nbsp;</td>
+            <td style="text-align:right">&nbsp;@(Math.Round(OtherTotalAmountwithServicetax + TotalAmountwithServicetax, 2))</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Reimbursements (+)</td>
+            <td>&nbsp;</td>
+            <td style="text-align:center">&nbsp;</td>
+            <td style="text-align:right">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Discount (-)</td>
+            <td>&nbsp;</td>
+            <td style="text-align:center">&nbsp;</td>
+            <td style="text-align:right">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Others (+)</td>
+            <td>&nbsp;</td>
+            <td style="text-align:center">&nbsp;</td>
+            <td style="text-align:right">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center;"><span style="font-weight:bold;">Total Invoice Value</span></td>
+            <td>&nbsp;</td>
+            <td style="text-align:center">&nbsp;</td>
+            <td style="text-align:right">&nbsp;<b>@(Math.Round(OtherTotalAmountwithServicetax + TotalAmountwithServicetax, 0))</b></td>
+        </tr>
+    </table>
+        <!--#SECONDROW_END-->
+        <!--#THIRDROW_START-->
+    <div id="thirdrow">
+        <br />
+        <div>Rupees :<b> @(StayBazar.Common.Utils.NumberToWords((int)(Math.Round(OtherTotalAmountwithServicetax + TotalAmountwithServicetax, 0)))) Only  </b></div>
+        <br />
+    </div>
+        <!--#THIRDROW_END-->
+    @Html.Partial("_InvoiceFooter")

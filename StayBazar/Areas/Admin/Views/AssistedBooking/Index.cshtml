@@ -1,0 +1,206 @@
+﻿@{
+    ViewBag.Title = "AssistedBooking";
+    try
+    {
+        var grid = new WebGrid(Model, defaultSort: "Name", canSort: false, canPage: true, rowsPerPage: 25,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        var currentAction = "";
+        HtmlHelper htmlHelper = this.Html;
+        var routeData = htmlHelper.ViewContext.RouteData;
+        currentAction = routeData.GetRequiredString("Action").ToLower();
+        <text>
+            <form id="frmIds" method="post">
+                <input id="data" name="data" type="hidden" value="" />
+                <input id="type" name="type" type="hidden" value="" />
+            </form>
+
+<div id="bodycontent">
+
+    <div class="page-title-container style3">
+        <div class="row">
+            @*<div class="h2">
+        Staff&nbsp;*@
+
+            <div class="col-md-8">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+            <br />
+            <br>
+            <div class="col-md-4">
+                @*<div class="btn-group">*@
+                @if (Model.Count > 0)
+                {<text>
+                        <div class="btn-group" id="div-actions">
+                            @if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_INDEX)
+                            {<text>
+                                    <button id="btnReadAll" data-action="block" class="btn btn-default" disabled>Block</button>
+                                    <button id="btnArchiveAll" data-action="delete" class="btn btn-danger" disabled>Delete</button>
+                            </text>
+                        }
+                        else if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_BLOCKED)
+                        {<text>
+                                <button id="btnReadAll" data-action="restore" class="btn btn-default" disabled>Restore</button>
+                                <button id="btnArchiveAll" data-action="delete" class="btn btn-danger" disabled>Delete</button>
+                        </text>
+                    }
+                    else if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_DELETED)
+                    {<text>
+                            <button id="btnReadAll" data-action="restore" class="btn btn-default" disabled>Restore</button>
+                    </text>
+                }
+                        </div>
+                </text>
+            }
+                @if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_INDEX)
+                {<text>
+                        <div class="btn-group">
+                            <a href="/Admin/AssistedBooking/New" class="btn btn-primary">Add New</a>
+                        </div>
+                </text>
+            }
+            </div>
+        </div>
+    </div>
+            @*</div>*@
+                <br />
+                <br />
+               <div class="container-fluid">
+                    <ul class="nav nav-tabs">
+                        <li @if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_INDEX) { <text> class="active" </text> }><a href="/Admin/AssistedBooking">Active</a></li>
+                        <li @if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_BLOCKED) { <text> class="active" </text> }><a href="/Admin/AssistedBooking/Blocked">Blocked</a></li>
+                        <li @if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_DELETED) { <text> class="active" </text> }><a href="/Admin/AssistedBooking/RecentlyDeleted">Deleted</a></li>
+                    </ul>
+                @*</div>*@
+                @*@if (Model.Count > 0)
+                    {<text>*@
+                <div id="gridContent">
+                   <div class="container-fluid"></div>
+
+
+                    @if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_INDEX)
+                        {
+                        @grid.GetHtml(tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered",
+            headerStyle: "header",
+            alternatingRowStyle: "alt",
+            selectedRowStyle: "select",
+            columns: grid.Columns(
+            grid.Column(header: "head", format: @<text>@if (item.UserId > 1)
+            {<text><input type="checkbox" class="chk checkbox-inline" value="@item.UserId" /></text>}</text>),
+            grid.Column("Name", format: @<text> @item.Salutation<span>.&nbsp;</span>@item.FirstName&nbsp;@item.LastName</text>),
+            grid.Column("CreatedDate","Created On"),
+            grid.Column("Last Login On",format: @<text>@if (item.LastLoginOn > item.CreatedDate)
+            {<text>@item.LastLoginOn</text>}
+            else
+            {<text>Not yet logged in</text>}</text>),
+            grid.Column("", format: @<text><a href="/Admin/AssistedBooking/Edit/@item.UserId" class="lnk btn">Edit</a></text>)))
+                        }
+                        else if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_BLOCKED)
+                        {
+                        @grid.GetHtml(tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered",
+            headerStyle: "header",
+            alternatingRowStyle: "alt",
+            selectedRowStyle: "select",
+            columns: grid.Columns(
+            grid.Column(header: "head", format: @<text><input type="checkbox" class="chk checkbox-inline" value="@item.UserId" /></text>),
+            grid.Column("Name", format: @<text> @item.Salutation<span>.&nbsp;</span>@item.FirstName&nbsp;@item.LastName</text>),
+            grid.Column("CreatedDate", "Created On"),
+            grid.Column("LastLoginOn","Last Login On"),
+            grid.Column("", format: @<text><a href="/Admin/AssistedBooking/Edit/@item.UserId" class="lnk btn">Edit</a></text>)
+))
+                        }
+                        else if (currentAction == StayBazar.Areas.Admin.Models.HostModel.ACTION_DELETED)
+                        {
+                        @grid.GetHtml(tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered",
+            headerStyle: "header",
+            alternatingRowStyle: "alt",
+            selectedRowStyle: "select",
+            columns: grid.Columns(
+            grid.Column(header: "head", format: @<text><input type="checkbox" class="chk checkbox-inline" value="@item.UserId" /></text>),
+            grid.Column("Name", format: @<text> @item.Salutation<span>.&nbsp;</span>@item.FirstName&nbsp;@item.LastName</text>),
+            grid.Column("CreatedDate", "Created On"),
+            grid.Column("DeletedDate", "Deleted On"),
+            grid.Column("", format: @<text><a href="/Admin/AssistedBooking/Edit/@item.UserId" class="lnk btn">Edit</a></text>)
+))
+                        }
+                </div>
+                   </div>
+                @*</text>
+                    }
+                    else
+                    {
+                        <div class="bottom">&nbsp;</div>
+                        <div class="alert alert-info">is empty</div>
+                    }*@
+</div>
+
+            <script type="text/javascript">
+                function EditRoomType(id) {
+                }
+                $(function () {
+                    $(".header th").each(function () {
+                        if ($(this).html().trim() == "head") {
+                            $(this).html("<input type='checkbox' id='chkAll' />");
+                        }
+                    });
+                    function checkchange() {
+                        var ids = "";
+                        var cnt = 0;
+                        var chkcnt = 0;
+                        $(".chk").each(function () {
+                            cnt += 1;
+                            if ($(this).is(":checked") == true) { ids += $(this).attr("value") + ","; chkcnt += 1; }
+                        });
+                        if (ids.length > 0) { ids = ids.substr(0, ids.length - 1); }
+                        if (ids == "") { $("#div-actions button").attr("disabled", "disabled"); }
+                        else { $("#data").val(ids); $("#div-actions button").removeAttr("disabled"); }
+                        if (cnt > 0 && chkcnt > 0) {
+                            if (cnt == chkcnt) { $("#chkAll").prop('checked', true); }
+                            else { $("#chkAll").prop('checked', false); }
+                        }
+                        else { $("#chkAll").prop('checked', false); }
+                    }
+                    $(".chk").change(function () { checkchange(); });
+                    $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+                    $(".webGrid thead tr th a").click(function () {
+                        $(".header th").each(function () {
+                            if ($(this).html().trim() == "head") {
+                                $(this).html("<input type='checkbox' id='chkAll' />");
+                            }
+                        });
+                        $("#chkAll").prop('checked', false);
+                        $("#div-actions button").attr("disabled", "disabled");
+                        $(".chk").change(function () { checkchange(); });
+                        $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+                    });
+                    $(".webGrid tfoot tr td a").click(function () {
+                        $(".header th").each(function () {
+                            if ($(this).html().trim() == "head") {
+                                $(this).html("<input type='checkbox' id='chkAll' />");
+                            }
+                        });
+                        $("#chkAll").prop('checked', false);
+                        $("#div-actions button").attr("disabled", "disabled");
+                        $(".chk").change(function () { checkchange(); });
+                        $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+                    });
+                    $("#div-actions button").click(function () {
+                        $("#type").val($(this).attr("data-action"));
+                        if (confirm("Are you sure you want to " + $("#type").val() + " all the selectd items?")) {
+                            var url = '@Url.Action("ActionSet", "AssistedBooking")';
+                            $.post(url, $("#frmIds").serialize(),
+                                    function (data) {
+                                        window.location = location;
+                                    });
+                        }
+                    });
+                });
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}

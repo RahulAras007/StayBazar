@@ -1,0 +1,108 @@
+﻿@model StayBazar.Areas.Admin.Models.RateCommissionModel
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("SaveMarkup", "Property", FormMethod.Post, new { area = "Admin", onsubmit = "return false;", id = "prop_markupform" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="container-fluid">
+            <br /><br />
+            <table class="table table-hover table-responsive table-striped table-custom">
+                <thead>@*<th>&nbsp;</th>*@
+                    <tr><th>Markup Details</th><th>Short Term (%)</th><th>Long Term (%)</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>B2C</td>
+                        <td>@Html.TextBoxFor(m => m.B2CShortTerm, new { @class = "form-control input-sm" })@Html.ValidationMessageFor(m => m.B2CShortTerm)</td>
+                        <td>
+                            @Html.TextBoxFor(m => m.B2CLongTerm, new { @class = "form-control input-sm" })@Html.ValidationMessageFor(m => m.B2CLongTerm)
+                            @Html.HiddenFor(m => m.ComPropertyId)
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>B2B </td>
+                        <td>@Html.TextBoxFor(m => m.B2BShortTerm, new { @class = "form-control input-sm" })@Html.ValidationMessageFor(m => m.B2BShortTerm)</td>
+                        <td>@Html.TextBoxFor(m => m.B2BLongTerm, new { @class = "form-control input-sm" })@Html.ValidationMessageFor(m => m.B2BLongTerm)</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr><td colspan="4"><h4>Cancellation Policy</h4></td></tr>
+                    <tr >
+                        <td >Cancellation Method</td>
+                        <td colspan="3">
+                            @Html.RadioButtonFor(m => m.CancellationType, (int)CLayer.ObjectStatus.CancellationType.FixedNight, new { onclick = "chgType(" + ((int)CLayer.ObjectStatus.CancellationType.FixedNight).ToString() + ")" })Fixed Nights&nbsp;&nbsp;&nbsp;&nbsp;
+                            @Html.RadioButtonFor(m => m.CancellationType, (int)CLayer.ObjectStatus.CancellationType.FixedPercent, new { onclick = "chgType(" + ((int)CLayer.ObjectStatus.CancellationType.FixedPercent).ToString() + ")" })Fixed Percent&nbsp;&nbsp;&nbsp;&nbsp;
+                            @Html.RadioButtonFor(m => m.CancellationType, (int)CLayer.ObjectStatus.CancellationType.VariableNights, new { onclick = "chgType(" + ((int)CLayer.ObjectStatus.CancellationType.VariableNights).ToString() + ")" })Variable Nights
+                        </td>
+                    </tr>
+                    <tr id="typeFixedRow">
+                        <td colspan="2">
+                            Cancellation Charge -
+                            <span id="lFixedCharge">Fixed Nights</span>
+                            <span id="lFixedPerc">Fixed Percent</span>
+                        </td>
+                        <td colspan="2">@Html.TextBoxFor(m => m.CancellationCharges) @Html.ValidationMessageFor(m => m.CancellationCharges)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Period (Days)</td>
+                        <td>@Html.TextBoxFor(m => m.CancellationPeriod)@Html.ValidationMessageFor(m => m.CancellationPeriod)</td>
+                        <td>&nbsp;</td>
+                        <td><input type="button" class="btn btn-default" value="Save" onclick="SaveMarkup()" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Applicable to Modification or reduction of stays</td><td colspan="2">@Html.CheckBoxFor(m=>m.AppliesToRefund) </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+}
+
+<script type="text/javascript">
+    $(function () { chgType(@Model.CancellationType); });
+    function chgType(typ)
+    {
+        if (isNaN($("#CancellationCharges").val()))
+        {
+            $("#CancellationCharges").val(0).focus();
+            $("#CancellationPeriod").focus();
+        }
+        else if ($("#CancellationCharges").val() < 0)
+        {
+            $("#CancellationCharges").val(0).focus();
+            $("#CancellationPeriod").focus();
+        }
+        switch(typ)
+        {
+ 
+            case 0@((int)CLayer.ObjectStatus.CancellationType.FixedNight):
+                $("#lFixedPerc").hide();
+                $("#lFixedCharge").show();
+                $("#typeFixedRow").show();
+                break;
+            case 0@((int)CLayer.ObjectStatus.CancellationType.FixedPercent):
+                $("#lFixedPerc").show();
+                $("#lFixedCharge").hide();
+                $("#typeFixedRow").show();
+                break;
+            case 0@((int)CLayer.ObjectStatus.CancellationType.VariableNights):
+                $("#lFixedPerc").hide();
+                $("#lFixedCharge").hide();
+                $("#typeFixedRow").hide();
+                break;
+
+        }
+    }
+    function SaveMarkup() {
+
+        $.post('@Url.Action("SaveMarkup", "Property", new { area = "Admin" })', $("#prop_markupform").serialize(),
+            function (data) {
+                if (data == "false")
+                    alert("An issue occured, could not save the changes");
+            });
+    }
+</script>

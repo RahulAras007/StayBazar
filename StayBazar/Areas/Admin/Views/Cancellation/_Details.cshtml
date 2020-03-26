@@ -1,0 +1,54 @@
+﻿@model StayBazar.Areas.Admin.Models.CancelModel
+@{
+    Layout = null;
+    string javaFunc = "cancelBooking()";
+    if(Model.IsAccommodationCancel)
+    {
+        javaFunc = "cancelAcc()";
+    }
+}
+@if (Model.CanCancel)
+{
+<div>Amount in Rupees</div>
+<table class="table table-bordered">
+    <tr>
+        <td>Amount</td>
+        <td class="rightalign">@(Math.Round(Model.Amount))</td>
+    </tr>
+    <tr>
+        <td>Cancellation Charge</td>
+        <td class="rightalign">@(Math.Round(Model.CancellationCharge))</td>
+    </tr>
+    <tr>
+        <td>Service Charge</td>
+        <td class="rightalign">@(Math.Round(Model.ServiceCharge))</td>
+    </tr>
+    <tr>
+        <td>Total amount to be refunded</td>
+        <td class="rightalign">@(Math.Round(Model.RefundAmount))</td>
+    </tr>
+</table>
+
+    <div class="row"><div class="col-md-2 col-md-offset-9"><form id="cancForm">
+        <input type="hidden" value="@Model.Id" id="cancFormValueId"/>
+                                                               <input type="hidden" value="@Model.RefundAmount" id="cancRefundAmount" />
+        <input type="button" value="Cancel Booking" class="btn btn-success" onclick="@javaFunc" />
+        </form></div></div>
+}
+else{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="height10">
+            </div>
+            <div class="height10">
+            </div>
+        </div>
+        <div class="col-md-8 col-md-offset-2">
+            <div class="alert alert-info">
+                Sorry, you cannot cancel this booking.
+            </div>
+        </div> 
+    </div>
+    
+    
+}

@@ -1,0 +1,232 @@
+﻿@using System;
+@using System.Collections.Generic;
+@using System.IO;
+@using System.Linq;
+@using System.Security;
+@using System.ServiceModel.Syndication;
+@using System.Web;
+@using System.Web.Mvc;
+@using System.Xml;
+@using System.Net;
+@using HtmlAgilityPack;
+
+@{
+
+
+}
+
+<div class="col-sm-12 col-md-8">
+    <div class="line">
+        <div class="pull-left leftside whitebg pattern">Blogs</div>
+        <div class="pull-right rightside whitebg  pattern">
+            <a href="javascript:void(0)" class="pplr1 prev">
+                <img src="../images/arrow-left.png" alt="Left">
+            </a>
+            <a href="javascript:void(0)" class="pplr1 next">
+                <img src="../images/arrow-right.png" alt="Right">
+            </a>
+        </div>
+    </div>
+    <div id="Blogs" class="owl-carousel">
+        @try
+        {
+            string feed = "https://www.staybazar.com/blog/index.php/feed/";
+            SyndicationFeed rssData = new SyndicationFeed();
+            using (XmlReader reader = XmlReader.Create(feed))
+            {
+                rssData = SyndicationFeed.Load(reader);
+            }
+
+            if (rssData != null)
+            {
+                if (rssData.Items != null)
+                {
+                    if (rssData.Items.Count() > 0)
+                    {
+                        foreach (System.ServiceModel.Syndication.SyndicationItem ss in rssData.Items)
+                        {
+                            if (ss != null)
+                            {
+                                if (ss.Links != null)
+                                {
+                                    if (ss.Links.Count > 0)
+                                    {
+                                        if (ss.Links[0] != null)
+                                        {
+                                            if (ss.Links[0].Uri.ToString() != null && ss.Links[0].Uri.ToString() != "")
+                                            {
+                                                string getimg = ss.Links[0].Uri.ToString();
+                                                HtmlWeb web = new HtmlWeb();
+                                                HtmlDocument doc = web.Load(getimg);
+
+                                                if (doc != null && doc.ToString() != "")
+                                                {
+                                                    HtmlNode rateNode = doc.DocumentNode.SelectSingleNode("//div[@class='entry-thumbnail']");
+                                                    string ImageUrl = "";
+                                                    if (rateNode != null)
+                                                    {
+                                                        if (rateNode.ChildNodes.Count > 0)
+                                                        {
+                                                            if (rateNode.ChildNodes[1].Attributes.Count > 0)
+                                                            {
+                                                                if (rateNode.ChildNodes[1].Attributes[2].Value != null)
+                                                                {
+                                                                    ImageUrl = rateNode.ChildNodes[1].Attributes[2].Value;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    if (ImageUrl == "" || ImageUrl == null)
+                                                    {
+                                                        ImageUrl = "/images/BlankImage.jpg";
+                                                    }
+                                                    <div class="item">
+                                                        <div class="prop">
+                                                            <div class="prop-image">
+                                                                <a style="display:inline-block;" href="@ss.Links[0].Uri" target="_blank">
+                                                                    <img src="@ImageUrl" style="min-height:170px;" />
+                                                                </a>
+                                                            </div>
+                                                            <div style="padding:15px; min-height: 80px;display:inline-block;width:100%;line-height:80px;">
+                                                                <div class="" style="width:76%;display:inline-block;line-height:23px;">
+                                                                    @if (ss.Title.Text != null)
+                                                                    {
+                                                                        <a title="@ss.Title.Text" style="display:inline-block; font-size: 16px; color:black;" href="@ss.Links[0].Uri" target="_blank">
+                                                                            @{
+                                                                        string name = ss.Title.Text;
+                                                                        string titlename = ss.Title.Text;
+                                                                        if (name.Length > 35)
+                                                                        {
+                                                                            titlename = StayBazar.Common.Utils.ConvertShortLengthString(name, 32) + "...";
+
+                                                                        }
+                                                                        @String.Format(titlename);
+                                                                            }
+                                                                        </a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <a style="display:inline-block; font-size: 16px; color:black;" href="@ss.Links[0].Uri" target="_blank">
+                                                                            Staybazar blog
+                                                                        </a>
+                                                                    }
+                                                                </div>
+                                                                <div style="width:20%;display:inline-block;text-align:center;">
+                                                                    <a style="display:inline-block;" href="@ss.Links[0].Uri" target="_blank">
+                                                                        <img src="~/images/Arrowright.png" width="30" height="30" />
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Exception Error = new Exception("#Error from  Blog section on ," + DateTime.Now + " , " + ex);
+            StayBazar.Common.LogHandler.HandleError(Error);
+        }
+    </div>
+</div>
+
+
+<script type='text/javascript'>
+    $(document).ready(function () {
+
+                                               //   Old slider  Script
+        $("#Blogs").owlCarousel({
+            items: 3,
+            itemsDesktop: [1199, 2],
+            pagination: false,
+            autoPlay: 7000
+        });
+
+        $(".pplr1.prev").click(function () {
+            $("#Blogs").trigger('owl.prev');
+        })
+
+        $(".pplr1.next").click(function () {
+            $("#Blogs").trigger('owl.next');
+        })
+
+
+
+
+
+
+        //                    //   New slider  Script
+
+        //var Mpitems = $('.prop');
+        //if (Mpitems.length > 3) {
+        //    $("#Blogs").owlCarousel({
+        //        loop: true,
+        //        items: 3,
+        //        pagination: false,
+        //        //loop: true,
+        //        dots: false,
+        //        navigation: false,
+        //        autoplay: 7000,
+        //        responsiveClass: true,
+        //        responsive: {
+        //            0: {
+        //                items: 1
+        //            },
+        //            450: {
+        //                items: 1
+        //            },
+        //            767: {
+        //                items: 3
+        //            }
+        //        }
+
+        //    });
+        //}
+        //else {
+
+        //    $("#Blogs").owlCarousel({
+        //        items: 3,
+        //        pagination: false,
+        //        dots: false,
+        //        navigation: false,
+        //        autoplay: 7000,
+        //        responsiveClass: true,
+        //        responsive: {
+        //            0: {
+        //                items: 1
+        //            },
+        //            450: {
+        //                items: 1
+        //            },
+        //            767: {
+        //                items: 3
+        //            }
+        //        }
+
+        //    });
+
+        //}
+        //$(".pplr1.prev").click(function () {
+        //    $("#Blogs").trigger('prev.owl.carousel');
+        //})
+
+        //$(".pplr1.next").click(function () {
+        //    $("#Blogs").trigger('next.owl.carousel');
+        //})
+
+
+
+    });
+</script>
+
+<!--Adding jQuery rating plug-in-->
+<script src="~/Content/raty27/jquery.raty.js"></script>
+<link href="~/Content/raty27/jquery.raty.css" rel="stylesheet" property="" />

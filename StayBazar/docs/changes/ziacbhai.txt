@@ -1,0 +1,1518 @@
+﻿
+14-12-19
+
+drop view ggn_users_customers_vu
+$$
+create view ggn_users_customers_vu
+as
+select a.userid,upper(a.firstname) firstname,a.usertype,a.email,a.status,b.country,b.state,b.cityid,b.mobile,
+upper(c.name) country_name,upper(d.name) state_name,upper(e.name) city_name
+from user a 
+inner join address b on a.userid = b.userid
+inner join country c on b.country = c.countryid
+inner join state d on b.state = d.stateid and c.countryid = d.countryid
+inner join city e on b.cityid = e.cityid
+where a.usertype = 7
+and c.tamarind_flag is null and c.tbo_flag is null
+and d.tboflag is null
+and e.tboflag is null and e.tamarind_flag is null
+$$
+
+drop view ggn_users_corporates_vu
+$$
+create view ggn_users_corporates_vu
+as
+select a.userid,upper(a.firstname) firstname,a.usertype,a.email,
+a.status,b.country,b.state,b.cityid,b.mobile,
+upper(c.name) country_name,upper(d.name) state_name,upper(e.name) city_name,
+f.gstregno
+from user a 
+inner join address b on a.userid = b.userid
+inner join country c on b.country = c.countryid
+inner join state d on b.state = d.stateid and c.countryid = d.countryid
+inner join city e on b.cityid = e.cityid
+inner join offlinecustomergst_details f on a.userid = f.offlinebookingcustomerid
+where a.usertype = 5
+and c.tamarind_flag is null and c.tbo_flag is null
+and d.tboflag is null
+and e.tboflag is null and e.tamarind_flag is null
+$$
+
+-----------------------------------------------------------------------------------------------------
+20-12-2019
+
+
+Alter table bookingimport
+Add property_address varchar(500) after supplier
+$$
+
+Alter table bookingimport
+Add property_country varchar(50) after property_address
+$$
+
+Alter table bookingimport
+Add property_gst_no varchar(50) after property_country
+$$
+
+Alter table bookingimport
+Add property_contact_person varchar(50) after property_gst_no
+$$
+
+Alter table bookingimport
+Add property_contact_number varchar(50) after property_contact_person
+$$
+
+Alter table bookingimport
+Add property_email_address varchar(100) after property_contact_number
+$$
+
+Alter table bookingimport
+Add supplier_pan varchar(50) after supplier
+$$
+Alter table bookingimport
+Add place_of_supply varchar(50) after property_email_address
+
+$$
+
+Alter table bookingimport
+Add hsn_code int after place_of_supply
+
+$$
+--------------------------------------------
+28-12-2019
+
+ALTER TABLE `bookingimport` CHANGE COLUMN `corporate_user_id` `corporate_user_id` bigint NULL;
+$$
+ALTER TABLE `bookingimport` CHANGE COLUMN `customer_GST_number` `customer_GST_number` varchar(50) NULL
+$$
+ALTER TABLE `bookingimport` add `customer_state_id` int NULL
+$$
+ALTER TABLE `bookingimport` add `property_state_id` int NULL
+$$
+
+----------------------------------------------
+
+30-12-2019
+
+ALTER TABLE `bookingimport` add `data_from` varchar(50) NULL
+$$
+
+ALTER TABLE `bookingimport` add `data_from_email_address` varchar(150) NULL
+$$
+
+ALTER TABLE bookingimport
+MODIFY COLUMN base_buy_rate_INR DECIMAL(10 , 2 ) NULL;
+
+$$
+
+ALTER TABLE bookingimport
+MODIFY COLUMN total_buy_value DECIMAL(10 , 2 ) NULL;
+$$
+
+ALTER TABLE bookingimport
+MODIFY COLUMN base_sell_rate DECIMAL(10 , 2 ) NULL;
+$$
+
+ALTER TABLE bookingimport
+MODIFY COLUMN total_sale_value_including_gst DECIMAL(10 , 2 ) NULL;
+$$
+
+CREATE INDEX `IX_offline_bookings_HotelConformationNo` ON `offline_bookings` (`HotelConformationNo`)
+$$
+
+CREATE INDEX `IX_property_GSTRegistrationNo` ON `property` (`GSTRegistrationNo`)
+$$
+
+drop view bookingimport_offline_bookings_vu
+$$
+create view bookingimport_offline_bookings_vu as
+select uc.UserId customeruserid, bimp.guest_name,pr.PropertyId,us.UserId supplieruserid,
+bimp.check_in,bimp.check_out,bimp.no_of_nights,bimp.no_of_room,st.CategoryId, 
+acct.AccommodationTypeId,bimp.accomodation_type,bimp.base_buy_rate_INR, 
+if((bimp.input_sgst + bimp.input_cgst + bimp.input_igst)<>0,Round(((bimp.input_sgst + bimp.input_cgst + bimp.input_igst) * 100) / (total_buy_value - bimp.input_sgst - bimp.input_cgst - bimp.input_igst )),18 )as BuyGST, 
+bimp.total_buy_value,bimp.total_buy_value totalbuyvalue,bimp.base_sell_rate, 
+if((bimp.output_sgst + bimp.output_cgst + bimp.output_igst)<>0,Round(((bimp.output_sgst + bimp.output_cgst + bimp.output_igst) * 100) / (total_sale_value_including_gst - bimp.output_sgst - bimp.output_cgst - bimp.output_igst)),18)as SellGST, 
+bimp.total_sale_value_including_gst,bimp.total_sale_value_including_gst totalsalevalueincludinggst,
+bimp.date_of_booking, 
+1 as IsSendCustomerMail,1 as IsSendSupplierMail,5 as SaveStatus,
+bimp.hotel_confirmation_number,bimp.date_of_booking dateofbooking,bimp.UserID loginuserid,2043 createduserid,
+'North' salesregion,bimp.itilite_booking_id,2 as IsGST, 
+IF(pr.State = sb.StateId, sb.EntityId, '4') as SBEntityEntityId,
+IF(pr.State = sb.StateId, sb.EntityId, '4') as SBEntityEntityIdBilling,
+bimp.property_gst_no,bimp.booking_code,
+IF(pr.State = sb.StateId, '11', '10') as HSNcode,
+ocd.GSTRegNO,ocd.Stateid,uc.UserId,1 fromcustomer,IF(pr.State = sb.StateId,sb.StateId,'3' )as POSStateID
+from bookingimport bimp 
+left outer join sbentity sb on sb.Stateid = bimp.property_state_id
+inner join user uc on uc.FirstName = bimp.customer_name and uc.usertype = 5 
+left outer join address addr on addr.userid = uc.userid 
+and addr.type = 5 
+inner join user us on us.FirstName = bimp.data_from and us.usertype = 3
+and us.email = bimp.data_from_email_address 
+left outer join address  addrs on addrs.userid = us.userid and addrs.city = bimp.property_city 
+and addrs.mobile = bimp.property_contact_number and addrs.type = 3 
+inner join state c on upper(ltrim(rtrim(bimp.place_of_supply))) = upper(ltrim(rtrim(c.name))) 
+and c.tboflag is null and c.countryid = 1
+inner join city ci on upper(ltrim(rtrim(ci.name)))= upper(ltrim(rtrim(bimp.property_city))) 
+and ci.tamarind_flag is null and ci.tboflag is null and ci.stateid = bimp.property_state_id 
+left outer join property pr on pr.OwnerId = us.userid and 
+ltrim(rtrim(upper(pr.Title))) = ltrim(rtrim(upper(bimp.property_name))) 
+and pr.country = 1 and pr.state = bimp.property_state_id and pr.cityid = ci.cityid
+and trim(pr.GSTRegistrationNo) = trim(bimp.property_gst_no)
+Join accommodationtype_vu acct on acct.Title = bimp.accomodation_type 
+Join staycategory st on st.Title = bimp.stay_option 
+left outer join offlinecustomergst_details ocd on ocd.OfflinebookingCustomerId = uc.userid and uc.usertype = 5 
+and ocd.Stateid=IF(pr.State = sb.StateId, bimp.customer_state_id, '4')
+LEFT OUTER JOIN OFFLINE_BOOKINGS OBS ON OBS.HotelConformationNo=bimp.hotel_confirmation_number 
+and OBS.CustomerReferenceNo=bimp.itilite_booking_id and OBS.UserId=uc.userid 
+and obs.CustomerGstStateId = ocd.Stateid
+where isnull(OBS.offline_bookingid) and bimp.base_buy_rate_INR > 0 
+$$
+
+-----------------------------------------------
+03-01-2020
+
+drop view bookingimport_offline_bookings_vu
+GO
+create view bookingimport_offline_bookings_vu as
+select 
+uc.UserId customeruserid, bimp.guest_name,pr.PropertyId,us.UserId supplieruserid,
+bimp.check_in,bimp.check_out,bimp.no_of_nights,bimp.no_of_room,st.CategoryId, 
+acct.AccommodationTypeId,bimp.accomodation_type,bimp.base_buy_rate_INR, 
+Round(((bimp.input_sgst + bimp.input_cgst + bimp.input_igst) * 100) / bimp.base_buy_rate_INR) as BuyGST, 
+bimp.total_buy_value,bimp.total_buy_value totalbuyvalue,bimp.base_sell_rate, 
+Round(((bimp.output_sgst + bimp.output_cgst + bimp.output_igst) * 100) / bimp.base_sell_rate) as SellGST, 
+bimp.total_sale_value_including_gst,bimp.total_sale_value_including_gst totalsalevalueincludinggst,
+bimp.date_of_booking, 
+1 as IsSendCustomerMail,1 as IsSendSupplierMail,5 as SaveStatus,
+bimp.hotel_confirmation_number,bimp.date_of_booking dateofbooking,bimp.UserID loginuserid,2043 createduserid,
+'North' salesregion,bimp.itilite_booking_id,2 as IsGST, 
+IF(pr.State = sb.StateId, sb.EntityId, '4') as SBEntityEntityId,
+IF(pr.State = sb.StateId, sb.EntityId, '4') as SBEntityEntityIdBilling,
+bimp.property_gst_no,bimp.booking_code,
+IF(pr.State = sb.StateId, '11', '10') as HSNcode,
+ocd.GSTRegNO,ocd.Stateid,uc.UserId,1 fromcustomer,IF(pr.State = sb.StateId,sb.StateId,'3' )as POSStateID
+from bookingimport bimp 
+left outer join sbentity sb on sb.Stateid = bimp.property_state_id
+inner join user uc on uc.FirstName = bimp.customer_name and uc.usertype = 5 
+left outer join address addr on addr.userid = uc.userid 
+and addr.type = 5 
+inner join user us on us.FirstName = bimp.data_from and us.usertype = 3
+and us.email = bimp.data_from_email_address 
+left outer join address  addrs on addrs.userid = us.userid and addrs.city = bimp.property_city 
+and addrs.mobile = bimp.property_contact_number and addrs.type = 3 
+inner join state c on upper(ltrim(rtrim(bimp.place_of_supply))) = upper(ltrim(rtrim(c.name))) 
+and c.tboflag is null and c.countryid = 1
+inner join city ci on upper(ltrim(rtrim(ci.name)))= upper(ltrim(rtrim(bimp.property_city))) 
+and ci.tamarind_flag is null and ci.tboflag is null and ci.stateid = bimp.property_state_id 
+left outer join property pr on pr.OwnerId = us.userid and 
+ltrim(rtrim(upper(pr.Title))) = ltrim(rtrim(upper(bimp.property_name))) 
+and pr.country = 1 and pr.state = bimp.property_state_id and pr.cityid = ci.cityid
+and trim(pr.GSTRegistrationNo) = trim(bimp.property_gst_no)
+Join accommodationtype_vu acct on acct.Title = bimp.accomodation_type 
+Join staycategory st on st.Title = bimp.stay_option 
+left outer join offlinecustomergst_details ocd on ocd.OfflinebookingCustomerId = uc.userid and 
+uc.usertype = 5 and ocd.Stateid=IF(pr.State = sb.StateId, bimp.customer_state_id, '3')
+LEFT OUTER JOIN OFFLINE_BOOKINGS OBS ON OBS.HotelConformationNo=bimp.hotel_confirmation_number 
+and OBS.CustomerReferenceNo=bimp.itilite_booking_id and OBS.UserId=uc.userid 
+and obs.CustomerGstStateId = ocd.Stateid
+where isnull(OBS.offline_bookingid) and bimp.base_buy_rate_INR > 0 
+Go
+-------------------------------------------------------------------------------------------------
+
+06-01-2020
+
+DELIMITER
+$$
+drop view bookingimport_offline_bookings_vu
+$$
+create view bookingimport_offline_bookings_vu as
+select uc.UserId customeruserid, bimp.guest_name,pr.PropertyId,us.UserId supplieruserid,
+bimp.check_in,bimp.check_out,bimp.no_of_nights,bimp.no_of_room,st.CategoryId, 
+acct.AccommodationTypeId,bimp.accomodation_type,bimp.base_buy_rate_INR, 
+if((bimp.input_sgst + bimp.input_cgst + bimp.input_igst)<>0,Round(((bimp.input_sgst + bimp.input_cgst + bimp.input_igst) * 100) / (total_buy_value - bimp.input_sgst - bimp.input_cgst - bimp.input_igst )),0 )as BuyGST, 
+bimp.total_buy_value,bimp.total_buy_value totalbuyvalue,bimp.base_sell_rate, 
+if((bimp.output_sgst + bimp.output_cgst + bimp.output_igst)<>0,Round(((bimp.output_sgst + bimp.output_cgst + bimp.output_igst) * 100) / (total_sale_value_including_gst - bimp.output_sgst - bimp.output_cgst - bimp.output_igst)),18)as SellGST, 
+bimp.total_sale_value_including_gst,bimp.total_sale_value_including_gst totalsalevalueincludinggst,
+bimp.date_of_booking, 
+1 as IsSendCustomerMail,1 as IsSendSupplierMail,5 as SaveStatus,
+bimp.hotel_confirmation_number,bimp.date_of_booking dateofbooking,bimp.UserID loginuserid,2043 createduserid,
+'North' salesregion,bimp.itilite_booking_id,2 as IsGST, 
+IF(pr.State = sb.StateId, sb.EntityId, '4') as SBEntityEntityId,
+IF(pr.State = sb.StateId, sb.EntityId, '4') as SBEntityEntityIdBilling,
+bimp.property_gst_no,bimp.booking_code,
+IF(pr.State = sb.StateId, '11', '10') as HSNcode,
+ocd.GSTRegNO,ocd.Stateid,uc.UserId,1 fromcustomer,IF(pr.State = sb.StateId,sb.StateId,'3' )as POSStateID
+from bookingimport bimp 
+left outer join sbentity sb on sb.Stateid = bimp.property_state_id
+inner join user uc on uc.FirstName = bimp.customer_name and uc.usertype = 5 
+left outer join address addr on addr.userid = uc.userid 
+and addr.type = 5 
+inner join user us on us.FirstName = bimp.data_from and us.usertype = 3
+and us.email = bimp.data_from_email_address 
+left outer join address  addrs on addrs.userid = us.userid and addrs.city = bimp.property_city 
+and addrs.mobile = bimp.property_contact_number and addrs.type = 3 
+inner join state c on upper(ltrim(rtrim(bimp.place_of_supply))) = upper(ltrim(rtrim(c.name))) 
+and c.tboflag is null and c.countryid = 1
+inner join city ci on upper(ltrim(rtrim(ci.name)))= upper(ltrim(rtrim(bimp.property_city))) 
+and ci.tamarind_flag is null and ci.tboflag is null and ci.stateid = bimp.property_state_id 
+left outer join property pr on pr.OwnerId = us.userid and 
+ltrim(rtrim(upper(pr.Title))) = ltrim(rtrim(upper(bimp.property_name))) 
+and pr.country = 1 and pr.state = bimp.property_state_id and pr.cityid = ci.cityid
+and trim(pr.GSTRegistrationNo) = trim(bimp.property_gst_no)
+Join accommodationtype_vu acct on acct.Title = bimp.accomodation_type 
+Join staycategory st on st.Title = bimp.stay_option 
+left outer join offlinecustomergst_details ocd on ocd.OfflinebookingCustomerId = uc.userid and 
+uc.usertype = 5 and ocd.Stateid=IF(pr.State = sb.StateId, bimp.customer_state_id, '3')
+LEFT OUTER JOIN OFFLINE_BOOKINGS OBS ON OBS.HotelConformationNo=bimp.hotel_confirmation_number 
+and OBS.CustomerReferenceNo=bimp.itilite_booking_id and OBS.UserId=uc.userid 
+and obs.CustomerGstStateId = ocd.Stateid and OBS.Guestname=bimp.guest_name
+where isnull(OBS.offline_bookingid) and bimp.base_buy_rate_INR > 0 
+$$
+
+--------------------------------------------------------------------------------------------
+03-01-2020
+ALTER TABLE `staybazar`.`offline_bookings` add `BookingFor` varchar(10) NULL
+
+DROP PROCEDURE `OfflineBooking_SaveGST`
+
+GO
+
+CREATE  PROCEDURE `OfflineBooking_SaveGST`( 
+IN pOfflineBookingId BIGINT,
+IN pCustomerId BIGINT,
+IN pGuestName VARCHAR(1000),
+ IN pGuestEmail VARCHAR(1000),
+IN pSupplierId BIGINT,
+IN pPropertyId BIGINT,
+IN pAccommodationid BIGINT,
+IN pAccommodationtypeid BIGINT,
+IN pAccommodatoinTypename VARCHAR(200),
+IN  pStayCategoryName VARCHAR(100),
+IN pStayCategoryid BIGINT,
+IN pNoOfNight VARCHAR(100),
+IN pNoOfRooms VARCHAR(100),
+IN pNoOfPaxAdult BIGINT,
+IN pNoOfPaxChild BIGINT,
+IN pCheckIn DATETIME,
+IN pCheckOut DATETIME,
+IN pCreatedDate DATETIME,
+IN pTotalAmtForBuyPrice DECIMAL(16,2),
+IN pTotalAmtotherForBuyPrice DECIMAL(16,2),
+IN pAvgDailyRateBefreStaxForBuyPrice DECIMAL(16,2),
+IN pBuyPriceforotherservicesForBuyprice DECIMAL(16,2),
+IN pStaxForBuyPrice DECIMAL(16,4),
+IN pStaxForotherBuyPrice DECIMAL(16,4),
+IN pTotalAmtForSalePrice DECIMAL(16,2),
+IN pTotalAmtotherForSalePrice DECIMAL(16,2),
+IN pAvgDailyRateBefreStaxForSalePrice DECIMAL(16,2),
+IN pBuyPriceforotherservicesForSalePrice DECIMAL(16,2),
+IN pStaxForSalePrice DECIMAL(16,4),
+IN pStaxForotherForSalePrice DECIMAL(16,4),
+IN pOtherService  VARCHAR(1000),
+IN psendmailtocustomer BOOL,
+IN psendmailtosupplier BOOL,
+IN pCustomPropertyId BIGINT,
+IN pSaveStatus INT,
+IN pTotalBuyPrice DECIMAL(16,2),
+IN pTotalSalePrice DECIMAL(16,2),
+IN pCreatedBy BIGINT,
+IN pSalesPersonId BIGINT,
+IN pSalesRegion VARCHAR(100),
+IN pNewCustomerReferenceNo VARCHAR(200),
+IN pMailContent VARCHAR(2000),
+IN pHotelConformationNo VARCHAR(30),
+IN pHotelFacility VARCHAR(2000),
+IN pSBEntityEntityId INT,
+IN pSBEntityEntityId1 INT,
+IN pPayeeID BIGINT,
+IN pCustomerGstStateId BIGINT,
+IN pCustomerGstRegNo VARCHAR(100),
+IN pPropertyGstRegNo VARCHAR(100),
+IN pFromCustomer BIGINT ,
+IN pFromCustomerId BIGINT ,
+IN pcancellationpolicy VARCHAR(8000),
+IN pCustomerPaymentMode INT ,
+in PInventoryAPIType int,
+IN pCreditDays DECIMAL(24,3),
+in pAssistedBy BIGINT,
+IN pBookingForSelf VARCHAR(10),
+IN pNewBillingFor VARCHAR(10),
+IN pCorporate_ID BIGINT
+
+ 
+)
+BEGIN
+IF pOfflineBookingId = 0 THEN
+		INSERT INTO `offline_bookings` ( `UserId`,`Guestname`,`Guestemail`,`PropertyId`,CustomPropertyId,`SupplierId`,`CheckIn_date`,`CheckOut_date`,`Noofnight`,`NoOfPaxAdult`,`NoOfPaxChild`,`NoOfRooms`,`StayCategoryName`,`StayCategoryId`,`AccommodationId`,
+		`AccommodatoinTypeId`, `AccommodatoinTypeName`,`AvgDailyRateBefreStaxForBuyPrice`,`StaxForBuyPrice`,`TotalAmtForBuyPrice`,
+		`BuyPriceforotherservicesForBuyprice`,`StaxForotherBuyPrice`,`TotalAmtotherForBuyPrice`,`TotalBuyPrice`,
+		`AvgDailyRateBefreStaxForSalePrice`,
+		`StaxForSalePrice`,`TotalAmtForSalePrice`,
+		`BuyPriceforotherservicesForSalePrice`,`StaxForotherForSalePrice`,`TotalAmtotherForSalePrice`,`TotalSalePrice`,`OtherService`,`CreatedDate`,`IsSendCustomerMail`,`IsSendSupplierMail`,`UpdatedDate`,`SaveStatus`,`CreatedBy`,`supplierPayment`,SalesPersonId
+		,SalesRegion,`CustomerReferenceNo`,`MailContent`,`HotelConformationNo`,HotelFacility,`booking_creationdate`,`IsGST`,`SBEntityEntityId`,`SBEntityEntityIdBilling`,`PayeeID`,`CustomerGstStateId`,`CustomerGstRegNo`,`PropertyGstRegNo`,FromCustomer,FromCustomerId,cancellationpolicy,CustomerPaymentMode,
+		CreditDays,InventoryAPIType,`Assisted_By`,`Billing_For`,`Corporate_ID`,`BookingFor`)
+			VALUES(pCustomerId ,pGuestName ,pGuestEmail ,pPropertyId ,pCustomPropertyId,pSupplierId ,pCheckIn,pCheckOut,pNoOfNight ,
+pNoOfPaxAdult ,pNoOfPaxChild ,pNoOfRooms,pStayCategoryName,pStayCategoryid ,pAccommodationid ,pAccommodationtypeid , pAccommodatoinTypename,pAvgDailyRateBefreStaxForBuyPrice,pStaxForBuyPrice,pTotalAmtForBuyPrice ,pBuyPriceforotherservicesForBuyprice,pStaxForotherBuyPrice,
+pTotalAmtotherForBuyPrice,pTotalBuyPrice,pAvgDailyRateBefreStaxForSalePrice,pStaxForSalePrice,pTotalAmtForSalePrice ,pBuyPriceforotherservicesForSalePrice,pStaxForotherForSalePrice,
+pTotalAmtotherForSalePrice,pTotalSalePrice,pOtherService,pCreatedDate,psendmailtocustomer,psendmailtosupplier,NOW(),pSaveStatus,pCreatedBy,0,pSalesPersonId,pSalesRegion,pNewCustomerReferenceNo,pMailContent,pHotelConformationNo,pHotelFacility,now(),2,pSBEntityEntityId,pSBEntityEntityId1,pPayeeID
+,pCustomerGstStateId,pCustomerGstRegNo,pPropertyGstRegNo,pFromCustomer,pFromCustomerId,pcancellationpolicy,pCustomerPaymentMode,pCreditDays,PInventoryAPIType,pAssistedBy,pNewBillingFor,pCorporate_ID,pBookingForSelf	
+			
+			);
+			
+			SELECT LAST_INSERT_ID();	
+			
+ELSE
+		UPDATE 	offline_bookings SET 
+		`CreatedDate`=pCreatedDate,
+		`UserId` = pCustomerId
+		,`Guestname` =pGuestName
+		,`Guestemail` =pGuestEmail
+		,`PropertyId`=pPropertyId
+		,CustomPropertyId=pCustomPropertyId
+		,`SupplierId`=pSupplierId
+		,`CheckIn_date`=pCheckIn
+		,`CheckOut_date`=pCheckOut
+		,`Noofnight`=pNoOfNight
+		,`NoOfPaxAdult`=pNoOfPaxAdult
+		,`NoOfPaxChild`=pNoOfPaxChild
+		,`NoOfRooms`=pNoOfRooms
+		,`StayCategoryName`=pStayCategoryName
+		,`StayCategoryId`=pStayCategoryid
+		,`AccommodationId`=pAccommodationid
+		,`AccommodatoinTypeId`=pAccommodationtypeid
+		,`AccommodatoinTypeName` = pAccommodatoinTypename	
+		,`AvgDailyRateBefreStaxForBuyPrice`=pAvgDailyRateBefreStaxForBuyPrice
+		,`StaxForBuyPrice`=pStaxForBuyPrice
+		,`TotalAmtForBuyPrice`=pTotalAmtForBuyPrice
+		,`BuyPriceforotherservicesForBuyprice`=pBuyPriceforotherservicesForBuyprice
+		,`StaxForotherBuyPrice`=pStaxForotherBuyPrice
+		,`TotalAmtotherForBuyPrice`=pTotalAmtotherForBuyPrice
+		,`AvgDailyRateBefreStaxForSalePrice`=pAvgDailyRateBefreStaxForSalePrice
+		,`StaxForSalePrice`=pStaxForSalePrice
+		,`TotalAmtForSalePrice`=pTotalAmtForSalePrice
+		,`BuyPriceforotherservicesForSalePrice`=pBuyPriceforotherservicesForSalePrice
+		,`StaxForotherForSalePrice`=pStaxForotherForSalePrice
+		,`TotalAmtotherForSalePrice`=pTotalAmtotherForSalePrice
+		,`OtherService`=pOtherService
+		,`UpdatedDate`= NOW()
+		,`IsSendCustomerMail`=psendmailtocustomer
+		,`IsSendSupplierMail`=psendmailtosupplier
+		,`TotalBuyPrice` = pTotalBuyPrice
+		,`TotalSalePrice` = pTotalSalePrice	
+		,SalesPersonId = pSalesPersonId,
+		SalesRegion=pSalesRegion,
+		CustomerReferenceNo =pNewCustomerReferenceNo,
+		MailContent=pMailContent,
+	`HotelConformationNo`=pHotelConformationNo,
+	HotelFacility = pHotelFacility,
+	`SBEntityEntityId`=pSBEntityEntityId,
+	`SBEntityEntityIdBilling`=pSBEntityEntityId1,
+	`CustomerGstStateId`=pCustomerGstStateId,
+	`CustomerGstRegNo`=pCustomerGstRegNo,
+	`PropertyGstRegNo`=pPropertyGstRegNo,
+	FromCustomer=pFromCustomer,
+	FromCustomerId=pFromCustomerId,
+	cancellationpolicy=pcancellationpolicy,
+	PayeeID =pPayeeID,
+	CustomerPaymentMode = pCustomerPaymentMode,
+	CreditDays = pCreditDays,
+	`Assisted_By`= pAssistedBy,
+	`Billing_For` = pNewBillingFor,
+	`Corporate_ID` = pCorporate_ID,
+	`BookingFor` = pBookingForSelf
+	
+	
+			WHERE `Offline_BookingId` = pOfflineBookingId;
+SELECT pOfflineBookingId;			
+			
+ END IF;
+			
+						
+	
+ END
+
+ --------------------------------------------------------------------------------------
+
+
+
+08-02-2020
+
+ALTER TABLE `user` add `AssistedBooking_Flag` char(3) NULL
+
+
+DROP PROCEDURE `user_Get`
+
+GO
+
+CREATE  PROCEDURE `user_Get`(pUserId INT)
+BEGIN
+	SELECT 
+		DISTINCT 
+			u.UserId,
+			u.FirstName,
+			u.LastName,
+			u.Email,
+			u.SalutationId,
+			stf.SalesRegion,
+			u.DateOfBirth,
+			u.CreatedDate,
+			u.DeletedDate,
+			u.LastLoginOn,
+			u.Status,
+			u.Sex,
+			u.UserType, 
+			a.Address,
+			a.City,
+			a.Phone,
+			st.Name AS State,
+			c.Name AS Country,
+			a.`Phone`,
+			a.`Mobile`,
+			u.OPSEmail,
+			u.CustomerPaymentMode,
+			u.CustomerPaymentModeCreditDays,
+			ifnull(bu.MaximumDailyEntitlement,0) as MaximumDailyEntitlement,
+			IFNULL(bu.GradeID,0) AS GradeID,
+			IFNULL(u.`SbEntities`,'') AS SbEntities,
+			IFNULL(bu.CostCentre,0) as CostCentre,
+			u.AssistedBooking_Flag
+	FROM  `user` u 
+        LEFT JOIN address a ON a.UserId = u.UserId 
+        LEFT JOIN staff stf ON stf.UserId = u.UserId 
+        LEFT JOIN state st ON st.StateId = a.State
+        LEFT JOIN country c ON c.CountryId = a.Country
+        left join b2b_user bu on bu.UserId = u.UserId 
+        WHERE u.UserId = pUserId;
+    END
+
+	-----------------------------------------------------------------
+
+10-01-2020
+
+ALTER TABLE `user` add `MyAssistedBookerId` bigint NULL
+
+DROP PROCEDURE `user_Save`
+
+GO
+
+CREATE  PROCEDURE `user_Save`( IN pUserId BIGINT(20),
+						IN pSalutationId INT(11),
+						IN pFirstName VARCHAR(100),
+						IN pLastName VARCHAR(100),
+						IN pDateOfBirth DATE,
+						IN pSex INT(11),
+						IN pUserType INT(11),
+						IN pStatus INT(11),
+						IN pEmail VARCHAR(150),
+						IN pOPSEmail VARCHAR(150),
+						IN PMyAssistedBookerId Int(11)
+					      )
+BEGIN
+	DECLARE usercount INT DEFAULT 0;
+	IF pUserId < 1 THEN
+		SELECT COUNT(UserId) INTO usercount FROM `user` WHERE Email=pEmail AND `Status`<>4;
+		IF usercount = 0 THEN
+			INSERT INTO `user`(SalutationId,FirstName,LastName,DateOfBirth,Sex,UserType,`Status`,Email,OPSEmail,CreatedDate,MyAssistedBookerId)
+			VALUES(pSalutationId,pFirstName,pLastName,pDateOfBirth,pSex,pUserType,pStatus,pEmail,pOPSEmail,NOW(),PMyAssistedBookerId);
+			SELECT LAST_INSERT_ID();			
+		ELSE
+			SELECT 0;
+		END IF;
+	ELSE
+		 SELECT COUNT(UserId) INTO usercount FROM `user` WHERE Email=pEmail AND UserId <> pUserId;
+		IF usercount = 0 THEN	
+			UPDATE `user` SET
+			SalutationId = pSalutationId,
+			FirstName = pFirstName,
+			LastName = pLastName,
+			DateOfBirth = pDateOfBirth,
+			Sex = pSex,
+			UserType = pUserType,
+			`Status` = pStatus,
+			Email = pEmail,
+		        OPSEmail=pOPSEmail,
+		       MyAssistedBookerId = PMyAssistedBookerId
+			WHERE
+			UserId = pUserId;
+			SELECT pUserId;
+		ELSE
+			SELECT 0;
+		END IF;
+	END IF;
+	
+END
+
+-------------------------------------------------------------------------
+
+16-01-2020
+
+DROP PROCEDURE `user_GetAssistedBookingFlagType`
+
+GO
+
+CREATE  PROCEDURE `user_GetAssistedBookingFlagType`(pEmail Varchar(150))
+BEGIN
+	Select ifnull(AssistedBooking_Flag,0) as val from `user` u 
+	Where u.Email = pEmail;
+END
+
+------------------------------------------------------------------------
+
+18-01-2020
+
+DROP PROCEDURE `corporate_ApprovalOrder_Save`
+
+GO
+
+CREATE  PROCEDURE `corporate_ApprovalOrder_Save`(
+	IN Puser_id BIGINT(20),
+	IN Papprover_id BIGINT(20),
+	IN Papprover_order INT(11),
+	IN Pcreated_by INT(11)	
+)
+BEGIN
+		INSERT INTO b2b_approvers
+		(
+			user_id, 
+			approver_id, 
+			approver_order, 
+			created_by, 
+			created_date
+		)
+		VALUES
+		(
+			Puser_id, 
+			Papprover_id, 
+			Papprover_order, 
+			Pcreated_by, 
+			NOW()
+		);	
+		UPDATE `user` SET `IsApprover`=1 WHERE UserId = Papprover_id;	
+    END
+----------------------------------------------------------------------
+
+28-01-2020
+
+DROP PROCEDURE `report_Margintracking`
+
+GO
+
+CREATE  PROCEDURE `report_Margintracking`(IN pFromDate DATE,IN pTodate DATE, IN pStart INT, IN pLimit INT,IN pLoginUserid INT)
+BEGIN
+ DECLARE sbentity VARCHAR(8000);
+ SET @sbentity = '';
+ IF pLoginUserid > 0 THEN
+	SELECT IFNULL(`SbEntities`,'') INTO sbentity FROM `user` WHERE `UserId` = pLoginUserid;
+ END IF;
+ 
+ SELECT 1 AS NumberOfRows;
+        
+SELECT u.* FROM 
+(
+SELECT DISTINCT ob.`Offline_BookingId`,ob.`OrderNo`,ifnull(ob.`CustomerReferenceNo`,'-') as CustomerReferenceNo,ifnull(ob.`HotelConformationNo`,'-') as HotelConformationNo,ob.`NoOfRooms` AS NumberofAccomodation,ob.`CheckIn_date` AS CheckIn,ob.`CheckOut_date` AS CheckOut,
+ob.`CheckIn_date`,ob.`CheckOut_date`,ob.`CreatedDate` AS BookingDate,p.`Title` AS PropertyName,p.`Mobile` AS `PropertyContactNo`,p.`Email` AS PropertyEmail 
+,p.City AS PropertyCity, 
+(ob.`TotalBuyPrice`  + IFNULL((SELECT SUM(`ByPriceTotal`) FROM `vendorpaymentsgst` WHERE `Offline_BookingId` = ob.`Offline_BookingId`),0)) AS TotalBuyPrice ,
+ob.`TotalSalePrice`,INV.`InvoiceNumber`,
+((ob.totalnights)*ob.AvgDailyRateBefreStaxForSalePrice  +  IFNULL(ob.`BuyPriceforotherservicesForSalePrice`,0)) AS CustomerValueBeforeGST,
+((ob.totalnights)*ob.AvgDailyRateBefreStaxForBuyPrice 
+  + IFNULL(ob.`BuyPriceforotherservicesForBuyprice`,0)
+  + IFNULL((SELECT SUM(`ByPriceBeforeTax`) FROM `vendorpaymentsgst` WHERE `Offline_BookingId` = ob.`Offline_BookingId`),0)
+  )  
+  AS SupplierValueBeforeGST,
+ob.`Noofnight` ,ob.`NoOfRooms`,
+CONCAT(IFNULL(cu.`FirstName`,' '), ' ',IFNULL(cu.`LastName`,''))    AS salepersonaname,oc.Name AS CustomerName,oc.City AS City,ob.GuestName
+,ob.isgst,
+CASE ob.BookingType WHEN 2 THEN 'TAC Booking'
+	WHEN 3 THEN 'Direct Booking'
+	ELSE
+	'Regular Booking'
+	END AS Booking_Category,
+	entitystate.Name AS BillingEntity,
+	
+	(ob.`DirectAmount` +   ob.`BuyPriceforotherservicesForSalePrice` ) AS ManagementFee,
+	
+	ob.`BookingType` AS BookingType,
+	
+(ob.`TACAmount` +   ob.`BuyPriceforotherservicesForSalePrice` ) AS TacAmount,
+( ((ob.DirectAmount * `BookingTypeGST`)/100) + ob.DirectAmount +  ob.TotalSalePrice) AS SaleAmountDirect,
+(ob.TACAmount + ob.TotalSalePrice) AS SaleAmountTac,
+ob.`SaveStatus` AS offlinestatus	,
+ob.`TACAmount` AS TAConlyAmount,
+ob.`DirectAmount` AS DirectOnlyAmount,IFNULL(op.Amount,0) AS ORCAmount,ob.totalnights
+,ob.`SBEntityEntityId`,b2b.Name AS supplier_name
+FROM  
+(SELECT  off.*,CASE WHEN  IFNULL(off.isgst,1)=1  THEN (off.noofnight * off.noofrooms)
+ELSE SUM(bd.noofnight * bd.noofrooms) END AS totalnights
+  FROM offline_bookings off LEFT JOIN bookingdetails bd ON off.offline_bookingid = bd.offline_bookingid 
+WHERE   off.savestatus != 4 AND off.`PropertyId` > 0  AND (off.CreatedDate >= pFromDate AND off.CreatedDate <= pToDate)
+  GROUP BY off.offline_bookingid) ob
+INNER JOIN offlinebooking_customer oc ON ob.offline_bookingid = oc.offline_bookingid
+INNER JOIN property p ON p.`PropertyId` = ob.`PropertyId` 
+INNER JOIN  `b2b` b2b ON b2b.`B2BId` = p.`OwnerId`
+INNER JOIN `user`u ON u.`UserId` = b2b.B2BId
+INNER JOIN address ad ON ad.`UserId` = u.UserId
+LEFT JOIN `user`cu ON cu.`UserId` = ob.`SalesPersonId`
+LEFT JOIN invoices INV ON ob.offline_bookingid =INV.`OfflineBookingId` AND inv.invoiceType=1
+LEFT JOIN  sbentity billing ON ob.SBEntityEntityId = billing.EntityId
+LEFT JOIN state entitystate ON billing.stateId = entitystate.stateid
+LEFT JOIN offlinebookingpayee op ON ob.PayeeId = op.PayeeId
+WHERE   ob.savestatus != 4 AND IFNULL(INV.`InvoiceType`,1)=1  AND ob.`PropertyId` > 0  AND (
+ob.CreatedDate >= pFromDate AND ob.CreatedDate <= pToDate  
+   )
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+UNION 
+SELECT DISTINCT ob.`Offline_BookingId`,ob.`OrderNo`,ifnull(ob.`CustomerReferenceNo`,'-') as CustomerReferenceNo,ifnull(ob.`HotelConformationNo`,'-') as HotelConformationNo,ob.`NoOfRooms` AS NumberofAccomodation,ob.`CheckIn_date` AS CheckIn,ob.`CheckOut_date` AS CheckOut,
+ob.`CheckIn_date`,ob.`CheckOut_date`,ob.`CreatedDate` AS BookingDate,cp.`PropertyName`,cp.PropertyContactNo,cp.`PropertyEmail`
+,cp.PropertyCityname AS PropertyCity,(ob.`TotalBuyPrice`  + IFNULL((SELECT SUM(`ByPriceTotal`) FROM `vendorpaymentsgst` WHERE `Offline_BookingId` = ob.`Offline_BookingId`),0)) AS TotalBuyPrice,ob.`TotalSalePrice`,INV.`InvoiceNumber`,
+((ob.totalnights)*ob.AvgDailyRateBefreStaxForSalePrice  +  IFNULL(ob.`BuyPriceforotherservicesForSalePrice`,0) ) AS CustomerValueBeforeGST,
+((ob.totalnights)*ob.AvgDailyRateBefreStaxForBuyPrice 
+  + IFNULL(ob.`BuyPriceforotherservicesForBuyprice`,0)
+  + IFNULL((SELECT SUM(`ByPriceBeforeTax`) FROM `vendorpaymentsgst` WHERE `Offline_BookingId` = ob.`Offline_BookingId`),0)
+  )  
+  AS SupplierValueBeforeGST,
+ob.`Noofnight` ,ob.`NoOfRooms`,
+CONCAT(IFNULL(cu.`FirstName`,' '), ' ',IFNULL(cu.`LastName`,''))     AS salepersonaname,oc.Name AS CustomerName,oc.City AS City,ob.GuestName
+,ob.isgst,
+CASE ob.BookingType WHEN 2 THEN 'TAC Booking'
+	WHEN 3 THEN 'Direct Booking'
+	ELSE
+	'Regular Booking'
+	END AS Booking_Category,
+	entitystate.Name AS BillingEntity,
+	(ob.`DirectAmount` + ((ob.totalnights*ob.AvgDailyRateBefreStaxForSalePrice  +  ob.`BuyPriceforotherservicesForSalePrice` ))) AS ManagementFee,
+	
+	ob.`BookingType` AS BookingType,
+	
+	(ob.`TACAmount` + (ob.totalnights*ob.AvgDailyRateBefreStaxForSalePrice  +  ob.`BuyPriceforotherservicesForSalePrice`) ) AS TacAmount,
+	
+( ((ob.DirectAmount * `BookingTypeGST`)/100) + ob.DirectAmount +  ob.TotalSalePrice ) AS SaleAmountDirect,
+(ob.TACAmount + (ob.TACAmount * ob.BookingTypeGST * 0.01) ) AS SaleAmountTac,
+ob.SaveStatus AS offlinestatus,
+IFNULL(ob.`TACAmount`,0) AS TAConlyAmount,
+IFNULL(ob.`DirectAmount`,0) AS DirectOnlyAmount,IFNULL(op.Amount,0) AS ORCAmount,ob.totalnights
+,ob.`SBEntityEntityId`,cp.SupplierName AS supplier_name
+FROM   (SELECT off.*,CASE WHEN  IFNULL(off.isgst,1)=1  THEN (off.noofnight * off.noofrooms)
+ELSE SUM(bd.noofnight * bd.noofrooms) END AS totalnights
+  FROM offline_bookings off LEFT JOIN bookingdetails bd ON off.offline_bookingid = bd.offline_bookingid 
+WHERE   off.savestatus IN (2,5) AND off.`PropertyId` = 0  AND (off.CreatedDate >= pFromDate AND off.CreatedDate <= pToDate)
+  GROUP BY off.offline_bookingid) ob
+INNER JOIN offlinebooking_customer oc  ON ob.offline_bookingid = oc.offline_bookingid
+INNER JOIN `offline_customproperty` cp ON cp.`CustomPropertyId` = ob.`CustomPropertyId`
+ LEFT JOIN `user`cu ON cu.`UserId` = ob.`SalesPersonId`
+LEFT JOIN invoices INV ON ob.offline_bookingid =INV.`OfflineBookingId` AND INV.invoicetype=1
+LEFT JOIN  sbentity billing ON ob.SBEntityEntityId = billing.EntityId
+LEFT JOIN state entitystate ON billing.stateId = entitystate.stateid
+LEFT JOIN offlinebookingpayee op ON ob.PayeeId = op.PayeeId
+WHERE   ob.savestatus IN (2,5) -- AND IFNULL(INV.`InvoiceType`,1)=1  
+AND ob.`PropertyId` = 0 AND(
+  ob.CreatedDate >= pFromDate AND ob.CreatedDate <= pToDate  
+   )
+   
+   
+) AS u 
+WHERE u.isgst = 2  
+AND (sbentity ='' OR sbentity IS NULL OR FIND_IN_SET(u.SBEntityEntityId, sbentity) = 0) 
+GROUP  BY u.offline_bookingid 
+ORDER  BY u.BookingDate;
+END
+
+------Above StoreProc has been updated to server---
+
+
+
+
+ALTER TABLE `users_api_pricemarkup` CHANGE COLUMN `api_codee` `api_code` int(10) NULL
+
+-----------
+
+DROP PROCEDURE `sp_api_pricemarkup_save`
+
+GO
+
+CREATE  PROCEDURE `sp_api_pricemarkup_save`(
+	in pCode bigint,
+	in pDescription int,
+	in pCustomerID bigint,
+	in pSellMarkup Varchar(200)
+)
+begin
+	if ( pCode > 0) then
+		update users_api_pricemarkup set api_code = pDescription,
+		customer_id = pCustomerID,sell_markup_inPercentage = pSellMarkup
+		where api_pricemarkup_code = pCode;
+	else
+		insert into users_api_pricemarkup (api_code,customer_id,sell_markup_inPercentage)
+		values (pDescription,pCustomerID,pSellMarkup);
+	end if;
+end
+
+----------------------------------------------------------
+
+30-01-2020
+
+DROP PROCEDURE `Sp_NewAPIPriceMarkup_Get`
+
+GO
+
+CREATE  PROCEDURE `Sp_NewAPIPriceMarkup_Get`()
+begin
+	select * from ggn_api_pricemarkup;
+end
+
+----------
+DROP PROCEDURE `sp_new_api_pricemarkup_get`
+
+GO
+
+CREATE  PROCEDURE `sp_new_api_pricemarkup_get`(in pID bigint)
+begin
+	select * from ggn_api_pricemarkup a
+	where a.pricemarkup_code = pID;
+end
+
+----------
+
+DROP PROCEDURE `sp_new_api_pricemarkup_save`
+
+GO
+
+CREATE  PROCEDURE `sp_new_api_pricemarkup_save`(
+	in pCode bigint,
+	in pSellMarkup Varchar(200)
+)
+begin
+		update ggn_api_pricemarkup set markup_per = pSellMarkup
+		where pricemarkup_code = pCode;
+end
+
+--------------------------------------
+
+04-01-2020
+
+DROP PROCEDURE `report_Margintracking`
+
+GO
+
+CREATE  PROCEDURE `report_Margintracking`(IN pFromDate DATE,IN pTodate DATE, IN pStart INT, IN pLimit INT,IN pLoginUserid INT)
+BEGIN
+ DECLARE sbentity VARCHAR(8000);
+ SET @sbentity = '';
+ IF pLoginUserid > 0 THEN
+	SELECT IFNULL(`SbEntities`,'') INTO sbentity FROM `user` WHERE `UserId` = pLoginUserid;
+ END IF;
+ 
+ SELECT 1 AS NumberOfRows;
+        
+SELECT u.* FROM 
+(
+SELECT DISTINCT ob.`Offline_BookingId`,ob.`OrderNo`,ifnull(ob.`CustomerReferenceNo`,'-') as CustomerReferenceNo,ifnull(ob.`HotelConformationNo`,'-') as HotelConformationNo,INV.`InvoiceDate` as InvoiceDate,ob.`NoOfRooms` AS NumberofAccomodation,ob.`CheckIn_date` AS CheckIn,ob.`CheckOut_date` AS CheckOut,
+ob.`CheckIn_date`,ob.`CheckOut_date`,ob.`CreatedDate` AS BookingDate,p.`Title` AS PropertyName,p.`Mobile` AS `PropertyContactNo`,p.`Email` AS PropertyEmail 
+,p.City AS PropertyCity, 
+(ob.`TotalBuyPrice`  + IFNULL((SELECT SUM(`ByPriceTotal`) FROM `vendorpaymentsgst` WHERE `Offline_BookingId` = ob.`Offline_BookingId`),0)) AS TotalBuyPrice ,
+ob.`TotalSalePrice`,INV.`InvoiceNumber`,
+((ob.totalnights)*ob.AvgDailyRateBefreStaxForSalePrice  +  IFNULL(ob.`BuyPriceforotherservicesForSalePrice`,0)) AS CustomerValueBeforeGST,
+((ob.totalnights)*ob.AvgDailyRateBefreStaxForBuyPrice 
+  + IFNULL(ob.`BuyPriceforotherservicesForBuyprice`,0)
+  + IFNULL((SELECT SUM(`ByPriceBeforeTax`) FROM `vendorpaymentsgst` WHERE `Offline_BookingId` = ob.`Offline_BookingId`),0)
+  )  
+  AS SupplierValueBeforeGST,
+ob.`Noofnight` ,ob.`NoOfRooms`,
+CONCAT(IFNULL(cu.`FirstName`,' '), ' ',IFNULL(cu.`LastName`,''))    AS salepersonaname,oc.Name AS CustomerName,oc.City AS City,ob.GuestName
+,ob.isgst,
+CASE ob.BookingType WHEN 2 THEN 'TAC Booking'
+	WHEN 3 THEN 'Direct Booking'
+	ELSE
+	'Regular Booking'
+	END AS Booking_Category,
+	entitystate.Name AS BillingEntity,
+	
+	(ob.`DirectAmount` +   ob.`BuyPriceforotherservicesForSalePrice` ) AS ManagementFee,
+	
+	ob.`BookingType` AS BookingType,
+	
+(ob.`TACAmount` +   ob.`BuyPriceforotherservicesForSalePrice` ) AS TacAmount,
+( ((ob.DirectAmount * `BookingTypeGST`)/100) + ob.DirectAmount +  ob.TotalSalePrice) AS SaleAmountDirect,
+(ob.TACAmount + ob.TotalSalePrice) AS SaleAmountTac,
+ob.`SaveStatus` AS offlinestatus	,
+ob.`TACAmount` AS TAConlyAmount,
+ob.`DirectAmount` AS DirectOnlyAmount,IFNULL(op.Amount,0) AS ORCAmount,ob.totalnights
+,ob.`SBEntityEntityId`,b2b.Name AS supplier_name
+FROM  
+(SELECT  off.*,CASE WHEN  IFNULL(off.isgst,1)=1  THEN (off.noofnight * off.noofrooms)
+ELSE SUM(bd.noofnight * bd.noofrooms) END AS totalnights
+  FROM offline_bookings off LEFT JOIN bookingdetails bd ON off.offline_bookingid = bd.offline_bookingid 
+WHERE   off.savestatus != 4 AND off.`PropertyId` > 0  AND (off.CreatedDate >= pFromDate AND off.CreatedDate <= pToDate)
+  GROUP BY off.offline_bookingid) ob
+INNER JOIN offlinebooking_customer oc ON ob.offline_bookingid = oc.offline_bookingid
+INNER JOIN property p ON p.`PropertyId` = ob.`PropertyId` 
+INNER JOIN  `b2b` b2b ON b2b.`B2BId` = p.`OwnerId`
+INNER JOIN `user`u ON u.`UserId` = b2b.B2BId
+INNER JOIN address ad ON ad.`UserId` = u.UserId
+LEFT JOIN `user`cu ON cu.`UserId` = ob.`SalesPersonId`
+LEFT JOIN invoices INV ON ob.offline_bookingid =INV.`OfflineBookingId` AND inv.invoiceType=1
+LEFT JOIN  sbentity billing ON ob.SBEntityEntityId = billing.EntityId
+LEFT JOIN state entitystate ON billing.stateId = entitystate.stateid
+LEFT JOIN offlinebookingpayee op ON ob.PayeeId = op.PayeeId
+WHERE   ob.savestatus != 4 AND IFNULL(INV.`InvoiceType`,1)=1  AND ob.`PropertyId` > 0  AND (
+ob.CreatedDate >= pFromDate AND ob.CreatedDate <= pToDate  
+   )
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+UNION 
+SELECT DISTINCT ob.`Offline_BookingId`,ob.`OrderNo`,ifnull(ob.`CustomerReferenceNo`,'-') as CustomerReferenceNo,ifnull(ob.`HotelConformationNo`,'-') as HotelConformationNo,INV.`InvoiceDate` as InvoiceDate,ob.`NoOfRooms` AS NumberofAccomodation,ob.`CheckIn_date` AS CheckIn,ob.`CheckOut_date` AS CheckOut,
+ob.`CheckIn_date`,ob.`CheckOut_date`,ob.`CreatedDate` AS BookingDate,cp.`PropertyName`,cp.PropertyContactNo,cp.`PropertyEmail`
+,cp.PropertyCityname AS PropertyCity,(ob.`TotalBuyPrice`  + IFNULL((SELECT SUM(`ByPriceTotal`) FROM `vendorpaymentsgst` WHERE `Offline_BookingId` = ob.`Offline_BookingId`),0)) AS TotalBuyPrice,ob.`TotalSalePrice`,INV.`InvoiceNumber`,
+((ob.totalnights)*ob.AvgDailyRateBefreStaxForSalePrice  +  IFNULL(ob.`BuyPriceforotherservicesForSalePrice`,0) ) AS CustomerValueBeforeGST,
+((ob.totalnights)*ob.AvgDailyRateBefreStaxForBuyPrice 
+  + IFNULL(ob.`BuyPriceforotherservicesForBuyprice`,0)
+  + IFNULL((SELECT SUM(`ByPriceBeforeTax`) FROM `vendorpaymentsgst` WHERE `Offline_BookingId` = ob.`Offline_BookingId`),0)
+  )  
+  AS SupplierValueBeforeGST,
+ob.`Noofnight` ,ob.`NoOfRooms`,
+CONCAT(IFNULL(cu.`FirstName`,' '), ' ',IFNULL(cu.`LastName`,''))     AS salepersonaname,oc.Name AS CustomerName,oc.City AS City,ob.GuestName
+,ob.isgst,
+CASE ob.BookingType WHEN 2 THEN 'TAC Booking'
+	WHEN 3 THEN 'Direct Booking'
+	ELSE
+	'Regular Booking'
+	END AS Booking_Category,
+	entitystate.Name AS BillingEntity,
+	(ob.`DirectAmount` + ((ob.totalnights*ob.AvgDailyRateBefreStaxForSalePrice  +  ob.`BuyPriceforotherservicesForSalePrice` ))) AS ManagementFee,
+	
+	ob.`BookingType` AS BookingType,
+	
+	(ob.`TACAmount` + (ob.totalnights*ob.AvgDailyRateBefreStaxForSalePrice  +  ob.`BuyPriceforotherservicesForSalePrice`) ) AS TacAmount,
+	
+( ((ob.DirectAmount * `BookingTypeGST`)/100) + ob.DirectAmount +  ob.TotalSalePrice ) AS SaleAmountDirect,
+(ob.TACAmount + (ob.TACAmount * ob.BookingTypeGST * 0.01) ) AS SaleAmountTac,
+ob.SaveStatus AS offlinestatus,
+IFNULL(ob.`TACAmount`,0) AS TAConlyAmount,
+IFNULL(ob.`DirectAmount`,0) AS DirectOnlyAmount,IFNULL(op.Amount,0) AS ORCAmount,ob.totalnights
+,ob.`SBEntityEntityId`,cp.SupplierName AS supplier_name
+FROM   (SELECT off.*,CASE WHEN  IFNULL(off.isgst,1)=1  THEN (off.noofnight * off.noofrooms)
+ELSE SUM(bd.noofnight * bd.noofrooms) END AS totalnights
+  FROM offline_bookings off LEFT JOIN bookingdetails bd ON off.offline_bookingid = bd.offline_bookingid 
+WHERE   off.savestatus IN (2,5) AND off.`PropertyId` = 0  AND (off.CreatedDate >= pFromDate AND off.CreatedDate <= pToDate)
+  GROUP BY off.offline_bookingid) ob
+INNER JOIN offlinebooking_customer oc  ON ob.offline_bookingid = oc.offline_bookingid
+INNER JOIN `offline_customproperty` cp ON cp.`CustomPropertyId` = ob.`CustomPropertyId`
+ LEFT JOIN `user`cu ON cu.`UserId` = ob.`SalesPersonId`
+LEFT JOIN invoices INV ON ob.offline_bookingid =INV.`OfflineBookingId` AND INV.invoicetype=1
+LEFT JOIN  sbentity billing ON ob.SBEntityEntityId = billing.EntityId
+LEFT JOIN state entitystate ON billing.stateId = entitystate.stateid
+LEFT JOIN offlinebookingpayee op ON ob.PayeeId = op.PayeeId
+WHERE   ob.savestatus IN (2,5) -- AND IFNULL(INV.`InvoiceType`,1)=1  
+AND ob.`PropertyId` = 0 AND(
+  ob.CreatedDate >= pFromDate AND ob.CreatedDate <= pToDate  
+   )
+   
+   
+) AS u 
+WHERE u.isgst = 2  
+AND (sbentity ='' OR sbentity IS NULL OR FIND_IN_SET(u.SBEntityEntityId, sbentity) = 0) 
+GROUP  BY u.offline_bookingid 
+ORDER  BY u.BookingDate;
+END
+
+---------------------------------
+----------------------------------------------------------------------------------------------
+
+04-03-2020
+
+//*This is for adding the mark up price and tax for the property rate
+
+ALTER TABLE `rates` add `PurchaseRateAfterTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `rates` add `TaxRate` decimal(0,0) NULL;
+$$
+ALTER TABLE `rates` add `MarkUpRate` decimal(0,0) NULL;
+$$
+ALTER TABLE `rates` add `PurchaseRateBeforeTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `rates` add `SellRateAfterTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `rates` add `SellRateBeforeTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `rates` add `MarginAmount` decimal(0,0) NULL
+
+$$
+ALTER TABLE `offline_bookings` add `PurchaseRateAfterTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `offline_bookings` add `TaxRate` decimal(0,0) NULL;
+$$
+ALTER TABLE `offline_bookings` add `MarkUpRate` decimal(0,0) NULL;
+$$
+ALTER TABLE `offline_bookings` add `PurchaseRateBeforeTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `offline_bookings` add `SellRateAfterTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `offline_bookings` add `SellRateBeforeTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `offline_bookings` add `MarginAmount` decimal(0,0) NULL
+
+$$
+ALTER TABLE `bookingdetails` add `createdby` bigint NULL;
+$$
+ALTER TABLE `bookingdetails` add `SaveStatus` int NULL;
+
+$$
+ALTER TABLE `bookingdetails` add `PurchaseRateAfterTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `bookingdetails` add `TaxRate` decimal(0,0) NULL;
+$$
+ALTER TABLE `bookingdetails` add `MarkUpRate` decimal(0,0) NULL;
+$$
+ALTER TABLE `bookingdetails` add `PurchaseRateBeforeTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `bookingdetails` add `SellRateAfterTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `bookingdetails` add `SellRateBeforeTax` decimal(0,0) NULL;
+$$
+ALTER TABLE `bookingdetails` add `MarginAmount` decimal(0,0) NULL
+$$
+ALTER TABLE `bookingdetails` add `LockInTime` datetime NULL
+$$
+ALTER TABLE `booking` add `BookingFor` varchar(5) NULL;
+$$
+ALTER TABLE `booking` add `BillingFor` varchar(5) NULL
+$$
+ALTER TABLE `booking` add `Assisted_By` bigint NULL
+
+--------------------------------
+--------------------------------
+
+//*Added SellRateAfterTax in this Procedure
+
+DROP PROCEDURE `sp_API_rates_Save`
+
+GO
+
+CREATE  PROCEDURE `sp_API_rates_Save`(
+    pAccommodationId BIGINT, pRateFor INT,
+    pDailyRate DECIMAL(16,2), pWeeklyRate DECIMAL(16,2),pMonthlyRate DECIMAL(16,2),pLongTermRate DECIMAL(16,2),pGuestRate DECIMAL(16,2),
+    pStartDate DATE,pEndDate DATE,pStatus INT,IsB2CMarkup BIT, pUser BIGINT,pSellRateAfterTax DECIMAL(16,2))
+ratesave:BEGIN
+	DECLARE vShortTerm DECIMAL(5,2);
+	DECLARE vLongTerm DECIMAL(5,2);
+	DECLARE vPropertyId BIGINT;
+	declare vTax DECIMAL(16,2);
+	declare vpDailyRatetax DECIMAL(16,2);
+	DECLARE vpWeeklyRatetax DECIMAL(16,2);
+	DECLARE vpMonthlyRatetax DECIMAL(16,2);
+	DECLARE vpLongTermRatetax DECIMAL(16,2);
+	
+	SELECT PropertyId INTO vPropertyId FROM accommodation WHERE AccommodationId = pAccommodationId;
+		
+	IF vPropertyId IS NULL THEN
+		LEAVE ratesave;
+	END IF;
+	
+ -- set tax values 
+	SELECT SUM(pt.TaxValue) into  vTax FROM propertyTax pt WHERE  pt.PropertyId=vPropertyId;
+	
+	IF vTax IS NULL THEN
+			SET vTax = 0;
+	END IF;	
+		
+	-- set vpDailyRatetax = pDailyRate -((pDailyRate * vTax)/100);
+	-- SET vpWeeklyRatetax =pWeeklyRate- ((pWeeklyRate * vTax)/100);	
+	-- SET vpMonthlyRatetax = pMonthlyRate-((pMonthlyRate * vTax)/100);
+	-- SET vpLongTermRatetax =pLongTermRate- ((pLongTermRate * vTax)/100);
+	
+	SET vpDailyRatetax =  ROUND(pDailyRate / ( 1 + (vTax/100) ) );
+	SET vpWeeklyRatetax = ROUND(pWeeklyRate / ( 1 + (vTax/100) ));	
+	SET vpMonthlyRatetax = ROUND( pMonthlyRate / ( 1 + (vTax/100) ));
+	SET vpLongTermRatetax = ROUND(pLongTermRate / ( 1 + (vTax/100) ) );
+		
+	IF IsB2CMarkup = 1 THEN
+		SELECT B2CMarkupShortTerm,B2CMarkupLongTerm INTO vShortTerm,vLongTerm
+		FROM property WHERE PropertyId= vPropertyId;
+	ELSE	
+		SELECT B2BMarkupShortTerm,B2BMarkupLongTerm INTO vShortTerm,vLongTerm
+		FROM property WHERE PropertyId= vPropertyId;
+	END IF;
+		
+	SET vShortTerm = vShortTerm / 100;
+	SET vLongTerm = vLongTerm / 100;
+	
+	IF EXISTS (SELECT *  FROM rates WHERE AccommodationId = pAccommodationId and RateFor = pRateFor) THEN
+			UPDATE rates SET 
+			DailyRate=pDailyRate ,
+			MonthlyRate = pMonthlyRate ,
+			WeeklyRate = pWeeklyRate,
+			LongTermRate = pLongTermRate,
+			GuestRate = pGuestRate,
+			StartDate = pStartDate,EndDate=pEndDate,
+			UpdatedBy=pUser,UpdatedDate = NOW(),
+			CalcDailyRate = round((vpDailyRatetax + (vpDailyRatetax *  vShortTerm)),0) ,
+			CalcWeeklyRate = ROUND((vpWeeklyRatetax + (vpWeeklyRatetax * vShortTerm)),0) ,
+			CalcMonthlyRate = ROUND((vpMonthlyRatetax + (vpMonthlyRatetax * vLongTerm)),0) ,
+			CalcLongTermRate = ROUND((vpLongTermRatetax + (vpLongTermRatetax * vLongTerm)),0) ,
+			SellRateAfterTax = pSellRateAfterTax
+			WHERE AccommodationId = pAccommodationId and RateFor = pRateFor;	
+	ELSE
+			INSERT INTO rates (AccommodationId,RateFor,DailyRate,MonthlyRate,WeeklyRate,LongTermRate,
+			GuestRate,StartDate,EndDate,`Status`,CalcDailyRate,CalcWeeklyRate,CalcMonthlyRate,CalcLongTermRate,
+			UpdatedBy,UpdatedDate,SellRateAfterTax)
+			VALUES(pAccommodationId,pRateFor,
+			pDailyRate,
+			pMonthlyRate,
+			pWeeklyRate,
+			pLongTermRate,
+			pGuestRate,pStartDate,pEndDate,pStatus,
+			ROUND((vpDailyRatetax + (vpDailyRatetax * vShortTerm)),0),
+			ROUND((vpWeeklyRatetax + (vpWeeklyRatetax * vShortTerm)),0),
+			ROUND((vpMonthlyRatetax + (vpMonthlyRatetax * vLongTerm)),0),
+			ROUND((vpLongTermRatetax + (vpLongTermRatetax * vLongTerm)),0),
+			pUser,
+			NOW(),
+			pSellRateAfterTax);
+			SELECT LAST_INSERT_ID() as RateId;
+		
+	END IF;
+	SELECT RateId  FROM rates WHERE AccommodationId = pAccommodationId and RateFor = pRateFor limit 1;
+    END
+
+
+	-----------------------------------------------------------------
+	-----------------------------------------------------------------
+
+	11/03/20
+
+	DROP PROCEDURE `booking_SaveOfflineBookingInitialData`
+
+GO
+
+CREATE  PROCEDURE `booking_SaveOfflineBookingInitialData`(pBookingId BIGINT, pStatus INT,pByUserId BIGINT,pBookingDate DATE,pInventoryAPIType INT)
+BEGIN
+	IF pBookingId > 0 THEN
+		UPDATE offline_bookings SET CreatedDate = pBookingDate,SaveStatus = pStatus WHERE Offline_BookingId=pBookingId;
+	ELSE
+		INSERT INTO offline_bookings (CreatedDate,SaveStatus,CreatedBy,InventoryAPIType ) VALUES(pBookingDate,pStatus,pByUserId,pInventoryAPIType);
+		SET pBookingId = LAST_INSERT_ID();
+	END IF;
+	SELECT pBookingId AS BId;
+    END
+
+	-----------------------------------------------
+
+	DROP PROCEDURE `bookingdetails_SaveInitialData`
+
+GO
+
+CREATE  PROCEDURE `bookingdetails_SaveInitialData`(pBookingId BIGINT,pAccommodationId BIGINT,pForUserId BIGINT,
+	pNoOfAccommodations INT,pStatus INT,pNoOfAdults INT, pNoOfDays INT, pNoOfChildren INT,pCheckIn DAte,pCheckOut Date,pLockInTime DATETIME)
+BEGIN
+	Declare cnt int;
+	set cnt = 0;
+	Select Count(BookingId) into cnt from bookingdetails Where Offline_BookingId = pBookingId and AccommodationId = pAccommodationId;
+	if cnt > 0 then
+		Update bookingdetails set NoOfRooms=pNoOfAccommodations,Noofnight=pNoOfDays,NoOfPaxAdult=pNoOfAdults,NoOfPaxChild=pNoOfChildren,
+		createdby=pForUserId,`SaveStatus`=pStatus,CheckIn_date=pCheckIn,CheckOut_date=pCheckOut,LockInTime=pLockInTime  WHERE Offline_BookingId = pBookingId AND AccommodationId = pAccommodationId;
+	else
+		INSERT INTO bookingdetails (Offline_BookingId,AccommodationId,NoOfRooms,Noofnight,NoOfPaxAdult,NoOfPaxChild,
+		CheckIn_date,CheckOut_date,createdby,`SaveStatus`,LockInTime)VALUES
+		(pBookingId,pAccommodationId,pNoOfAccommodations,pNoOfDays,pNoOfAdults,pNoOfChildren,
+		pCheckIn,pCheckOut,pForUserId,pStatus,pLockInTime);
+		SELECT LAST_INSERT_ID() AS BId;
+	end if;
+    END
+
+
+	--------------------------------------------------------------
+
+	DROP PROCEDURE `booking_offlinebookingdetails_Update`
+
+GO
+
+CREATE  PROCEDURE `booking_offlinebookingdetails_Update`(pBookingItemId bigint,
+    pAmount decimal(16,2),pTotalAmount DECIMAL(16,2),pRatesApplied Varchar(1000),
+pTotalRateTax DECIMAL(16,2),pSBMarkup DECIMAL(16,2),pTotalTax DECIMAL(16,2),
+pPurchaseRateAfterTax decimal(16,2),pPurchaseRateBeforeTax decimal(16,2),
+pSellRateAfterTax decimal(16,2),pSellRateBeforeTax decimal(16,2)
+    )
+BEGIN
+	Update bookingdetails 
+	set AvgDailyRateBefreStaxForSalePrice = pAmount,
+	TotalSalePrice=pTotalAmount,
+	`StaxForSalePrice`=pTotalRateTax,
+	MarginAmount=pSBMarkup,
+	TaxRate=pTotalRateTax,
+	MarkUpRate=pTotalRateTax,
+	PurchaseRateAfterTax=pPurchaseRateAfterTax,
+	PurchaseRateBeforeTax=pPurchaseRateBeforeTax,
+	SellRateAfterTax=pSellRateAfterTax,
+	SellRateBeforeTax=pSellRateBeforeTax
+	Where BookingId = pBookingItemId;
+	END
+
+
+	-------------------------------------------------------------
+
+	DROP PROCEDURE `booking_SaveBookingDetailstaxdata`
+
+GO
+
+CREATE  PROCEDURE `booking_SaveBookingDetailstaxdata`(pBookingId BIGINT,
+pBookingItemId BIGINT, 
+pTaxTitleId bigint,
+prate dECIMAL(16,2),
+pTotalTax decimal(16,2))
+BEGIN	
+	INSERT INTO `offline_bookings_taxes_gst` (offline_Id,`BookingId`,`taxTitle`,`taxPercentage`) 
+	VALUES(pBookingId,pBookingItemId,pTaxTitleId,pTotalTax);
+    END
+
+
+	----------------------------------------------------------
+
+	DROP PROCEDURE `Booking_OfflineBookingUpdateAmounts`
+
+GO
+
+CREATE  PROCEDURE `Booking_OfflineBookingUpdateAmounts`(pBookingId bigint)
+BEGIN
+Update offline_bookings 
+inner join (Select Offline_BookingId,CheckIn_date,CheckOut_date,Noofnight,NoOfPaxAdult,NoOfPaxChild,NoOfRooms,AccommodationId,sum(TotalSalePrice) as ta,(Sum(`MarkUpRate`)) as tt,Sum(MarginAmount) as markup,
+Sum(`StaxForSalePrice`) as amnt,
+PurchaseRateAfterTax,PurchaseRateBeforeTax,SellRateAfterTax,SellRateBeforeTax
+from bookingdetails 
+where bookingdetails.Offline_BookingId = pBookingId) bi On offline_bookings.Offline_BookingId = bi.Offline_BookingId
+Set offline_bookings.StaxForSalePrice = bi.amnt,offline_bookings.TotalSalePrice = bi.ta,
+offline_bookings.MarginAmount=bi.markup,offline_bookings.MarkUpRate=bi.tt,
+offline_bookings.CheckIn_date=bi.CheckIn_date,
+offline_bookings.CheckOut_date=bi.CheckOut_date,
+offline_bookings.Noofnight=bi.Noofnight,
+offline_bookings.NoOfPaxAdult=bi.NoOfPaxAdult,
+offline_bookings.NoOfPaxChild=bi.NoOfPaxChild,
+offline_bookings.NoOfRooms=bi.NoOfRooms,
+offline_bookings.AccommodationId=bi.AccommodationId,
+offline_bookings.PurchaseRateAfterTax = bi.PurchaseRateAfterTax,
+offline_bookings.PurchaseRateBeforeTax = bi.PurchaseRateBeforeTax,
+offline_bookings.SellRateAfterTax = bi.SellRateAfterTax,
+offline_bookings.SellRateBeforeTax = bi.SellRateBeforeTax
+Where offline_bookings.Offline_BookingId = pBookingId;
+END
+
+---------------------------------------------------------
+
+DROP PROCEDURE `Booking_OfflineBookingUpdateTotalAmtIncPayComm`
+
+GO
+
+CREATE  PROCEDURE `Booking_OfflineBookingUpdateTotalAmtIncPayComm`(pBookingId BIGINT,pTotalAmtIncPayComm DECIMAL(16,2)  
+    )
+BEGIN
+	UPDATE `offline_bookings` 
+	SET `TotalBuyPrice` = pTotalAmtIncPayComm
+	WHERE `Offline_BookingId` = pBookingId;
+		
+    END
+
+	-------------------------------------------------------------
+	DROP PROCEDURE `Booking_OfflineBookingGetBookingCartId`
+
+GO
+
+CREATE  PROCEDURE `Booking_OfflineBookingGetBookingCartId`(pUserId bigint,pStatus int)
+BEGIN
+	Select Offline_BookingId From offline_bookings Where CreatedBy = pUserId and `Status` = SaveStatus limit 1;
+    END
+
+	-----------------------------------------------------------
+
+	DROP PROCEDURE `transaction_OfflineBookingGetBookedForAddress`
+
+GO
+
+CREATE  PROCEDURE `transaction_OfflineBookingGetBookedForAddress`(pBookingId BIGINT)
+BEGIN
+	DECLARE vForUserId BIGINT;
+	SET vForUserId = 0;
+	SELECT IFNULL(CreatedBy,0) INTO vForUserId FROM offline_bookings WHERE Offline_BookingId = pBookingId LIMIT 1;
+	
+	IF vForUserId = 0 THEN
+		SELECT  DISTINCT b.Offline_BookingId,
+		bi.BookingId,
+		bu.BookingUserId AS BookingForUserId,bu.Firstname AS ForFirstname,bu.Lastname AS ForLastname,bu.Mobile AS ForUserMobile,a.phone,
+		bu.Email AS ForUserEmail,a.Address AS ForAddress,a.City AS ForCity,c.Name AS ForCountry,c.Code AS CountryCode,
+		s.Name AS ForState, a.ZipCode,
+		p.Title AS PropertyTitle,p.Address AS PropertyAddress,p.PropertyId
+		FROM offline_bookings b 
+		INNER JOIN bookingdetails bi ON b.Offline_BookingId = bi.Offline_BookingId
+		INNER JOIN  bookinguser bu ON bi.ForBookingUser = bu.BookingUserId
+		INNER JOIN accommodation acc ON bi.AccommodationId = acc.AccommodationId
+		INNER JOIN property p ON p.PropertyId=acc.PropertyId
+		INNER JOIN address a ON bu.AddressId = a.AddressId
+		INNER JOIN country c ON a.Country = c.CountryId
+		INNER JOIN state s ON a.state = s.StateId							
+		WHERE b.Offline_BookingId = pBookingId
+		ORDER BY a.Type
+		LIMIT 1;
+	ELSE
+		SELECT  DISTINCT b.Offline_BookingId,
+		bi.BookingId,b.CreatedBy AS BookingForUserId,
+		bu.UserId,bu.Firstname AS ForFirstname,bu.Lastname AS ForLastname,a.Mobile AS ForUserMobile,a.Phone,
+		bu.Email AS ForUserEmail,
+		a.Address AS ForAddress,a.City AS ForCity,c.Name AS ForCountry,c.Code AS CountryCode,
+		s.Name AS ForState, a.ZipCode,
+		p.Title AS PropertyTitle,p.Address AS PropertyAddress,p.PropertyId
+		FROM offline_bookings b 
+		INNER JOIN bookingdetails bi ON b.Offline_BookingId = bi.Offline_BookingId
+		INNER JOIN  `user` bu ON b.CreatedBy = bu.UserId
+		INNER JOIN accommodation acc ON bi.AccommodationId = acc.AccommodationId
+		INNER JOIN property p ON p.PropertyId=acc.PropertyId
+		INNER JOIN address a ON bu.UserId = a.UserId  
+		INNER JOIN country c ON a.Country = c.CountryId
+		INNER JOIN state s ON a.state = s.StateId				
+		WHERE b.Offline_BookingId = pBookingId
+		ORDER BY a.Type
+		LIMIT 1;
+	END IF;
+	
+    END
+
+	---------------------------------------------------------------
+
+	DROP PROCEDURE `booking_offlinebookingGetPropertyId`
+
+GO
+
+CREATE  PROCEDURE `booking_offlinebookingGetPropertyId`(pBookingId bigint)
+BEGIN
+	SELECT a.PropertyId FROM bookingdetails bi INNER JOIN accommodation a ON bi.accommodationId = a.accommodationId
+WHERE bi.Offline_BookingId=pBookingId LIMIT 1;
+    END
+
+
+	------------------------------------------------------------------
+
+	DROP PROCEDURE `sp_API_rates_Save`
+
+GO
+
+CREATE  PROCEDURE `sp_API_rates_Save`(
+    pAccommodationId BIGINT, pRateFor INT,
+    pDailyRate DECIMAL(16,2), pWeeklyRate DECIMAL(16,2),pMonthlyRate DECIMAL(16,2),pLongTermRate DECIMAL(16,2),pGuestRate DECIMAL(16,2),
+    pStartDate DATE,pEndDate DATE,pStatus INT,IsB2CMarkup BIT, pUser BIGINT,pSellRateAfterTax DECIMAL(16,2))
+ratesave:BEGIN
+	DECLARE vShortTerm DECIMAL(5,2);
+	DECLARE vLongTerm DECIMAL(5,2);
+	DECLARE vPropertyId BIGINT;
+	declare vTax DECIMAL(16,2);
+	declare vpDailyRatetax DECIMAL(16,2);
+	DECLARE vpWeeklyRatetax DECIMAL(16,2);
+	DECLARE vpMonthlyRatetax DECIMAL(16,2);
+	DECLARE vpLongTermRatetax DECIMAL(16,2);
+	
+	SELECT PropertyId INTO vPropertyId FROM accommodation WHERE AccommodationId = pAccommodationId;
+		
+	IF vPropertyId IS NULL THEN
+		LEAVE ratesave;
+	END IF;
+	
+ -- set tax values 
+	SELECT SUM(pt.TaxValue) into  vTax FROM propertyTax pt WHERE  pt.PropertyId=vPropertyId;
+	
+	IF vTax IS NULL THEN
+			SET vTax = 0;
+	END IF;	
+		
+	-- set vpDailyRatetax = pDailyRate -((pDailyRate * vTax)/100);
+	-- SET vpWeeklyRatetax =pWeeklyRate- ((pWeeklyRate * vTax)/100);	
+	-- SET vpMonthlyRatetax = pMonthlyRate-((pMonthlyRate * vTax)/100);
+	-- SET vpLongTermRatetax =pLongTermRate- ((pLongTermRate * vTax)/100);
+	
+	SET vpDailyRatetax =  ROUND(pDailyRate / ( 1 + (vTax/100) ) );
+	SET vpWeeklyRatetax = ROUND(pWeeklyRate / ( 1 + (vTax/100) ));	
+	SET vpMonthlyRatetax = ROUND( pMonthlyRate / ( 1 + (vTax/100) ));
+	SET vpLongTermRatetax = ROUND(pLongTermRate / ( 1 + (vTax/100) ) );
+		
+	IF IsB2CMarkup = 1 THEN
+		SELECT B2CMarkupShortTerm,B2CMarkupLongTerm INTO vShortTerm,vLongTerm
+		FROM property WHERE PropertyId= vPropertyId;
+	ELSE	
+		SELECT B2BMarkupShortTerm,B2BMarkupLongTerm INTO vShortTerm,vLongTerm
+		FROM property WHERE PropertyId= vPropertyId;
+	END IF;
+		
+	SET vShortTerm = vShortTerm / 100;
+	SET vLongTerm = vLongTerm / 100;
+	
+	IF EXISTS (SELECT *  FROM rates WHERE AccommodationId = pAccommodationId and RateFor = pRateFor) THEN
+			UPDATE rates SET 
+			DailyRate=pDailyRate ,
+			MonthlyRate = pMonthlyRate ,
+			WeeklyRate = pWeeklyRate,
+			LongTermRate = pLongTermRate,
+			GuestRate = pGuestRate,
+			StartDate = pStartDate,EndDate=pEndDate,
+			UpdatedBy=pUser,UpdatedDate = NOW(),
+			CalcDailyRate = round((vpDailyRatetax + (vpDailyRatetax *  vShortTerm)),0) ,
+			CalcWeeklyRate = ROUND((vpWeeklyRatetax + (vpWeeklyRatetax * vShortTerm)),0) ,
+			CalcMonthlyRate = ROUND((vpMonthlyRatetax + (vpMonthlyRatetax * vLongTerm)),0) ,
+			CalcLongTermRate = ROUND((vpLongTermRatetax + (vpLongTermRatetax * vLongTerm)),0) ,
+			SellRateAfterTax = pSellRateAfterTax
+			WHERE AccommodationId = pAccommodationId and RateFor = pRateFor;	
+	ELSE
+			INSERT INTO rates (AccommodationId,RateFor,DailyRate,MonthlyRate,WeeklyRate,LongTermRate,
+			GuestRate,StartDate,EndDate,`Status`,CalcDailyRate,CalcWeeklyRate,CalcMonthlyRate,CalcLongTermRate,
+			UpdatedBy,UpdatedDate,SellRateAfterTax)
+			VALUES(pAccommodationId,pRateFor,
+			pDailyRate,
+			pMonthlyRate,
+			pWeeklyRate,
+			pLongTermRate,
+			pGuestRate,pStartDate,pEndDate,pStatus,
+			ROUND((vpDailyRatetax + (vpDailyRatetax * vShortTerm)),0),
+			ROUND((vpWeeklyRatetax + (vpWeeklyRatetax * vShortTerm)),0),
+			ROUND((vpMonthlyRatetax + (vpMonthlyRatetax * vLongTerm)),0),
+			ROUND((vpLongTermRatetax + (vpLongTermRatetax * vLongTerm)),0),
+			pUser,
+			NOW(),
+			pSellRateAfterTax);
+			SELECT LAST_INSERT_ID() as RateId;
+		
+	END IF;
+	SELECT RateId  FROM rates WHERE AccommodationId = pAccommodationId and RateFor = pRateFor limit 1;
+    END
+
+	---------------------------------------------------------------------------------------
+
+	DROP PROCEDURE `accommodation_GetAvailabilityAndRateForAPI`
+
+GO
+
+CREATE  PROCEDURE `accommodation_GetAvailabilityAndRateForAPI`( pAccs VARCHAR(1000),pCheckIn DATE, pCheckOut DATE,pBookingDayCount INT, pRateType INT, pDefaultRateType INT)
+BEGIN
+	DECLARE criteria VARCHAR(1000) ;
+	DECLARE havingcrit VARCHAR(500) ;
+	DECLARE selectparams VARCHAR(2500);
+	declare ychk int;
+	
+	SET ychk = 0;
+		SELECT CASE WHEN YEAR(pCheckOut) > YEAR(pCheckIn) THEN 1
+		ELSE
+		0 END INTO ychk;
+	
+	SET selectparams = CONCAT('SELECT ra.RateId,acc_GetAvailableRoom(ra.accommodationId,''',pCheckIn ,''',''',pCheckOut,''') as noofacc,ra.accommodationid, ');
+	
+	IF pBookingDayCount< 7 THEN
+	 	SET selectparams = CONCAT(selectparams,' ra.SellRateAfterTax ');
+	ELSEIF pBookingDayCount < 30 THEN
+	 	SET selectparams = CONCAT(selectparams,' ra.WeeklyRate ');
+	ELSEIF pBookingDayCount <90 THEN
+		SET selectparams = CONCAT(selectparams,' ra.MonthlyRate ');
+	ELSE
+		SET selectparams = CONCAT(selectparams,' ra.LongTermRate ');
+	END IF;
+	
+	
+	 SET selectparams = CONCAT(selectparams,' As Amount ,ra.GuestRate,startdate,enddate,DailyRate, ',
+		' CASE WHEN ra.RateFor = 7 THEN 1 ELSE 2 END AS AType  FROM (');
+		 SET selectparams = CONCAT(selectparams,' SELECT ras.`RateId`,ras.`AccommodationId`,ras.`RateFor`,ras.`DailyRate`,ras.`SellRateAfterTax`,ras.`WeeklyRate`,ras.`MonthlyRate`,ras.`LongTermRate`,ras.`GuestRate`, ',
+		' rate_GetMaxDate(ras.StartDate,ras.EndDate,''',pCheckIn,''',0) AS EndDate,rate_GetMinDate(ras.StartDate,''',pCheckIn,''',0) AS StartDate FROM rates ras WHERE ');
+		SET selectparams = CONCAT(selectparams,' ras.AccommodationId In(',pAccs,') ');
+		SET selectparams = CONCAT(selectparams,' AND ( NOT( ''',pCheckIn,''' > rate_GetMaxDate(ras.StartDate,ras.EndDate,''',pCheckIn,''',0) OR  ''',pCheckOut,'''  < rate_GetMinDate(ras.StartDate,''',pCheckIn,''',0) )) ');
+		
+	 SET selectparams = CONCAT(selectparams,'UNION SELECT rass.`RateId`,rass.`AccommodationId`,rass.`RateFor`,rass.`DailyRate`,rass.`SellRateAfterTax`,rass.`WeeklyRate`,rass.`MonthlyRate`,rass.`LongTermRate`,rass.`GuestRate`, ',
+		' rate_GetMaxDate(rass.StartDate,rass.EndDate,''',pCheckIn,''',-1) AS EndDate,rate_GetMinDate(rass.StartDate,''',pCheckIn,''',-1) AS StartDate FROM rates rass WHERE ');
+		SET selectparams = CONCAT(selectparams,' rass.AccommodationId In(',pAccs,') ');
+		SET selectparams = CONCAT(selectparams,' AND (NOT ( ''',pCheckIn,''' > rate_GetMaxDate(rass.StartDate,rass.EndDate,''',pCheckIn,''',-1) OR  ''',pCheckOut,'''  < rate_GetMinDate(rass.StartDate,''',pCheckIn,''',-1) )) ');
+		
+	IF ychk = 1 THEN
+		SET selectparams = CONCAT(selectparams,'UNION SELECT rass.`RateId`,rass.`AccommodationId`,rass.`RateFor`,rass.`DailyRate`,rass.`SellRateAfterTax`,rass.`WeeklyRate`,rass.`MonthlyRate`,rass.`LongTermRate`,rass.`GuestRate`, ',
+		' rate_GetMaxDate(rass.StartDate,rass.EndDate,''',pCheckIn,''',1) AS EndDate,rate_GetMinDate(rass.StartDate,''',pCheckIn,''',1) AS StartDate FROM rates rass WHERE ');
+		SET selectparams = CONCAT(selectparams,' rass.AccommodationId In(',pAccs,') ');
+		SET selectparams = CONCAT(selectparams,' AND (NOT ( ''',pCheckIn,''' > rate_GetMaxDate(rass.StartDate,rass.EndDate,''',pCheckIn,''',1) OR  ''',pCheckOut,'''  < rate_GetMinDate(rass.StartDate,''',pCheckIn,''',1) )) ');
+	end if;	
+		
+	SET selectparams = CONCAT(selectparams,') ra WHERE ');
+	IF pDefaultRateType = pRateType THEN
+		SET selectparams = CONCAT(selectparams, '  ra.RateFor=', pRateType);
+	ELSE
+		SET selectparams = CONCAT(selectparams, '  ( ra.RateFor=', pRateType,' OR ra.RateFor=',pDefaultRateType,' ) ');
+	END IF;
+		SET selectparams = CONCAT(selectparams,' AND (NOT( ''', pCheckIn, ''' > ra.EndDate OR  ''',
+		pCheckOut,'''  < ra.StartDate )) ORDER BY ra.StartDate ');
+	IF pRateType >=  pDefaultRateType THEN
+		SET selectparams = CONCAT(selectparams,', ra.RateFor Desc ');
+	ELSE
+		SET selectparams = CONCAT(selectparams,', ra.RateFor Asc ');
+	END IF;
+	
+	SET @finalst2 = selectparams;
+	PREPARE stmt1 FROM @finalst2;
+	EXECUTE stmt1;
+	DEALLOCATE PREPARE stmt1;
+	-- select selectparams;
+    END
+
+
+	-----------------------------------------------------------------------------
+
+	DROP PROCEDURE `booking_OfflinebookingsIsExist`
+
+GO
+
+CREATE  PROCEDURE `booking_OfflinebookingsIsExist`(pUserId Bigint,pStatus int)
+BEGIN
+	Delete bi From offline_bookings b inner join bookingdetails bi on b.Offline_BookingId = bi.Offline_BookingId 
+	Where b.CreatedBy = pUserId and b.SaveStatus = pStatus and bi.LockInTime <= Now();
+		
+	
+	Select Offline_BookingId From offline_bookings Where `SaveStatus` = pStatus and CreatedBy = CreatedBy;	
+	
+    END
+
+
+
+	-------------------------------------------------------------------------------
+
+	DROP PROCEDURE `booking_OfflinebookingClearCart`
+
+GO
+
+CREATE  PROCEDURE `booking_OfflinebookingClearCart`(pUserId BIGINT, pStatus INT)
+BEGIN
+	DELETE FROM offline_bookings WHERE `SaveStatus` = pStatus AND createdby = pUserId;
+    END
+
+---------------------------------------------------------------------------------------------------------
+
+20-03-2020
+
+ALTER TABLE bookingimport MODIFY guest_name VARCHAR(2000)
+$$
+ALTER TABLE offline_bookings MODIFY Guestname VARCHAR(2000)
+$$
+ALTER TABLE offline_bookings MODIFY Guestemail VARCHAR(500)
+$$
+ALTER TABLE offline_bookings MODIFY HotelFacility VARCHAR(2500)
+$$
+ALTER TABLE offline_bookings MODIFY NatureOfReimbursements VARCHAR(1000)
+$$
+ALTER TABLE offline_bookings MODIFY cancellationpolicy VARCHAR(7000)
+$$
+ALTER TABLE bookingdetails MODIFY Guestname VARCHAR(2000)
+$$
+ALTER TABLE bookingdetails MODIFY Guestemail VARCHAR(500);

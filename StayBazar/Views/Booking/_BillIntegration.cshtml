@@ -1,0 +1,44 @@
+﻿@model long
+@{
+    Layout = null;
+    long bookingId = Model;
+    StayBazar.Models.BookingModel data = new StayBazar.Models.BookingModel();
+    //    CLayer.Address wh = BLayer.Bookings.GetBookedByUser(bookingId);
+    List<CLayer.Address> adr = BLayer.Bookings.GetBookedForUser(bookingId);
+    if(adr.Count==0)
+    {
+        adr.Add(new CLayer.Address());
+    }
+    else 
+    {                       
+    data.OrderedBy = adr[0];
+    }
+    data.Items = BLayer.BookingItem.GetAllDetails(bookingId);
+    CLayer.Booking bdata = BLayer.Bookings.GetDetails(bookingId);
+    data.BookingDetails.OrderNo = bdata.OrderNo;
+    data.BookingDetails.BookingDate = bdata.BookingDate;
+    data.Supplier = BLayer.Bookings.GetSupplierDetails(bookingId);   
+   if( data.Supplier==null )
+   {
+       data.Supplier = new CLayer.User();
+   }    
+    data.BookingId = bookingId;
+    
+}
+
+<div class="container bdy_min_height">
+    <div class="row topmargin10">
+        <div class="col-md-1 col-md-offset-10"><a href="#" onclick="printDoc()"><img src="~/images/printer.png" alt="Print" width="24" height="24" /></a><a target="_blank" href="~/Booking/BillPdf?Id=@bookingId"><img src="~/images/pdfdoc.png" alt="PDF" width="24" height="24" /></a></div>
+    </div>
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            @Html.Partial("~/Views/Booking/_BookingConfirmation.cshtml", data)
+        </div>
+    </div>
+</div>
+<script type="text/javascript" language="javascript">
+    function printDoc() {
+        var url = '@Url.Action("BillPrint","Booking")';
+        window.open(url + "?id=" + @bookingId, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+</script>

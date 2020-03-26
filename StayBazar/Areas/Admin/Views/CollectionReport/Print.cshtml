@@ -1,0 +1,19 @@
+﻿@model IEnumerable<CLayer.CollectionReport>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Print</title>
+</head>
+<body>
+    <div>  
+        @Html.Partial("_Report", Model)
+        <script type="text/javascript">
+            window.print();
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+﻿@model StayBazar.Areas.Admin.Models.B2BDiscountModel
+@{ Layout = null;
+   if (Model.B2BName == "" || Model.B2BName == null)
+   {
+       Model.B2BName = "Please choose a corporate.";
+   }
+   }
+    @using (Html.BeginForm("SaveDiscount", "Property", new { area = "Admin" }, FormMethod.Post, new { id = "corpdiscountform" }))
+    {
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Corporate:</th>
+                    <th><span id="corporateName">@Model.B2BName</span></th>
+                    <th><input type="button" value="Choose" onclick="browseCorporate()" />
+                    @Html.HiddenFor(m => m.B2BId)
+@Html.HiddenFor(m => m.B2BPropertyId)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Short Term (%)</td>
+                    <td>@Html.TextBoxFor(m => m.B2BDShortTerm)@Html.ValidationMessageFor(m => m.B2BDShortTerm)</td>
+                    <td>&nbsp;</td>
+                </tr> 
+                <tr>
+                    <td>Long Term (%)</td>
+                    <td>@Html.TextBoxFor(m => m.B2BDLongTerm)@Html.ValidationMessageFor(m => m.B2BDLongTerm)</td>
+                    <td><input type="button" value="Save" class="btn btn-primary" onclick="saveDiscount()" /> <input type="button" value="Cancel" class="btn btn-danger" onclick="clearDiscount()" /> </td>
+                </tr>
+            </tbody>
+        </table>
+    }

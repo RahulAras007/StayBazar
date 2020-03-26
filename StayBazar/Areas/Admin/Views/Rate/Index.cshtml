@@ -1,0 +1,201 @@
+﻿@model StayBazar.Areas.Admin.Models.RateModel
+@{
+    StayBazar.Areas.Admin.Models.RateValueModel rv = new StayBazar.Areas.Admin.Models.RateValueModel();
+    rv.AccommodationId = Model.RateAccommodationId;
+    ViewBag.Title = "Rates";
+    string accTitle = BLayer.Accommodation.GetAccommodationTitle(Model.RateAccommodationId);
+    string prpTitle = BLayer.Accommodation.GetPropertyTitle(Model.RateAccommodationId);
+    decimal tax = BLayer.PropertyTax.GetTotalTax(Model.PropertyId);
+    
+   
+}
+
+
+<input id="taxamt" style="display:none;" value="@tax" />
+<div class="row margin10px"><h2>Rates/<a href="~/Admin/Property/Index/@Model.PropertyId">@prpTitle</a>/@accTitle</h2></div>
+<div class="row">
+    <div class="col-lg-7" id="ratecommission">
+        @Html.Partial("_Commission", Model.Commission)
+     </div>
+    <div class="col-md-3"></div>
+    <div class="col-lg-1">
+        @Html.HiddenFor(m => m.RateAccommodationId)
+        <input type="button" value="New Rate" class="btn btn-info" onclick="newRate()" />
+    </div>
+</div>
+<div class="row margin10px" id="ratelist">
+       @Html.Partial("_List",Model)
+</div>
+<div id="myModal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Rate Details</h4>
+            </div>
+            <div class="modal-body" id="rateDetailsDiv">
+                @Html.Partial("_Edit", rv)
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-info" onclick="saveRate()">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeEdit()">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/javascript">
+    function newRate()
+    {
+        resetVal();
+        showEdit();
+    }
+    function showEdit() {
+        $("#myModal").modal("show");
+    }
+    function closeEdit() {
+        $("#myModal").modal("hide");
+    }
+    function saveRate() {
+        var startmonth = $("#StartMonth").val();
+        var endmonth = $("#EndMonth").val();      
+        var startday = $("#StartDay").val();
+        var endday = $("#EndDay").val();
+        var isv = false;
+
+        if (startmonth != endmonth || startday != endday)
+        {
+            $.post("@Url.Action("SaveRate", "Rate", new { area = "Admin" })", $("#rateform").serialize(), function (data) {
+                $.get("@Url.Action("GetList", "Rate", new { area = "Admin" })?accommodationId=" + $("#RateAccommodationId").val(), function (data) {
+                    $("#ratelist").html(data);
+                });
+            });
+            closeEdit();
+            return false;
+        }
+        else
+        {
+            alert("Please set start and end date");
+        }
+    }
+    function editRate(sDate,eDate,accId)
+    {
+        $.post("@Url.Action("GetRates", "Rate", new { area = "Admin" })", { StartDate: sDate, EndDate: eDate, AccommodationId: accId }, function (data) {
+            $("#rateDetailsDiv").html(data);
+            calcReg();
+           calcCorp();
+          /*  calcSup();
+            calcTA();*/
+            showEdit();
+            @*$.get("@Url.Action("GetList", "Rate", new { area = "Admin" })?accommodationId=" + $("#RateAccommodationId").val(), function (data) {
+                $("#ratelist").html(data);
+                
+            });*@
+        });
+    }
+
+    function delRate(sDate, eDate, accId)
+    {
+        if (!confirm("Are you sure to delete this rate?")) return;
+        $.post('@Url.Action("Delete", "Rate", new { area = "Admin" })', { StartDate: sDate, EndDate: eDate, AccommodationId: accId }, function (data) {
+            $("#ratelist").html(data);
+        });
+        
+    }
+ 
+    function resetVal() {
+        $(".raterrval").each(function () {
+            $(this).val(0);
+            var name = $(this).prop("id");
+            $("#s" + name).html("Total: 0.00");
+        });
+        $(".raterval").each(function () {
+            $(this).val(0);
+            var name = $(this).prop("id");
+            $("#s" + name).html("Total: 0.00");
+        });
+        $(".rateccval").each(function () {
+            $(this).val(0);
+            var name = $(this).prop("id");
+            $("#s" + name).html("Total: 0.00");
+        });
+        $(".ratecval").each(function () {
+            $(this).val(0);
+            var name = $(this).prop("id");
+            $("#s" + name).html("Total: 0.00");
+        });
+        $("#StartMonth").val(1);
+        $("#StartDay").val(1);
+        $("#EndMonth").val(1);
+        $("#EndDay").val(1);
+        $("#RRateId").val(0);
+        $("#CRateId").val(0);
+    }
+    function calcReg() {
+        
+            var tax = parseFloat($("#taxamt").val());
+            var commreg = parseFloat($("#B2CShortTerm").val());
+            if (isNaN(commreg)) commreg = 0;
+            commreg = commreg / 100;
+            $(".raterrval").each(function () {
+                var taxamount = ((Math.round($(this).val()) * tax) / 100);
+                var SupAmt = parseFloat($(this).val());
+                //var SupamtWouttx = Math.round(SupAmt - taxamount);
+                var SupamtWouttx = Math.round(SupAmt / ((1 + (tax / 100))));
+                var name = $(this).prop("id");
+                $("#s" + name + "WTax").html(SupamtWouttx);
+                $("#s" + name).html("Total: " + Math.round((SupamtWouttx * commreg) + SupamtWouttx));
+            });
+            commreg = parseFloat($("#B2CLongTerm").val());
+            if (isNaN(commreg)) commreg = 0;
+            commreg = commreg / 100;
+            $(".raterval").each(function () {
+                var taxamount = ((Math.round($(this).val()) * tax) / 100);
+                var SupAmt = parseFloat($(this).val());
+                //var SupamtWouttx = Math.round(SupAmt - taxamount);
+                var SupamtWouttx = Math.round(SupAmt / ((1 + (tax / 100))));
+                var name = $(this).prop("id");
+                $("#s" + name + "WTax").html(SupamtWouttx);
+                $("#s" + name).html("Total: " + Math.round((SupamtWouttx * commreg) + SupamtWouttx));
+            });
+        }
+       
+    function calcCorp() {
+
+            var tax = parseFloat($("#taxamt").val());
+
+            var disShort =parseFloat($("#BaseShortDisRate").val());
+            var disLong = parseFloat($("#BaseLongTermDisRate").val());
+            var commcorp = parseFloat($("#B2BShortTerm").val());
+            if (isNaN(commcorp)) commcorp = 0;
+            commcorp = commcorp / 100;
+            $(".rateccval").each(function () {
+                var taxamount = ((Math.round($(this).val()) * tax) / 100);
+                var SupAmt = parseFloat($(this).val());
+                //var SupamtWouttx = Math.round(SupAmt - taxamount);
+                var SupamtWouttx = Math.round(SupAmt / ((1 + (tax / 100))));
+                var name = $(this).prop("id");
+                var vale = parseFloat($(this).val());
+                $("#s" + name + "WTax").html(SupamtWouttx);
+                $("#s" + name).html("Total: " + Math.round(SupamtWouttx + ((SupamtWouttx * commcorp) - (SupamtWouttx * disShort / 100))));
+            });
+            commcorp = parseFloat($("#B2BLongTerm").val());
+            if (isNaN(commcorp)) commcorp = 0;
+            commcorp = commcorp / 100;
+            $(".ratecval").each(function () {
+                var taxamount = ((Math.round($(this).val()) * tax) / 100);
+                var SupAmt = parseFloat($(this).val());
+                //var SupamtWouttx = Math.round(SupAmt - taxamount);
+                var SupamtWouttx = Math.round(SupAmt / ((1 + (tax / 100))));
+                var name = $(this).prop("id");
+                var vale = parseFloat($(this).val());
+                $("#s" + name + "WTax").html(SupamtWouttx);
+                $("#s" + name).html("Total: " + Math.round(SupamtWouttx +( (SupamtWouttx * commcorp) - (SupamtWouttx * disLong / 100))));
+            });
+        }
+
+        
+        function valRound(val)
+        {
+           return (Math.round(val * 100) / 100).toFixed(2);
+        }
+</script>

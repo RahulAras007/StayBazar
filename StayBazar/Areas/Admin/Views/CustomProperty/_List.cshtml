@@ -1,0 +1,91 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    int totalRows = 0;
+    if(Model!= null && Model.Count() > 0 )
+    {
+        totalRows =(int)  Model.First().TotalRows;
+    }
+}
+<div class="body-content">
+    @{
+        //    StayBazar.Areas.Admin.Models.OfflineBookingModel filterform = (StayBazar.Areas.Admin.Models.OfflineBookingModel)ViewData["Filter"];
+        <div class="col-md-12">
+
+            @using (Html.BeginForm("Pager", "OfflineBookingCustomerList", FormMethod.Post, new { @id = "frmPagers" }))
+            {
+                <input type="hidden" id="SearchStringCache" name="SearchStringCache" value="@ViewBag.SearchString" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@ViewBag.CurrentPage" />
+            }
+
+        </div>
+        gp.RowsInAPage = 80;
+    }
+
+    @if (Model != null && Model.Count() > 0)
+    {
+        <text>@Html.Raw(gp.GetPager(totalRows, ViewBag.currentPage))</text>
+    }
+    @if (100 > totalRows)
+    {
+        <div class="height10px"></div>
+    }
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <table border="0" class="table table-condensed table-responsive table-custom table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Property Name</th>
+                            <th>Property Location</th>
+                            <th>Property Email</th>
+                            <th>Supplier Name</th>
+                            @*<th>Supplier Email</th>*@
+                            <th>Edit</th>
+                            @*<th align="center">Remove</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count() > 0)
+                        {
+                            foreach (CLayer.OfflineBooking pr in Model)
+                            {
+                                <tr>
+                                    <td>@pr.PropertyName</td>
+                                    <td>@pr.PropertyCityname</td>
+                                    <td>@pr.PropertyEmail</td>
+                                    <td>@pr.SupplierName</td>
+                                    @*<td>@pr.SupplierEmail</td>*@
+                                    <td align="center"><a href="/Admin/CustomProperty/EditCustomProperty?CustomPropertyId=@pr.CustomPropertyId" title="Edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></td>
+                                    @*<td><a class="showhand" href="/Admin/CustomProperty/Custompropdelete?CustomPropertyId=@pr.CustomPropertyId" onclick="return confirm('Are you sure you want to delete?')" title="Delete"><span class="glyphicon glyphicon-trash"></span> </a> </td>*@
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @*<div class="col-md-12">
+
+        @using (Html.BeginForm("Pager", "OfflineBookingCustomerList", FormMethod.Post, new { @id = "frmPagers" }))
+        {
+            <input type="hidden" id="SearchStringCache" name="SearchStringCache" value="@ViewBag.SearchString" />
+            <input type="hidden" id="currentPage" name="currentPage" value="@ViewBag.CurrentPage" />
+        }
+
+    </div>*@
+</div>
+
+    <script type="text/javascript">
+        function propdelete(pid, sid) {
+            if (confirm("Are you sure, you want to delete?")) {
+                window.location = "@Url.Action("Delete","Property")?id=" + pid + "&sid=" + sid;
+            }
+        }
+    </script>

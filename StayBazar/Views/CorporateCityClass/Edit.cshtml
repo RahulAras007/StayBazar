@@ -1,0 +1,47 @@
+﻿@model StayBazar.Models.CorporateCityClassModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Edit", "CorporateCityClass"))
+{
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="incontainer">
+        <div class="form-group">
+
+
+            <div>
+                @Html.DisplayNameFor(m => m.CityClassCode)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.CityClassCode, new { @tabindex = "1", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.CityClassCode)
+            </div>
+            <div>
+                @Html.DisplayNameFor(m => m.CityClassDescription)
+                @Html.TextBoxFor(m => m.CityClassDescription, new { @tabindex = "1", @class = "form-control input-sm" })
+
+            </div>
+
+            
+
+
+
+            <div class="btn-toolbar">
+                <div class="btn-group">
+                    <input type="submit" id="btnSave" value="Add" class="btn btn-sm btn-default" tabindex="3" />
+                    
+                </div>
+            </div>
+
+        </div>
+    </div>
+    @Html.HiddenFor(m => m.CityClassID)
+    <script type="text/javascript">
+            $(function () {
+                $("#Title").focus();
+            });
+    </script>
+}
+
+
+

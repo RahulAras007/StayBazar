@@ -1,0 +1,374 @@
+﻿@model StayBazar.Areas.Admin.Models.PropertyModel
+@{
+    if (Model.Description != null)
+    {
+        Model.PropertyDescription = Model.Description;
+    }
+}
+@using (Html.BeginForm("SaveDetails", "Property", FormMethod.Post, new { role = "form" }))
+{
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(m => m.PropertyId)
+    @Html.HiddenFor(m => m.PositionLat)
+    @Html.HiddenFor(m => m.PositionLng)
+    @Html.HiddenFor(m => m.OwnerId)
+    @Html.HiddenFor(m => m.Status)
+
+
+<div class="row">
+    @*<div class="col-xs-12 col-md-12 tab-content property-detail">*@
+        <div class="col-lg-6">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Title)
+                @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Title)
+            </div><br />
+            @*<div class="form-group" style="display:none;">
+                        @Html.LabelFor(m => m.Description)
+                    <textarea class="form-control valid propdesc desprop" cols="20" data-val="true" data-val-required="Description is required" id="Description" name="Description" rows="4">@Model.Description</textarea>
+                        @Html.ValidationMessageFor(m => m.Description)
+                </div>*@
+            <textarea style="display:none;" class="form-control valid  prodesc" cols="20" data-val="true" data-val-required="Description is required" id="Description" name="Description" rows="4">@Model.Description</textarea>
+            <div class="form-group">
+                <input type="button" class="btn btn-info" value="Edit Description" id="desproperty" onclick="despp()" />
+                @Html.ValidationMessageFor(m => m.Description)
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="descview" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog" style="width:75%">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Property Description</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        @*@Html.LabelFor(m => m.PropertyDescription)*@
+                                        <textarea class="form-control valid my_classpro" cols="20" data-val="true" data-val-required="Description is required" id="PropertyDescription" name="PropertyDescription" rows="4">@Model.PropertyDescription</textarea>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+
+
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Address)
+                @Html.TextAreaFor(m => m.Address, new { @class = "form-control", @rows = "5" })
+                @Html.ValidationMessageFor(m => m.Address)
+            </div>
+
+            <div>
+                <div class="row">
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.Rating)
+                        @Html.DropDownListFor(m => m.Rating, Model.RatingStatusList, new { @tabindex = "9" })
+                    </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.IsManualReview)
+                        @Html.CheckBoxFor(m => m.IsManualReview, new { @tabindex = "1" })
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="form-group">
+                @Html.LabelFor(m => m.Country)
+                @Html.DropDownListFor(m => m.Country, Model.CountryList, new { @tabindex = "7", @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.State)
+                @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "8", @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CityId)
+                @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "9", @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ZipCode)
+                @Html.TextBoxFor(m => m.ZipCode, new { @class = "form-control", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
+            </div>
+            <br />
+            <div class="form-group">
+                @Html.LabelFor(m => m.InventoryAPITypeId)
+                @Html.DropDownListFor(m => m.InventoryAPITypeId, Model.InventoryAPITypes, new { @tabindex = "1", @class = "form-control" })
+            </div>
+
+
+            <br />
+            <div class="form-group">
+                @Html.LabelFor(m => m.HotelId)
+                @Html.TextBoxFor(m => m.HotelId, new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.GSTRegistrationNo)
+                @Html.TextBoxFor(m => m.GSTRegistrationNo, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Location)
+                @Html.TextBoxFor(m => m.Location, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Location)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Phone)
+                @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", @MaxLength = "50", @onkeypress = "return isINNumbers(event)" })
+                @Html.ValidationMessageFor(m => m.Phone)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Mobile)
+                @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control", @onkeypress = "return isINNumbers(event)" })
+                @Html.ValidationMessageFor(m => m.Mobile)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email)
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.DistanceFromCity)
+                @Html.TextBoxFor(m => m.DistanceFromCity, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.AgeLimit)
+                @Html.TextBoxFor(m => m.AgeLimit, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-3">
+                        <br />
+                        @Html.LabelFor(m => m.CheckInTime)
+                    </div>
+                    <div class="col-md-2">
+                        Hr<br />
+                        @Html.DropDownListFor(m => m.CheckInhr, Model.CheckHourlist, new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-2">
+                        Min<br />
+                        @Html.DropDownListFor(m => m.CheckInmin, Model.CheckMinlist, new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-2">
+                        <br />
+                        @Html.DropDownListFor(m => m.CheckInclock, Model.Checkclock, new { @class = "form-control " })
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-3">
+                        <br />
+                        @Html.LabelFor(m => m.CheckOutTime)
+                    </div>
+
+                    <div class="col-md-2">
+                        Hr<br />
+                        @Html.DropDownListFor(m => m.CheckOuthr, Model.CheckHourlist, new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-2">
+                        Min<br />
+                        @Html.DropDownListFor(m => m.CheckOutmin, Model.CheckMinlist, new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-2">
+                        <br />
+                        @Html.DropDownListFor(m => m.CheckOutClock, Model.Checkclock, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PageTitle)
+                @Html.TextAreaFor(m => m.PageTitle, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.MetaDescription)
+                @Html.TextAreaFor(m => m.MetaDescription, new { @class = "form-control" })
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.Status)
+                </div>
+                <div class="col-md-3">
+                    <input id="rdbactive" name="status" class="css-radiobutton" type="radio" />
+                    <label for="rdbactive" class="css-label">Active</label>
+                </div>
+                <div class=" col-md-3">
+                    <input id="rdbdisabled" name="status" class="css-radiobutton" type="radio" />
+                    <label for="rdbdisabled" class="css-label">Disabled</label>
+                    <input type="hidden" value="@Model.CityId" id="hiddenCity" />
+                </div>
+            </div>@*<br /><br /><br />*@
+            <div class="row">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.PropertyFor)
+                </div>
+                <div class="col-md-3">
+                    <input @if (Model.PropertyFor == ((int)CLayer.ObjectStatus.PropertFor.B2B)) { <text> checked </text> } id="rdbB2B" value="1" name="PropertyFor" class="css-radiobutton" type="radio" />
+                    <label for="rdbB2B" class="css-label">B2B</label>
+                </div>
+                <div class="col-md-3">
+                    <input @if (Model.PropertyFor == ((int)CLayer.ObjectStatus.PropertFor.B2C)) { <text> checked </text> } id="rdbB2C" value="2" name="PropertyFor" class="css-radiobutton" type="radio" />
+                    <label for="rdbB2C" class="css-label">B2C</label>
+                </div>
+                <div class="col-md-2">
+                    <input @if (Model.PropertyFor == ((int)CLayer.ObjectStatus.PropertFor.Both)) { <text> checked </text> } id="rdbBoth" value="3" name="PropertyFor" class="css-radiobutton" type="radio" />
+                    <label for="rdbBoth" class="css-label">Both</label>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.PropertyInventoryType)
+                </div>
+                <div class="col-md-3">
+
+                    <input @if (Model.PropertyInventoryType == ((int)CLayer.ObjectStatus.PropertyInventoryType.Online)) { <text> checked </text> } id="rdbon" value="1" name="PropertyInventoryType" class="css-radiobutton" type="radio" />
+                    <label for="rdbOn" class="css-label">Online</label>
+                </div>
+                <div class="col-md-3">
+                    <input @if (Model.PropertyInventoryType == ((int)CLayer.ObjectStatus.PropertyInventoryType.Offline)) { <text> checked </text> } id="rdboff" value="2" name="PropertyInventoryType" class="css-radiobutton" type="radio" />
+                    <label for="rdboff" class="css-label">Offline</label>
+
+
+
+
+                </div>
+            </div>
+
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group text-right">
+                        <button type="submit" class="btn btn-success">Save</button>
+                        @if (Model.PropertyId > 0)
+                        {
+                            <a href="/Admin/Property/Index/@Model.PropertyId" class="btn btn-danger">Cancel</a>
+                        }
+                        else
+                        {
+                            <a href="/Admin/Supplier/Details/@Model.OwnerId" class="btn btn-danger">Cancel</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@*</div>*@
+    <br>
+    <br />
+}
+@if (Model.PropertyId > 0)
+{
+    @Html.Partial("~/Areas/Admin/Views/Property/_Landmarks.cshtml", Model.Landmarks)
+}
+
+<script type="text/javascript">
+
+    function despp() {
+
+        tinyMCE.init({
+            mode: "textareas",
+            editor_selector: "my_classpro",
+            theme: "advanced",
+            width: "100%",
+            height: "800",
+            onchange_callback: "TinyMceGetStatsLostpro",
+            theme_advanced_toolbar_location: "top",
+            theme_advanced_buttons1: "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
+            theme_advanced_buttons2: "",
+            theme_advanced_buttons3: "",
+            setup: function (ed) {
+                ed.onKeyUp.add(function () {
+                    procontent();
+                });
+            }
+
+        });
+        $('#descview').modal('show');
+
+
+    }
+    function procontent() {
+        var html = tinyMCE.activeEditor.getContent();
+        $(".prodesc").val(html);
+    }
+    function TinyMceGetStatsLostpro(inst) {
+        var conprodes = inst.getBody().innerHTML;
+        //if (conprodes == '<p><br data-mce-bogus="1"></p>') {
+        //    $(".prodesc").val("");
+        //}
+        //else {
+        $(".prodesc").val(conprodes);
+        //}
+
+        //alert($(".prodesc").val());
+
+    }
+    function Loadcity() {
+        $.get("/Common/GetCityNon?id=" + $('#State').val(), function (data) {
+            if (data != "") {
+                $('#CityId').html(data);
+            }
+            else {
+                $('#CityId').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+    $(function () {
+
+        //if ($('#CityId').val() < 1) {
+        //    $('#CityId').empty().html('<option selected="selected" value="0">not available...</option>');
+        //}
+        //else {
+
+        //}
+        //  $('#CityId').val($("#hiddenCity").val());
+
+        $('#Country').change(function () {
+            $.get("/Common/GetState?id=" + $('#Country').val(), function (data) {
+                if (data != "")
+                    $('#State').html(data);
+                else
+                    $('#State').html('<option selected="selected" value="0">None</option>');
+                Loadcity();
+            });
+
+        });
+        $('#State').change(function () {
+            Loadcity();
+        });
+
+        if ($("#Status").val() == '@((int)CLayer.ObjectStatus.StatusType.Active)') {
+            $('#rdbactive').prop("checked", true);
+        }
+        if ($("#Status").val() == '@((int)CLayer.ObjectStatus.StatusType.Disabled)') {
+            $('#rdbdisabled').prop("checked", true);
+        }
+
+        $('#rdbactive').change(function () {
+            if ($(this).prop("checked")) {
+                $("#Status").val("@((int)CLayer.ObjectStatus.StatusType.Active)");
+            }
+        });
+        $('#rdbdisabled').change(function () {
+            if ($(this).prop("checked")) {
+                $("#Status").val("@((int)CLayer.ObjectStatus.StatusType.Disabled)");
+            }
+        });
+
+    });
+
+
+
+</script>

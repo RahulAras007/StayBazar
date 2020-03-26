@@ -1,0 +1,9 @@
+﻿@model long
+@{
+    decimal paypal = BLayer.Bookings.GetPaypalCommissionByBookId(Model);
+}
+<p>
+
+    <text>Paypal Commission: <b>@paypal</b></text> <br />
+
+</p>

@@ -1,0 +1,108 @@
+﻿@model List<CLayer.Property>
+@{ Layout = null; }
+<div class="col-lg-12">
+
+    <div id="divpro">
+
+    </div>
+    @if (Model.Count > 0)
+    {
+        @*<h4> List Of Properties for @Model[0].BusinessName</h4>*@
+        
+        <div class="height-popup">
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th>property Name</th>
+                        <th>City</th>
+                        <th>Choose</th>
+                        @*<th>Supplier Name</th>*@
+                        <th style="display:none;">email</th>
+                        <th style="display:none;">address</th>                        
+                        <th style="display:none;">FirstName</th>
+                        <th style="display:none;">Mobile</th>
+                        <th style="display:none;">ccountry,state,city</th>
+                        <th>
+                            
+                        </th>
+                       
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (CLayer.Property item in Model)
+                    {
+                        
+                            
+                        CLayer.Address ddf = BLayer.Address.GetPrimaryOnUser(item.OwnerId);
+                        string supemail = BLayer.User.GetEmail(item.OwnerId);
+                        string Mobile = "";
+                        string address = "";
+                        
+                        if (ddf != null)
+                        {
+                            if (ddf.Mobile != null) { Mobile = ddf.Mobile; }
+                            if (ddf.AddressText != null) { address = ddf.AddressText; }
+
+                        }
+
+                        
+                        
+                        <tr>
+                            <td><span id="proname_@item.PropertyId">@item.Title</span></td>
+                            <td>@item.City</td>
+                            @*<td>@item.BusinessName</td>*@
+                            <td style="display:none;"><span id="proemail_@item.PropertyId">@item.Email</span></td>
+                            <td style="display:none;"><span id="proAddress_@item.PropertyId">@item.Address</span></td>
+                            <td style="display:none;"><span id="prosupname_@item.PropertyId">@item.SupplierName</span></td>
+                            <td style="display:none;"><span id="promobile_@item.PropertyId">@item.Mobile</span></td>
+                            <td style="display:none;">
+                            <span id="prosupbuissname_@item.PropertyId">@item.BusinessName</span>
+                                <span id="prosupid_@item.PropertyId">@item.OwnerId</span>
+                                <span id="prosupmobile_@item.PropertyId">@Mobile</span>
+                                <span id="prosupemail_@item.PropertyId">@supemail</span>
+                                <span id="prosupaddress_@item.PropertyId">@address</span>
+                                <span id="prosupcountry_@item.PropertyId">@ddf.CountryId</span>
+                                <span id="prosupstate_@item.PropertyId">@ddf.State</span>
+                                <span id="prosupcityid_@item.PropertyId">@ddf.CityId</span>
+                                <span id="prosupcityname_@item.PropertyId">@ddf.City</span>
+
+                                <span id="PropertyZipcode_@item.PropertyId">@item.ZipCode</span>
+                                <span id="SupplierAddress_@item.PropertyId">@item.SupplierAddress</span>
+                                <span id="SupplierCountry_@item.PropertyId">@item.SupplierCountry</span>
+                                <span id="SupplierState_@item.PropertyId">@item.SupplierState</span>
+                                <span id="SupplierCityName_@item.PropertyId">@item.SupplierCity</span>
+                                <span id="SupplierCityId_@item.PropertyId">@item.SupplierCityId</span>
+                                <span id="SupplierZipcode_@item.PropertyId">@item.SupplierZipCode</span>
+                                <span id="SupplierMobile_@item.PropertyId">@item.SuppierMobile</span>
+
+                            </td>
+
+                            <td style="display:none;">
+                                <span id="procountry_@item.PropertyId">@item.Country</span>
+                                <span id="prostate_@item.PropertyId">@item.State</span>
+                                <span id="procity_@item.PropertyId">@item.CityId</span>
+                                <span id="procityname_@item.PropertyId">@item.City</span>
+                            </td>
+                            <td><a href="#" onclick="proSelected(@item.PropertyId)">Choose</a></td>       
+                        </tr>
+  
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        if (ViewBag.ErrorMessage != null && ViewBag.ErrorMessage != "")
+        {
+            <div class="alert alert-info" role="alert">No matching data found.</div>
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">Please search by property,city,location,supplier name </div>
+        }
+    }
+</div>

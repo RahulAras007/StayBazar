@@ -1,0 +1,54 @@
+﻿@model CLayer.OfflineBooking
+@{
+    Layout = null;
+}
+
+@if (Model != null)
+{
+    int OfflineBookingType = BLayer.OfflineBooking.GetBookingType(Model.OfflineBookingId);
+
+    if (OfflineBookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+    {
+        long IsGST = BLayer.OfflineBooking.GetOfflinebookingIsGST(Model.OfflineBookingId);
+        
+        if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.Normal)
+        {
+            @Html.Partial("ServiceTaxAutoInvoice", Model);
+        }
+        else
+        {
+            @Html.Partial("GSTAutoInvoice", Model);
+        }
+    }
+    else if (OfflineBookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+    {
+        @Html.Partial("DirectAutoInvoice", Model);
+    }
+    else if (OfflineBookingType == (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+    {
+        @Html.Partial("TACAutoInvoice", Model);
+    }
+    else
+    {
+
+        long IsGST = BLayer.OfflineBooking.GetOfflinebookingIsGST(Model.OfflineBookingId);
+
+        if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.Normal)
+        {
+            @Html.Partial("ServiceTaxAutoInvoice", Model);
+        }
+        else
+        {
+            @Html.Partial("GSTAutoInvoice", Model);
+        }
+    }
+
+
+}
+else
+{
+    <div>Booking not found</div>
+}
+
+
+

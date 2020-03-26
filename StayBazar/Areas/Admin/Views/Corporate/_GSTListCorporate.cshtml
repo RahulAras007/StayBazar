@@ -1,0 +1,51 @@
+﻿@model IEnumerable<CLayer.User>
+@{
+    Layout = null;
+}
+
+
+<table border="0" class="table table-condensed table-responsive table-custom table-bordered">
+    <thead>
+        <tr>
+            <th align="center">GST RegistrationNo</th>
+            <th align="center">State Of Registration</th>
+            <th align="center">Remove</th>
+        </tr>
+    </thead>
+    <tbody>
+      
+            @foreach (CLayer.User pr in Model)
+            {
+                <tr>
+                    <td>@pr.GSTRegistrationNo</td>
+                    <td>@pr.StateOfRegistration</td>
+                    <td align="center">
+                        <a class="showhand" onclick="propedit(@pr.B2bGSTId,@pr.GSTstateid)" title="Edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span> </a>
+                        <a class="showhand" onclick="propdelete(@pr.B2bGSTId)" title="Delete"><span class="glyphicon glyphicon-trash red-color fa-2x"></span> </a>
+
+                    </td>
+                </tr>
+            }
+        
+
+
+
+
+    </tbody>
+</table>
+
+<script type="text/javascript">
+                function propdelete(pid)
+                {
+                    var url = '@Url.Action("GSTDelete", "Corporate")' + "?B2bGSTId=" + pid;
+                    $.get(url, function () {
+                        var CustID = $('#UserId').val();
+                        var url = '@Url.Action("GSTList", "Corporate")' + "?custid=" + CustID;
+                        $.get(url, function (data) {
+                            $('#GSTListCorporate').html(data);
+                        });
+                    });
+                }
+</script>
+
+

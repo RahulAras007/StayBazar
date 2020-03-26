@@ -1,0 +1,58 @@
+﻿@model StayBazar.Models.PropertyModel
+@{
+    if (Model.PropertyId > 0)
+    {
+        ViewBag.Title = "My Properties / " + Model.Title;
+    }
+    else
+    {
+        ViewBag.Title = "My Properties / New";
+    }
+    //ViewData["Titlepopup"] = Model.Title;
+}
+<script src="@Url.Content("~/Scripts/tinymce/tiny_mce.js")" type="text/javascript"></script>
+
+<div class="container whitebg bdy_min_height">
+    <script type="text/javascript">
+        $(function () { validateRq(); });
+    </script>
+    <div class="row">
+        <div class="col-md-12 greyborderbottom">
+            <h3>
+                <a href="/PropertyList/">@*<span class="h6 glyphicon glyphicon-arrow-left"></span>*@My Properties</a>@if (Model.PropertyId > 0)
+                { <text>/</text> @Model.Title }
+                else
+                { <text>/ New</text> }
+            </h3>
+            @*<p class="greytext">We use this info to put you in a group with people close to your attributes (weird choice of world)</p>*@
+        </div>
+        <div class="col-md-12">
+            <ul class="nav nav-tabs nav-justified property">
+                @if (Model.PropertyId > 0)
+                {
+                    <li class="details @if (Model.ActiveTab == "home") { <text> active </text>            }"><a href="#home" data-toggle="tab">Details</a></li>
+                    <li class="gallery @if (Model.ActiveTab == "gallery") { <text> active </text>              }"><a href="#gallery" data-toggle="tab">Gallery</a></li>
+                    <li class="features"><a href="#features" data-toggle="tab">Features</a></li>
+                    <li class="accomodation  @if (Model.ActiveTab == "accommodation") { <text> active </text>             }"><a href="#accommodation" data-toggle="tab">Accommodation</a></li>
+                }
+            </ul>
+            <div class="col-xs-12 col-md-12 tab-content property-detail">
+                <div class="tab-pane fade @if (Model.ActiveTab == "home"){ <text> in active </text>}" id="home">
+                    @Html.Partial("~/Views/PropertyEdit/_Details.cshtml", Model)
+                </div>
+                @if (Model.PropertyId > 0)
+                {
+                    <div class="tab-pane fade @if (Model.ActiveTab == "gallery") { <text> in active </text>}" id="gallery">
+                        @Html.Partial("~/Views/PropertyEdit/_Gallery.cshtml", Model.Pictures)
+                    </div>
+                    <div class="tab-pane fade" id="features">
+                        @Html.Partial("~/Views/PropertyEdit/_Features.cshtml", Model.Features)
+                    </div>
+                    <div class="tab-pane fade @if (Model.ActiveTab == "accommodation") { <text> in active </text>}" id="accommodation">
+                        @Html.Partial("~/Views/PropertyEdit/_Rooms.cshtml", Model.Accommodations)
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,235 @@
+﻿@model List<CLayer.Booking>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;   
+}
+<div class="panel">     
+@if (Model.Count() == 0)
+{
+    <div class="alert alert-info">Data not found</div>
+}
+else
+{
+<div class="panel-group" id="accordion">
+    @{      
+    long i = 0;
+    long prev = 0;
+    bool closeDo = false;
+    StayBazar.Areas.Admin.Models.TransactionListModel filterform = (StayBazar.Areas.Admin.Models.TransactionListModel)ViewBag.Filter;
+    using (Html.BeginForm("Pager", "TransactionList", FormMethod.Post, new { @id = "frmPagersverify" }))
+    {
+            <input type="hidden" id="Status" name="Status" value="@filterform.Status" />
+            <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+            <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+    }
+    gp.RowsInAPage = filterform.Limit;
+    }
+
+    @*@if (Model != null && Model.Count() > 0)
+    {
+        @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+    }*@
+   
+       @foreach (CLayer.Booking usr in Model)
+                {
+                   
+                    if (i != usr.BookingId)
+                    {
+                        long PayOption = BLayer.Bookings.GetPaymentoption(usr.BookingId);
+                        if(i!=0)
+                        { @Html.Raw("</div></div></div>")}
+                        i = usr.BookingId;                    
+                        <text>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#i_@usr.BookingId">
+                                <div class="row">
+                                    <div class="col-md-2 ">
+                                        <span ></span>@usr.BookingDate.ToShortDateString()
+                                    </div>
+                                    <div class="col-md-3 ">  Conf No:@usr.OrderNo </div>
+
+                                    <div class="col-md-4">   @usr.PropertyTitle,@usr.propertyLocation  </div>
+
+                                    @if (PayOption == (int)CLayer.ObjectStatus.PaymentOption.FullPayment)
+                                    {
+                                        <div class="col-md-3">Payment Option: Full Payment</div>
+                                    }
+                                    @if (PayOption == (int)CLayer.ObjectStatus.PaymentOption.PartialPayment)
+                                    {
+                                        <div class="col-md-3">Payment Option: Partial Payment</div>
+                                    }
+                                </div>
+                            </a>
+                        </div>
+                        <div id="i_@usr.BookingId" class="panel-collapse collapse ">
+                            <div class="panel-body">
+                                
+                        </text>                             
+                    }
+                  else { 
+                      <text> <hr /></text>
+                    }
+                    <div class="row">
+                                    <div class="col-md-3">
+                                        
+                                        <dl>
+                                            <dt>Confirmation Details</dt>
+                                            <dd>@usr.OrderNo</dd>
+                                            <dt>Booking Date:</dt>
+                                            <dd>@usr.BookingDate.ToShortDateString()</dd>
+                                            (Rates and amounts are all inclusive)
+                                        </dl>
+                                        
+
+                                    </div>
+                        <div class="col-md-3">
+                            <dl>
+                                <dt>
+                                    Supplier Details
+                                </dt>
+                                <dd>
+                                    @usr.FirstName
+                                    @usr.LastName
+                                </dd>
+                                <dd>
+                                    @usr.Address
+                                    @usr.City
+                                    @usr.StateName
+                                    @usr.CountryName
+                                </dd>
+                                <dd>
+                                   Mobile:@usr.Mobile
+                                    @usr.Email</dd>                                                   
+                                </dl>
+                                    <br />
+
+</div>
+                        <div class=" col-lg-3">
+                            <dl>
+                                <dt>Property Details</dt>
+                                <dd>@usr.PropertyTitle</dd>
+                                <dd>@usr.propertyAddress</dd>
+                                <dd>@usr.propertyLocation</dd>
+                                <dd>@usr.propertyCity</dd>
+                                <dd>@usr.propertyPin</dd>
+                            </dl>
+                        </div>
+                                    <div class="col-md-3">
+                                        <dl>
+                                            <dt>Accommodation Details</dt>
+                                            <dd>@usr.AccommodationTypeTitle</dd>
+                                            <dd>CheckIn Date  @usr.CheckIn.ToShortDateString(),Checkout Date:  @usr.CheckOut.ToShortDateString()</dd>
+                                            <dd>Quantity:   @usr.Quantity</dd>
+                                            <dd>Adults:   @usr.NoOfAdults, Guests @usr.NoOfGuests,Children:  @usr.NoOfChildren</dd>                                                                         
+                                            <dd>Total Amount:  @usr.bookingitemsTotalAmount</dd>
+                                        </dl>
+                                     </div>
+
+                                </div>
+           
+           
+           
+           
+            <div class=" row"  >
+                                    
+    @{
+List<CLayer.Address> usersFor = BLayer.Bookings.GetBookingVerifiedAddress(@usr.BookingId);
+foreach (CLayer.Address usr2 in usersFor)
+{
+    <div class=" col-lg-2">
+
+        <b>Verified By</b>  <br />
+        @usr2.Firstname,       
+       @usr2.datetime.ToString("dd/MM/yyyy hh:mm:ss tt")
+
+        </div>
+}
+
+}
+
+                @{
+List<CLayer.Address> buyer = BLayer.Transaction.BookedByAddressSearch(@usr.BookingId);
+foreach (CLayer.Address usr3 in buyer)
+{
+            <div class=" col-lg-5">
+
+                <b>Buyer Details</b>  <br />
+                @usr3.Firstname,
+                @*Last Name: @usr1.Lastname<br />*@
+                @usr3.AddressText,
+                @usr3.City ,
+                @usr3.StateName ,
+                @usr3.Country ,@usr3.ZipCode.
+                Phone:@usr3.Phone   @usr3.Mobile,
+                Email:@usr3.Email
+            </div>
+}
+
+                }
+
+
+
+                @{List<CLayer.Address> usersFor1 = BLayer.Bookings.GetBookedForUser(@usr.BookingId);
+                foreach (CLayer.Address usr2 in usersFor1)
+                {
+                    <div class=" col-lg-5">
+
+                        <b>Guest Details</b>  <br />
+                        @usr2.Firstname,
+                        @usr2.AddressText,
+                        @usr2.City ,
+                        @usr2.StateName ,
+                        @usr2.Country ,@usr2.ZipCode.
+                        Phone:@usr2.Phone    @usr2.Mobile.
+                        Email:@usr2.Email
+                    </div>
+                }
+                }
+                                </div> 
+
+                }
+                                  @Html.Raw("</div></div></div>")
+    
+</div>
+
+    @*if (Model != null && Model.Count() > 0)
+    {
+    @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+    }*@
+}
+<script type="text/javascript">
+
+    $(function () {
+        $('#StartDate').datepicker({
+            dateFormat: "dd/mm/yy"
+        });
+        $('#EndDate').datepicker({
+            dateFormat: "dd/mm/yy"
+        });
+    });
+
+    function SearchData() {
+        var id1 = $("#StartDate").val();
+        var id2 = $("#EndDate").val();
+        //alert("hai" + id1);
+        var url ='@Url.Action("FilterVeriFiedByDate", "TransactionList", new { area = "Admin" })';
+        $.post(url, { StartDate: id1, EndDate: id2 }, function (data) {
+            $("#VerifiedListnow").html(data);
+        });
+    };
+
+    function showPager(num) {
+        //alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("PagerVerified", "TransactionList", new { area = "Admin" })';
+        $.post(url, $("#frmPagersverify").serialize(),
+                function (data) {
+                    $("#VerifiedListnow").html(data);
+                });
+    }    
+</script>
+

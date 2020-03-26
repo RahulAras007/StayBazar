@@ -1,0 +1,68 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflinePropertyBookingModel
+
+<div class="row margin-bot-10" style="margin-bottom:15px;">
+    <div class="col-xs-12 col-md-12">
+        <div class="form-group">
+            @Html.LabelFor(m => m.NoOfAccomodation)
+            @Html.TextBoxFor(m => m.NoOfAccomodation, new { @class = "form-control input-sm", @onchange = "changenoofrooms()" })
+            @Html.ValidationMessageFor(m => m.NoOfAccomodation)
+        </div>
+        <div class="col-md-6 pad0 bold">No Of Pax:</div><br />
+        <div class="form-group">
+            @Html.LabelFor(m => m.NoOfPaxAdult)
+            @Html.TextBoxFor(m => m.NoOfPaxAdult, new { @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.NoOfPaxAdult)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.NoOfPaxChild)
+            @Html.TextBoxFor(m => m.NoOfPaxChild, new { @class = "form-control input-sm" })
+            @Html.ValidationMessageFor(m => m.NoOfPaxChild)
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-bottom:15px;">
+ 
+    <div class="col-xs-12 col-md-12">
+
+        <div class="row"><div class="col-md-5 bold">Accommodation Type  &nbsp; </div><a onclick="Accdivdisplay()" id="close_other_Acctype" class="lnk handpointer " style="display:none; "><span class="glyphicon glyphicon-remove"></span>choose from the list</a></div>
+
+        <div id="other_Acctype">
+            @Html.TextBoxFor(m => m.AccommodationTypeName, new { @class = "form-control input-sm", id = "AccommodationTypeName" })
+            @Html.ValidationMessageFor(m => m.AccommodationTypeName)
+        </div>
+
+        <div class="row" style="display:none;">
+            <div class="col-md-12">
+                <div id="Accdiv">
+                    @Html.HiddenFor(m => m.Accommodationid)
+                    @Html.HiddenFor(m => m.Accommodationtypeid)
+                    @*chosen-select*@
+                    <select @*data-placeholder="Choose a Country..." *@ class="styleselect" style="width:100%;" name="AccommodatoinType" id="AccommodatoinType">
+                        @{
+                            List<CLayer.AccommodationType>
+                                Acctypes = BLayer.AccommodationType.GetAll();
+                        }
+                        @foreach (CLayer.AccommodationType sc in Acctypes)
+                        {
+                            <option value="@sc.AccommodationTypeId">@sc.Title</option>
+                        }
+                        <option value="-1">Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+<div id="container1"></div>
+<script>
+    $(document).ready(function () {
+        alert();
+    });
+    $("#ss").click(function () {
+        $("#container1").append('<div class="module_holder"><div class="module_item"><img src="images/i-5.png" alt="Sweep Stakes"><br>sendSMS</div></div>');
+    });
+</script>

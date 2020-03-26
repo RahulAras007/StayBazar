@@ -1,0 +1,16 @@
+tbo hotel api link
+
+http://api.tektravels.com/hotelapidocument/
+
+
+
+
+URL: api.tektravels.com
+
+UserName    : STAYBAZAR
+
+B2B PASSWORD: STAYBAZAR@12
+
+API PASSWORD: STAYBAZAR@123
+
+

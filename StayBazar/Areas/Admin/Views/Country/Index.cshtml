@@ -1,0 +1,68 @@
+﻿@model IEnumerable<CLayer.Country>
+
+@{
+    ViewBag.Title = "Country";
+    try
+    {
+        var grid = new WebGrid(Model, canSort: false, canPage: true, rowsPerPage: 20,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Areas.Admin.Models.CountryModel data = (StayBazar.Areas.Admin.Models.CountryModel)ViewBag.Country;
+        <text>
+            <div id="bodycontent">
+                <div id="divedit">
+                    @{
+        Html.RenderPartial("~/Areas/Admin/Views/Country/_Edit.cshtml", data, ViewData);
+                    }
+                </div>
+                <div id="gridContent">
+                    <div class="container-fluid">
+                    
+                    @grid.GetHtml(
+         tableStyle: "webGrid center table table-striped table-hover table-condensed table-custom table-bordered ",
+                headerStyle: "header",
+                alternatingRowStyle: "alt",
+                selectedRowStyle: "select",
+                columns: grid.Columns(grid.Column("Name", "Name"),
+                grid.Column("Code","Code"),
+                grid.Column("Status", format: @<text>@if (item.Status == 1)
+                {<text>Enabled</text>}
+                else
+                {<text>Disable</text>}</text>, style: "btnclm"),
+                grid.Column("States", format: @<text><a href="/Admin/State/Index/@item.CountryId" title="Go to state list"><span class="soap-icon-notice green-color fa-2x"></span></a></text>, style: "btnclm"),
+                grid.Column("Default", format: @<text>@if (item.IsDefault)
+                {<text>&#10004;</text>}
+                else
+                {<text></text>}</text>, style: "btnclm"),
+                grid.Column("For Property", format: @<text>@if (item.ForProperty)
+                {<text>&#10004;</text>}
+                else
+                {<text></text>}</text>, style: "btnclm"),
+                grid.Column("Edit", format: @<text><a href="#" title="Edit" onclick="EditBT(@item.CountryId)"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>, style: "btnclm")
+))
+                </div>
+                    </div>
+            </div>
+            <script type="text/javascript">
+                function EditBT(id) {
+                    $.get("Country/Edit?id=" + id, function (data) {
+                        $("#divedit").html(data);
+                    });
+                }
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}
+
+
+
+            @*<style>
+                .gridcellstyle {
+                    text-align: center;
+                }
+            </style>*@

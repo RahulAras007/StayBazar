@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="www.tamarindtours.in/IBaseDetails" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="www.tamarindtours.in/IBaseDetails" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="www.tamarindtours.in/IBaseDetails/Imports">
+      <xsd:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/BaseDetails.svc?xsd=xsd0" namespace="www.tamarindtours.in/IBaseDetails" />
+      <xsd:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/BaseDetails.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" />
+      <xsd:import schemaLocation="https://stagingxml.tamarindtours.in/Version1.0/BaseDetails.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IBaseDetails_GetDestinations_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestinations" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetDestinations_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestinationsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetDestinations_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q1:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetCities_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCities" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetCities_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCitiesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetHotelList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetHotelList" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetHotelList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetHotelListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetHotelList_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q2:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetStarRatings_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStarRatings" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetStarRatings_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStarRatingsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetRoomTypes_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetRoomTypes" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetRoomTypes_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetRoomTypesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetDestinationDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestinationDetails" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetDestinationDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestinationDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetDestinationDetails_InputExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/TamarindXML.BusinessClass" name="detail" element="q3:InputException" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetMasterCurrency_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetMasterCurrency" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetMasterCurrency_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetMasterCurrencyResponse" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetCountries_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCountries" />
+  </wsdl:message>
+  <wsdl:message name="IBaseDetails_GetCountries_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCountriesResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IBaseDetails">
+    <wsdl:operation name="GetDestinations">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetDestinations" message="tns:IBaseDetails_GetDestinations_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetDestinationsResponse" message="tns:IBaseDetails_GetDestinations_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetDestinationsInputExceptionFault" name="InputExceptionFault" message="tns:IBaseDetails_GetDestinations_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCities">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetCities" message="tns:IBaseDetails_GetCities_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetCitiesResponse" message="tns:IBaseDetails_GetCities_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetHotelList">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetHotelList" message="tns:IBaseDetails_GetHotelList_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetHotelListResponse" message="tns:IBaseDetails_GetHotelList_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetHotelListInputExceptionFault" name="InputExceptionFault" message="tns:IBaseDetails_GetHotelList_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStarRatings">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetStarRatings" message="tns:IBaseDetails_GetStarRatings_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetStarRatingsResponse" message="tns:IBaseDetails_GetStarRatings_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetRoomTypes">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetRoomTypes" message="tns:IBaseDetails_GetRoomTypes_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetRoomTypesResponse" message="tns:IBaseDetails_GetRoomTypes_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDestinationDetails">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetDestinationDetails" message="tns:IBaseDetails_GetDestinationDetails_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetDestinationDetailsResponse" message="tns:IBaseDetails_GetDestinationDetails_OutputMessage" />
+      <wsdl:fault wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetDestinationDetailsInputExceptionFault" name="InputExceptionFault" message="tns:IBaseDetails_GetDestinationDetails_InputExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMasterCurrency">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetMasterCurrency" message="tns:IBaseDetails_GetMasterCurrency_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetMasterCurrencyResponse" message="tns:IBaseDetails_GetMasterCurrency_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCountries">
+      <wsdl:input wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetCountries" message="tns:IBaseDetails_GetCountries_InputMessage" />
+      <wsdl:output wsaw:Action="www.tamarindtours.in/IBaseDetails/IBaseDetails/GetCountriesResponse" message="tns:IBaseDetails_GetCountries_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

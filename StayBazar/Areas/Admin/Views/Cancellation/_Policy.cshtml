@@ -1,0 +1,39 @@
+﻿@{
+    Layout = null;
+}
+<div class="modal fade" id="cancPolicy" tabindex="-1" role="dialog" aria-labelledby="cancelpolicy" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="polprog"><p><img src="/content/ajax11-loader.gif" /> Loading...</p></div>
+                <div id="polbox"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var policyShown = false;
+    function callPolicy(pId) {
+        if (!policyShown) {
+            $("#polprog").show();
+            $("#polbox").hide();
+        }
+        $('#cancPolicy').modal('show');
+        if(!policyShown)
+        {
+            var url = '@Url.Action("CancellationPolicy", "Cancellation")?pId=' + pId;
+            $.get(url, function (data) {
+                $("#polprog").hide();
+                $("#polbox").html(data);
+                $("#polbox").show();
+                policyShown = true;
+            });
+        }
+    }
+
+  
+</script>

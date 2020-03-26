@@ -1,0 +1,852 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    //Layout = null;
+}
+@*@using (Html.BeginForm("SavePropertyFromOffline", "CustomProperty", FormMethod.Post, new { enctype = "multipart/form-data", @id = "FormCustomPropertyFromProperty" }))
+    {*@
+@*<div class="col-md-12 margin-top-10 margin-bot-10">*@
+
+<style>
+  
+  .ui-autocomplete {
+    z-index: 111111 !important;
+ 
+}
+</style>
+
+<div id="divSerial" class="col-md-12 margin-top-10 margin-bot-10" style="padding:0px;">
+    <div class="col-md-6">
+        <div id="PropertyDetails">
+            <div class="row">
+                <h4 class="bold">
+                    Property Details
+                </h4>
+            </div>
+            <div class="row" style="margin-bottom:15px;">
+
+                <div class="col-md-12">
+
+                    @*@Html.HiddenFor(m => m.CustomPropertyId)*@
+                    @Html.LabelFor(m => m.PropertyName1)<span style="color:red">*</span>
+                    @Html.TextBoxFor(m => m.PropertyName1, new { @tabindex = "1", @class = "form-control input-sm" })
+                    @*@Html.ValidationMessageFor(m => m.PropertyName)*@
+                    <span id="PropertyName1Span" data-val="PropertyName1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="PropertyName1" data-valmsg-replace="true"><span for="PropertyName1" class="">Enter Property Name</span></span>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyAddress1)<span style="color:red">*</span>
+                @Html.TextAreaFor(m => m.PropertyAddress1, new { @tabindex = "2", @class = "form-control input-sm" })
+                @*@Html.ValidationMessageFor(m => m.PropertyAddress)*@
+                <span id="PropertyAddress1Span" data-val="PropertyAddress1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="PropertyAddress1" data-valmsg-replace="true"><span for="PropertyAddress1" class="">Enter Property Address</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyPinCode1)
+                @Html.TextBoxFor(m => m.PropertyPinCode1, new { @tabindex = "2", @class = "form-control input-sm" })
+                
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyCountry1)<span style="color:red">*</span>
+                @Html.DropDownListFor(m => m.PropertyCountry1, Model.PropCountryList, new { @tabindex = "4", @class = "form-control input-sm" })
+                <span id="PropertyCountry1Span" data-val="PropertyCountry1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="PropertyCountry1" data-valmsg-replace="true"><span for="PropertyCountry1" class="">Enter Property Country</span></span>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyState1)<span style="color:red">*</span>
+                @Html.DropDownListFor(m => m.PropertyState1, Model.PropStateList, new { @tabindex = "5", @class = "form-control input-sm", id = "PropertyState1" })
+                <span id="PropertyState1Span" data-val="PropertyState1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="PropertyState1" data-valmsg-replace="true"><span for="PropertyState1" class="">Enter Property State</span></span>
+
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyCity1)<span style="color:red">*</span> &nbsp;
+                <a href="#" id="close_other_cityprops" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                @Html.DropDownListFor(m => m.PropertyCity1, Model.PropCityList, "select", new { @tabindex = "6", @class = "form-control" })
+                <div id="other_cityprops" style="display:none;">
+                    @Html.TextBoxFor(m => m.PropertyCityname1, new { @tabindex = "6", @class = "form-control input-sm"})
+                    @*<span id="PropertyCityname1Span" data-val="PropertyCityname1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="PropertyCityname1" data-valmsg-replace="true"><span for="PropertyCityname1" class="">Enter Property City</span></span>*@
+                </div>
+                @*@Html.ValidationMessageFor(m => m.PropertyCity)*@
+                <span id="PropertyCity1Span" data-val="PropertyCity1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="PropertyCity1" data-valmsg-replace="true"><span for="PropertyCity1" class="">Select Property City</span></span>
+
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyEmail1)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.PropertyEmail1, new { @tabindex = "3", @class = "form-control input-sm" })
+                @*@Html.ValidationMessageFor(m => m.PropertyEmail1)*@
+                <span id="PropertyEmail1Span" data-val="PropertyEmail1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="PropertyEmail1" data-valmsg-replace="true"><span for="PropertyEmail1" class="">Enter Property Email</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyContactNo1)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.PropertyContactNo1, new { @tabindex = "3", @class = "form-control input-sm" })
+                @*@Html.ValidationMessageFor(m => m.PropertyContactNo1)*@
+                <span id="PropertyContactNo1Span" data-val="PropertyContactNo1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="PropertyContactNo1" data-valmsg-replace="true"><span for="PropertyContactNo1" class="">Enter Property Contact Number</span></span>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.PropertyCaretakerName1)
+                @Html.TextBoxFor(m => m.PropertyCaretakerName1, new { @tabindex = "3", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.PropertyCaretakerName1)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CareTakerEmail)
+                @Html.TextBoxFor(m => m.CareTakerEmail, new { @tabindex = "3", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.CareTakerEmail)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.SubPropertyGstRegNo)
+                @Html.TextBoxFor(m => m.SubPropertyGstRegNo, new { @tabindex = "3", @class = "form-control input-sm" })
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div id="supDetails">
+            <div class="row">
+                <h4 class="bold">
+                    Supplier Details
+                </h4>
+            </div>
+
+            <div class="row" style="margin-bottom:15px;">
+
+                <div class="col-md-12">
+
+                    @Html.LabelFor(m => m.SupplierName1)@*<span style="color:red">*</span>*@
+                    @Html.TextBoxFor(m => m.SupplierName1, new { @tabindex = "1", @class = "form-control input-sm", @id = "SupplierName1" })
+                  
+                    @Html.ValidationMessageFor(m => m.SupplierName1)
+                 
+
+                        @*<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content custom" id="selectValue" style="top: 54px;left: 15px;">
+
+                        </ul>*@
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.SupplierAddress)<span style="color:red">*</span>
+                @Html.TextAreaFor(m => m.SupplierAddress, new { @tabindex = "2", @class = "form-control input-sm" })
+                @*@Html.ValidationMessageFor(m => m.SupplierAddress)*@
+                <span id="SupplierAddressSpan" data-val="SupplierAddress" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="SupplierAddress" data-valmsg-replace="true"><span for="SupplierAddress" class="">Enter Supplier Address</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.SupplierPinCode)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.SupplierPinCode, new { @tabindex = "2", @class = "form-control input-sm" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.SupplierCountry)<span style="color:red">*</span>
+                @Html.DropDownListFor(m => m.SupplierCountry, Model.SupCountryList, new { @tabindex = "4", @class = "form-control input-sm", id = "SupplierCountry" })
+                <span id="SupplierCountrySpan" data-val="SupplierCountry" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="SupplierCountry" data-valmsg-replace="true"><span for="SupplierCountry" class="">Enter Supplier Country</span></span>
+
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.SupplierState)<span style="color:red">*</span>
+                @Html.DropDownListFor(m => m.SupplierState, Model.SupStateList, "Select", new { @tabindex = "5", @class = "form-control input-sm", id = "SupplierState" })
+                @*@Html.ValidationMessageFor(m => m.SupplierState)*@
+                <span id="SupplierStateSpan" data-val="SupplierState" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="SupplierState" data-valmsg-replace="true"><span for="SupplierState" class="">Enter Supplier State</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.SupplierCity1)<span style="color:red">*</span> &nbsp;
+                <a href="#" id="close_other_citysups" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                @Html.DropDownListFor(m => m.SupplierCity1, Model.SupCityList,"Select", new { @tabindex = "6", @class = "form-control", id = "SupplierCity1" })
+                @*@Html.ValidationMessageFor(m => m.SupplierCity)*@
+                <div id="other_citysups" style="display:none;">
+                    @Html.TextBoxFor(m => m.SupplierCityname1, new { @tabindex = "6", @class = "form-control input-sm"})
+                    @*<span id="SupplierCityname1Span" data-val="SupplierCityname1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="SupplierCityname1" data-valmsg-replace="true"><span for="SupplierCityname1" class="">Enter Supplier City</span></span>*@
+                </div>
+                <span id="SupplierCity1Span" data-val="SupplierCity1" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="SupplierCity1" data-valmsg-replace="true"><span for="SupplierCity1" class="">Select Supplier City</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.SupplierEmail)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.SupplierEmail, new { @tabindex = "3", @class = "form-control input-sm" })
+                @*@Html.ValidationMessageFor(m => m.SupplierEmail)*@
+                <span id="SupplierEmailSpan" data-val="SupplierEmail" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="SupplierEmail" data-valmsg-replace="true">
+                    <span for="SupplierEmail" class="">Enter Supplier Email</span>
+                </span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.SupplierMobile)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.SupplierMobile, new { @tabindex = "3", @class = "form-control input-sm" })
+                @*@Html.ValidationMessageFor(m => m.SupplierMobile)*@
+                <span id="SupplierMobileSpan" data-val="SupplierMobile" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="SupplierMobile" data-valmsg-replace="true"><span for="SupplierMobile" class="">Enter Supplier Mobile</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CareTakerPhone)
+                @Html.TextBoxFor(m => m.CareTakerPhone, new { @tabindex = "3", @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.CareTakerPhone)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.PAN)
+                @Html.TextBoxFor(m => m.PAN, new { @tabindex = "3", @class = "form-control input-sm" })
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="copytosupplier" onclick="copyTextValues()" /> Supplier details same as property details
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin:2px;">
+
+    </div>
+
+    <div class="col-md-6">
+        <div>
+
+            <div class="row">
+                <h4 class="bold">
+                    Bank Details
+                </h4>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.AccountName)
+                @Html.TextBoxFor(m => m.AccountName, new { @tabindex = "3", @class = "form-control input-sm" })
+                <span id="AccountNameSpan" data-val="AccountName" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="AccountName" data-valmsg-replace="true"><span for="AccountName" class="">Enter account name</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.AccountType)
+                @*@Html.TextBoxFor(m => m.AccountType, new { @tabindex = "3", @class = "form-control input-sm" })*@
+                @Html.DropDownListFor(m => m.AccountType, Model.AccountTypeList as SelectList, "Select", new { @tabindex = "3", @class = "form-control input-sm" })
+                <span id="AccountTypeSpan" data-val="AccountType" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="AccountType" data-valmsg-replace="true"><span for="AccountType" class="">Choose account type</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.BranchName)
+                @Html.TextBoxFor(m => m.BranchName, new { @tabindex = "3", @class = "form-control input-sm" })
+                <span id="BranchNameSpan" data-val="BranchName" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="BranchName" data-valmsg-replace="true"><span for="BranchName" class="">Enter bank name</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.IFSCcode)
+                @Html.TextBoxFor(m => m.IFSCcode, new { @tabindex = "3", @class = "form-control input-sm" })
+                <span id="IFSCcodeSpan" data-val="IFSCcode" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="IFSCcode" data-valmsg-replace="true"><span for="IFSCcode" class="">Enter IFSC code</span></span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div>
+            <div class="row" style="margin-top: 29px;">
+                <h4 class="bold">
+                    @*Bank Details*@
+                </h4>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.AccountNumber)
+                @Html.TextBoxFor(m => m.AccountNumber, new { @tabindex = "3", @class = "form-control input-sm" })
+                <span id="AccountNumberSpan" data-val="AccountNumber" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="AccountNumber" data-valmsg-replace="true"><span for="AccountNumber" class="">Enter account number</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.BankName)
+                @Html.TextBoxFor(m => m.BankName, new { @tabindex = "3", @class = "form-control input-sm" })
+                <span id="BankNameSpan" data-val="BankName" style="display:none;" class="field-validation-error classValidateSpan" data-valmsg-for="BankName" data-valmsg-replace="true"><span for="BankName" class="">Enter bank name</span></span>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.BranchAddress)
+                @Html.TextBoxFor(m => m.BranchAddress, new { @tabindex = "3", @class = "form-control input-sm" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.MICRcode)
+                @Html.TextBoxFor(m => m.MICRcode, new { @tabindex = "3", @class = "form-control input-sm" })
+            </div>
+        </div>
+    </div>
+
+</div>
+@*</div>*@
+<div class="btn-toolbar margin-bot-10 col-lg-offset-1  margin-top-10">
+    <div class="submitctr marginleft30px">
+        @*<input type="submit" id="btnSave" value="Save" class="btn btn-success marginleft30px" tabindex="23" />*@
+        <input type="button" id="btnSave" onclick="SavePropertySave()" value="Save" class="btn btn-success marginleft30px" tabindex="23" />
+        <a style="cursor:pointer;" onclick="onCancelCustomPropSave()" class="btn btn-danger" tabindex="24">Cancel</a>
+    </div>
+</div>
+@*}*@
+
+@if (Model.BookedpropertyList != null)
+{
+    if (Model.BookedpropertyList.Count > 0)
+    {
+        <div class="col-md-12 margin-top-10">
+            <div class="col-md-4">
+                <h4 class="bold">Bookings ( @Model.BookedpropertyList.Count )</h4>
+            </div>
+        </div>
+        <div class="col-md-12 margin-top-10">
+            <div class="col-md-12">
+                <table border="0" class="table table-condensed table-responsive table-custom">
+                    <thead>
+                        <tr>
+                            <th>CustomerName</th>
+                            <th>CustomerEmail</th>
+                            <th>CustomerMobile</th>
+                            <th>Confirmation Number</th>
+                            <th>CheckIn</th>
+                            <th>CheckOut</th>
+                            <th>BookingDate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.BookedpropertyList.Count > 0)
+                        {
+                            foreach (CLayer.OfflineBooking pr in Model.BookedpropertyList)
+                            {
+                                <tr>
+                                    <td>@pr.CustomerName</td>
+                                    <td>@pr.CustomerEmail</td>
+                                    <td>@pr.CustomerMobile</td>
+                                    <td>@pr.ConfirmationNumber</td>
+                                    <td>@pr.CheckIn</td>
+                                    <td>@pr.CheckOut</td>
+                                    <td>@pr.BookingDate</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+
+        <div class="col-md-12 margin-top-10">
+            <div class="col-md-4">
+                <h4 class="redtext"> No Bookings </h4>
+            </div>
+        </div>
+    }
+}
+
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+
+
+<!-- Script for autocomplete Supplier details  -->
+<script type="text/javascript">
+        $(function () {
+            $("#SupplierName1").autocomplete({
+                source: "/Admin/OfflineBookingGST/GetSupplier",
+                minLength: 1,
+                select: function (event, ui) {
+                    if (ui.item) {
+                        $("#SupplierName1").val(ui.item.value);
+                        var id = ui.item.id;
+                        $.get("/Admin/OfflineBookingGST/GetSupplierDetails?id=" + id, function (data) {
+                            $("#SupplierAddress").val(data.SupplierAddress);
+                            $("#SupplierEmail").val(data.SupplierEmail);
+                            $("#SupplierMobile").val(data.SupplierMobile);
+                            $("#CareTakerPhone").val(data.CareTakerPhone);
+                            $("#AccountName").val(data.AccountName);
+                            $("#AccountNumber").val(data.AccountNumber);
+                            $("#BankName").val(data.BankName);
+                            $("#BranchName").val(data.BranchName);
+                            $("#BranchAddress").val(data.BranchAddress);
+                            $("#IFSCcode").val(data.IFSCcode);
+                            $("#MICRcode").val(data.MICRcode);
+                            $("#AccountType").val(data.AccountType);
+                            $("#SupplierCountry").val(data.SupplierCountry);
+                            $("#SupplierPinCode").val(data.SupplierPinCode);
+                            
+
+                            $.get("/Common/GetState?id=" + data.SupplierCountry, function (datastate) {
+                                if (datastate != "")
+                                {
+                                    $('#SupplierState').empty().append(datastate);
+                                    var stateis = data.SupplierState;
+                                    $("#SupplierState").val(stateis);
+                                }
+                                else
+                                {
+                                    $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+                                }
+                            });
+                            if (data.SupplierCity != -1)
+                            {
+                                $("#SupplierCity1").show();
+                                $("#other_citysups").hide();
+                                $.get("/Common/GetCity?id=" + data.SupplierState, function (datacity) {
+                                    if (datacity != "") {
+                                        $("#close_other_citysups").hide();
+                                        $('#SupplierCity1').html(datacity);
+                                        var cityid = data.SupplierCity;
+                                        $("#SupplierCity1").val(cityid);
+                                       
+                                    }
+                                    else {
+                                        $('#SupplierCity1').html('<option selected="selected" value="0">not available...</option>');
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                  $.get("/Common/GetCity?id=" + data.SupplierState, function (datacity) {
+                                    if (datacity != "") {
+                                        $('#SupplierCity1').html(datacity);
+                                    }
+                                   
+                                });
+                                $("#SupplierCityname1").val("");
+                                $("#SupplierCity1").hide();
+                                $("#SupplierCityname1").val(data.SupplierCityname);
+                                $("#other_citysups").show();
+                                $("#close_other_citysups").show();
+                                var cityid = data.SupplierCity;
+                                $("#SupplierCity1").val(cityid);
+                   
+
+                                
+                            }
+                            
+                           
+                        });
+                    }
+                }
+            });
+        });
+</script>
+<!-- end of Script for autocomplete Supplier details  -->
+<script>
+
+    function copyTextValues()
+    {
+        if ($("#copytosupplier").prop("checked") ) {
+            $("#SupplierName1").val($("#PropertyName1").val());
+            $("#SupplierAddress").val($("#PropertyAddress1").val());
+            if ($("#SupplierCountry").val() != $("#PropertyCountry1").val())
+            {
+                $("#SupplierCountry").val($("#PropertyCountry1").val());
+                $("#SupplierCountry").trigger("change");
+            }
+            else
+            {
+                $("#SupplierState").val($("#PropertyState1").val());
+                $("#SupplierState").trigger("change");
+            }
+           // $("#SupplierState").val($("#PropertyState1").val());
+          //  $("#SupplierCity1").val($("#PropertyCity1").val());
+            $("#SupplierEmail").val($("#PropertyEmail1").val());
+            $("#SupplierMobile").val($("#PropertyContactNo1").val());
+            $("#SupplierPinCode").val($("#PropertyPinCode1").val());
+            debugger
+            if ($("#PropertyCity1").val() == "-1")
+            {
+                $("#close_other_citysups").show();
+                $("#SupplierCity1").hide();
+                $("#other_citysups").show();
+                $("#SupplierCityname1").val($("#PropertyCityname1").val());
+            }
+            else {
+                $("#close_other_citysups").hide();
+                $("#other_citysups").hide();
+                $("#SupplierCity1").show();
+                $("#SupplierCity1").val($("#PropertyCity1").val());
+            }
+            
+
+
+        }
+    }
+    // for customer
+
+    //var cntif = 0, cntelse = 0;
+    //$(".classValidateSpan").each(function () {
+    //    var txt = $(this).attr("data-val");
+
+    //    if ($("#" + txt).val() != "" && $("#" + txt).val() != null && $("#" + txt).val() !== undefined) {
+    //        cntif = cntif + 1;
+    //        console.log(txt + " - " + $("#" + txt).val() + " - IF");
+    //        $(this).css("display", "none");
+    //        $(this).addClass("field-validation-valid");
+    //        $(this).removeClass("field-validation-error");
+    //        $(this).html("");
+    //    }
+    //    else {
+    //        console.log(txt + " - " + $("#" + txt).val() + " - ELSE");
+    //        $(this).html("<span for='" + txt + "' class=''>" + txt + "</span>");
+    //        $(this).removeClass("field-validation-valid");
+    //        $(this).addClass("field-validation-error");
+    //        $(this).css("display", "block");
+    //        cntelse = cntelse + 1;
+    //    }
+    //});
+    //console.log("IF:" + cntif + " , ELSE:" + cntelse);
+    function SavePropertySave() {
+        var cnt = 0;
+        $("#divSerial .classValidateSpan").each(function () {
+            var ths = this;
+            var txt = $(ths).attr("data-val");
+            if (($("#divSerial #" + txt).val() != "") && ($("#" + txt).val() != null) && (typeof $("#" + txt).val() != undefined)) {
+                //if (txt == "PropertyContactNo1") {
+                //    if (!/^^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test($("#PropertyContactNo1").val())) {
+                //        $(ths).html("<span for='" + txt + "' class=''>Not a valid Phone number</span>");
+                //        $(ths).removeClass("field-validation-valid");
+                //        $(ths).addClass("field-validation-error");
+                //        $(ths).css("display", "block");
+                //        cnt = cnt + 1;
+                //    }
+                //} else
+                 if (txt == "SupplierMobile") {
+                    if (!/^^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test($("#SupplierMobile").val())) {
+                        $(ths).html("<span for='" + txt + "' class=''>Not a valid Phone number</span>");
+                        $(ths).removeClass("field-validation-valid");
+                        $(ths).addClass("field-validation-error");
+                        $(ths).css("display", "block");
+
+                        cnt = cnt + 1;
+                    }
+                }
+                else if (txt == "SupplierEmail") {
+                    if (!isValidEmailAddress($("#SupplierEmail").val())) {
+                        $(ths).html("<span for='" + txt + "' class=''>Invalid Email Address</span>");
+                        $(ths).removeClass("field-validation-valid");
+                        $(ths).addClass("field-validation-error");
+                        $(ths).css("display", "block");
+                        cnt = cnt + 1;
+                    }
+                }
+                else if (txt == "PropertyEmail1") {
+                    if (!isValidEmailAddress($("#PropertyEmail1").val())) {
+                        $(ths).html("<span for='" + txt + "' class=''>Invalid Email Address</span>");
+                        $(ths).removeClass("field-validation-valid");
+                        $(ths).addClass("field-validation-error");
+                        $(ths).css("display", "block");
+                        cnt = cnt + 1;
+                    }
+                }
+                else if (txt == "CareTakerPhone") {
+                    if (!/^^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test($("#CareTakerPhone").val())) {
+                        $(ths).html("<span for='" + txt + "' class=''>Not a valid Phone number</span>");
+                        $(ths).removeClass("field-validation-valid");
+                        $(ths).addClass("field-validation-error");
+                        $(ths).css("display", "block");
+                        cnt = cnt + 1;
+                    }
+                }
+                else if (txt == "CareTakerEmail") {
+                    if (!isValidEmailAddress($("#CareTakerEmail").val())) {
+                        $(ths).html("<span for='" + txt + "' class=''>Invalid Email Address</span>");
+                        $(ths).removeClass("field-validation-valid");
+                        $(ths).addClass("field-validation-error");
+                        $(ths).css("display", "block");
+                        cnt = cnt + 1;
+                    }
+                }//PropertyCity1
+                //else if (txt == "PropertyCity1") {
+                //    if ($("#PropertyCity1").val() == "-1" && $("#PropertyCityname1").val()==) {
+                //        $(ths).html("<span for='" + txt + "' class=''>Invalid City Name</span>");
+                //        $(ths).removeClass("field-validation-valid");
+                //        $(ths).addClass("field-validation-error");
+                //        $(ths).css("display", "block");
+                //        cnt = cnt + 1;
+                //    }
+                //}
+
+                else {
+                    $(ths).css("display", "none");
+                    $(ths).removeClass("field-validation-error");
+                    $(ths).addClass("field-validation-valid");
+                    $(ths).html("");
+                }
+                //cnt = 1;//
+                //console.log(txt + " - " + $("#" + txt).val() + ": Length :" + $("#" + txt).val().length + " -- IF ");
+            }
+            else {
+                if ($("#" + txt).val().length > 0) {
+                    console.log("Wrong Dispaly");
+                }
+                else {
+                    if (txt == "PropertyName1") $(ths).html("<span for='" + txt + "' class=''>Enter Property Name</span>");
+                    if (txt == "PropertyAddress1") $(ths).html("<span for='" + txt + "' class=''>Enter Property Address</span>");
+                    if (txt == "SupplierAddress") $(ths).html("<span for='" + txt + "' class=''>Enter Supplier Address</span>");
+
+                    if (txt == "PropertyCountry1") $(ths).html("<span for='" + txt + "' class=''>Enter Property Country</span>");
+                    if (txt == "SupplierCountry") $(ths).html("<span for='" + txt + "' class=''>Enter Supplier Country</span>");
+                    if (txt == "PropertyState1") $(ths).html("<span for='" + txt + "' class=''>Enter Property State</span>");
+
+                    if (txt == "SupplierState") $(ths).html("<span for='" + txt + "' class=''>Enter Supplier State</span>");
+                    if (txt == "PropertyCity1") $(ths).html("<span for='" + txt + "' class=''>Enter Property City</span>");
+                    if (txt == "SupplierCity1") $(ths).html("<span for='" + txt + "' class=''>Enter Supplier City</span>");
+                    //if (txt == "PropertyCityname1") $(ths).html("<span for='" + txt + "' class=''>Property City</span>");
+                    //if (txt == "SupplierCityname1") $(ths).html("<span for='" + txt + "' class=''>Supplier City</span>");
+                    if (txt == "PropertyEmail1") $(ths).html("<span for='" + txt + "' class=''>Enter Property Email</span>");
+                    if (txt == "SupplierEmail") $(ths).html("<span for='" + txt + "' class=''>Enter Supplier Email</span>");
+                    if (txt == "PropertyContactNo1") $(ths).html("<span for='" + txt + "' class=''>Enter Property Contact Number</span>");
+
+                    if (txt == "SupplierMobile") $(ths).html("<span for='" + txt + "' class=''>Enter Supplier Mobile</span>");
+
+                    if (txt == "AccountType") $(ths).html("<span for='" + txt + "' class=''>Choose account type</span>");
+                    if (txt == "BranchName") $(ths).html("<span for='" + txt + "' class=''>Enter branch name</span>");
+                    if (txt == "IFSCcode") $(ths).html("<span for='" + txt + "' class=''>Enter IFSC code</span>");
+                    if (txt == "AccountNumber") $(ths).html("<span for='" + txt + "' class=''>Enter account number</span>");
+                    if (txt == "BankName") $(ths).html("<span for='" + txt + "' class=''>Enter bank name</span>");
+
+                    //$(ths).html("<span for='" + txt + "' class=''>" + txt + "</span>");
+                    $(ths).removeClass("field-validation-valid");
+                    $(ths).addClass("field-validation-error");
+                    $(ths).css("display", "block");
+                    cnt = cnt + 1;
+
+                    //console.log(txt + " - " + $("#" + txt).val() + ": Length :" + $("#" + txt).val().length + " -- Else IF Else ");
+                }
+            }
+        });
+
+        //cnt = 0;
+        console.log(cnt + "= cnt");
+        if (cnt == 0) {
+            var actionPath = '@Url.Action("SavePropertyFromOffline", "CustomProperty", new { area = "Admin" })?' + $('#divSerial :input').serialize();
+            $.get(actionPath, function (data) {
+                if (data > 0) {
+                    var htmlDiv = '<span id="customeproname_' + data + '">' + $('#PropertyName1').val() + '</span>' +
+                        '<span id="customeproemail_' + data + '">' + $('#PropertyEmail1').val() + '</span>' +
+                        '<span id="customeproAddress_' + data + '">' + $('#PropertyAddress1').val() + '</span>' +
+                        '<span id="customeprosupname_' + data + '">' + $('#SupplierName1').val() + '</span>' +
+                        '<span id="customeprotakecarename_' + data + '">' + $('#PropertyCaretakerName1').val() + '</span>' +
+                        '<span id="customepromobile_' + data + '">' + $('#PropertyContactNo1').val() + '</span>' +
+                '<span id="customeprosupbuissname_' + data + '">' + $('#SupplierName1').val() + '</span>' +
+                '<span id="customeprosupid_' + data + '">' + 0 + '</span>' +
+                '<span id="customeprosupmobile_' + data + '">' + $('#SupplierMobile').val() + '</span>' +
+                '<span id="customeprosupemail_' + data + '">' + $('#SupplierEmail').val() + '</span>' +
+                '<span id="customeprosupaddress_' + data + '">' + $('#SupplierAddress').val() + '</span>' +
+                '<span id="customeprosupcountry_' + data + '">' + $('#SupplierCountry').val() + '</span>' +
+                '<span id="customeprosupstate_' + data + '">' + $('#SupplierState').val() + '</span>' +
+                    '<span id="customeprosupstateName_' + data + '">' + $('#SupplierState option:selected').text() + '</span>' +
+                '<span id="customeprosupcityid_' + data + '">' + $('#SupplierCity1').val() + '</span>' +
+                '<span id="customeprosupcityname_' + data + '">' + $('#SupplierCityname1').val() + '</span>' +
+                '<span id="customeprocountry_' + data + '">' + $('#PropertyCountry1').val() + '</span>' +
+                  '<span id="customepropertypincode_' + data + '">' + $('#PropertyPinCode1').val() + '</span>' +
+                '<span id="customeprostate_' + data + '">' + $('#PropertyState1').val() + '</span>' +
+                '<span id="customeprocity_' + data + '">' + $('#PropertyCity1').val() + '</span>' +
+                '<span id="customeprocity_New' + data + '">' + $('#PropertyCityname1').val() + '</span>' +
+                 '<span id="HiddenSupplierPinCode' + data + '">' + $('#SupplierPinCode').val() + '</span>' +
+
+                '<span id="customeprocityname_' + data + '">' + $('#PropertyCity1 option:selected').text() + '</span>';
+                   
+                    $('#divpro').html(htmlDiv);
+                    proSelectedFromCstomPropSave(data);
+                }
+                else {
+                    alert("Property already exists!");
+                }
+            });
+
+        }
+    }
+
+
+    function isValidEmailAddress(emailAddress) {
+        var pattern = /^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+        return pattern.test(emailAddress);
+    }
+
+
+    @*function SaveProperty()
+    {
+        $.post('@Url.Action("SaveCustomProperty", "property", new { area = "Admin" })', { name: cname2 },function (data){
+
+        });
+
+    }*@
+
+    // for property
+
+
+    $(function () {
+
+
+        if ($('#PropertyCity1').val() == -1) {
+            $("#PropertyCity1").hide();
+            //$("#PropertyCity1name").val("");
+            $("#other_cityprops").show();
+        }
+
+        $('#PropertyCountry1').change(function () {
+            $.get("/Common/GetState?id=" + $('#PropertyCountry1').val(), function (data) {
+                if (data != "")
+                    $('#PropertyState1').empty().append(data);
+                else
+                    $('#PropertyState1').empty().append('<option selected="selected" value="0">not available...</option>');
+                CustompropLoadcity1()
+            });
+        });
+
+        function CustompropLoadcity1() {
+            $.get("/Common/GetCity?id=" + $('#PropertyState1').val(), function (data) {
+                if (data != "") {
+                    $('#PropertyCity1').html(data);
+                }
+                else {
+                    $('#PropertyCity1').html('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        }
+
+
+
+        $('#PropertyState1').change(function () {
+            $("#PropertyCity1").show();
+            $("#PropertyCityname1").val("");
+            $("#other_cityprops").hide();
+            $.get("/Common/GetCity?id=" + $('#PropertyState1').val(), function (data) {
+                if (data != "") {
+                    $('#PropertyCity1').empty().append(data);
+                    $("#PropertyCityname1").val($("#PropertyCity1").find('option:selected').text());
+                    if ($("select#PropertyCity1 option").length == 1) {
+                        $("#PropertyCity1").hide();
+                        $("#PropertyCityname1").val("");
+                        $("#other_cityprops").show();
+                    }
+                }
+                else {
+                    $('#PropertyCity1').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+
+        });
+        $('#PropertyCity1').change(function () {
+            $("#PropertyCityname1").val($("#PropertyCity1").find('option:selected').text());
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#PropertyCityname1").val("");
+                $("#other_cityprops").show();
+                $("#close_other_cityprops").show();
+            }
+        });
+        $('#close_other_cityprops').click(function () {
+            $("#PropertyCity1").show();
+            $("#PropertyCity1").prop("selectedIndex", 0);
+            $("#PropertyCityname1").val("");
+            $("#other_cityprops").hide();
+            $("#close_other_cityprops").hide();
+        });
+    });
+    
+   
+
+    function propLoadcity() {
+        $.get("/Common/GetCity?id=" + $('#PropertyState1').val(), function (data) {
+            if (data != "") {
+                $('#PropertyCity1').html(data).append('<option selected="selected" value="0">Select</option>');;
+            }
+            else {
+                $('#PropertyCity1').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+    function propLoadState() {
+        $.get("/Common/GetState?id=" + $('#PropertyCountry1').val(), function (data) {
+            if (data != "") {
+                $('#PropertyState1').empty().append(data);
+            }
+            else {
+                $('#PropertyState1').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+    //for supplier
+
+    $(function () {
+
+
+        if ($('#SupplierCity1').val() == -1) {
+            $("#SupplierCity1").hide();
+            //$("#SupplierCityname").val("");
+            $("#other_citysups").show();
+        }
+
+        $('#SupplierCountry').change(function () {
+            $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+                if (data != "") {
+                    $('#SupplierState').empty().append(data);
+                    if ($("#copytosupplier").prop("checked") )
+                    {
+                        $("#SupplierState").val($("#PropertyState1").val());
+                        $("#SupplierState").trigger("change");
+                    }
+                }
+                else
+                    $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+                CustomsupLoadcity1()
+            });
+        });
+        function CustomsupLoadcity1() {
+            $.get("/Common/GetCity?id=" + $('#SupplierState').val(), function (data) {
+                if (data != "") {
+                    $('#SupplierCity').html(data);
+                }
+                else {
+                    $('#SupplierCity').html('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        }
+
+
+        $('#SupplierState').change(function () {
+            $("#SupplierCity1").show();
+            $("#SupplierCity1name").val("");
+            $("#other_citysups").hide();
+            $.get("/Common/GetCity?id=" + $('#SupplierState').val(), function (data) {
+                if (data != "") {
+                    $('#SupplierCity1').empty().append(data);
+                    $("#SupplierCity1name").val($("#SupplierCity1").find('option:selected').text());
+                    if ($("select#SupplierCity1 option").length == 1) {
+                        $("#SupplierCity1").hide();
+                        $("#SupplierCity1name").val("");
+                        $("#other_citysups").show();
+                    }
+                    if ($("#copytosupplier").prop("checked")) {
+                        $("#SupplierCity1").val($("#PropertyCity1").val());
+                    }
+                }
+                else {
+                    $('#SupplierCity1').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+            });
+        });
+        $('#SupplierCity1').change(function () {
+
+
+            $("#SupplierCityname1").val($("#SupplierCity1").find('option:selected').text());
+
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#SupplierCity1name").val("");
+                $("#SupplierCityname1").val("");
+                $("#other_citysups").show();
+                $("#close_other_citysups").show();
+            }
+        });
+        $('#close_other_citysups').click(function () {
+            $("#SupplierCity1").show();
+            $("#SupplierCity1").prop("selectedIndex", 0);
+            $("#SupplierCityname1").val("");
+            $("#other_citysups").hide();
+            $("#close_other_citysups").hide();
+        });
+    });
+
+    function supLoadcity() {
+        $.get("/Common/GetCity?id=" + $('#SupplierState').val(), function (data) {
+            if (data != "") {
+                $('#SupplierCity').html(data).append('<option selected="selected" value="0">Select</option>');;
+            }
+            else {
+                $('#SupplierCity').html('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+    function supLoadState() {
+        $.get("/Common/GetState?id=" + $('#SupplierCountry').val(), function (data) {
+            if (data != "") {
+                $('#SupplierState').empty().append(data);
+            }
+            else {
+                $('#SupplierState').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+
+
+</script>

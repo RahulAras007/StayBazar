@@ -1,0 +1,652 @@
+﻿@{
+    Layout = null;
+}
+<!---->
+@*@Scripts.Render("~/bundles/jquery")*@
+@*@Scripts.Render("~/bundles/jqueryui")*@
+@*@Scripts.Render("~/bundles/jqueryval")*@
+@*@Scripts.Render("~/bundles/bootstrap")*@
+@*@Styles.Render("~/Content/bootcss")*@
+
+<!---->
+<link rel="stylesheet" href="~/RahulSample/css/bootstrap.min.css">
+<link rel="stylesheet" href="~/RahulSample/css/font-awesome.min.css">
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="~/RahulSample/css/animate.min.css">
+
+<!-- Current Page Styles -->
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/revolution_slider/css/settings.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/revolution_slider/css/style.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/jquery.bxslider/jquery.bxslider.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/flexslider/flexslider.css" media="screen" />
+
+<!-- Main Style -->
+<link id="main-style" rel="stylesheet" href="~/RahulSample/css/style.css">
+
+<!-- Updated Styles -->
+<link rel="stylesheet" href="~/RahulSample/css/updates.css">
+
+<!-- Custom Styles -->
+<link rel="stylesheet" href="~/RahulSample/css/custom.css">
+
+<!-- Responsive Styles -->
+<link rel="stylesheet" href="~/RahulSample/css/responsive.css">
+<h4 class="panel-title">
+    <a data-toggle="collapse" href="#price-filter" class="collapsed">Price</a>
+</h4>
+<div id="price-filter" class="panel-collapse collapse">
+    <div class="panel-content">
+        <div id="price-range"></div>
+        <br />
+        <span class="min-price-label pull-left" id="pricerangelbl"></span>
+        <span class="max-price-label pull-right"></span>
+        <div class="clearer"></div>
+    </div><!-- end content -->
+</div>
+
+
+
+@*<div class="filterctr greyborder whitebg pull-left">
+    <div class="col-xs-12 col-md-12 darkredbg whitetext">
+        <p class="heading">
+            Filter results
+            <button type="button" class="btn btn-default pull-right" onclick="resetFilters()" title="Reset all Filters">Reset filters</button>
+        </p>
+    </div>
+
+    <div class="col-xs-12 reset first">
+        <span>
+            Price range*@
+@*<a href="#" id="resetPriceRangeCtrl" class="pull-right fa fa-undo greytext" title="Reset Price Range"></a>*@
+@*<span class="smtext greytext" id="pricerangelbl">(500,8000)</span>
+            <span id="resetPriceRangeCtrl" class="pull-right fa fa-undo greytext" title="Reset Price Range" style="cursor:pointer;"></span>
+        </span>
+    </div>
+    <div class="col-xs-12 col-md-12">*@
+@*<input id="pricerange" type="text"  data-slider-handle="square" data-slider-min="0" data-slider-max="15000" data-slider-step="1" data-slider-value="[500,8000]" />
+        <i class="fa cxprice fa-rupee" id="iPriceRangeMin">0</i>
+        <i class="fa cxprice fa-rupee pull-right" id="iPriceRangeMax">15000</i>
+    </div>*@
+@*<div class="col-xs-12 reset" style="display:none">
+    <span>
+        Distance
+        <span class="greytext smtext" id="Distancekmlbl">(15 KM)</span>*@
+@*<a href="#" id="resetDistanceCtrl" class="pull-right fa fa-undo greytext" title="Reset Distance Range"></a>*@
+@*<span id="resetDistanceCtrl" class="pull-right fa fa-undo greytext" title="Reset Distance Range" style="cursor:pointer;"></span>
+        </span>
+    </div>
+    <div class="col-xs-12 col-md-12" style="display:none">*@
+@*<input id="distancekm" type="text" data-slider-handle="square" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="15" />
+        <span>0 KM</span>
+        <span class="pull-right">20 KM</span>
+    </div>
+    <div class="col-xs-12 reset" id="Starcn">
+        <span>
+            Star Rating
+        </span>
+    </div>
+    <div class="col-xs-12 col-md-12 less">
+
+        <div class="marginleft15px" style="height:auto;">
+            <div class="row" id="dvStarRatings">
+                <input type="hidden" id="lcnchk" name="lcnchk">
+                <dl>
+                    <dt></dt>
+
+
+
+                    @for (var i = 0; i <= 5; i++)
+                    {
+                        <dd class="styledcheckbox">
+                            <input type="checkbox" data-internal-id="star@(i)" class="css-checkbox Locationchk" id="star@(i)" name="star@(i)" value="@i" onclick="chkStar(@i)" />
+                            @if (i == 0)
+                            {
+                                <label for="star@(i)" class="css-label">Unrated</label>
+                            }
+                            else
+                            {
+                                <label for="star@(i)" class="css-label">@i star</label>
+                            }
+
+
+
+
+                            <span class="label-frmt" id="RatingCount@(i)">0</span>
+
+
+                        </dd>
+                    }
+
+
+                </dl>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-xs-12 reset" id="locn">
+        <span>
+            Location*@
+@*<input type="button" class="btn-danger marginleft-180" value="Search" onclick="LocSearch1()" />*@
+@*<span id="resetLocation" class="pull-right fa fa-undo greytext margin-top-7" title="Reset Selection" style="cursor:pointer;"></span>
+        </span>
+    </div>*@
+@*@{
+        string lcnn1 = ViewBag.destination;
+        List<CLayer.SearchResult> locations1 = BLayer.Utility.GetLocationmultiFilter(lcnn1, 2);
+    }
+
+    @if (locations1.Count > 0)
+    {
+        <div class="col-xs-12 col-md-12" style="margin-top:-15px;">
+            <div class="panel-group" style="margin-bottom:0 !important;" id="accordion">
+                <div>
+                    <div>
+                        <h5>
+                            <a style="color:blue; margin-left:5px; " data-toggle="collapse" data-parent="#accordion"
+                               href="#collapseOne">
+                                Show more....
+                            </a>
+                        </h5>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse">
+
+                        @if (locations1.Count > 5)
+                        {
+                            <div class="panel-body autoyscroll-perm height195px">
+                                <div class="row">
+                                    <dl>
+                                        @{
+                            long slno1 = 7;
+
+                            foreach (CLayer.SearchResult lcn1 in locations1)
+                            {
+                                <dd class="styledcheckbox">
+                                    <input type="checkbox" data-internal-id="@slno1" class="css-checkbox Locationchk" id="@slno1" name="Locationselected" value="@lcn1.Location" />
+                                    <label for="@slno1" class="css-label">@lcn1.Location</label>
+                                    <label class="label-frmt">@lcn1.PropertyCount</label>
+                                    <input type="hidden" id="lcnchk" name="lcnchk">
+                                </dd>
+                                slno1++;
+
+                            }
+
+                                        }
+                                    </dl>
+                                </div>
+                            </div>
+                        }
+                        @if (locations1.Count < 5)
+                        {
+                            <div class="panel-body" style="height:auto;">
+                                <div class="row">
+                                    <dl>
+                                        @{
+                            long slno1 = 7;
+
+                            foreach (CLayer.SearchResult lcn1 in locations1)
+                            {
+                                <dd class="styledcheckbox">
+                                    <input type="checkbox" data-internal-id="@slno1" class="css-checkbox Locationchk" id="@slno1" name="Locationselected" value="@lcn1.Location" />
+                                    <label for="@slno1" class="css-label">@lcn1.Location</label>
+                                    <label class="label-frmt">@lcn1.PropertyCount</label>
+                                    <input type="hidden" id="lcnchk" name="lcnchk">
+                                </dd>
+                                slno1++;
+
+                            }
+
+                                        }
+                                    </dl>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>*@
+@*}*@
+
+@*@{
+
+        string lcnn = ViewBag.destination;
+        List<CLayer.SearchResult> locations = BLayer.Utility.GetLocationmultiFilter(lcnn, 1);
+        string lcnn1 = ViewBag.destination;
+        List<CLayer.SearchResult> locations1 = BLayer.Utility.GetLocationmultiFilter(lcnn1, 2);
+
+
+        List<string> locations2 =(List<string>)ViewBag.LocationList;
+
+    }*@
+
+@*<div class="col-xs-12 col-md-12 less" id="dvLocationsMain">*@
+    @*<input id="filtLocation" type="text" class="loc_srchfiltr" />*@
+    @*<input id="filtdestination" style="display:none;" type="text" class="loc_srchfiltr" />*@
+    @*<select id="FilterLocatn"  class="loc_srchfiltr">
+        </select>*@
+    @*<div class="marginleft15px" style="height:auto;">
+        <div class="row" id="dvLocations">
+            <input type="hidden" id="lcnchk" name="lcnchk">
+
+        </div>
+    </div>
+</div>
+<div class="col-xs-12 col-md-12 more height220px autoyscroll-perm" id="dvLocationsMoreMain">
+    <div class="marginleft15px">
+        <div class="row" id="dvLocationsMore">
+
+
+        </div>
+    </div>
+</div>*@
+
+
+
+
+@*star rating*@
+
+@{
+}
+
+
+
+
+@*<div class="col-xs-12 reset" style="display:none">
+    <span>
+        Bedrooms
+        <span class="pull-right fa fa-undo greytext" onclick="resetRooms()" title="Reset Bedrooms" style="cursor:pointer;"></span>
+    </span>
+</div>*@
+@*<div class="col-xs-12 col-md-12 text-center" style="display:none">
+    <input id="studio" name="bedroom" class="css-radiobutton" type="radio" />
+    <label for="studio" class="rms css-label">STUDIO</label>
+    <input id="1bed" name="bedroom" class="css-radiobutton" type="radio" />
+    <label for="1bed" class="rms css-label">1</label>
+    <input id="2bed" name="bedroom" class="css-radiobutton" type="radio" />
+    <label for="2bed" class="rms css-label">2</label>
+    <input id="3bed" name="bedroom" class="css-radiobutton" type="radio" />
+    <label for="3bed" class="rms css-label">3</label>
+    <input id="4bedplus" name="bedroom" class="css-radiobutton" type="radio" />
+    <label for="4bedplus" class="rms css-label">4+</label>
+</div>
+<div class="col-xs-12 reset" style="display:none">
+    <span>
+        Amenities
+        <span id="resetAmenities" class="pull-right fa fa-undo greytext" onclick="resetAmenities()" title="Reset Amenities" style="cursor:pointer;"></span>
+    </span>
+</div>*@
+@*<div class="col-xs-12 col-md-12 amenities" style="display:none">
+    <dl>
+        <dt></dt>
+        @{
+            List<CLayer.PropertyFeature> amenities = BLayer.PropertyFeature.GetAllSearch();
+            foreach (CLayer.PropertyFeature pf in amenities)
+            {
+                <dd class="styledcheckbox">
+                    <input id="feat@(pf.PropertyFeatureId)" data-internal-id="@pf.PropertyFeatureId" class="css-checkbox amnts" value="@pf.PropertyFeatureId" type="checkbox" />
+                    <label for="feat@(pf.PropertyFeatureId)" class="css-label">@pf.Title</label>
+                </dd>
+            }
+        }
+    </dl>
+</div>*@
+@*<div class="col-xs-12 reset">
+        <span>
+            Star rating
+            <span class="greytext smtext" id="Starratinglbl">(4)</span>
+            <span id="resetStarCtrl" class="pull-right fa fa-undo greytext" title="Reset Star Rating" style="cursor:pointer;"></span>
+        </span>
+    </div>
+    <div class="col-xs-12 col-md-12">
+        <input id="star_slider" data-slider-id='distance' type="text" data-slider-handle="square" data-slider-min="0" data-slider-max="5" data-slider-step="1" data-slider-value="0" />
+        <span>
+            1
+            <i class="glyphicon glyphicon-star goldtext"></i>
+        </span>
+        <span class="pull-right">
+            5
+            <i class="glyphicon glyphicon-star goldtext"></i>
+        </span>
+    </div>*@
+@*</div>*@
+
+
+<script type="text/javascript">
+    @*$(function () {
+
+        $.get('@Url.Action("GetLocationFilter", "Common")?term=' + $("#Destination").val() , function (data) {
+            if (data != "") {
+                $("#FilterLocatn").html(data);
+            }
+        });
+    });*@
+
+    function chkFilB(fno) {
+        $("#fb" + fno).prop("checked", $("#fa" + fno).prop("checked"));
+    }
+    function chkFilA(fno) {
+        if ($("#fa" + fno).val() != undefined) {
+            $("#fa" + fno).prop("checked", $("#fb" + fno).prop("checked"));
+        }
+    }
+    function chkStar(fno) {
+
+
+        //debugger;;
+
+ //       $("#star" + fno).prop("checked", $("#star" + fno).prop("checked"));
+
+        selected = [];
+        $('#dvStarRatings input:checked').each(function () {
+            selected.push($(this).attr('value'));
+        });
+        LocationsSelected = [];
+        if (LocationCount > 10)
+        {
+            $('#dvLocationsMore input:checked').each(function () {
+                LocationsSelected.push($(this).attr('value'));
+            });
+        }
+        else {
+            $('#dvLocations input:checked').each(function () {
+                LocationsSelected.push($(this).attr('value'));
+            });
+        }
+       var sorteddata= FilterbyStarRating(selected,LocationsSelected);
+    }
+    function shmore() {
+
+
+        $(".more").show();
+        $("#abc").hide();
+        $(".less").hide();
+        $("#cba").show();
+
+    }
+    function shless() {
+        $(".more").hide();
+        $("#abc").show();
+        $(".less").show();
+        $("#cba").hide();
+
+    }
+    function resetAmenities() {
+        $(".amnts").each(function () {
+            $(this).prop('checked', false);
+            var $label = $("label[for='" + $(this).attr("id") + "']");
+            $label.removeClass("css-label");
+            $label.addClass("css-label");
+        });
+        $('#features').val("");
+    }
+    function resetRooms() {
+        $(".rms").each(function () {
+            $('#' + $(this).attr("for") + '').prop("checked", false).removeAttr("checked");
+            $(this).removeClass("css-label");
+            $(this).addClass("css-label");
+        });
+        $('#beds').val("");
+
+
+    }
+    function resetPriceRange() {
+        $('#pricerange').slider('setValue', [0, 0]);
+        //$('#pricerangelbl').val($('#pricerange').val);
+        $("#rangeBudgetMax").val("0");
+        $("#rangeBudgetMin").val("0");
+
+        $("#pricerangelbl").html('');
+
+        rateMax = 0;
+        rateMin = 0;
+
+
+        selected = [];
+        $('#dvStarRatings input:checked').each(function () {
+            selected.push($(this).attr('value'));
+        });
+    //    FilterbyStarRating(selected);
+        var sortedData = FilterbyStarRating(selected, LocationsSelected);
+    }
+    function resetKMRange() {
+        $('#distancekm').slider('setValue', 0);
+        $("#distanceInKm").val("0");
+        $("#Distancekmlbl").html('');
+    }
+    function resetStarRating() {
+        $("#starRatingRange").val("0");
+        $('#star_slider').slider('setValue', 0);
+        $("#Starratinglbl").html('');
+    }
+    function resetLocation() {
+        //$("#filtLocation").val("");
+        $(".Locationchk").each(function () {
+            $(this).prop("checked", false);
+            //debugger;;
+           // var sortedData = FilterbyStarRating(selected, LocationsSelected);
+        });
+        chkStar(0);
+        //document.getElementById("FilterLocatn").value = 0;
+        LocSearch();
+
+    }
+    function resetFilters() {
+        resetLocation();
+        resetAmenities();
+        resetRooms();
+        resetKMRange();
+        resetStarRating();
+        resetPriceRange();
+
+    }
+
+
+    //// RESET functions - END
+    $(function () {
+
+
+        $("#resetPriceRangeCtrl").on("click", function () {
+
+            resetPriceRange();
+        });
+        $("#resetDistanceCtrl").on('click', function () { resetKMRange(); });
+        $("#resetStarCtrl").on('click', function () { resetStarRating(); });
+        $("#resetLocation").on("click", function () { resetLocation(); });
+        //$(".amnts").change(function () {
+        //});
+        $(".amnts").bind("change", function () {
+            $("#features").val("");
+            fts = "";
+            $(".amnts").each(function () {
+                if ($(this).prop("checked") == true) {
+                    if (fts != "") fts = fts + ",";
+                    fts = fts + $(this).data("internal-id");
+                }
+            });
+            $("#features").val(fts);
+            makeFilterBoxes();
+        });
+
+        //$(".rms").bind('change', function () {
+        //    switch ($(this).prop('id')) {
+        //        case "studio":
+        //            $("#beds").val("1");
+        //            break;
+        //        case "1bed":
+        //            $("#beds").val("1");
+        //            break;
+        //        case "2bed":
+        //            $("#beds").val("2");
+        //            break;
+        //        case "3bed":
+        //            $("#beds").val("3");
+        //            break;
+        //        case "4bedplus":
+        //            $("#beds").val("4");
+        //            break;
+        //        default:
+        //            $("#beds").val("0");
+        //            break;
+        //    }
+        //    makeFilterBoxes();
+        //});
+
+        $('.rms').click(function () {
+            $(this).parent().find('input[type="radio"]').prop("checked", false).removeAttr("checked");
+            var a = $(this).parent().find('#' + $(this).attr("for") + '').attr("checked", "checked").prop("checked", true).attr("checked");
+
+            if (a == "checked") {
+                switch ($(this).parent().find('#' + $(this).attr("for") + '').prop('id')) {
+                    case "studio":
+                        $("#beds").val("1");
+                        break;
+                    case "1bed":
+                        $("#beds").val("1");
+                        break;
+                    case "2bed":
+                        $("#beds").val("2");
+                        break;
+                    case "3bed":
+                        $("#beds").val("3");
+                        break;
+                    case "4bedplus":
+                        $("#beds").val("4");
+                        break;
+                    default:
+                        $("#beds").val("0");
+                        break;
+                }
+
+            }
+            makeFilterBoxes();
+        });
+
+
+
+    });
+
+    //$(function () {
+
+    //    $("#filtLocation").autocomplete({
+    //        minLength: 0,
+    //        source: "/Common/GetLocation",
+    //        focus: function (event, ui) {
+    //            $("#filtLocation").val(ui.item.value);
+    //            return false;
+    //        }
+    //    })
+    //    .autocomplete("instance")._renderItem = function (ul, item) {
+    //        ul.addClass("custom");
+    //        return $("<li>") //.addClass("custom")
+    //        .append("<a>" + item.label + "<br>" + item.desc + "</a>")
+    //        .appendTo(ul);
+
+    //    };
+    //});
+
+    $(function () {
+
+        $("#filtLocation").autocomplete({
+            minLength: 0,
+            source: "/Common/GetDestination",
+            focus: function (event, ui) {
+                $("#Destination").val(ui.item.value);
+
+                return false;
+            }
+        })
+            .autocomplete("instance")._renderItem = function (ul, item) {
+                ul.addClass("custom");
+                //debugger;;
+                var RedirectUrl = "/serviced-apartments/" + item.City + "/" + item.Location + "/" + item.PropertyId;//+ "?start=" + $("#CheckIn").val() + "&end=" + $("#CheckOut").val() + "";
+                $("#hdDestination").val(item.City);
+                $("#hdPropertyID").val(item.PropertyId);
+
+                //   alert(item.PropertyId);
+                if ((item.bHotelName == true)) {
+                    $("#hdHotelName").val(RedirectUrl);
+
+                    return $("<li>")
+                        //.addClass("custom")
+                        //.append("<a>" + item.label + "<br>" + item.desc + "</a>")
+                        .append('<a>' + item.desc + '</a>')
+                        .appendTo(ul);
+                }
+                else {
+                    $("#hdHotelName").val('');
+                    return $("<li>")
+                        //.addClass("custom")
+                        //.append("<a>" + item.label + "<br>" + item.desc + "</a>")
+                        .append("<a>" + item.desc + "</a>")
+                        .appendTo(ul);
+
+                }
+
+            };
+    });
+</script>
+
+
+
+<!-- Javascript -->
+<script type="text/javascript" src="~/RahulSample/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="~/RahulSample/js/jquery.noconflict.js"></script>
+<script type="text/javascript" src="~/RahulSample/js/modernizr.2.7.1.min.js"></script>
+<script type="text/javascript" src="~/RahulSample/js/jquery-migrate-1.2.1.min.js"></script>
+<script type="text/javascript" src="~/RahulSample/js/jquery.placeholder.js"></script>
+<script type="text/javascript" src="~/RahulSample/js/jquery-ui.1.10.4.min.js"></script>
+
+<!-- Twitter Bootstrap -->
+@*<script type="text/javascript" src="~/RahulSample/js/bootstrap.js"></script>*@
+
+<!-- load revolution slider scripts -->
+<script type="text/javascript" src="~/RahulSample/components/revolution_slider/js/jquery.themepunch.tools.min.js"></script>
+<script type="text/javascript" src="~/RahulSample/components/revolution_slider/js/jquery.themepunch.revolution.min.js"></script>
+
+<!-- load BXSlider scripts -->
+<script type="text/javascript" src="~/RahulSample/components/jquery.bxslider/jquery.bxslider.min.js"></script>
+
+<!-- load FlexSlider scripts -->
+<script type="text/javascript" src="~/RahulSample/components/flexslider/jquery.flexslider-min.js"></script>
+
+<!-- Google Map Api -->
+<script type='text/javascript' src="http://maps.google.com/maps/api/js?sensor=false&amp;language=en"></script>
+<script type="text/javascript" src="~/RahulSample/js/gmap3.min.js"></script>
+
+<!-- parallax -->
+<script type="text/javascript" src="~/RahulSample/js/jquery.stellar.min.js"></script>
+
+<!-- waypoint -->
+<script type="text/javascript" src="~/RahulSample/js/waypoints.min.js"></script>
+
+<!-- load page Javascript -->
+<script type="text/javascript" src="~/RahulSample/js/theme-scripts.js"></script>
+<script type="text/javascript" src="~/RahulSample/js/scripts.js"></script>
+
+<script type="text/javascript">
+    tjq(document).ready(function () {
+        tjq("#price-range").slider({
+            range: true,
+            min: 0,
+            max: 1000,
+            values: [100, 800],
+            slide: function (event, ui) {
+                tjq(".min-price-label").html("&#8377" + ui.values[0]);
+                tjq(".max-price-label").html("&#8377" + ui.values[1]);
+            }
+        });
+        tjq(".min-price-label").html("&#8377" + tjq("#price-range").slider("values", 0));
+        tjq(".max-price-label").html("&#8377" + tjq("#price-range").slider("values", 1));
+
+        tjq("#rating").slider({
+            range: "min",
+            value: 40,
+            min: 0,
+            max: 50,
+            slide: function (event, ui) {
+
+            }
+        });
+    });
+</script>

@@ -1,0 +1,46 @@
+﻿@model long
+@{
+    Layout = null;
+    CLayer.Property canc = BLayer.Property.GetCancellationCharges(Model);
+    if(canc==null)
+    {
+        canc = new CLayer.Property();
+    }
+    int days = canc.CancellationPeriod;
+}
+ <div class="row">
+    <div class="col-md-12">
+        <div class="policy_box">
+            <h3>Cancellation Policy</h3>
+            <p>
+             @{
+                    switch (canc.CancellationMethod)
+                    {
+                        case CLayer.ObjectStatus.CancellationType.FixedNight:
+       
+                <text> If cancelled up to @days days before checkin date, no cancellation fees are charged.  If cancelled later, </text>
+             if(canc.CancellationCharge > 1){
+             <text>@canc.CancellationCharge night/s charge </text>
+             }
+             else{
+                 canc.CancellationCharge = Math.Round(canc.CancellationCharge * 100);
+                <text>@canc.CancellationCharge% of one  night</text>
+             }
+             <text> will be charged. Service fees might apply as appropriate</text>
+               break;
+            case CLayer.ObjectStatus.CancellationType.FixedPercent:
+            <text>If cancelled up to @days days before checkin date, no cancellation fees are charged.  If cancelled later,  @(canc.CancellationCharge)% of total booking amount  will be charged. Service fees might apply as appropriate</text>
+                break;
+            case CLayer.ObjectStatus.CancellationType.VariableNights:
+            <text>@days days' notice of cancellation is required prior to check-in for all lengths of stay in order to avoid charges. Notice given within @days days will result in a charge equal to @days nights minus the number of days' notice given. Service fees might apply as appropriate</text>
+                break;
+                    }
+                }
+            </p>
+            @if (canc.IsChargeAppliesToRefund)
+            {
+                <text><p>This policy also applies to shortening of stays or changes on check-in date</p></text>
+            }
+        </div>
+    </div>
+</div>

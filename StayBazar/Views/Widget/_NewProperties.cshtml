@@ -1,0 +1,74 @@
+﻿@{
+    int i = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_NEW_PROPERTIES_NO)));
+    StayBazar.Models.PropertyMostpopularModel newly1 = new StayBazar.Models.PropertyMostpopularModel();
+    newly1.PropertypopularList = BLayer.PropertyMostpopular.NewlyCreatedList((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, i);
+    List<CLayer.Property> PropertypopularList = newly1.PropertypopularList;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+}
+ 
+
+    <div class="col-md-12">
+    <div class="line">
+        <div class="pull-left leftside whitebg">New Properties</div>
+        <div class="pull-right rightside whitebg">
+            <a href="javascript:void(0)" class="ppty prev">
+                <img src="../images/arrow-left.png" alt="Left">
+            </a>
+            <a href="javascript:void(0)" class="ppty next">
+                <img src="../images/arrow-right.png" alt="Right">
+            </a>
+        </div>
+    </div>
+    <div id="new-properties" class="owl-carousel">
+        @if (PropertypopularList.Count>0)
+        {
+            foreach (CLayer.Property newly in PropertypopularList)
+        {
+            <Text>
+
+
+        <div class="prop">
+
+            <div class="prop-image">
+                <a href="~/serviced-apartments/@newly.City.ToLower().Replace(" ", "-")/@newly.Location.ToLower().Replace(" ", "-")/@newly.PropertyId">
+                    @if (newly.FileName == "")
+                    {
+                        <img src="~/@no_image" height="177" alt="noimage" />
+                    }
+                    else
+                    { <img src="@newly.FileName" height="177" alt="@newly.Title serviced apartment in  @newly.Location @newly.City" /> }
+                    
+                    <div class="price">
+                        <i class="fa cxprice fa-rupee"></i><span class="cxcurele">@Math.Round(newly.bookingitemsTotalAmount)</span>@*<small>00</small>*@
+                        <p class="onwards whitetext">onwards</p>
+                    </div>
+                </a>
+</div>
+            <div class="tile_desc">
+                <a href="~/serviced-apartments/@newly.City.ToLower().Replace(" ", "-")/@newly.Location.ToLower().Replace(" ", "-")/@newly.PropertyId">
+                    <span class="name">
+                        @{
+            string title = StayBazar.Common.Utils.ConvertShortLengthString(@newly.Title, 20);
+            @String.Format(title);
+                        }
+                        <br>
+                        <b>@newly.Location, @newly.City</b>
+                    </span>
+                    </a>
+                <div class="starbox">
+                    @*@(Html.Raw(StayBazar.Common.Utils.GetStarRating(@newly.Rating)))*@
+                </div>
+                    <a href="~/serviced-apartments/@newly.City.ToLower().Replace(" ", "-")/@newly.Location.ToLower().Replace(" ", "-")/@newly.PropertyId" class="redtext">
+                        <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                    </a>
+
+</div>
+            <a href="~/serviced-apartments/@newly.City.ToLower().Replace(" ", "-")/@newly.Location.ToLower().Replace(" ", "-")/@newly.PropertyId">
+                <div class="text-center redbg whitetext book">Book now</div>
+            </a>
+        </div>
+        </text>
+        }
+}
+</div>
+</div>

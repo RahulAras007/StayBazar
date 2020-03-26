@@ -1,0 +1,154 @@
+﻿@model StayBazar.Areas.Admin.Models.SuppierInvoiceModel
+@{
+    Layout = null;
+}
+
+<style>
+    table {
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+
+
+@if (Model.SupplierInvList != null)
+{
+
+    <div class="row" style="text-align:center;">
+        <h3>Supplier Invoice Report</h3>
+    </div>
+
+    <div class="col-md-12" style="overflow:auto;">
+        <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+            <thead style="background-color:#E3E3E3;">
+                <tr>
+                    <th>Supplier Name</th>
+                    <th>Property Name</th>
+                    <th>City</th>
+                    <th>Invoice Number</th>
+                    <th>Invoice Date</th>
+                    <th>Service Tax Reg No</th>
+                    <th>Base Amount</th>
+                    <th>LuxuryTax</th>
+                    <th>Service Tax</th>
+                    <th>Total Invoice Value</th>
+                    <th>Entry Date</th>
+                    <th>Confirmation No</th>
+                    <th>Created Date</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.SupplierInvList.Count() > 0)
+                {
+                    long InvID = 0, rowspan = 0;
+                    var ls = from c in Model.SupplierInvList
+                             group c by new
+                             {
+                                 c.SupplierInvoiceID,
+                                 c.PropertyId,
+                                 c.Property_Name,
+                                 c.SupplierId,
+                                 c.SupplierName,
+                                 c.City,
+                                 c.InvoiceNumber,
+                                 c.InvoiceDate,
+                                 c.ServiceTaxRegNumber,
+                                 c.PAN_Number,
+                                 c.BaseAmount,
+                                 c.LuxuryTax,
+                                 c.ServiceTax,
+                                 c.TotalInvoiceValue,
+                                 c.EntryDate
+                             } into gs
+                             select new
+                             {
+                                 gs.Key.SupplierInvoiceID,
+                                 gs.Key.PropertyId,
+                                 gs.Key.Property_Name,
+                                 gs.Key.SupplierId,
+                                 gs.Key.SupplierName,
+                                 gs.Key.City,
+                                 gs.Key.InvoiceNumber,
+                                 gs.Key.InvoiceDate,
+                                 gs.Key.ServiceTaxRegNumber,
+                                 gs.Key.PAN_Number,
+                                 gs.Key.BaseAmount,
+                                 gs.Key.LuxuryTax,
+                                 gs.Key.ServiceTax,
+                                 gs.Key.TotalInvoiceValue,
+                                 gs.Key.EntryDate
+                             };
+                    foreach (var item in ls)
+                    {
+                        rowspan = Model.SupplierInvList.Where(b => b.SupplierInvoiceID == item.SupplierInvoiceID).Count() + 1;
+                        InvID = item.SupplierInvoiceID;
+                        <tr>
+                            <td rowspan="@rowspan">@item.SupplierName </td>
+                            <td rowspan="@rowspan">@item.Property_Name</td>
+                            <td rowspan="@rowspan">@item.City</td>
+                            <td rowspan="@rowspan">@item.InvoiceNumber</td>
+                            <td rowspan="@rowspan">
+                                @if (item.InvoiceDate != null && item.InvoiceDate != DateTime.MinValue)
+                                {
+                                    @Convert.ToDateTime(item.InvoiceDate).ToShortDateString()
+                                }
+                            </td>
+                            <td rowspan="@rowspan">@item.ServiceTaxRegNumber</td>
+                            <td rowspan="@rowspan">@item.BaseAmount</td>
+                            <td rowspan="@rowspan">@item.LuxuryTax</td>
+                            <td rowspan="@rowspan">@item.ServiceTax</td>
+                            <td rowspan="@rowspan">@item.TotalInvoiceValue</td>
+                            <td rowspan="@rowspan">
+                                @if (item.EntryDate != null && item.EntryDate != DateTime.MinValue)
+                                {
+                                    @Convert.ToDateTime(item.EntryDate).ToShortDateString()
+                                }
+                            </td>
+                            @{
+                                var subls = Model.SupplierInvList.Where(b => b.SupplierInvoiceID == item.SupplierInvoiceID).ToList();
+                                foreach (var itm in subls)
+                                {
+                                <tr>
+                                    <td>@itm.BookingRefNumber</td>
+                                    <td>
+                                        @if (itm.BookinCreatedDT != null && itm.BookinCreatedDT != DateTime.MinValue)
+                                        {
+                                            @Convert.ToDateTime(itm.BookinCreatedDT).ToShortDateString()
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (itm.CheckIn_date != null && itm.CheckIn_date != DateTime.MinValue)
+                                        {
+                                            @Convert.ToDateTime(itm.CheckIn_date).ToShortDateString()
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (itm.CheckOut_date != null && itm.CheckOut_date != DateTime.MinValue)
+                                        {
+                                            @Convert.ToDateTime(itm.CheckOut_date).ToShortDateString()
+                                        }
+                                    </td>
+                                </tr>
+                                }
+                                if (subls == null || subls.Count <= 0)
+                                {
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                }
+                            }
+
+                            </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+}
+

@@ -1,0 +1,433 @@
+
+@{
+    ViewBag.Title = "DGSSearchProperty";
+    int startD = 0;
+    int endD = 0;
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarStartDate"), out startD);
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarEndDate"), out endD);
+    int diff = endD - startD;
+}
+
+
+
+<div class="row">
+    <div class="col-xs-12 col-md-3 col-sm-3">
+        <div>City/location</div>
+        <div>
+            <input type="text" id="place" class="form-control" name="place" placeholder="Enter your destination" onchange="ChangePlace();" />
+        </div>
+        </div>
+
+    <div class="col-xs-12 col-md-3 col-sm-3">
+        <div>Check In</div>
+        <div class="checkin border">
+             <input type="text" id="CheckIn" name="CheckIn" placeholder="Check In" class="form-control">
+         </div>
+     </div>
+
+    <div class="col-xs-12 col-md-3 col-sm-3">
+        <div>Check Out</div>
+        <div class="checkout border">
+            <input type="text" class="form-control" id="CheckOut" name="CheckOut" placeholder="Check Out">
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-3 col-sm-3">
+        <div>Number of BedRooms</div>
+        <div class="border">
+            @*<input type="text" class="form-control" id="BeedRooms" name="BeedRooms" placeholder="Number of BedRooms">*@
+            <div id="BeedRooms"></div>
+            <input type="hidden" name="BedRooms" id="BedRooms" value="1" />
+        </div>
+       
+
+    </div>
+
+    <div class="col-xs-12 col-md-3 col-sm-3 searchbtnctr gds-div left">
+        <button class="redbg whitetext" id="searchbutton" type="button">Search</button>
+    </div><br />
+    <div class="row">
+        <span id="DestinationAlert" style="color:red;margin-left:15px;"></span>
+    </div>
+
+    </div>
+<div class="row">
+
+    <div id="gdslist">
+
+
+    </div>
+    <input type="hidden" id="hdHotelName" name="hdHotelName" />
+    <input type="hidden" id="hdPropertyID" name="hdPropertyID" />
+    <input type="hidden" id="hdDestination" name="hdDestination" />
+</div>
+
+<div id="loadingSearchProperty">
+    <div class="center_load">
+        <img src="~/images/loading.gif" width="30" height="30" />
+    </div>
+</div>
+<style>
+    #loadingSearchProperty {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        position: fixed;
+        display: block;
+        opacity: 0.7;
+        background-color: #fff;
+        z-index: 99;
+        text-align: center;
+    }
+
+    #loadingSearchProperty-image {
+        position: absolute;
+        top: 100px;
+        left: 240px;
+        z-index: 100;
+    }
+</style>
+<script language="javascript" type="text/javascript">
+     $(window).load(function() {
+    // $('#loading').hide();
+     });
+
+
+</script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#loadingSearchProperty').hide();
+    });
+    $(function () {
+
+        $("#place").autocomplete({
+            minLength: 0,
+            source: "/Common/GetDestination",
+            focus: function (event, ui) {
+                $("#place").val(ui.item.value);
+                $("#hdDestination").val(ui.item.City);
+                $("#hdPropertyID").val(ui.item.PropertyId);
+                if ((ui.item.bHotelName == true)) {
+                    $("#hdHotelName").val('1');
+                }
+                else {
+                    $("#hdHotelName").val('0');
+                }
+                return false;
+            }
+        })
+            .autocomplete("instance")._renderItem = function (ul, item) {
+                ul.addClass("custom");
+                $("#hdDestination").val(item.City);
+                $("#hdPropertyID").val(item.PropertyId);
+
+                //   alert(item.PropertyId);
+                if ((item.bHotelName == true)) {
+                    //  $("#hdHotelName").val('1');
+
+                    return $("<li class='hotel'>")
+                        //.addClass("custom")
+                        //.append("<a>" + item.label + "<br>" + item.desc + "</a>")
+                        .append('<a>' + item.desc + '</a>')
+                        .appendTo(ul);
+                }
+                else {
+                    //   $("#hdHotelName").val('0');
+                    return $("<li class='location'>")
+                        //.addClass("custom")
+                        //.append("<a>" + item.label + "<br>" + item.desc + "</a>")
+                        .append("<a>" + item.desc + "</a>")
+                        .appendTo(ul);
+
+                }
+                //return $("<li>") //.addClass("custom")
+                //    //.append("<a>" + item.label + "<br>" + item.desc + "</a>")
+                //    .append("<a>" + item.desc + "</a>")
+                //    .appendTo(ul);
+            };
+    });
+</script>
+
+    <script>
+
+
+        $('#searchbutton').click(function () {
+
+            if (($.trim($("#place").val()) == '') || ($("#place").val() == "0")) {
+                //$("#DestinationAlert").html("Please enter a valid city, location or property name to search");
+                $("#DestinationAlert").html("Please select a valid city");
+                $("#Destination").val('').focus();
+                return false;
+            }
+            else {
+                if (!valdInOutDates()) return false;
+            }
+
+            $('#loadingSearchProperty').show();
+            
+          
+           
+            if ($("#hdHotelName").val() == "1") {
+            //    alert('test');
+                $.ajax({
+                    type: "Get",
+                    url: "/OfflineBookingGST/gdssearch1",
+                    data: { place: $("#place").val(), CheckIn: $("#CheckIn").val(), CheckOut: $("#CheckOut").val(), BeedRooms: $("#BedRooms").val(), PropertyId: $("#hdPropertyID").val() },
+                    success: function (data) {
+                        debugger;
+                        $("#gdslist").html(data)
+                        $('#loadingSearchProperty').hide();
+
+                    }
+                })
+            }
+            else {
+                $.ajax({
+                    type: "Get",
+                    url: "/OfflineBookingGST/gdssearch",
+                    data: { place: $("#place").val(), CheckIn: $("#CheckIn").val(), CheckOut: $("#CheckOut").val(), BeedRooms: $("#BedRooms").val() },
+                    success: function (data) {
+                        debugger
+                        $("#gdslist").html(data)
+                        $('#loadingSearchProperty').hide();
+
+                    }
+                })
+            }
+
+        });
+</script>
+
+<script type="text/javascript">
+
+
+    $(function () {
+        // $('#most-popular1').show();
+        $('#most-popular12').show();
+        $('#most-popular123').show();
+
+
+        // for Start Date
+        var now = new Date();
+        now.setDate(now.getDate() + @startD );
+
+        var mnth = pad(now.getMonth() + 1, 2);
+        var sdate = pad(now.getDate(), 2) + "/" + mnth + "/" + now.getFullYear();
+        $("#CheckIn").val(sdate);
+
+        //    var now = nowTemp; // new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDay(), 0, 0, 0, 0);
+        var checkin = $('#CheckIn').datepicker(
+            {
+                minDate:$("#hiddenmindate").val(),
+                defaultDate: now,
+                numberOfMonths: 2,
+                dateFormat: "dd/mm/yy",
+             //   maxDate: "06/07/2019"
+            });
+
+
+
+        $(".checkin div").click(function () { $("#CheckIn").datepicker('show'); });
+        $(".checkout div").click(function () { $("#CheckOut").datepicker('show'); });
+
+        // for end date
+        now.setDate(now.getDate() + @diff);
+
+        var mnth1 = pad(now.getMonth() + 1, 2);
+        var edate = pad(now.getDate(), 2) + "/" + mnth1 + "/" + now.getFullYear();
+        $("#CheckOut").val(edate);
+
+        var checkout = $('#CheckOut').datepicker(
+             {
+                 minDate: 2,
+                 numberOfMonths: 2,
+                 defaultDate: now,
+                 dateFormat: "dd/mm/yy",
+              //   maxDate:"06/07/2019"
+             });
+
+        $("#CheckIn").change(function () {
+            var v = $(this).val().trim();
+
+            var curDate = new Date();
+            curDate.setDate(curDate.getDate() + 1);
+            var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+            curDate.setDate(curDate.getDate() + 2);
+            var odat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+
+            if (checkDate(v)) {
+                re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                if (regs = v.match(re)) {
+                    var day, mnt, yr;
+                    yr = parseInt(regs[3]);
+                    mnt = parseInt(regs[2]);
+                    dy = parseInt(regs[1]);
+                    if (mnt > 0) mnt = mnt - 1;
+                    var cd = new Date(Date.UTC(yr, mnt, dy));
+                    cd.setDate(cd.getDate() + 1);
+                    var mn = cd.getMonth() + 1; //parseInt(cd.getMonth()) + 1;
+                    var chgDt = pad(cd.getDate(), 2) + "/" + pad(mn, 2) + "/" + cd.getFullYear();
+                    // alert(chgDt);
+                    var cs = new Date(Date.UTC(yr, mnt, dy));
+                    var mind = new Date(Date.UTC(yr, mnt, dy));
+                    mind.setDate(mind.getDate() + 1);
+                    var mindx = pad(mind.getDate(), 2) + "/" + pad(parseInt(mind.getMonth()) + 1, 2) + "/" + mind.getFullYear();
+                    var xo = $("#CheckOut").val();
+                    //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                    if (checkDate(xo)) {
+                        if (regss = xo.match(re)) {
+                            yr = parseInt(regss[3]);
+                            mnt = parseInt(regss[2]);
+                            dy = parseInt(regss[1]);
+                            if (mnt > 0) mnt = mnt - 1;
+                            var co = new Date(Date.UTC(yr, mnt, dy));
+                            if (co <= cs) {
+                                $("#CheckOut").val(chgDt);
+                                // $("#CheckOut").datepicker("option", "setDate", cd);
+                            }
+                        }
+                        else {
+                            // $("#CheckOut").datepicker("option", "setDate", cd);
+                            $("#CheckOut").val(chgDt);
+                        }
+                    }
+                    else {
+                        // $("#CheckOut").datepicker("option", "setDate", cd);
+                        $("#CheckOut").val(chgDt);
+                    }
+                    //checkout.minDate = n;
+                    $("#CheckOut").datepicker("option", "minDate", mindx);
+                    //$("#CheckOut").datepicker("show");
+                }
+                else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+            }
+            else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+        });
+
+
+        //$("#spnrAd").dpNumberPicker({
+        //    value: 1,
+        //    min: 1,
+        //    max: 8,
+        //    step: 1,
+        //    afterChange: function () { $("#Adults").val(this.options.value); }
+        //});
+        //$("#spnrCd").dpNumberPicker({
+        //    value: 0,
+        //    min: 0,
+        //    max: 8,
+        //    step: 1,
+        //    afterChange: function () { $("#Children").val(this.options.value); }
+        //});
+
+        $("#BeedRooms").dpNumberPicker({
+            value: 1,
+            min: 0,
+            max: 6,
+            step: 1,
+            afterChange: function () { $("#BedRooms").val(this.options.value); }
+        });
+
+        //$("#place").on('change', function () {
+        //    if ($(this).val().length>0) {
+        //        $("#DestinationAlert").val("");
+        //       // console.log('The text box really changed this time');
+        //    }
+        //});
+        });
+    function ChangePlace()
+    {
+        debugger;
+        var place = $("#place").val();
+        if ((place != "") || (place != null) || (place != undefined))
+        {
+            $("#DestinationAlert").hide();
+        }
+    }
+
+    function valdInOutDates() {
+        var v = $.trim($("#CheckIn").val());
+        if (checkDate(v)) {
+            re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            if (regs = v.match(re)) {
+                var cs = new Date(parseInt(regs[3]), parseInt(regs[2])-1, parseInt(regs[1]));
+                var xo = $("#CheckOut").val();
+                //                    $("#CheckOut").datepicker("option", "minDate", mind);
+                if (checkDate(xo)) {
+                    if (regss = xo.match(re)) {
+                        var co = new Date(parseInt(regss[3]), parseInt(regss[2])-1, parseInt(regss[1]));
+                        if (co <= cs) {
+
+                            $("#DestinationAlert").html('Please enter a checkout date which falls after checkin date');
+                            $("#CheckOut").focus();
+                            return false;
+                        }
+                    }
+                    else {
+                        $("#DestinationAlert").html('Invalid Check Out date');
+                        $("#CheckOut").focus();
+                        return false;
+                    }
+                }
+                else {
+                    $("#DestinationAlert").html('Invalid Check Out date');
+                    $("#CheckOut").focus();
+                    return false;
+                }
+            }
+            else {
+                $("#DestinationAlert").html('Invalid Check In date');
+                $("#CheckIn").focus();
+                return false;
+            }
+        } else {
+            $("#DestinationAlert").html('Invalid Check In date');
+            $("#CheckIn").focus();
+            return false;
+        }
+        return true;
+    }
+    function pad(num, size) {
+        var s = num + "";
+        while (s.length < size) s = "0" + s;
+        return s;
+    }
+    function checkDate(field)
+    { var allowBlank = true; var minYear = 2014; var maxYear = (new Date()).getFullYear()+ 1;
+        // regular expression to match required date format
+        re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        if (field != '') {
+            if (regs = field.match(re)) {
+                if (regs[1] < 1 || regs[1] > 31)
+                { return false;}
+                else if (regs[2] < 1 || regs[2] > 12)
+                { return false; }
+                else if (regs[3] < minYear || regs[3] > maxYear)
+                { return false; }
+            } else { return false; }
+        } else { return false; }
+        return true;
+    }
+    function daydiff(first, second) {
+        return (second - first) / (1000 * 60 * 60 * 24);
+    }
+    function getDate(d) {
+
+        var date = d;
+        year = date.getFullYear(),
+            month = (date.getMonth() + 1).toString(),
+            formatedMonth = (month.length === 1) ? ("0" + month) : month,
+            day = date.getDate().toString(),
+            formatedDay = (day.length === 1) ? ("0" + day) : day,
+            hour = date.getHours().toString(),
+            formatedHour = (hour.length === 1) ? ("0" + hour) : hour,
+            minute = date.getMinutes().toString(),
+            formatedMinute = (minute.length === 1) ? ("0" + minute) : minute,
+            second = date.getSeconds().toString(),
+            formatedSecond = (second.length === 1) ? ("0" + second) : second;
+        return formatedDay + "/" + formatedMonth + "/" + year + " " + formatedHour + ':' + formatedMinute + ':' + formatedSecond;
+    };
+    </script>

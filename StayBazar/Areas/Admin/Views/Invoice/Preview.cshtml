@@ -1,0 +1,90 @@
+﻿@model  StayBazar.Areas.Admin.Models.Invoice
+@{
+    Layout = null;
+
+    if (ViewBag.DisableEdit == null) { ViewBag.DisableEdit = ""; }
+
+    int OfflineBookingType = BLayer.OfflineBooking.GetBookingType(Model.OfflineBookingId);
+}
+<!DOCTYPE html>
+<style>
+    td {
+        padding: 2px !important;
+    }
+</style>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Preview</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/popup.css" />
+</head>
+<body>
+    <div class="row tophd">
+        <div class="col-xs-4"><div class="titlebar">Invoice - Preview</div></div>
+       
+        <div class="col-xs-8" style="font-size:12px;color:#ffd800 !important;padding-top:15px;">
+            <span style="width:80px;display:block;float:right;text-align:center;margin-right:20px;  ">
+                <a style="color:white !important;" title="Pdf"  href="InvoiceDigitalSignPDF?obid=@Model.OfflineBookingId" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6"><img src="~/Content/themes/icon images/pdf-icon-cert.png" width="25" /><br />Digital PDF</a>
+            </span>
+            <span style="width:80px;display:block;float:right;text-align:center;">
+                <a style="color:white !important;" title="Pdf"  href="InvoicePDF?obid=@Model.OfflineBookingId" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6">  <img src="~/Content/themes/icon images/pdf-icon-4.png" width="25" /><br />PDF</a>
+            </span>
+
+            <div style="width:120px;display:block;float:right;text-align:left;padding-bottom:10px;">
+                @if (ViewBag.DisableEdit != "True")
+        {
+            <text>
+                <a class="lnkbtn" href="Edit?obid=@Model.OfflineBookingId">Edit</a> <span style="color:#ffd800 !important">|</span>
+                <a class="lnkbtn" href="Preview?obid=@Model.OfflineBookingId">Preview</a>
+            </text>
+}
+            </div>
+        </div>
+    </div>
+    <div style="width: 89%;padding-left: 61px;">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="wraparound">
+                    <div  style="margin-right:20px;text-align:right;padding-top:20px;">
+                        
+                    </div>
+                    @{
+
+                        long IsGST = BLayer.OfflineBooking.GetOfflinebookingIsGST(Model.OfflineBookingId);
+                    }
+                    @if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.GST)
+                    {
+                        @Html.Partial("_InvoiceHeaderGst", Model.OfflineBookingId)
+                    }
+                    else
+                    {
+                        @Html.Partial("_InvoiceHeader")
+                    }
+                    @Html.Raw(Model.HtmlSection1)
+                    @Html.Raw(Model.HtmlSection2)
+                    @Html.Raw(Model.HtmlSection3)
+                    
+                    @if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.GST)
+                    {
+                        @Html.Partial("_InvoiceFooterGST")
+                    }
+                    else
+                    {
+                        @Html.Partial("_InvoiceFooter")
+                    }
+                    @if (OfflineBookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                    {
+                        @Html.Raw(Model.HtmlSection4)
+                        @Html.Partial("_InvoiceDirectFooter")
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,427 @@
+﻿@using Microsoft.AspNet.Identity
+@using System.Collections
+@using System.Linq
+@{
+    string email = User.Identity.GetUserName();
+    int roleId = BLayer.User.GetRole(email);
+    int menuCount;
+    List<CLayer.RolePermission> perm = BLayer.RolePermissions.GetAllPermissions(roleId);
+
+    menuCount = perm.Count(n => n.HeadingId == 1 && n.HasAccess);
+}
+
+@*<style>
+        ul.megamenu > li.megamenu-columns-3 .sub-menu > li, .chaser ul.menu > .megamenu-menu ul.megamenu > li.megamenu-columns-3 .sub-menu > li {
+            width: 20%;
+        }
+
+
+    </style>*@
+
+<link id="main-style" rel="stylesheet" href="~/SampleCss/style.css">
+
+@*<ul class="nav navbar-nav">*@
+<ul class="menu">
+    @if (menuCount > 0)
+    {
+        <li class="menu-item-has-children">
+            <a href="#">Registrations </a>
+            <ul>
+                @if (perm.Exists(m => m.ModuleId == 1 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Corporates", "Corporate", "JoinRequests", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 2 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Supplier/Owners", "Supplier", "JoinRequests", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 3 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Travel Agents", "TravelAgent", "JoinRequests", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 4 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Affiliates", "Affiliates", "JoinRequests", new { area = "Admin" }, new { })</li>}
+            </ul>
+        </li>
+    }
+    @{
+        menuCount = perm.Count(n => n.HeadingId == 2 && n.HasAccess);
+    }
+    @if (menuCount > 0)
+    {
+        <li class="menu-item-has-children">
+            <a href="#">Users </a>
+            <ul>
+                @if (perm.Exists(m => m.ModuleId == 5 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Corporates", "", "Corporate", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 6 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Customers", "", "RegularUser", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 7 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Suppliers", "", "Supplier", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 8 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Travel Agents", "", "TravelAgent", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 9 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Affiliates", "", "Affiliate", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 10 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Properties", "Index", "PropertyStatus", new { area = "Admin" }, new { })</li>}
+            </ul>
+        </li>
+    }
+    @{
+        menuCount = perm.Count(n => n.HeadingId == 3 && n.HasAccess);
+    }
+    @if (menuCount > 0)
+    {
+        <li class="menu-item-has-children">
+            <a href="#">Communication</a>
+            <ul>
+                @if (perm.Exists(m => m.ModuleId == 11 && m.HasAccess))
+                {
+                    <li><a href="@Url.Action("Index", "Query",new {Area = "Admin"})?id=@((int) CLayer.ObjectStatus.MsgType.Query)">Query</a></li>}
+                @if (perm.Exists(m => m.ModuleId == 12 && m.HasAccess))
+                {
+                    <li><a href="@Url.Action("Index", "Query",new {Area = "Admin"})?id=@((int)CLayer.ObjectStatus.MsgType.Complaint)">Complaints</a></li>}
+                @if (perm.Exists(m => m.ModuleId == 13 && m.HasAccess))
+                {
+                    <li><a href="@Url.Action("Index", "Query",new {Area = "Admin"})?id=@((int)CLayer.ObjectStatus.MsgType.Feedback )">Feedback</a></li>}
+                @*<li>@Html.ActionLink("Suggestions", "Index", "Suggest")</li>*@
+            </ul>
+        </li>
+    }
+
+    @{
+        menuCount = perm.Count(n => n.HeadingId == 4 && n.HasAccess);
+    }
+    @if (menuCount > 0)
+    {
+        <li class="menu-item-has-children">
+            <a href="#">Tracking </a>
+            <ul>
+                @*@if (perm.Exists(m => m.ModuleId == 14 && m.HasAccess))
+                    {
+                        <li>@Html.ActionLink("Bookings", "Index", "Transactions")</li>}
+                    @if (perm.Exists(m => m.ModuleId == 15 && m.HasAccess))
+                    {
+                        <li>@Html.ActionLink("Booking Requests", "Index", "BookingRequestTransactions")</li>}
+                    @if (perm.Exists(m => m.ModuleId == 16 && m.HasAccess))
+                    {
+                        <li>@Html.ActionLink("Booking Requests - Offline Properties", "Index", "BookingofflineRequestTransactions")</li>}
+                    @if (perm.Exists(m => m.ModuleId == 17 && m.HasAccess))
+                    {
+                        <li>@Html.ActionLink("Bookings With Partial Payment", "Index", "PartialPaymentBookings")</li>}
+                    @if (perm.Exists(m => m.ModuleId == 18 && m.HasAccess))
+                    {
+                        <li>@Html.ActionLink("Final Payment Attempts/Failures", "Index", "TransactionList")</li>}
+                    @if (perm.Exists(m => m.ModuleId == 19 && m.HasAccess))
+                    {
+                        <li>@Html.ActionLink("Cancelled Partial Payment Bookings", "Index", "PartialPayCancelledBookings")</li>}
+                    @if (perm.Exists(m => m.ModuleId == 20 && m.HasAccess))
+                    {
+                        <li>@Html.ActionLink("Booking Review Attempts", "Index", "BookingStarted")</li>}
+                    @if (perm.Exists(m => m.ModuleId == 21 && m.HasAccess))
+                    {
+                        <li class="dropdown">
+                            <a href="#">Corporate Credit Bookings</a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Bookings", "Index", "CorporateCreditBookings")</li>
+                                <li>@Html.ActionLink("Booking Requests", "Index", "CorporateCreditBookingRequests")</li>
+                            </ul>
+                        </li>
+                    }*@
+
+                <li class="dropdown">
+                    <a href="#">Bookings</a>
+                    <ul class="dropdown-menu">
+
+                        @*offline bookings is renamed to bookings
+                            only new and manage are retained*@
+                        @if (perm.Exists(m => m.ModuleId == 22 && m.HasAccess))
+                        {
+                            @*@if (roleId == (int)CLayer.Role.Roles.Administrator)
+                                {
+                                    <li>@Html.ActionLink("New (Service Tax)", "OfflineBooking", "OfflineBooking")</li>
+                                }*@
+                            @*<li>@Html.ActionLink("New (GST)", "OfflineBooking", "OfflineBookingGst")</li>*@
+                            <li>@Html.ActionLink("New", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
+                            @*<li>@Html.ActionLink("History", "Index", "OfflineBookingList")</li>*@
+
+                        }
+
+                        @if (perm.Exists(m => m.ModuleId == 24 && m.HasAccess))
+                        {
+                            <li>@Html.ActionLink("Manage", "Index", "ManageOfflineBooking", new { area = "Admin" }, new { })</li>}
+
+                    </ul>
+                </li>
+
+
+                @if (perm.Exists(m => m.ModuleId == 23 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Supplier Invoice", "getSupplierInvoiceListForgst", "SupplierInvoiceDetails", new { area = "Admin" }, new { })</li>
+                    @*<li class="dropdown">
+                            <a href="#">Supplier Invoice</a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Service Tax", "getSupplierInvoiceList", "SupplierInvoiceDetails")</li>
+                                <li>@Html.ActionLink("GST", "getSupplierInvoiceListForgst", "SupplierInvoiceDetails")</li>
+                            </ul>
+                        </li>*@
+                }
+
+
+                @*@if (perm.Exists(m => m.ModuleId == 24 && m.HasAccess))
+                    {
+                        <li>@Html.ActionLink("Manage Offline Booking", "Index", "ManageOfflineBooking")</li>}*@
+
+                @if (perm.Exists(m => m.ModuleId == 25 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("External Inv. Booking Request", "Index", "ExternalInventoryBookingRequest", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 26 && m.HasAccess))
+                {
+                    <li class="dropdown">
+                        <a href="#">Supplier Payment</a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("New", "Index", "supplierpayment", new { area = "Admin" }, new { })</li>
+                            <li>@Html.ActionLink("History", "Index", "SupplierPaymetList", new { area = "Admin" }, new { })</li>
+                        </ul>
+                    </li>
+
+                }
+
+                @if (perm.Exists(m => m.ModuleId == 70 && m.HasAccess))
+                {
+                    <li> @Html.ActionLink("Offline Booking Customers", "Index", "OfflineBookingCustomerList", new { area = "Admin" }, new { })</li>}
+                @if (perm.Exists(m => m.ModuleId == 68 && m.HasAccess))
+                {
+                    <li> @Html.ActionLink("Booking-Invoice List", "Index", "InvoiceList", new { area = "Admin" }, new { })</li>}
+                @*karthikms added on 20-09-2019*@
+                @if (perm.Exists(m => m.ModuleId == 24 && m.HasAccess))
+                {
+                    <li>@Html.ActionLink("Send Payment Link", "Index", "PaymentListToCustomer", new { area = "Admin" }, new { })</li>}
+
+            </ul>
+        </li>
+    }
+    @{
+        menuCount = perm.Count(n => n.HeadingId == 5 && n.HasAccess);
+    }
+    @if (menuCount > 0)
+    {
+        <li class="menu-item-has-children megamenu-menu">
+            <a href="#">Settings </a>
+            <div class="megamenu-wrapper container" data-items-per-column="8">
+                <div class="megamenu-holder">
+                    <ul class="megamenu">
+                        <li class="menu-item-has-children" style="width:30px;">
+                            <ul>
+                                @if (perm.Exists(m => m.ModuleId == 27 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Accomm. Feature", "Index", "AccommodationFeature", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 28 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Accomm. Type", "Index", "AccommodationType", new { area = "Admin" }, new { })</li>}
+                                <li>@Html.ActionLink("API PriceMarkup", "Index", "APIPriceMarkup", new { area = "Admin" }, new { })</li>
+                                <li>@Html.ActionLink("New API PriceMarkup", "Index", "NewAPIPriceMarkup", new { area = "Admin" }, new { })</li>
+                                @if (perm.Exists(m => m.ModuleId == 29 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Country", "Index", "Country", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 30 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Currency", "Index", "Currency", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 31 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Data Import", "Index", "ExcelImport", new { area = "Admin" }, new { })</li>}
+
+                                @if (perm.Exists(m => m.ModuleId == 72 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Nature Of Services", "Index", "HSNCode", new { area = "Admin" }, new { })</li>}
+
+
+                                @if (perm.Exists(m => m.ModuleId == 32 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Property Feature", "Index", "PropertyFeature", new { area = "Admin" }, new { })</li>}
+                                @*</ul>
+                                    </li>
+                                    <li class="menu-item-has-children" style="width:20%;">
+                                        <ul style="width:20%; padding-left:0px;">*@
+                                @if (perm.Exists(m => m.ModuleId == 33 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Offers", "Index", "OfferList", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 34 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Recommended", "Index", "Recommended", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 35 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Reviews", "Index", "Reviews", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 36 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Salutation", "Index", "Salutation", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 71 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("SB Entity", "Index", "SBEntity", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 37 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Staff", "Index", "Host", new { area = "Admin" }, new { })</li>
+                                }
+
+                                @if (perm.Exists(m => m.ModuleId == 38 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Stay Category", "Index", "StayCategory", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 39 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Subscriptions", "Index", "Subscriptions", new { area = "Admin" }, new { })</li>}
+                                @*</ul>
+                                    </li>
+                                    <li class="menu-item-has-children" style="width:20%;">
+                                        <ul style="width:20%; padding-left:0px;">*@
+                                @if (perm.Exists(m => m.ModuleId == 40 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Tax", "Index", "TaxTitle", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 41 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Testimonial", "Index", "Testimonial", new { area = "Admin" }, new { })</li>}
+
+                                @if (perm.Exists(m => m.ModuleId == 42 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Settings", "Index", "Settings", new { area = "Admin" }, new { })</li>}
+
+                                @if (perm.Exists(m => m.ModuleId == 43 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("SEO Static Pages", "Index", "StaticPage", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 44 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Custom Property", "Index", "CustomProperty", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == StayBazar.Common.AdminRolePermission.ROLES && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Roles", "Index", "Roles", new { area = "Admin" }, new { })</li>}
+                            </ul>
+
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+    }
+    @{
+        menuCount = perm.Count(n => n.HeadingId == 6 && n.HasAccess);
+    }
+    @if (menuCount > 0)
+    {
+        <li class="menu-item-has-children megamenu-menu">
+            <a href="#">Reports </a>
+            <div class="megamenu-wrapper container" style="width:100%;" data-items-per-column="8">
+                <div class="megamenu-holder">
+                    <ul class="megamenu">
+                        <li class="menu-item-has-children" style="width:50px;">
+                            <ul style="width:20%; padding-left:0px;">
+                                @if (perm.Exists(m => m.ModuleId == 45 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Failed Transactions", "Index", "ReportForFailedTransactions", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 46 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Collection", "Index", "CollectionReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 47 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Daily Booking", "Index", "ReportForDailyBookings", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 48 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Daily Inventory and Booking", "Index", "ReportDailyPropertyBookings", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 49 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Gross Margin", "Index", "GrossMarrginReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 50 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Room Inventory Availability", "Index", "ReportRoomInventory", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 51 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Suppliers Registration", "Index", "ReportForSuppliersRegistration", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 52 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Supplier Payment ", "Index", "SupplierPaymentReport", new { area = "Admin" }, new { })</li>}
+                                @*</ul>
+                                    </li>
+                                    <li class="menu-item-has-children" style="width:20%;">
+                                        <ul style="width:20%; padding-left:0px;">*@
+                                @if (perm.Exists(m => m.ModuleId == 53 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Property Details", "Index", "PropertyDetailsReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 54 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("City Wise Statistics", "Index", "CityWiseStatistics", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 55 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Offline Payments Report", "Index", "Report_OfflinePayment", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 56 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Corporate Credit Bookings Report", "Index", "CorporateCreditBookingsReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 57 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Corporate Discounts Report", "Index", "ReportCorporateDiscounts", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 58 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Supplier Invoice", "Index", "SupplierInvoiceReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 59 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Supplier Invoice Pending", "Index", "SupplierInvoicePendingReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 60 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Pending Customer Invoice", "Index", "PendingCustomerInvoiceReport", new { area = "Admin" }, new { })</li>}
+                                @*</ul>
+                                    </li>
+                                    <li class="menu-item-has-children" style="width:20%;">
+                                        <ul style="width:20%; padding-left:0px;">*@
+                                @if (perm.Exists(m => m.ModuleId == 61 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Margin Tracking", "Index", "MargintrackingReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 62 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Booking Status Report", "Index", "bookingstatusreport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 69 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Customer Invoice Report", "Index", "CustomerInvoiceReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 69 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Customer Invoice GST Report", "Index", "CustomerInvoiceGSTReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 69 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("GST Report", "Index", "GSTInvoiceReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 73 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("ORC Report", "Index", "ORCReport", new { area = "Admin" }, new { })</li>}
+                                @if (perm.Exists(m => m.ModuleId == 63 && m.HasAccess))
+                                {
+                                    <li><a href="~/Files/Reports/Properties.xlsx">Download Property Report</a></li>}
+                                @if (perm.Exists(m => m.ModuleName.ToString().ToLower() == "supplier payment report" && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Supplier Payment Report", "Index", "OfflineSupplierPaymentReport", new { area = "Admin" }, new { })</li>
+                                }
+                                @*</ul>
+                                    </li>
+                                    <li class="menu-item-has-children" style="width:20%;">
+                                        <ul style="width:20%; padding-left:0px;">*@
+                                @if (perm.Exists(m => m.ModuleName.ToString().ToLower() == "bank upload report" && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Bank Upload Report", "Index", "BankUploadReport", new { area = "Admin" }, new { })</li>
+                                }
+                                @if (perm.Exists(m => m.ModuleId == 77 && m.HasAccess))
+                                {
+                                    <li>@Html.ActionLink("Supplier Payment Pending Report", "Index", "SupplierPaymentPendingReport", new { area = "Admin" }, new { }  )</li>
+                                }
+                                @*@if (perm.Exists(m => m.ModuleName.ToString().ToLower() == "gds booking status report" && m.HasAccess))
+                                    {
+                                        <li>@Html.ActionLink("GDS Booking Status Report", "Index", "GDSBookingStatusReport")</li>
+                                    }*@
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+
+    }
+
+    @*<li><a href="/Account/Profile?userid=@(User.Identity.GetUserId().ToString())">@User.Identity.GetUserName()</a></li>*@
+</ul>

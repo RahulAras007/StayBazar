@@ -1,0 +1,124 @@
+﻿@{
+    int j = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_MOST_POPULAR_NO)));
+    StayBazar.Models.PropertyMostpopularModel b = new StayBazar.Models.PropertyMostpopularModel();
+    //  b.PropertypopularList = BLayer.PropertyMostpopular.MostpopularGet((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+    b.PropertypopularList = BLayer.PropertyMostpopular.MostpopularGetWithGDS((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+    List<CLayer.Property> PropertypopularList = b.PropertypopularList;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+}
+<div class="container">
+    <h2>Recommended Hotels</h2>
+    <div class="block image-carousel style2 flexslider" data-animation="slide" data-item-width="270" data-item-margin="30">
+        <ul class="slides image-box listing-style2">
+            @if (PropertypopularList.Count > 0)
+            {
+
+                foreach (CLayer.Property most in PropertypopularList)
+                {
+
+                    <li>
+                        <article class="box">
+                            <figure>
+                                <a href="ajax/slideshow-popup.html" class="hover-effect popup-gallery"><img src="~/RahulSample/images/luxurious-hotel-room-wallpaper-preview.jpg" alt="" width="270" height="160" /></a>
+                            </figure>
+                            <div class="details">
+                                <a title="View all" href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId" class="pull-right button uppercase">select</a>
+                                <h4 class="box-title">
+                                    @{
+                                        string title = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 20);
+                                        @String.Format(title);
+                                    }
+                                    <small><i class="soap-icon-departure yellow-color"></i>@most.City</small>
+                                </h4>
+                                <label class="price-wrapper">
+                                    <span class="price-per-unit">&#8377; @Math.Round(most.bookingitemsTotalAmount)</span>avg/night
+                                </label>
+                            </div>
+                        </article>
+                    </li>
+
+                }
+
+            }
+        </ul>
+    </div>
+</div>
+
+
+@*<div class="col-sm-12 col-md-8">
+        <div class="line">
+                <div class="pull-left leftside whitebg">Most popular</div>
+                <div class="pull-right rightside whitebg">
+                    <a href="javascript:void(0)" class="pplr prev">
+                        <img src="~/images/arrow-left.png" alt="Left">
+                    </a>
+                    <a href="javascript:void(0)" class="pplr next">
+                        <img src="~/images/arrow-right.png" alt="Right">
+                    </a>
+                </div>
+            </div>
+        <div id="most-popular" class="owl-carousel">
+                @if (PropertypopularList.Count > 0)
+                {
+                    foreach (CLayer.Property most in PropertypopularList)
+                    {
+                        <Text>
+                        <div class="prop">
+                            <div class="prop-image">
+
+                                <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                                    @if (most.FileName == "")
+                                    {
+                                        <img src="~/@no_image" height="153" alt="noimage" />
+                                    }
+                                    else
+                                    {
+                                        if (most.InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+                                        {
+                                            <img src="@most.FileName" height="153" alt="@most.Title serviced apartment in  @most.Location @most.City" />
+                                        }
+                                        else
+                                        {
+                                            <img src="@most.FileName" height="153" alt="@most.Title serviced apartment in  @most.Location @most.City" />
+                                        }
+                                    }
+                                    <div class="price">
+                                        <i class="fa cxprice fa-rupee"></i><span class="cxcurele">
+                                            @Math.Round(most.bookingitemsTotalAmount)
+                                        </span>
+                                        <p class="onwards whitetext">onwards</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="tile_desc">
+                                <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                                    <span class="name">
+                                        @{
+                                            string title = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 20);
+                                            @String.Format(title);
+                                        }
+
+                                        <br>
+                                        <b>@most.Location, @most.City</b>
+                                    </span>
+                                </a>
+                                <div class="starbox">
+
+                                </div>
+                                <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId" class="redtext">
+                                    <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                                </a>
+                                <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId" class="pull-right redtext">
+                                    <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                                </a>
+                            </div>
+                            <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                                <div class="text-center redbg whitetext book">Book now</div>
+                            </a>
+                        </div>
+                        </text>
+                    }
+                }
+
+            </div>
+    </div>*@

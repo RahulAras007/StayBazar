@@ -1,0 +1,55 @@
+﻿@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-lg-10">
+        <input type="radio" name="radiocheck" value="1" id="Defaultcheck" checked />  Standard Properties
+        <input type="radio"  name="radiocheck" value="0" id="customcheck" />       Additional Properties  @*( <span> <a href="/admin/CustomProperty">  New Property ? </a> </span> )*@
+        
+        @*<div class="input-group">*@
+
+            <input type="text" id="searchprop" class="form-control">
+            @*<span class="input-group-btn" id="goid">
+                <button class="btn btn-default" onclick="findproperty()" type="button">Go!</button>
+            </span>
+        </div>*@
+        <!-- /input-group -->
+    </div>
+</div>
+<div class="row top-margin-10px" id="browseListpro">
+    @*@Html.Partial("_PropertyList", new List<CLayer.Property>())*@
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("input[id=Defaultcheck]").is(":checked") == true;
+    });
+
+    $("#searchprop").on('change keyup paste', function () {
+        findproperty();
+    });
+
+    function findproperty() {
+        if ($("#searchprop").val().trim() == "") {
+            alert('Search criteria not found!');
+            return;
+        }
+
+        var cname2 = $("#searchprop").val();
+        if ($("input[id=Defaultcheck]").is(":checked") == true) {
+            $.post('@Url.Action("SearchforSupplierInvoiceBook", "property", new { area = "Admin" })', { name: cname2 }, function (data) {
+                $("#browseListpro").html("");
+                $("#browseListpro").html(data);
+            });
+        }
+        else {
+            $.post('@Url.Action("SearchforSupplierInvoicefromcustom", "property", new { area = "Admin" })', { name: cname2 }, function (data) {
+                $("#browseListpro").html("");
+                $("#browseListpro").html(data);
+            });
+        }
+
+    }
+    function selectCorporate() {
+    }
+</script>

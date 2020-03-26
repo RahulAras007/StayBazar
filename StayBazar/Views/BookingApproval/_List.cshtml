@@ -1,0 +1,115 @@
+﻿@model StayBazar.Models.BookingApprovalModel
+@{
+    Layout = null;
+    int count = Model.pendingApprovalBookinglist.Count;
+    int idx = 1;
+    int perPagerCount = 25;
+    CLayer.BookingApprovals objUsr = null;
+
+}
+@using Microsoft.AspNet.Identity
+<div class="body-content">
+
+    <div class="row top-margin-10px">
+        <div class="col-md-12" style="display:none">
+            @{
+                long cid = 0;
+                long.TryParse(User.Identity.GetUserId(), out cid);
+                int maxno = BLayer.B2BUser.GetCountMaxNoOfUsers(cid);
+                int countLimit = BLayer.B2BUser.GetCountLimitOfUsers(cid);
+                if (countLimit >= maxno)
+                {
+                    <input type="button" value="Create a new User" class="btn btn-primary" onclick="editData(0)" />
+                }
+                else
+                {
+                    <text><h4>You can't add a new staff,you have reached maximum staff limit.</h4> </text>
+                }
+            }
+        </div>
+    </div>
+    <div class="row top-margin-10px" id="List">
+        @Html.Partial("~/Views/BookingApproval/BookingApprovalList.cshtml", Model.pendingApprovalBookinglist)
+    </div>
+</div>
+
+@if (perPagerCount < count)
+{
+    <ul class="pagination" id="myPager"></ul>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            preparePager();
+        });
+    </script>
+}
+
+
+
+<script type="text/javascript">
+
+    function preparePager()
+    {
+        $('#myTable').pageMe({ pagerSelector: '#myPager', showPrevNext: true, hidePageNumbers: false, perPage: @(perPagerCount) });
+    }
+
+    function editData(Booking_Approval_Id, BookingId, approver_id, approver, CreatedDate, approval_order, approval_status, approvalstatus) {
+
+        $("#dvAlert").hide();
+        $("#dvMessage").hide();
+
+        var BookingApprovals = {
+            'Booking_Approval_Id': Booking_Approval_Id,
+            'BookingId': BookingId,
+            'approver_id': approver_id,
+            'approver': approver,
+            'CreatedDate': CreatedDate,
+            'approval_order': approval_order,
+            'approval_status': approval_status,
+            'approvalstatus': approvalstatus
+        };
+        @*$.get('@(Url.Action("Approve","BookingApproval",new { a = BookingApprovals }))?id=' + id + '&pBookingApprovals=' + JSON.stringify(BookingApprovals),function(data){
+            //$("#userdetails").html(data);
+            //$("#myModal").modal('show');
+        });*@
+
+        $.ajax({
+            url: '@Url.Action("Approve", "BookingApproval")',
+            type: 'POST',
+            data: JSON.stringify(BookingApprovals),
+            dataType: 'json',
+            processData: false,
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                if (response.success) {
+                    window.location = '@Url.Action("Index", "BookingApproval")';
+                    $("#dvMessage").show();
+                    $("#pMessage").html("Approved and sent mail to the next approver.Please proceed");
+                }
+                else
+                {
+                    $("#dvAlert").show();
+                    $("#pError").html("Error in booking approval.Please try again..");
+                }
+            },
+            error: function (response) {}
+        });
+    }
+
+    @*function deleteData(id){
+        pname = $("#name"+id).html();
+        if(confirm("Are you sure to delete - '" + pname + "'"))
+        {
+            $.get('@Url.Action("Remove","CorporateUsers")?id='+id, function (data) {
+                $("#userlist").html(data);
+            });
+        }
+    }
+    function confirm(id)
+    {
+            $.get('@Url.Action("Login","Account")?id='+id, function (data) {
+                //$("#userlist").html(data);
+            });
+    }*@
+
+</script>
+

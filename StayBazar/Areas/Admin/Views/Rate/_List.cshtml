@@ -1,0 +1,30 @@
+﻿@model StayBazar.Areas.Admin.Models.RateModel
+@{
+    Layout = null;
+}
+@if(Model.Rates.Count==0)
+{
+    <div class="alert alert-info">Rates not found!</div>
+}else{
+<table class="table table-striped">
+    <thead>
+        <tr><th>Start Date</th><th>End Date</th><th>Edit</th><th>Delete</th><th>Updated By</th><th>Updated On</th></tr>
+    </thead>
+    <tbody>
+        @foreach (CLayer.Rates item in Model.Rates){
+        <tr>
+            <td>@item.StartDate.ToString("MMM-dd")</td>
+            <td>@item.EndDate.ToString("MMM-dd")</td>
+            <td><a href="#" onclick="editRate('@item.StartDate','@item.EndDate',@item.AccommodationId)"><span class="glyphicon glyphicon-arrow-right"></span></a></td>
+            <td><a href="#" onclick="delRate('@item.StartDate','@item.EndDate',@item.AccommodationId)"><span class="glyphicon glyphicon-trash"></span></a></td>
+            <td>@item.UpdatedByUser</td>
+            <td>@((item.UpdatedDate==DateTime.MinValue)? "": item.UpdatedDate.ToShortDateString())</td>
+        </tr>
+}
+    </tbody>
+</table>
+    
+
+
+
+}

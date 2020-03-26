@@ -1,0 +1,98 @@
+﻿
+@{
+    
+}
+
+
+<div class="col-sm-12 col-md-8">
+    <div class="line">
+        <div class="pull-left leftside whitebg">Most popular</div>
+        <div class="pull-right rightside whitebg">
+            <a href="javascript:void(0)" class="pplr1 prev1">
+                <img src="../images/arrow-left.png" alt="Left">
+            </a>
+            <a href="javascript:void(0)" class="pplr1 next1">
+                <img src="../images/arrow-right.png" alt="Right">
+            </a>
+        </div>
+    </div>
+    <div id="most-popular1" class="owl-carousel">
+       
+        <div class="item">
+                <div class="prop">
+                    sdsd
+
+                </div>
+            </div>
+            <div class="item">
+                <div class="prop">
+                    ss
+                </div>
+            </div>
+            <div class="item">
+                <div class="prop">
+                    ffffff
+
+                </div>
+            </div>
+
+    </div>
+</div>
+
+<script type='text/javascript'>
+
+
+    $(document).ready(function () {
+        var Mpitems = $('.prop');
+        if (Mpitems.length > 3) {
+            $("#most-popular1").owlCarousel({
+                loop: true,
+                items: 3,
+                pagination: false,
+                dots: false,
+                navigation: false,
+                autoplay: 7000,
+                responsiveClass: true,
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    450: {
+                        items: 2
+                    },
+                    767: {
+                        items: 3
+                    }
+                }
+
+            });
+        }
+        else {
+
+            $("#most-popular1").owlCarousel({
+                items: 3,
+                pagination: false,
+                dots: false,
+                navigation: false,
+                autoplay: 7000,
+                responsiveClass: true,
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    450: {
+                        items: 2
+                    },
+                    767: {
+                        items: 3
+                    }
+                }
+
+            });
+
+        }
+    });
+</script>
+
+<script src="~/Content/raty27/jquery.raty.js"></script>
+<link href="~/Content/raty27/jquery.raty.css" rel="stylesheet" property="" />

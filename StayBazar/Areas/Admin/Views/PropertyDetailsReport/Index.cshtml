@@ -1,0 +1,143 @@
+﻿@model StayBazar.Areas.Admin.Models.PropertyDetailsReportModel
+@{
+    ViewBag.Title = "Property Details Report";
+   // Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+}
+<div id="content">
+
+    @*<h2>@ViewBag.Title</h2>*@
+    <div class="page-title-container style3">
+
+
+        <div class="row">
+            <div class="col-md-4">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+
+            <div class="col-md-10" id="Fiterdiv" style="max-width: 1500px;">
+                @using (Html.BeginForm("Filter", "PropertyDetailsReport", FormMethod.Post, new { @id = "frmProptyFilters", onsubmit = "return false;" }))
+                {
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                                <span class="input-group-btn">
+                                    <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-control">
+                                @foreach (StayBazar.Areas.Admin.Models.PropertyDetailsReportModel.propertyDetailsSearchValue ruv in (StayBazar.Areas.Admin.Models.PropertyDetailsReportModel.propertyDetailsSearchValue[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.PropertyDetailsReportModel.propertyDetailsSearchValue)))
+                                {
+
+                                    <input type="radio" name="ruv" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == 0) { <text> checked </text> } />
+                                    <label for="@((int)ruv)" class="css-label">
+                                        @{
+                                            string Searchtext = @ruv.ToString();
+                                        }
+                                        @if (Searchtext == "Accommodation_Category")
+                                        {
+                                            Searchtext = "Accommodation Category";
+                                        }
+                                        @if (Searchtext == "Accommodation_Type")
+                                        {
+                                            Searchtext = "Accommodation Type";
+                                        }@Searchtext
+                                    </label>
+                                    <text>&nbsp;&nbsp;</text>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    @Html.HiddenFor(m => m.SearchValue)
+                }
+            </div>
+
+
+            <div class="row" id="toolbardiv" style="float:left">
+                <div class="col-md-12 exporticons col-md-offset-1">
+                    <a title="Print" href="#" onclick="printDoc();" id="btnNextClick" class="fa fa-print"> </a>
+                    <a title="Pdf" href="#" onclick="PDF();" id="btnNextClick" class="fa fa-file-pdf-o"></a>
+                    <a title="Export" href="#" onclick="Export();" id="btnNextClick2" class="fa fa-file-excel-o"></a>
+                </div>
+            </div>
+            </div>
+        </div>
+    <br />
+    <br />
+            <div class="row" id="PropertyDetailsReportList" style="margin-top:100px;">
+
+                <div class="height195px col-md-12"></div>
+                <div class="col-md-offset-4 col-md-4"><div class="alert alert-info">Please wait while loading data..</div></div>
+            </div>
+
+            <div class="row" id="ReportListLoading" style="margin-top:100px;">
+
+                <div class="height195px col-md-12"></div>
+                <div class="col-md-offset-4 col-md-4"><div class="alert alert-info">Please wait while loading data..</div></div>
+            </div>
+
+        </div>
+        <script type="text/javascript">
+
+
+    $(function () {
+        $("#toolbardiv").hide();
+        $("#PropertyDetailsReportList").hide();
+        $("#ReportListLoading").hide();
+
+        $("#SearchValue").val("0");
+        $(".css-radiobutton").change(function () {
+            $("#SearchValue").val("0");
+            $(".css-radiobutton").each(function () {
+                if (this.checked) {
+                    $("#SearchValue").val($(this).attr("id"));
+                }
+            });
+        });
+        $("#btnSearch").click(function () {
+            $("#PropertyDetailsReportList").hide();
+
+            $("#ReportListLoading").show();
+            var url = '@Url.Action("Filter", "PropertyDetailsReport")';
+            $.post(url, $("#frmProptyFilters").serialize(),
+                    function (data) {
+                        $("#ReportListLoading").hide();
+                        $("#PropertyDetailsReportList").show();
+                        $("#toolbardiv").show();
+                        $("#PropertyDetailsReportList").html(data);
+                    });
+        });
+    });
+
+
+    $(".container").removeClass("container").addClass("container-fluid");
+    function printDoc() {
+
+        var url = '@Url.Action("ReportPrint", "PropertyDetailsReport")?Searchstring=' + $("#SearchString").val() + "&SearchValue=" + $("#SearchValue").val();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function PDF() {
+
+        var url = '@Url.Action("ReportPdf", "PropertyDetailsReport")?Searchstring=' + $("#SearchString").val() + "&SearchValue=" + $("#SearchValue").val();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function Export() {
+
+        var url = '@Url.Action("ExcelReport", "PropertyDetailsReport")?Searchstring=' + $("#SearchString").val() + "&SearchValue=" + $("#SearchValue").val();
+        window.open(url, "_blank");
+    }
+
+    @*$(function () {
+       $("#toolbardiv").hide();
+      // $("#Fiterdiv").hide();
+        $.get('@Url.Action("getdata","PropertyDetailsReport",new { area="Admin"})', function (data) {
+            $("#PropertyDetailsReportList").html(data);
+            $("#toolbardiv").show();
+            $("#Fiterdiv").show();
+        });
+    })*@
+        </script>

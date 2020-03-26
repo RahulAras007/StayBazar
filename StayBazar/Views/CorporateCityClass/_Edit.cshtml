@@ -1,0 +1,498 @@
+﻿@model StayBazar.Models.CorporateCityClassModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("Edit", "CorporateCityClass"))//,FormMethod.Post,new { role = "form", id = "ccityclassform" , name = "ccityclassform" }))
+{
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(m => m.CityClassID)
+    <div class="incontainer">
+        <div class="form-group">
+
+            <table cellpadding="0" cellspacing="0"></table>
+
+            @*<div class="col-md-4">
+                    @Html.DisplayNameFor(m => m.CountryList)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.CountryID, Model.CountryList, new { @tabindex = "5", @class = "form-control " })
+                </div>
+                <div class="col-md-4">
+                    @Html.DisplayNameFor(m => m.StateList)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.StateID, Model.StateList, new { @tabindex = "5", @class = "form-control " })
+                </div>
+                <div class="col-md-4">
+                    @Html.DisplayNameFor(m => m.CityList)<span style="color:red">*</span>
+                    @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "5", @class = "form-control " })
+                </div>
+                <div class="col-md-4">
+                    <input class="btn btn-default" type="button" value="Add" onclick="AddApproverDetails()" />
+                </div>*@
+
+            <table cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr></tr>
+                </thead>
+                <tbody></tbody>
+                <tr>
+                    <td class="col-md-4">
+                        @Html.DisplayNameFor(m => m.CityClassCode)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.CityClassCode, new { @tabindex = "1", @class = "form-control input-sm" })
+                        @Html.ValidationMessageFor(m => m.CityClassCode)
+                    </td>
+                    <td class="col-md-4">
+                        @Html.DisplayNameFor(m => m.CityClassDescription)
+                        @Html.TextBoxFor(m => m.CityClassDescription, new { @tabindex = "1", @class = "form-control input-sm" })
+
+                    </td>
+                    <td class="col-md-4"></td>
+                    <td class="col-md-4"></td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">&nbsp;</td>
+                    <td class="col-md-4">&nbsp;</td>
+                    <td class="col-md-4">&nbsp;</td>
+                    <td class="col-md-4">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <input type="button" id="btnSave" value="Save" onclick="SaveData()" class="btn btn-sm btn-default" tabindex="3" />
+                        <a href="~/CorporateCityClass" id="btnReset" class="btn btn-sm btn-danger" tabindex="4">Cancel</a>
+                    </td>
+                    <td class="col-md-4">&nbsp;</td>
+                    <td class="col-md-4">&nbsp;</td>
+                    <td class="col-md-4">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="col-md-4"><h4><b>Cities</b></h4></td>
+                    <td class="col-md-4">&nbsp;</td>
+                    <td class="col-md-4">&nbsp;</td>
+                    <td class="col-md-4">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <label>Choose Country</label>
+                        @Html.DropDownListFor(m => m.CountryID, Model.CountryList, "Select Country", new {  @class = "form-control fname" })
+                        <label style="color:red;font-family:'Times New Roman', Times, serif;font-weight:normal;" id="errorMsg"></label>
+                    </td>
+                    <td class="col-md-4">
+                        <label>Choose State</label>
+                        @Html.DropDownListFor(m => m.StateID, Model.StateList, "Select State", new {  @class = "form-control fname" })
+                        <label style="color:red;font-family:'Times New Roman', Times, serif;font-weight:normal;" id="errorMsg"></label>
+                    </td>
+                    <td class="col-md-4">
+                        <label>Choose City</label>
+                        @Html.DropDownListFor(m => m.CityId, Model.CityList, "Select City", new {  @class = "form-control fname" })
+                        <label style="color:red;font-family:'Times New Roman', Times, serif;font-weight:normal;" id="errorMsg"></label>
+                    </td>
+
+                    <td class="col-md-4" align="left"><input class="btn btn-default" type="button" value="Add" onclick="AddApproverDetails()" /></td>
+                </tr>
+
+                <tfoot>
+                </tfoot>
+            </table>
+
+
+
+            @*<div><h4><b>Cities</b></h4></div>*@
+            @*<div>&nbsp;</div>*@
+            <div class="col-md-12 tblDiv">
+                <table id="tblAprovalOrderApproverList" class="table" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>State</th>
+                            <th>City</th>
+                            @*<th class="text-center"><span id="thApprovalOrder" hidden>State</span>&nbsp;</th>*@
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableGridAppr"></tbody>
+                    <tfoot>
+                        <tr></tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+}
+@{
+    string contryids, contrynames, stateids, statenames, cityids, citynames;
+    contryids = "";
+    stateids = "";
+    cityids = "";
+    contrynames = "";
+    statenames = "";
+    citynames = "";
+
+    contryids = Model.CountryIDs;
+    stateids = Model.StateIDs;
+    cityids = Model.CityIDs;
+    contrynames = Model.CountryNames;
+    statenames = Model.StateNames;
+    citynames = Model.CityNames;
+   
+}
+<script type="text/javascript">
+
+    
+
+
+    $(function () {
+        $("#Title").focus();
+
+
+        /*     $('#CityId [value=7]').attr('selected', 'true');*/
+        var CitySelected = $("#ddlCity").val();
+        //     alert(CitySelected);
+        $('#ddlCity [value="' + CitySelected + '"]').attr('selected', 'true');
+
+        if ($('#ddlCity').val() == -1) {
+            $("#ddlCity").hide();
+            $("#other_city").show();
+            if ($("select#ddlCity option").length > 1) {
+                $("#close_other_city").show();
+            }
+        }
+        $('#CountryID').change(function () {
+            debugger;
+            $.get("/Common/GetState?id=" + $('#CountryID').val(), function (data) {
+                if (data != "") {
+                    $('#StateID').html(data).append('<option selected="selected" value="0">Select</option>');
+                    //$('#ddlStateID').html(data).append('<option selected="selected" value="0">Select</option>');
+                }
+                else {
+                    $('#StateID').empty().append('<option selected="selected" value="0">not available...</option>');
+                    //$('#ddlStateID').html(data).append('<option selected="selected" value="0">Select</option>');
+                }
+
+                loadcity();
+            });
+        });
+        $('#StateID').change(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $.get("/Common/GetCity?id=" + $('#StateID').val(), function (data) {
+                if (data != "") {
+                    $('#CityId').empty().append(data);
+                    if ($("select#ddlCity option").length == 1) {
+                        $("#CityId").hide();
+                        $("#City").val("");
+                        $("#other_city").show();
+
+                    }
+                    //$('#ddlApproverCityID').empty().append(data);
+                    //if ($("select#ddlApproverCityID option").length == 1) {
+                    //    $("#ddlApproverCityID").hide();
+                    //    $("#City").val("");
+                    //    $("#other_city").show();
+
+                    //}
+
+                }
+                else {
+                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                    //  $('#ddlApproverCityID').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+
+            });
+        });
+        $('#CityId').change(function () {
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#City").val($("#hdnCity").val());
+                $("#other_city").show();
+                $("#close_other_city").show();
+            }
+        });
+        $('#close_other_city').click(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+        });
+    });
+
+
+
+    function loadcity() {
+        $.get("/Common/GetCity?id=" + $('#CityId').val(), function (data) {
+            if (data != "") {
+                $('#CityId').empty().append(data);
+                if ($("select#CityId option").length == 1) {
+                    $("#CityId").hide();
+                    $("#City").val("");
+                    $("#other_city").show();
+                }
+                //$('#ddlApproverCityID').empty().append(data);
+                //if ($("select#ddlApproverCityID option").length == 1) {
+                //    $("#ddlApproverCityID").hide();
+                //    $("#City").val("");
+                //    $("#other_city").show();
+
+                //}
+            }
+            else {
+                $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                //     $('#ddlApproverCityID').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+
+    }
+
+ 
+   
+
+
+</script>
+
+
+<script type="text/javascript">
+
+        var CountryIds = new Array();
+        var CountryName = new Array();
+        var StateIds = new Array();
+        var StateName = new Array();
+        var CityIds = new Array();
+        var CityName = new Array();
+        CountryIds = [@contryids];
+        StateIds = [@stateids];
+        CityIds = [@cityids];
+    debugger;
+    var Cn='@contrynames';
+    var Sn ='@statenames';
+    var Cnm='@citynames';
+    debugger;
+    if (Cnm != '') {
+        CountryName = Cn.split(',');
+        StateName = Sn.split(',');
+        CityName = Cnm.split(',');
+    }
+    
+        //    CountryIds = "";
+        //StateIds ="";
+        //CityIds = "";
+    function AddApproverDetails() {
+
+
+        var ddlCountry = $("#CountryID");
+        var ddlState = $("#StateID");
+        var ddlCity = $("#CityId");
+
+
+        if (ddlCountry.val() > 0) {
+
+            var ddlCountryID = $("#CountryID :selected").val();
+            var ddlCountryText = $("#CountryID :selected").text();
+            //if (hasDuplicateCountry(ddlCountryID)) { alert("Already added"); return; } //dont add - it is a duplicate
+            rowCount = CountryIds.length;
+           // orderNo = $("#approverOrder").val();
+            //if (isNaN(orderNo)) { alert("Please enter valid number"); return; }
+            //ono = parseInt(orderNo);
+            //if (ono < 1) { orderNo = 1; }
+            //if (ono > rowCount) { orderNo = rowCount + 1; }
+            CountryIds.push(ddlCountryID);
+            CountryName.push(ddlCountryText);
+            //addOrder(orderNo);
+
+            //refreshGrid();
+
+        }
+        else {
+            alert("Please Select Country");
+        }
+
+        if (ddlState.val() > 0) {
+
+            var ddlStateID = $("#StateID :selected").val();
+            var ddlStateText = $("#StateID :selected").text();
+            //if (hasDuplicateState(ddlStateID)) { alert("Already added"); return; } //dont add - it is a duplicate
+            rowCount = StateIds.length;
+            // orderNo = $("#approverOrder").val();
+            //if (isNaN(orderNo)) { alert("Please enter valid number"); return; }
+            //ono = parseInt(orderNo);
+            //if (ono < 1) { orderNo = 1; }
+            //if (ono > rowCount) { orderNo = rowCount + 1; }
+            StateIds.push(ddlStateID);
+            StateName.push(ddlStateText);
+            //addOrder(orderNo);
+
+           // refreshGrid();
+
+        }
+        else {
+            alert("Please Select State");
+        }
+        if (ddlCity.val() > 0) {
+
+            var ddlCityID = $("#CityId :selected").val();
+            var ddlCityText = $("#CityId :selected").text();
+            if (hasDuplicateCity(ddlCityID)) { alert("Already added"); return; } //dont add - it is a duplicate
+            rowCount = StateIds.length;
+            // orderNo = $("#approverOrder").val();
+            //if (isNaN(orderNo)) { alert("Please enter valid number"); return; }
+            //ono = parseInt(orderNo);
+            //if (ono < 1) { orderNo = 1; }
+            //if (ono > rowCount) { orderNo = rowCount + 1; }
+            CityIds.push(ddlCityID);
+            CityName.push(ddlCityText);
+            //addOrder(orderNo);
+
+            refreshGrid();
+
+        }
+        else {
+            alert("Please Select City");
+        }
+    }
+
+    function addOrder(orderNo) {
+        l = approverOrder.length;
+        for (i = 0; i < l; i++) {
+            if (approverOrder[i] >= orderNo) { approverOrder[i] = approverOrder[i] + 1; }
+        }
+        approverOrder.push(orderNo);
+    }
+
+    function hasDuplicateCity(id) {
+        l = CityIds.length;
+        for (i = 0; i < l; i++) {
+            if (CityIds[i] == id) { return true; }
+        }
+        return false;
+        }
+
+    function refreshGrid() {
+
+        //fixOrder();
+        debugger;
+
+        rowCount = CityIds.length;
+
+            trv = '';
+            for (i = 0; i < rowCount; i++) {
+                trv = trv + ' <tr class="form-group"><td>' + CountryName[i] + '</td><td>' + StateName[i] + '</td><td>' + CityName[i] + '</td><td> <input type="button" class="btn btn-danger btnRemove" onclick="remove(this)" value="Remove" data-val="' + CityIds[i] + '" /></td></tr>';
+            }
+            $("#tableGridAppr").html(trv);
+            if (rowCount > 0) {
+                $("#thApprovalOrder").show();
+            } else {
+                $("#thApprovalOrder").hide();
+            }
+
+
+
+    }
+    function remove(btn) {
+        deletedId = $(btn).attr("data-val");
+        //To chnage `user` - `IsApprover` to false
+        //$.post('@(Url.Action("SetIsApproverStatus", "CorporateUsers"))?isApproverStatus=' + deletedId, function (data) {
+        idx = -1;
+            rowCount = CountryIds.length;
+        for (i = 0; i < rowCount; i++) {
+            if (CityIds[i] == deletedId) { idx = i; break; }
+        }
+
+        if (idx == -1) {
+            return; //do nothing- could not find the element to delete
+        }
+        CityIds.splice(idx, 1);
+        CityName.splice(idx, 1);
+
+        StateIds.splice(idx, 1);
+        StateName.splice(idx, 1);
+
+        CountryIds.splice(idx, 1);
+        CountryName.splice(idx, 1);
+
+        refreshGrid();
+       // });
+        }
+    function SaveData() {
+
+        if (CountryIds.length > 0) {
+            $.post('@Url.Action("SaveDetails", "CorporateCityClass")?CityClassID=' + $("#CityClassID").val() + '&CityClassCode=' + $("#CityClassCode").val().toString() + '&CityClassDesc=' + $("#CityClassDescription").val().toString() + '&ddlCountryID=' + CountryIds.toString() + '&ddlstateID=' + StateIds.toString() + '&ddlCityID=' + CityIds.toString(), $("#ccityclassform").serialize(), function (data) {
+                if (data.Result == "Success") {
+                    window.location.href = "/CorporateCityClass";
+                }
+                else {
+                    var R = new Array();
+                    R = data.Result.split(',');
+                    alert(R[1] + " Already added in this city class as " + R[0])
+                }
+
+            });
+        }
+        else {
+            alert("Please select Country");
+        }
+
+               
+                   
+
+
+        }
+    function fixOrder() {
+        var lastVal = '';
+        len = approverIds.length;
+        for (i = 0; i < len; i++) {
+            for (j = i + 1; j < len; j++) {
+                if (approverOrder[i] > approverOrder[j]) {
+                    //swap order nos
+                    lastVal = approverOrder[i];
+                    approverOrder[i] = approverOrder[j];
+                    approverOrder[j] = lastVal;
+                    //swap ids
+                    lastVal = approverIds[i];
+                    approverIds[i] = approverIds[j];
+                    approverIds[j] = lastVal;
+                    //name
+                    lastVal = approverName[i];
+                    approverName[i] = approverName[j];
+                    approverName[j] = lastVal;
+                }
+            }
+        }
+        //fixing orders
+        for (i = 0; i < len; i++) {
+            approverOrder[i] = i + 1;
+        }
+    }
+
+    $(document).ready(function () {
+        var hiddenUserID = $('#hiddenUserID').val();
+
+        //Hide & show .tblDiv
+        if (hiddenUserID == 0) {
+            $("#list_AddHotels").hide();
+            $('.tblDiv').hide();
+        }
+        else {
+            $("#list_AddHotels").show();
+            $('.tblDiv').show();
+        }
+
+        refreshGrid();
+    });
+    $("#txtMaximumDailyEntitlement").keypress(function (e) {
+        //if the letter is not digit then display error and don't type anything
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            //display error message
+            $("#errmsg").html("Digits Only").show().fadeOut("slow");
+            return false;
+        }
+    });
+
+</script>
+
+
+
+
+
+
+

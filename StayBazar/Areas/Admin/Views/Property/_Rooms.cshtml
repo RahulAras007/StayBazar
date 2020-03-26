@@ -1,0 +1,78 @@
+﻿@model StayBazar.Areas.Admin.Models.PropertyAccommmodationModel
+@{
+    var grid = new WebGrid(Model.Accommodations, canSort: true, canPage: true, rowsPerPage: 25, pageFieldName: "pagerfield");
+}
+<style>
+    .col-md-6{
+        width:100%;
+    }
+</style>
+@try
+{
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <input type="button" class="btn redbg whitetext border-radius0" value="ADD NEW" id="AddNew" title="Add New Accommodation" />
+        </div>
+    </div>
+    <div class="row">
+        <div id="acc_list" class="col-md-6">
+            @grid.GetHtml(tableStyle: "table table-hover table-responsive table-striped table-custom table-bordered",
+                columns: grid.Columns(
+                grid.Column("StayCategory", "Category"),
+                grid.Column("AccommodationType", "Type"),
+                grid.Column("Edit Rate",format:@<text><a href="~/Admin/Rate/Index/@item.AccommodationId"><span class="glyphicon glyphicon-euro blue-color fa-2x"></span></a></text>),
+                grid.Column("Inventory",format:@<text><a href="~/Admin/Inventory/Index/@item.AccommodationId"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>),
+                grid.Column("Terms/ Condition", format: @<text><a href="~/Admin/Condition/Index/@item.AccommodationId"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>),
+                grid.Column("Status", format: @<text>@if (item.Status == (int)StayBazar.Models.AccommodationModel.StatusTypes.Enabled)
+                {
+                    <text>Enabled</text>
+                }
+                else
+                {
+                    <text>Disabled</text>
+                }</text>),
+                grid.Column("Edit", format: @<text>
+                <span class="glyphicon glyphicon-edit green-color fa-2x" title="Edit" onclick="EditACC(@item.AccommodationId)"  cursor: pointer;"></span>
+                </text>),
+             grid.Column("Delete", format: @<text>
+            <span class="glyphicon glyphicon-trash red-color fa-2x" title="Delete" onclick="DeleteACC(@item.AccommodationId)" cursor: pointer;"></span>
+            </text>)
+))
+        </div>
+        <div id="acc_details" class="col-md-6">
+            @Html.Partial("~/Areas/Admin/Views/Property/_Accommodation.cshtml", Model.Accommodation)
+        </div>
+    </div>
+    <script type="text/javascript">
+        function DeleteACC(accid) {
+        if (confirm("Are you sure, you want to delete?")) {
+            window.location = "@Url.Action("AccommodationDelete", "Property")?id=" + accid;
+        }
+    }
+    </script>
+    <script type="text/javascript">
+        function EditACC(id) {
+            $.get("/Admin/Property/AccommodationEdit?id=" + id, function (data) {
+                $("#acc_details").html(data);
+            });
+            $("#AddNew").removeClass("redbg");
+            $("#acc_list").removeClass("col-md-12").addClass("col-md-6");;
+            $("#acc_details").fadeIn(800).removeClass("hided");
+        }
+        $(function () {
+            $('#AddNew').click(function () {
+                $.get("/Admin/Property/AccommodationNew?propertyid=" + '@Model.PropertyId', function (data) {
+                    $("#acc_details").html(data);
+                });
+                $(this).removeClass("redbg");
+                $("#acc_list").removeClass("col-md-6").addClass("col-md-12");
+                $("#acc_details").hide();
+            });
+        });
+    </script>
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+    Response.Redirect("~/ErrorPage");
+}

@@ -1,0 +1,81 @@
+﻿@model StayBazar.Areas.Admin.Models.SubscriptionsModel
+@{
+    Layout = null;
+    long i = 1;
+    //int noOfRows = Model.SubscriptionsList.Count;
+
+    //bool rowsNotFound = (noOfRows == 0);
+    //Model.MaxCount = Model.SubscriptionsList.Count;
+    //StayBazar.Lib.GridPager pager = new StayBazar.Lib.GridPager();
+    //pager.ColumnsInPager = 10;
+    //pager.JavascriptFuncName = "SearchPager";
+    //int rip = 0;
+
+    //int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get(StayBazar.Common.Utils.SERARCH_MAX_ROWS), out rip);
+    //pager.RowsInAPage =10;
+    //string gridPage = pager.GetPager(Model.MaxCount, Model.CurrentPage);
+
+}
+<form id="form1">
+    @*@Html.HiddenFor(m => m.CurrentPage)
+    @Html.HiddenFor(m => m.MaxCount)*@
+    <div class=" row">
+        <div class=" col-lg-11">
+            <div id="content" class="container-fluid">
+                <div class="row">
+                    @*<div class="col-md-7">
+                        @Html.Raw(gridPage)
+                    </div>*@
+                    <div class="col-md-10 col-md-offset-1  ">
+                        <table class="table table-hover table-condensed table-responsive table-striped table-custom table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Mail</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (CLayer.Mail s in Model.SubscriptionsList)
+                                {
+                                    int Status = Convert.ToInt32(s.UnSubscribed);
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@s.Mailaddress</td>
+                                        <td>
+                                            @if (Status == 1)
+                                            {
+                                                <p>UnSubscribed</p>
+                                            }
+                                            else
+                                            {
+                                                <p>Subscribed</p>
+                                            }
+                                        </td>
+                                        <td>@s.CreatedOn.ToShortDateString()</td>
+                                        @{i = i + 1;}
+                                    </tr>
+
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                    @*<div class="col-md-7">
+                        @Html.Raw(gridPage)
+                    </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@*<script type='text/javascript'>
+
+    function SearchPager(idx) {
+        $('#CurrentPage').val(idx);
+        $.post('@(Url.Action("Applypager", "Subscriptions"))', $("#form1").serialize(), function (data) {
+            $("#SubscriptionsList").html(data);
+        });
+    }
+</script>*@

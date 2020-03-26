@@ -1,0 +1,53 @@
+﻿@model StayBazar.Models.ReviewModel
+@{   
+    
+    StayBazar.Models.PropertyMostpopularModel b2 = new StayBazar.Models.PropertyMostpopularModel();     
+    b2.PropertypopularList = BLayer.PropertyMostpopular.GetProperty(Model.PropertyId);        
+    List<CLayer.Property> PropertypopularList = b2.PropertypopularList;
+}
+<div class="col-md-12">
+    <div id="most-popular" >
+        @if (PropertypopularList.Count > 0)
+        {
+            foreach (CLayer.Property most in PropertypopularList)
+            {
+                <Text>
+                <div style="width:300px">
+                    <div >
+                        <a href="~/Property/Index/@most.PropertyId">
+                            <img height="150" width="200" src="~/Files/Property/@most.PropertyId/@most.FileName" />                           
+                        </a>
+                    </div>
+                    <div class="tile_desc">
+                        <a href="~/Property/Index/@most.PropertyId">
+                            <span class="name">
+                                @{
+                string title = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 20);
+                @String.Format(title);
+                                }
+
+                                <br>
+                                <b>@most.Location, @most.City</b>
+                            </span>
+                        </a>
+                        <a href="~/Property/Index/@most.PropertyId" class="redtext">
+                            <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                        </a>
+                    </div>
+
+                </div>
+                </text>
+            }
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                                         Sorry! No data Found
+                                        </div>
+        }
+    </div>
+</div>
+
+
+
+

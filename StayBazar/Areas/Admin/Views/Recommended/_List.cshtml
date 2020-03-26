@@ -1,0 +1,65 @@
+﻿@using Microsoft.AspNet.Identity;
+@model List<CLayer.Recommended>
+@{
+    int roles = BLayer.User.GetRole(User.Identity.GetUserName());
+    Layout = null;
+    bool recFound = (Model.Count > 0);
+    bool admin = (roles == (int)CLayer.Role.Roles.Administrator);
+
+}
+
+@{
+    if (recFound)
+    {
+        <table class="table table-striped table-custom table-bordered">
+            <thead>
+                <tr>
+                    <td>Title</td>
+                    <td>Supplier</td>
+                    @*<td>Start Date</td>
+                        <td>End Date</td>*@
+                    <td>Amount</td>
+                    <td>Status</td>
+                    <td>Order</td>
+                    <td>Edit</td>
+                    @{ if (admin)
+                        {   <text>
+                    <td>Delete</td></text> }
+                    }
+                    @*<td>Updated By</td>*@
+                    <td>Updated Date</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (CLayer.Recommended item in Model)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Supplier</td>
+                        @*<td>@(item.StartDate.ToShortDateString())</td>
+                            <td>@(item.EndDate.ToShortDateString())</td>*@
+                        <td>@item.Amount</td>
+                        <td>@((CLayer.ObjectStatus.StatusType)item.Status)</td>
+                        <td>@item.Order</td>
+                        <td align="center"><a href="#" title="Edit" onclick="editRec(@item.PropertyId,@item.ManageFor)"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></td>
+                        @{ if (admin)
+                            {  <text>
+                <td align="center"><a href="#" title="Delete" onclick="delRec(@item.PropertyId,@item.ManageFor)"><span class="glyphicon glyphicon-remove red-color fa-2x"></span></a></td></text>}
+                        }
+
+
+                        @*<td>@item.UpdatedByUser</td>*@
+                        <td>@( (item.UpdatedDate == DateTime.MinValue) ? "" : item.UpdatedDate.ToShortDateString())</td>
+                    </tr>
+                            }
+            </tbody>
+        </table>
+
+                            }
+}
+
+@if (!recFound)
+{
+    <div class="row margin10px"></div>
+    <div class="alert alert-info">There are no recommended Projects</div>
+}

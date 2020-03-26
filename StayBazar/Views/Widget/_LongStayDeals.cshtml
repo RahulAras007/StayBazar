@@ -1,0 +1,96 @@
+﻿@{
+    int j = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_DEALSOFTHEDAYPROFILE_NO)));
+    StayBazar.Models.DealsOftheday b2 = new StayBazar.Models.DealsOftheday();
+    b2.PropertypopularList = BLayer.PropertyMostpopular.LongStayDels((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+    List<CLayer.Property> PropertypopularList12 = b2.PropertypopularList;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+}
+<div class=" row">
+    <div id="owl-demo2" class="owl-carousel owl-theme">
+        @if (PropertypopularList12.Count > 0)
+        {
+            foreach (CLayer.Property most in PropertypopularList12)
+            {
+                <text>
+                <div class="item">
+                    <div class="col-lg-4">
+                        <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                            @if (most.FileName == "")
+                            {
+                                <img src="~/@no_image" height="103" alt="noimage" />
+                            }
+                            else
+                            { <img height="103" src="@most.FileName" alt="@most.Title serviced apartment in  @most.Location @most.City" /> }
+                        </a>
+                    </div>
+                    <div class="col-lg-8 tile_desc whitebg  ">
+                        <div class="row height150">
+                            <div class="col-md-12">
+                                <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                                    <span class="name">
+                                        @{
+                string Offertitle1 = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 10);
+                            @String.Format(Offertitle1);
+
+                                        }
+                                    </span>
+                                    </a>
+                                    <div class="dealspr">
+                                        <span class="fa fa-rupee cxprice"></span><span class="cxcurele">@Math.Round(most.bookingitemsTotalAmount)</span>
+                                    </div>
+</div>
+                            <div class="col-md-12 ">
+                                <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                                    <span>
+                                        @*@{
+                                            string title = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 13);
+                                            @String.Format(title);
+                                                                }
+                                                                <br>*@
+                                        <b>@*@most.Location,*@ @most.City</b>
+                                    </span>
+                                </a>
+                                <div class="starbox">
+                                    @*@(Html.Raw(StayBazar.Common.Utils.GetStarRating(most.Rating)))*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </text>
+            }
+        }
+    </div>
+    <script type="text/javascript">
+
+
+
+        //$("#owl-demo2").owlCarousel({
+        //    navigation: true,
+        //    responsiveClass: true,
+        //    items: 4,
+        //    responsive: {
+        //        0: {
+        //            items: 2
+        //        },
+        //        450: {
+        //            items: 3
+        //        },
+        //        767: {
+        //            items: 4
+        //        },
+        //        991: {
+        //            items: 5
+        //        },
+        //        1199: {
+        //            items: 5
+        //        }
+        //    }
+        //});
+
+
+
+
+
+    </script>
+</div>

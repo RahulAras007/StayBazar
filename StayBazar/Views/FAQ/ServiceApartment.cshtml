@@ -1,0 +1,64 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Service Apt FAQs";
+    ViewBag.BreadCrumb = " <p style='margin-top: -29px; margin-left: 38px;'> > </p> <div id='breads' style='margin-top: -30px; margin-left: 50px;'> <div itemscope itemtype='http://data-vocabulary.org/Breadcrumb'> <a href=''  itemprop='url'  class=' whitetext breadhvr' > <span class=' whitetext breadhvr'  itemprop='title'>Service Apt FAQs</span></a>  </div> </div>";
+
+}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="redtext">Staybazar – Frequently Asked Questions (FAQs)</h3>
+            <h4>Service Apt Owners</h4>
+
+            <p class="darktxtc">1. I have one or more properties I would like to sign up with Staybazar. How I do I proceed?</p>
+            <p>
+                Please raise request for registration using                
+                @if (Request.IsAuthenticated)
+                {
+                    int uId = Convert.ToInt32(User.Identity.GetUserId());
+                    CLayer.User usr = BLayer.User.Get(uId);
+
+                    int userType = (int)CLayer.Role.Roles.Customer;
+                    if (usr != null)
+                    {
+                        userType = usr.UserTypeId;
+                    }
+                    if (userType == (int)CLayer.Role.Roles.Supplier || userType == (int)CLayer.Role.Roles.Administrator)
+                    {
+                        <a href="~/PropertyList/Index">List property</a>
+                    }
+                    else
+                    {
+                        <a href="~/Join/Supplier">List property</a>
+                    }
+                }
+                else
+                {
+                    <a href="~/Join/Supplier">List property</a>
+                }
+                  @*<a href="/Join/Supplier">List Property</a>*@                                
+                option.
+                You can see this as first link underService Apartment  Owners section in footer of web site. This will open a registration web page where you can fill in details and submit. This will go though review and approval process in Staybazar following which you should receive a confirmation whether you are accepted. If registration is approved, you will get  login id and password for your account.
+            </p>
+            <p class="darktxtc">2. I have received registration email with my Supplier account login. How do I use this?</p>
+            <p> Please click on Staybazar for business link to go to Staybazar for business page.  On this page click Login My Account button at top, select Supplier and enter your email id and password to login.</p>
+
+            <p class="darktxtc">3. What are features available for me as Service apartment owner/Supplier?</p>
+            <p>
+                The main features available:
+            </p><ul>
+                <li>Update your property information as needed. Please use “My Properties” under “My Account” menu option.</li>
+                <li>Manage accommodation inventory allocation and availability. This is an important feature, and you should review and update on regular basis. For this please go to your properties using  “My Properties” under “My Account” menu option. Then select the property , choose edit and go to accommodation tab, then  select inventory option</li>
+                <li>Add or modify accommodation details as needed.</li>
+            </ul>
+            <p></p>
+
+            <p class="darktxtc"> 4. I have multiple properties across multiple locations. How do I use and update information for all these?</p>
+            <p>Please note your account is a single consolidated account which can be used  to setup and manage all your properties in system.  Under  “My account” menu option at top  you will see  the option  “My Properties” which can be used to manage all your properties.  Your properties can be set up in multiple cities in India.</p>
+
+            <p class="darktxtc">5. Whom I do contact for any help or clarifications on registration or services ?</p>
+            <p>You can contact Staybazar by email at <a href="mailto:@(BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID))">@(BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID))</a>  or by phone.</p>
+
+        </div>
+    </div>
+</div>

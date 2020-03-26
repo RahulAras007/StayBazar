@@ -1,0 +1,144 @@
+﻿@model StayBazar.Areas.Admin.Models.SupplierPaymetListModel
+@{
+    Layout = null;
+    long supplierPaymentId = 0;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = StayBazar.Areas.Admin.Controllers.SupplierPaymetListController.PAGE_LIMIT;
+}
+
+@using Microsoft.AspNet.Identity;
+
+@if (Model.SupPayList != null)
+{
+    @*<div class="col-md-12">
+            <a href="~/Admin/SupplierInvoiceDetails/Index" id="btnAddNW" class="btn btn-success" tabindex="">Add New</a>
+        </div>*@
+
+    long usid = Convert.ToInt32(User.Identity.GetUserId());
+    //CLayer.Role.Roles usr = BLayer.User.GetRole(usid);
+    <div class="col-md-12">
+        @{
+            
+            using (Html.BeginForm("Pager1", "SupplierPaymetList", FormMethod.Post, new { @id = "frmPagers1" }))
+            {
+                <input type="hidden" id="srString" name="srString" value="@Model.searchText" />
+                <input type="hidden" id="srType" name="srType" value="@Model.searchType" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@Model.currentPage" />
+            }
+            
+        }
+        @if (Model != null && Model.SupPayList.Count > 0)
+        {
+            <text>@Html.Raw(gp.GetPager((int)Model.TotalRows, Model.currentPage))</text>
+        }
+        <div class="row" style="padding:0px 5px 0px 5px !important;font-weight:bold;">
+            <div class="col-md-2">Supplier Name</div>
+            <div class="col-md-1">Gross Amount</div>
+            <div class="col-md-1">TDS Amount</div>
+            <div class="col-md-1">Net Amount</div>
+            <div class="col-md-2">Supplier Email</div>
+            <div class="col-md-1">Date of payment</div>
+            <div class="col-md-1">Mode Of Payment</div>
+            <div class="col-md-1">Bank</div>
+            <div class="col-md-2">Edit / Voucher</div>
+        </div>
+    </div>
+    <div class="col-md-12">
+      
+
+                @if (Model.SupPayList.Count() > 0)
+                {
+                    List<CLayer.SupplierPaymetList> ss = new List<CLayer.SupplierPaymetList>();
+
+                    ss = Model.SupPayList.ToList<CLayer.SupplierPaymetList>();
+                    var data = ss.Select(i => new { i.SupplierPaymentId }).Where(i=>i.SupplierPaymentId >0).Distinct().ToList();  //, // i.Prop_Name,
+                    //   i.SupplierName, i.OfflineSupplierEmail, i.SupplierPayment, i.dtPayment, i.grossAmount, i.tdsAmount, i.netAmtPaid, i.modeofPayment, i.bank }).Distinct().ToList();
+                    <text><div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true"></text>
+                    foreach (var item in data)
+                    {
+                        var SubItemdt = Model.SupPayList.Where(r => r.SupplierPaymentId == item.SupplierPaymentId).ToList();
+                        supplierPaymentId = 0;
+                        foreach (var items in SubItemdt)
+                        {
+                            if (supplierPaymentId != items.SupplierPaymentId && supplierPaymentId != 0)
+                            {
+                                @Html.Raw(" </tbody> </table> </div> </div> </div>")
+
+                            }
+                            if (supplierPaymentId != items.SupplierPaymentId)
+                            {
+                                supplierPaymentId = items.SupplierPaymentId;
+                                <text>
+                               <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingOne">
+        @*<div class="panel-title">*@
+        <a role="button" data-toggle="collapse" style="color:black !important;" data-parent="#accordion" href="#collapse@(supplierPaymentId)" aria-expanded="true" aria-controls="collapseOne">
+            <div class="row">
+                <div class="col-md-2">@items.SupplierName</div>
+                <div class="col-md-1">@items.grossAmount</div>
+                <div class="col-md-1">@items.tdsAmount</div>
+                <div class="col-md-1">@items.netAmtPaid</div>
+                <div class="col-md-2" style="word-break:break-all">@items.OfflineSupplierEmail.ToLower()</div>
+                <div class="col-md-1">@items.dtPayment.ToShortDateString()</div>
+                <div class="col-md-1">@items.modeofPayment</div>
+                <div class="col-md-1">@items.bank</div>
+                <div class="col-md-2">
+                    <span>
+                    <a style="cursor:pointer; padding-left: 5px;" onclick="onClickEdit(@item.SupplierPaymentId)" title="Edit"><span class="glyphicon glyphicon-edit"></span></a> &nbsp;
+                    <a href="@Url.Action("ReportPdf", "SupplierPaymetList")?SupplierPaymentId=@item.SupplierPaymentId" title="Download PDF" style="padding-left: 5px;">
+                        <img src="~/Content/themes/icon images/pdf-icon-4.png" width="25" />
+                    </a>
+                    <a style="cursor:pointer; padding-left: 5px;" onclick="onClickDelete(@item.SupplierPaymentId)" title="Edit"><span class="glyphicon glyphicon-trash"></span></a> &nbsp;
+                        </span>
+                </div>
+            </div>
+        </a>
+        @*</div>*@
+    </div>
+                                   <div id="collapse@(supplierPaymentId)" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                                       <div class="panel-body">
+                                           <table class="table">
+                                               <thead>
+                                                   <tr>
+                                                       <td>Confirmation No</td>
+                                                       <td>Property</td>
+                                                       <td>Amount Paid</td>
+                                                       <td>Check-In</td>
+                                                       <td>Check-Out</td>
+                                                   </tr>
+                                               </thead>
+                                               <tbody>
+                               </text>      }
+                                   <text>
+                                       <tr>
+                                           <td>@items.OrderNo</td>
+                                           <td>@items.Prop_Name</td>
+                                           <td>@items.AmountPaid</td>
+                                           <td>@items.CheckIn_date.ToShortDateString()</td>
+                                           <td>@items.CheckOut_date.ToShortDateString()</td>
+                                       </tr>
+                                   </text>
+
+                        }
+                        if (supplierPaymentId != 0)
+                        { @Html.Raw(" </tbody> </table> </div> </div>  </div>  ");
+                        }
+                    }
+                               @Html.Raw("</div>")
+                }
+
+
+                               </div>
+
+
+}
+<script language="javascript" type="text/javascript">
+        $(function () {
+        $('.collapse').collapse();
+        });
+
+
+</script>
+                             

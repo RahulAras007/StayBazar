@@ -1,0 +1,139 @@
+﻿@model IEnumerable<CLayer.Testimonial>
+@{
+    ViewBag.Title = "Testimonials";
+    try
+    {
+        var grid = new WebGrid(Model, canSort: false, canPage: true, rowsPerPage: 10,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        var currentAction = "";
+        HtmlHelper htmlHelper = this.Html;
+        var routeData = htmlHelper.ViewContext.RouteData;
+        currentAction = routeData.GetRequiredString("Action").ToLower();
+        <text>
+            @*<div class="btn-toolbar">
+                    <div class="btn-group">
+                        @if (currentAction == "Index")
+                        {<span class="btn btn-info">Enabled</span><a href="/Admin/Testimonial/Inactive" class="btn btn-default">Disabled</a>}
+                        else
+                        {<a href="/Admin/Testimonial" class="btn btn-default">Enabled</a><span class="btn btn-info">Disabled</span>}
+                    </div>
+                    <div class="btn-group">
+                        <a href="/Admin/Testimonial/NewInactive" class="btn btn-info">Add New</a>
+                    </div>
+                </div>*@
+            <form id="frmIds" method="post">
+                <input id="data" name="data" type="hidden" value="" />
+                <input id="type" name="type" type="hidden" value="" />
+            </form>
+
+            <div class="page-title-container style3">
+                <div class="row">
+                <div class="col-md-8">
+                    <h2 style="color:white">@ViewBag.Title</h2>
+                </div>
+                <div class="col-md-2">
+                    @*Testimonials&nbsp;*@<a href="/Admin/Testimonial/NewInactive" class="btn btn-sm btn-success">Add New</a>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn-group" id="div-actions">
+                        @if (currentAction == "index")
+                        {
+                            <button id="btnDisable" data-action="disable" class="btn btn-sm btn-default" disabled>Disable</button>
+                        }
+                        else
+                        {
+                            <button id="btnEnable" data-action="enable" class="btn btn-sm btn-default" disabled>Enable</button>
+                        }
+                        <button id="btnDeleteAll" data-action="delete" class="btn btn-sm btn-danger" disabled>Delete</button>
+                    </div>
+                </div>
+            </div>
+</div>
+            @*<hr />*@
+<br />
+<br />
+    <div class="container-fluid">
+            <ul class="nav nav-tabs">
+                <li @if (currentAction == "index") { <text> class="active" </text>               }><a href="/Admin/Testimonial">Enabled</a></li>
+                <li @if (currentAction != "index") { <text> class="active" </text>               }><a href="/Admin/Testimonial/Inactive">Disabled</a></li>
+            </ul>
+            <div id="gridContent">
+                @grid.GetHtml(
+             tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered",
+        headerStyle: "header",
+        alternatingRowStyle: "alt",
+        selectedRowStyle: "select",
+        columns: grid.Columns(
+        grid.Column(header: "head", format: @<text><input type="checkbox" class="chk checkbox-inline" value="@item.TestimonialId" /></text>),
+        grid.Column("Name", "Name"),
+        grid.Column("Company", "Company"),
+        grid.Column("Title", "Title"),
+        grid.Column("Show In Widget", style: "gridcellstyle",format:@<text>@if (item.ShowInWidget)
+        {<text><span class="glyphicon glyphicon-check green-color fa-2x"></span></text>}</text>),
+        grid.Column("", style: "gridcellstyle",format: @<text><a href="/Admin/Testimonial/Edit/@item.TestimonialId" class="lnk btn" title="Edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>),
+        grid.Column("", format: @<text>
+                    @if (item.Status == (int)StayBazar.Areas.Admin.Models.TestimonialModel.StatusList.Enabled)
+                    {<text><a href="/Admin/Testimonial/Disable/@item.TestimonialId" class="lnk btn" title="Disable" onclick="return confirm('Are you sure you want to disable?')">disable</a></text>}
+                    else
+                    {<text><a href="/Admin/Testimonial/Enable/@item.TestimonialId" class="lnk btn" title="Enable" onclick="return confirm('Are you sure you want to enable?')">enable</a></text>}
+        </text>)))
+                </div>
+            </div>
+            <script type="text/javascript">
+                $(function () {
+                    $(".header th").each(function () {
+                        if ($(this).html().trim() == "head") {
+                            $(this).html("<input type='checkbox' id='chkAll' />");
+                        }
+                    });
+                    function checkchange() {
+                        var ids = "";
+                        var cnt = 0;
+                        var chkcnt = 0;
+                        $(".chk").each(function () {
+                            cnt += 1;
+                            if ($(this).is(":checked") == true) { ids += $(this).attr("value") + ","; chkcnt += 1; }
+                        });
+                        if (ids.length > 0) { ids = ids.substr(0, ids.length - 1); }
+                        if (ids == "") { $("#div-actions button").attr("disabled", "disabled"); }
+                        else { $("#data").val(ids); $("#div-actions button").removeAttr("disabled"); }
+                        if (cnt > 0 && chkcnt > 0) {
+                            if (cnt == chkcnt) { $("#chkAll").prop('checked', true); }
+                            else { $("#chkAll").prop('checked', false); }
+                        }
+                        else { $("#chkAll").prop('checked', false); }
+                    }
+                    $(".chk").change(function () { checkchange(); });
+                    $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+                    $(".webGrid tfoot tr td a").click(function () {
+                        $("#chkAll").prop('checked', false);
+                        $("#div-actions button").attr("disabled", "disabled");
+                        $(".chk").change(function () { checkchange(); });
+                        $("#chkAll").change(function () { $('.chk').prop('checked', this.checked); checkchange(); });
+                    });
+                    $("#div-actions button").click(function () {
+                        $("#type").val($(this).attr("data-action"));
+                        if (confirm("Are you sure you want to " + $("#type").val() + " the selectd items?")) {
+                            var url = '@Url.Action("ActionSet", "Testimonial")';
+                            $.post(url, $("#frmIds").serialize(),
+                                    function (data) {
+                                        window.location = location;
+                                    });
+                        }
+                    });
+                });
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}
+            <style>
+                .gridcellstyle {
+                    text-align: center;
+                }
+            </style>

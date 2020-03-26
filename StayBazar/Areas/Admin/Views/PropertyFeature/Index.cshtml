@@ -1,0 +1,84 @@
+﻿@model IEnumerable<CLayer.PropertyFeature>
+@{
+    ViewBag.Title = "Property Feature";
+    try
+    {
+        var grid = new WebGrid(Model, defaultSort: "Title", canPage: true, rowsPerPage: 30,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Areas.Admin.Models.PropertyFeatureModel data = (StayBazar.Areas.Admin.Models.PropertyFeatureModel)ViewBag.PropertyFeature;
+        <text>
+            <div id="bodycontent">
+                <div id="divedit">
+                    @{
+        Html.RenderPartial("~/Areas/Admin/Views/PropertyFeature/_Edit.cshtml", data, ViewData);
+                    }
+                </div>
+                
+                <div class="col-md-12">
+
+                    <a id="tilt" href="~/Admin/PropertyFeature/Delete/"></a>
+                </div>
+
+                         @if (Model.Count() > 0)
+                          {
+                    <div id="gridContent">
+                        <div class="container-fluid">
+                        @grid.GetHtml(
+              tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered",
+            headerStyle: "header",
+            alternatingRowStyle: "alt",
+            selectedRowStyle: "select",
+                columns: grid.Columns(grid.Column("Title", "Title"),
+                    grid.Column("Show in search", format: @<text>@if (item.Showfeatures)
+                   {<text>&#10004;</text>}
+                   else
+                   {<text></text>}</text>, style: "btnclm"),
+                   //grid.Column("IsShow", "isshow"),
+                  grid.Column("Icon",format:@<text><span id="@item.Style" class="feat-icon nobdr height40 @item.Style"><label style="display:inline;"></label></span></text>),              
+                  grid.Column("Edit", format: @<text><a href="#" title="Edit" onclick="EditBT(@item.PropertyFeatureId)"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>, style: "btnclm"),
+grid.Column("Delete", format: (item) =>
+{
+    if (item.CanDelete)
+    {
+        return Html.Raw("<a title='Delete' class='lnk' href=\"" + item.PropertyFeatureId + "\" onclick=\"return confirm('Are you sure you want to delete?')\"><span class='glyphicon glyphicon-trash red-color fa-2x'></span></a>");
+    }
+    else
+    {
+        return Html.Raw("<a title='Delete' href=\"#\" onclick=\"alert('Cannot delete, already in use.')\"><span class='glyphicon glyphicon-trash red-color fa-2x'></span></a>");
+    }
+}, style: "btnclm")
+))
+                    </div>
+                    </div>
+                             }
+                         else
+                         {
+                            <div class="bottom">&nbsp;</div>
+                            <div class="alert alert-info">is Empty</div>
+                         }
+            </div>
+            <script type="text/javascript">
+                function EditBT(id) {
+                    $.get("PropertyFeature/Edit?id=" + id, function (data) {
+                        $("#divedit").html(data);
+                    });
+                }
+                $(function () {
+                    var root = $("#tilt").attr("href");
+                    $(".lnk").each(function () {
+                        var href = root + $(this).attr("href");
+                        $(this).attr("href", href);
+                    });
+                });
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}
+
+

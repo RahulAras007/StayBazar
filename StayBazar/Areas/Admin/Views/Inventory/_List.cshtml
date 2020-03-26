@@ -1,0 +1,86 @@
+﻿@model StayBazar.Areas.Admin.Models.InventoryModel
+@{
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    Layout = null;
+}
+<div class="col-lg-12">
+    @{
+        StayBazar.Areas.Admin.Models.InventoryModel filterform = (StayBazar.Areas.Admin.Models.InventoryModel)ViewBag.Filter;
+        using (Html.BeginForm("Pager", "Inventory", FormMethod.Post, new { @id = "frmPagers" }))
+        {
+             <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.AccommodationId" />
+            <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+            <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+        }
+        gp.RowsInAPage = filterform.Limit;
+    }
+    @if (Model != null && Model.InventoryList.Count() > 0)
+    {
+        @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+    }
+    <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+        <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Edit</th>
+                <th>Delete</th>
+                      
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.InventoryList.Count() > 0)
+            {
+                foreach (CLayer.Inventory usr in Model.InventoryList)
+                {
+                    <tr>
+                        <td>@usr.Quantity</td>
+                        <td>@usr.FromDate.ToString("dd/MMMM")</td>
+                        <td>@usr.ToDate.ToString("dd/MMMM")</td>   
+                        <td><a href="#" title="Edit" onclick="EditBT(@usr.InventoryId)"><span class="glyphicon glyphicon-edit"></span></a></td>                                   
+                        @*<td><a href="~/Admin/Inventory/Delete/@usr.InventoryId,@usr.AccommodationId"><span class="glyphicon glyphicon-remove"></span></a></td>*@
+                        <td><a href="#" title="Delete" onclick="DeleteBTN(@usr.InventoryId,@usr.AccommodationId)"><span class="glyphicon glyphicon-remove"></span></a></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    @if (Model != null && Model.InventoryList.Count() > 0)
+    {
+        @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+    }
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+       // alert('here is it ' + num);
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager","Inventory")';
+        $.post(url, $("#frmPagers").serialize(),
+                function (data) {
+                    $("#list").html(data);
+                });
+    }
+</script>
+<script type="text/javascript">
+    function EditBT(id) {
+
+      //  alert("hai" + id);
+        var url = '@Url.Action("Details", "Inventory", new { area = "Admin" })';
+        $.post(url, { InventoryId: id}, function (data) {     
+            $("#Detailsone").html(data);
+        });
+    }
+
+    function DeleteBTN(InventoryId,AccommodationId) {
+   //     alert("Value=");
+        var url = '@Url.Action("Delete", "Inventory", new { area = "Admin" })';
+        $.post(url, { InventoryId:InventoryId,AccommodationId: AccommodationId },function (data) {
+            $("#list").html(data);
+        });
+       
+    }
+</script>

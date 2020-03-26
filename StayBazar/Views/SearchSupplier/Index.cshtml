@@ -1,0 +1,57 @@
+﻿@model StayBazar.Models.SearchSupplierModel
+@{
+    ViewBag.Title = "Search";
+}
+<div class="container bdy_min_height">
+    <script type="text/javascript">
+        $(function () { validateRq(); });
+    </script>
+    <div class="row top_space_10">
+
+        <h2>
+            &nbsp; <a href="~/SupplierList" class="btn btn-sm btn-default" title="back to list"><span class="glyphicon glyphicon-arrow-left"></span></a>
+            <a href="~/SupplierList"  title="back to list">My Supplier</a>/<a href="~/SearchSupplier" title="back to search all">@ViewBag.Title</a>
+</h2>      
+       
+        @*<div class="col-md-1"><div class="height_adjust"></div><a href="/SearchSupplier" title="Add New" class="create_new">Add New</a></div>*@
+    </div>
+    <div class="row"><hr /></div>
+    <div class="row">
+        <div class="col-md-6">
+            @using (Html.BeginForm("GetSupplierList", "SearchSupplier", FormMethod.Post, new { id = "Search" }))
+            {
+
+                <div class="input-group ">
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default" id="btnSearch">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </span>
+                </div>
+                @Html.HiddenFor(m => m.SearchString)
+                @Html.HiddenFor(m => m.CurrentPage)
+
+            }
+
+        </div>
+    </div>
+    @if (Model.SearchList.Count <= StayBazar.Controllers.SearchSupplierController.PAGELIMIT)
+    {
+        <div class="height10"></div>
+    }
+    <div id="list" class="row">
+        @Html.Partial("Details", Model);
+    </div>
+</div>
+<script type="text/javascript">
+    function showPager(num) {
+        //alert('here is it ' + num);
+        $("#CurrentPage").val(num);
+        var url = '@Url.Action("Pager", "SearchSupplier")';
+        $.post(url, $("#Search").serialize(),
+                function (data) {
+                    $("#list").html(data);
+                });
+    }
+</script>

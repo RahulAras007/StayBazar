@@ -1,0 +1,44 @@
+﻿@model long
+@{
+    List<CLayer.Property> properties = BLayer.Property.GetAll(Model);
+
+}
+@*create_new margin-bot-10*@
+<a href="/Admin/Property?id=-@Model" title="Add New" id="AddnewPro" class="btn btn-success">Add New</a>
+<table border="0" class="table table-condensed table-responsive table-custom table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Accommodations</th>
+            <th>Edit</th>
+            <th align="center">Remove</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (properties != null)
+        {
+            foreach (CLayer.Property pr in properties)
+            {
+                <tr>
+                    <td>@pr.Title</td>
+                    <td>@pr.Location</td>
+                    <td>@pr.Status</td>
+                    <td>@pr.NoOfAccommodations</td>
+                    <td align="center"><a href="/Admin/Property/Index/@pr.PropertyId" title="Edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></td>
+                    <td align="center"><a class="showhand" onclick="propdelete(@pr.PropertyId,@Model)" title="Delete"><span class="glyphicon glyphicon-trash red-color fa-2x"></span> </a> </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<script type="text/javascript">
+            function propdelete(pid,sid)
+            {
+                if(confirm("Are you sure, you want to delete?"))
+                {
+                    window.location = "@Url.Action("Delete","Property")?id=" + pid + "&sid=" + sid;
+                }
+            }
+</script>

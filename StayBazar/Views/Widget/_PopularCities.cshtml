@@ -1,0 +1,32 @@
+﻿@{
+    StayBazar.Areas.Admin.Models.StaticPageModel newly1 = new StayBazar.Areas.Admin.Models.StaticPageModel();
+    newly1.StaticPropertyList = BLayer.StaticPage.GetAllWidget();
+    List<CLayer.StaticPage> StaticPropertyList = newly1.StaticPropertyList;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+    bool comma = false;
+}
+   <div class="row">
+       <div class="col-md-10 ftrctyele">
+          
+           @if (StaticPropertyList.Count > 0)
+           {
+            <text>Popular Destinations</text>
+               foreach (CLayer.StaticPage stc in StaticPropertyList)
+               {
+                   string title = StayBazar.Common.Utils.ConvertShortLengthString(@stc.City, 20);
+                   <text>
+           @if (comma)
+           {
+               <text> | </text>
+           }
+           else
+           {
+               comma = true;
+           }
+           <a href="~/@stc.RootFolder.ToLower()">@title</a>
+                   </text>
+                    
+               }
+           }
+       </div>
+    </div>

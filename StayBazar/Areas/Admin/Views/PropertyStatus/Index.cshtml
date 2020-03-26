@@ -1,0 +1,98 @@
+﻿@model StayBazar.Areas.Admin.Models.UserSearchModel
+@{
+    ViewBag.Title = "Properties";
+}
+
+<div class="page-title-container style3">
+   @* <div class="container">*@
+        
+            <div class="row">
+                <div class="col-md-2">
+                    <h2 style="color:white">@ViewBag.Title</h2>
+                </div>
+
+                @using (Html.BeginForm("Filter", "PropertyStatus", FormMethod.Post, new { @id = "frmFilters", onsubmit = "return false;" }))
+                {
+
+                    <div class="col-md-2">
+                        @Html.DropDownListFor(m => m.PropertyStatus, Model.PropertyStatusTypes, new { @tabindex = "1", @class = "form-control" })
+                    </div>
+                    <div class="col-md-1">
+                        @Html.DropDownListFor(m => m.InventoryAPIType, Model.InventoryAPITypes, new { @tabindex = "1", @class = "form-control" })
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                            <span class="input-group-btn">
+                                <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-control">
+                            @foreach (StayBazar.Areas.Admin.Models.UserSearchModel.PropertyValue ruv in (StayBazar.Areas.Admin.Models.UserSearchModel.PropertyValue[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.UserSearchModel.PropertyValue)))
+                            {
+                                <input type="radio" name="ruv" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text> } />
+                                <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                                <text>&nbsp;&nbsp;</text>
+                            }
+                        </div>
+                        @Html.CheckBoxFor(m => m.Statusfor)  Property with accommodation disabled
+                    </div>
+               
+                @Html.HiddenFor(m => m.SearchValue)
+            }
+                @*<hr />*@
+        </div>
+        
+    </div>
+@*</div>*@
+<div class="container-fluid">
+    <div id="list" class="row">
+        @{
+            Html.RenderPartial("~/Areas/Admin/Views/PropertyStatus/_List.cshtml", Model.userlist);
+        }
+    </div>
+</div>
+
+
+    <script type="text/javascript">
+    @*function Getprtsaccom() {
+        var Statusfor = $("#Statusfor").val();
+        $.post('@Url.Action("Index", "PropertyStatus", new { area = "Admin" })', { Statusfor: Statusfor }, function (data) {
+            $("#rec_list").html(data);
+        });
+    }*@
+    $(function () {
+
+        $('#InventoryAPIType option[value="3"]').attr("selected", "selected");
+
+        $("#PropertyStatus").change(function () {
+            var url = '@Url.Action("Filter", "PropertyStatus")';
+            $.post(url, $("#frmFilters").serialize(),
+                    function (data) {
+                        $("#list").html(data);
+                    });
+        });
+    });
+    $(function () {
+        $("#SearchValue").val("1");
+        $(".css-radiobutton").change(function () {
+            $("#SearchValue").val("1");
+            $(".css-radiobutton").each(function () {
+                if (this.checked) {
+                    $("#SearchValue").val($(this).attr("id"));
+                }
+            });
+        });
+        $("#btnSearch").click(function () {
+            var url = '@Url.Action("Filter", "PropertyStatus")';
+            $.post(url, $("#frmFilters").serialize(),
+                    function (data) {
+                        $("#list").html(data);
+                    });
+        });
+    });
+    </script>

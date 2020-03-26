@@ -1,0 +1,113 @@
+﻿@model StayBazar.Areas.Admin.Models.offersearch
+@{
+    ViewBag.Title = "Offers";
+}
+
+
+<div class="page-title-container style3">
+    <div class="row">
+        @using (Html.BeginForm("Filter", "OfferList", FormMethod.Post, new { @id = "frmFiltersOfferList", onsubmit = "return false;" }))
+        {
+            <div class="col-md-2">
+                <br />
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+
+
+            @*<h2>@ViewBag.Title</h2>*@
+            @*<div class="row">*@
+           
+
+                @*<div class="col-md-11">*@
+                    
+                        @*<div class="row">*@
+            
+                        <div class="col-md-3"><br />
+                            <div class="form-control">
+                                @foreach (StayBazar.Areas.Admin.Models.offersearch.OfferCategory ruv in (StayBazar.Areas.Admin.Models.offersearch.OfferCategory[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.offersearch.OfferCategory)))
+                                {
+                                    <input type="radio" name="ruv" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text> } />
+                                    <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                                    <text>&nbsp;&nbsp;</text>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <b>Title</b>
+                            <div class="input-group">
+                                @*@Html.DisplayNameFor(m=>m.SearchValue)*@
+                                @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                                <span class="input-group-btn">
+                                    <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                        <span class="glyphicon glyphicon-search green-color"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <br />
+                            <div class="btn-group">
+                                <a href="/Admin/Offer/Index" class="btn btn-success">Add New</a>
+                            </div>
+                        </div>
+            
+                @*</div>*@
+           
+
+            @Html.HiddenFor(m => m.SearchValue)
+        }
+    </div>
+</div>
+            <hr />
+<div class="container-fluid">
+            <div id="gridList">
+                @{
+                    //StayBazar.Areas.Admin.Models.offersearch a=new StayBazar.Areas.Admin.Models.offersearch();
+                    Html.RenderPartial("~/Areas/Admin/Views/offerList/_List.cshtml", Model.offerlist);
+                }
+            </div>
+       
+        </div>
+        <script type="text/javascript">
+      $(function () {
+          $("#SearchValue").val("1");
+          $(".css-radiobuttonOfferlist").change(function () {
+              $("#SearchValue").val("1");
+              $(".css-radiobuttonOfferlist").each(function () {
+                  if (this.checked) {
+                      $("#SearchValue").val($(this).attr("id"));
+                     // alert($(this).attr("id"));
+                  }
+              });
+          });
+          $("#btnSearch").click(function () {
+              var url = '@Url.Action("Filter", "OfferList")';
+              $.post(url, $("#frmFiltersOfferList").serialize(), function (data) {
+                  $("#gridList").html(data);
+              });
+          });
+      });
+
+      function FillOfferCategory(id) {
+
+          var url = '@Url.Action( "OfferByStatus","OfferList",new { area = "Admin" })';
+          $.post(url, { SearchValue: id }, function (data) {
+              $("#gridList").html(data);
+              $("#SearchValue").val(id);
+          })
+      }
+        function EditStatusBT(id, Statusid) {
+            $.post('@Url.Action("StatusEdit", "OfferList",new { area="Admin" })', { OfferId: id, Status: Statusid }, function (data) {
+                var itemname = "#status" + data;
+                if ($(itemname).html() == "Active") {
+                    $(itemname).html("Disabled");
+                    $(itemname).removeClass("status1").addClass("status2");
+                }
+                else {
+                    $(itemname).html("Active");
+                    $(itemname).removeClass("status2").addClass("status1");
+                }
+            });
+        }
+
+        </script>

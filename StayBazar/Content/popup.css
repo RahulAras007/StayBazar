@@ -1,0 +1,21 @@
+﻿body {
+}
+.tophd{
+    background:#086aa6;
+    height:60px;
+    color:white;
+    font-size:26px;
+}
+.tophd .titlebar{
+    padding:10px;
+}
+.lnkbtn a,.lnkbtn a:link,.lnkbtn{
+    text-decoration:none;
+    height:40px;
+    padding-top:20px;
+    font-size:16px;
+    color:#ffd800 !important;
+}
+.wraparound{
+    padding:10px;
+}

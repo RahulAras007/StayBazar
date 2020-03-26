@@ -1,0 +1,23 @@
+﻿@model CLayer.OfflineBooking
+@{
+    Layout = null;
+}
+
+@if (Model != null)
+{
+    long IsGST = BLayer.OfflineBooking.GetOfflinebookingIsGST(Model.OfflineBookingId);
+
+    if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.Normal)
+    {
+        @Html.Partial("ServiceTaxAutoInvoice", Model);
+    }
+    else
+    {
+        @Html.Partial("GSTAutoInvoice", Model);
+    }
+}
+else
+{
+    <div>Booking not found</div>
+}
+

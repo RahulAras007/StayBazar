@@ -1,0 +1,41 @@
+﻿@model StayBazar.Areas.Admin.Models.GrossMarrginReportModel
+@{
+    ViewBag.Title = "Gross Margin Report";
+   // Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+}
+@*<h2>@ViewBag.Title</h2>*@
+<div id="content">
+    <div class="page-title-container style3">
+        @*Roles&nbsp;*@
+
+        <div class="row">
+            <div class="col-md-3">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+            @*</div>*@
+            @*</div>
+        </div>*@
+            @*<div class="row" id="Filter">*@
+            <div class="col-md-9">
+                <div class="margin10px" id="Details">
+                    @Html.Partial("_Filter", Model)
+                </div>
+            </div>
+        </div>
+        </div>
+    <br />
+    <br />
+    @*<div class="col-md-12">*@
+        <div class="row" id="SupplierPayment">
+            <div class="col-md-12">
+                <div class="margin10px" id="GrossMarrginList">
+                    @Html.Partial("_Report", Model.GrossMarrginReportList)
+                </div>
+            </div>
+        </div>
+            @*</div>*@
+        </div>
+        <script type="text/javascript">
+            $(".container").removeClass("container").addClass("container-fluid");
+
+        </script>

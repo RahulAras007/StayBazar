@@ -1,0 +1,53 @@
+﻿@model  List<CLayer.PropertyDetailsReport>
+@using System.Data;
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    StayBazar.Areas.Admin.Models.PropertyDetailsReportModel data = new StayBazar.Areas.Admin.Models.PropertyDetailsReportModel();
+
+
+    string SearchString = "";
+    int SearchValue = 0;
+    
+    if (ViewBag.SearchString != null)
+    {
+         SearchString = ViewBag.SearchString;
+    }
+    if (ViewBag.SearchValue != null)
+    {
+         SearchValue = ViewBag.SearchValue;
+    }
+
+    data.propertyDetails = BLayer.Report.PropertyDetailsReport(SearchString,SearchValue);
+}
+<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" />
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="PropertyDetailsReport">
+        <ss:Table>
+            <ss:Row ss:Styleid="1">
+                @foreach (DataColumn col in data.propertyDetails.Columns)
+                {
+                    <ss:Cell><ss:Data ss:Type="String">@col.Caption</ss:Data></ss:Cell>
+                }
+            </ss:Row>
+            @foreach (DataRow row in data.propertyDetails.Rows)
+            {
+                <ss:Row>
+                    @foreach (var cell in row.ItemArray)
+                    {
+                        <ss:Cell><ss:Data ss:Type="String">@cell.ToString()</ss:Data></ss:Cell>
+                    }
+                </ss:Row>
+            }
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>
+

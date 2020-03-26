@@ -1,0 +1,29 @@
+﻿@model StayBazar.Areas.Admin.Models.RateCommissionModel
+@{
+    Layout = null;
+    Layout = null;
+
+    CLayer.Discount std = BLayer.Discount.GetStdDiscount(Model.ComPropertyId);
+    if (std == null) { std = new CLayer.Discount(); }
+}
+<table class="table">
+    <thead>
+        <tr><th width="80">Markup Details</th><th>Short Term (%)</th><th>Long Term (%)</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>B2C</td>
+            <td>@Html.TextBoxFor(m => m.B2CShortTerm, new { @class = "form-control input-sm", @readonly = "true" })</td> @*  ,@readonly="true" *@
+            <td>@Html.TextBoxFor(m => m.B2CLongTerm, new { @class = "form-control input-sm", @readonly = "true" })</td>
+        </tr>
+        <tr>
+            <td>B2B</td>
+            <td>@Html.TextBoxFor(m => m.B2BShortTerm, new { @class = "form-control input-sm", @readonly = "true" })</td>
+            <td>@Html.TextBoxFor(m => m.B2BLongTerm, new { @class = "form-control input-sm", @readonly = "true" })
+            @Html.Hidden("BaseShortDisRate", std.ShortTermRate, new { id = "BaseShortDisRate" })
+            @Html.Hidden("BaseLongTermDisRate", std.LongTermRate, new { id = "BaseLongTermDisRate" })
+            </td>
+        </tr>
+    </tbody>
+
+</table>

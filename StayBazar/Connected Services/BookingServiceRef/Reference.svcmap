@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="58bf4871-f49f-4407-8e37-8f58a1137683" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?wsdl " Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="BookingService.xsd" MetadataType="Schema" ID="d3eead6f-f741-41bf-bb6f-e00c5d005f81" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?xsd=xsd1" />
+    <MetadataFile FileName="BookingService1.xsd" MetadataType="Schema" ID="a2902cf6-b15f-4fa8-9479-ce534c2ad3a3" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?xsd=xsd0" />
+    <MetadataFile FileName="BookingService2.xsd" MetadataType="Schema" ID="dbd3fd8d-c57b-43ce-a0fc-68cd731f0535" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?xsd=xsd2" />
+    <MetadataFile FileName="BookingService.wsdl" MetadataType="Wsdl" ID="001f9ef3-c35f-48ea-b5f8-3e56d0d96f7f" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?wsdl" />
+    <MetadataFile FileName="BookingService1.wsdl" MetadataType="Wsdl" ID="7a39670a-3e51-4ec9-bfed-e60b3119ad71" SourceId="1" SourceUrl="https://stagingxml.tamarindtours.in/Version1.0/BookingService.svc?wsdl=wsdl0" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

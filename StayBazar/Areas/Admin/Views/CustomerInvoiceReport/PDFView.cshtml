@@ -1,0 +1,98 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    long i = 0;
+    long total = 0;
+    Decimal tt = 0;
+    Layout = null;
+
+}
+
+<div class="row" style="padding-left: 4%;">
+    <h2 class="bold">
+        Customer Invoice Report
+    </h2>
+</div>
+<div class="col-md-12 margin-top-10">
+    <div class="col-md-12">
+        <table border="0" class="table table-condensed table-responsive table-custom">
+            <thead>
+                <tr>
+                    <th>Sl No</th>
+                    <th>Invoice NO</th>
+                    <th> Date</th>
+                    <th style="width: 210px;">Customer Details</th>
+                    <th>Property Details</th>
+                    <th>Tax</th>
+                    <th>SBC & KKC</th>
+                    <th>Total Invoice Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (CLayer.OfflineBooking pr in Model)
+                {
+
+                    i = i + 1;
+                    if (@pr.NoOfNight > 0)
+                    {
+                        total = @pr.NoOfRooms * @pr.NoOfNight;
+                    }
+                    else
+                    {
+                        total = @pr.NoOfRooms;
+                    }
+                    tt = @pr.AvgDailyRateBefreStaxForSalePrice * total;
+
+
+                    <tr>
+                        <td> @i</td>
+
+                        <td>@pr.InvoiceNumber</td>
+
+                        <td>
+                            Invoice Date:@pr.InvoiceDate.ToShortDateString()
+                            <br />
+                            Check in Date:@pr.CheckIn_date.ToShortDateString()
+                            <br />
+                            Check out Date:@pr.CheckOut_date.ToShortDateString()
+
+                        </td>
+
+                        <td>
+                            Customer : @pr.FirstName
+                            <br />
+                            City: @pr.City
+                            <br />
+                            Guest Name :@pr.Guestname
+                        </td>
+                        <td>
+                            Property name :<br />@pr.PropertyName
+                            <br />
+                            No of Room : @pr.NoOfRooms
+                            <br />
+                            No of Night :@pr.NoOfNight
+                        </td>
+                        <td>
+                            Value before service tax : @pr.AvgDailyRateBefreStaxForSalePrice
+                            <br />
+                            Service Tax (base value) : @pr.AvgDailyRateBefreStaxForBuyPrice
+
+                        </td>
+
+                        <td>
+                            SBC :@pr.Swatchbharath %
+                            <br />
+                            KKC :@pr.KrishiKalyan %
+                            </td>
+
+                        <td style="text-align:right;">
+                            @tt
+                        </td>
+
+
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>

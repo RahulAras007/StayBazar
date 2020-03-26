@@ -1,0 +1,69 @@
+﻿@model StayBazar.Areas.Admin.Models.HSNCodeModel
+@{
+    ViewBag.Title = "HSN codes / Nature of services";
+    try
+    {
+        List<CLayer.HSNCode> data = BLayer.HSNCode.GetAll();
+        var grid = new WebGrid(data, defaultSort: "NatureOfService", canPage: true, rowsPerPage: 25,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Areas.Admin.Models.AccommodationTypeModel roomtype = (StayBazar.Areas.Admin.Models.AccommodationTypeModel)ViewBag.AccommodationType;
+        <text>
+            <div id="bodycontent">
+                <div id="divEdit">
+                    @Html.Partial("~/Areas/Admin/Views/HSNCode/_Edit.cshtml", Model)
+                </div>
+                <div class="container-fluid">
+                    @if (data.Count > 0)
+                    {
+                        <div id="gridContent">
+                            @grid.GetHtml(
+                        tableStyle: "webGrid table table-striped table-hover table-condensed table-custom table-bordered ",
+                headerStyle: "header",
+                alternatingRowStyle: "alt",
+                selectedRowStyle: "select",
+                columns: grid.Columns(grid.Column("NatureOfService", "Nature of service"), grid.Column("Code", "HSN Code"),
+                grid.Column("Edit", style: "gridcellstyle",format: @<text><a href="#" onclick="Edit(@item.CodeId)" title="Edit"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>),
+                 grid.Column("Delete", style: "gridcellstyle",format: (item) =>
+                 {
+            //if (item.CanDelete)
+            //{
+            return Html.Raw("<a title='Delete' class='lnk' href='/Admin/HSNCode/Delete?id=" + item.CodeId + "' onclick=\"return confirm('Are you sure you want to delete?')\"><span class='glyphicon glyphicon-remove red-color fa-2x'></span></a>");
+            //}
+            //else
+            //{
+            //    return Html.Raw("<a title='Delete' href=\"#\" onclick=\"alert('Cannot delete, already in use.')\"><span class='glyphicon glyphicon-remove red-color fa-2x'></span></a>");
+            //}
+})
+                 ))
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="bottom">&nbsp;</div>
+                        <div class="alert alert-info">is Empty</div>
+                    }
+                </div>
+            </div>
+            <script type="text/javascript">
+                function Edit(id) {
+                    $.get("/Admin/HSNCode/Edit?id=" + id, function (data) {
+                        $("#divEdit").html(data);
+                    });
+                }
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}
+
+<style>
+    .gridcellstyle {
+        text-align: center;
+    }
+</style>
+

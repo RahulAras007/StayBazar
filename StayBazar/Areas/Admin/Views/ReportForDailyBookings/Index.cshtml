@@ -1,0 +1,38 @@
+﻿@model StayBazar.Areas.Admin.Models.ReportForDailyBookingModel
+@{
+    ViewBag.Title = " Daily Booking Report";
+    //Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+}
+@*<h2>@ViewBag.Title</h2>*@
+<div class="page-title-container style3">
+    @*Roles&nbsp;*@
+
+    <div class="row">
+        <div class="col-md-6">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+
+        @*<div id="content">*@
+        @*<div class="row" id="Filter1">*@
+            <div class="col-md-6">
+                <div class="row margin10px" id="DetailsBooking">
+                    @Html.Partial("_Filtter", Model)
+                </div>
+            </div>
+        </div>
+    @*</div>*@
+</div>
+<br />
+<br />
+<div class="container-fluid">
+    <div class="row" id="DailyBooking">
+        @if (Model != null)
+        {
+            @Html.Partial("_Report", Model.ReportForDailyBookingList)
+        }
+    </div>
+</div>
+@*</div>*@
+<script type="text/javascript">
+    $(".container").removeClass("container").addClass("container-fluid");
+</script>

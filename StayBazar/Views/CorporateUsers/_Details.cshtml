@@ -1,0 +1,455 @@
+﻿@model StayBazar.Models.CorporateUserModel
+
+@{
+    Layout = null;
+}
+<style>
+    #errmsg {
+        color: red;
+    }
+</style>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.js" type="text/javascript"></script>
+<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">User Details</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#cudetails" data-toggle="tab" role="tab">General</a></li>
+                    <li id="list_AddHotels"><a href="#cutransactions" data-toggle="tab" role="tab">Details</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="cudetails">
+                        @using (Html.BeginForm("SaveDetails", "CorporateUsers", FormMethod.Post, new { role = "form", id = "cuserform", name = "cuserform" }))
+                        {
+                            @*@Html.AntiForgeryToken()*@
+                            @Html.ValidationSummary(true)
+                            @Html.HiddenFor(m => m.UserTypeId)
+                            @Html.HiddenFor(m => m.B2BApproverID)
+
+                            <div class=" row">
+                                @*<div class=" col-lg-12">*@
+                                <div class="form-group  col-lg-3">
+                                    @Html.LabelFor(m => m.Salutations)
+                                    @Html.DropDownListFor(m => m.SalutationId, Model.Salutations, new { @class = "form-control" })
+                                    @Html.HiddenFor(m => m.UserId, new { id = "hiddenUserID" })
+                                    @Html.HiddenFor(m => m.AddressId)
+                                </div>
+                                <div class="form-group  col-lg-5">
+                                    @Html.LabelFor(m => m.FirstName) <span style="color:red">*</span>
+                                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.FirstName)
+                                </div>
+                                <div class="form-group  col-lg-4">
+                                    @Html.LabelFor(m => m.LastName)@*<span style="color:red">*</span>*@
+                                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+                                </div>
+                                @*</div>*@
+                            </div>
+
+                            <div class=" row">
+
+                                <div class=" col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.Email)<span style="color:red">*</span>
+                                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", autocomplete = "new-password" })
+                                        @Html.ValidationMessageFor(m => m.Email)
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.Password)
+                                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", autocomplete = "new-password" })
+                                        @Html.ValidationMessageFor(m => m.Password)
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.Mobile)@*<span style="color:red">*</span>*@
+                                        @Html.TextBoxFor(m => m.Mobile, new { @class = "form-control", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
+                                        @Html.ValidationMessageFor(m => m.Mobile)
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.StatusId, "Status")<span style="color:red">*</span>
+                                        @Html.DropDownListFor(m => m.StatusId, Model.Status, new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.MaximumDailyEntitlement)<span style="color:red">*</span>
+                                        @Html.TextBoxFor(m => m.MaximumDailyEntitlement, new { @class = "form-control", id = "txtMaximumDailyEntitlement" })<span id="errmsg"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.GradeID)<span style="color:red">*</span>
+                                        @Html.DropDownListFor(m => m.GradeID, Model.EGradeList, "Select", new { @class = "form-control input-sm" })
+                                    </div>
+                                </div>
+
+                                <div class=" col-md-6">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                                        @Html.TextAreaFor(m => m.Address, new { @class = "form-control", @style = "resize: vertical;" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+                                        @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "4", @class = "form-control input-sm" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.State)<span style="color:red">*</span>
+                                        @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "5", @class = "form-control input-sm" })
+                                        @Html.ValidationMessageFor(m => m.State)
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CityId)<span style="color:red">*</span>
+                                        <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                                        @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "6", @class = "form-control input-sm" })
+                                        <div id="other_city" style="display:none;">
+                                            @Html.TextBoxFor(m => m.City, new { @tabindex = "6", @class = "form-control input-sm" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.CostCentre)<span style="color:red">*</span>
+                                        @Html.DropDownListFor(m => m.CostCentre, Model.ECostCentreList, "Select", new { @class = "form-control input-sm" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 tblDiv">
+                                    <table id="tblAprovalOrderApproverList" class="table" cellpadding="0" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Approver</th>
+                                                <th class="text-center"><span id="thApprovalOrder" hidden>Approval Order</span>&nbsp;</th>
+                                                <th>&nbsp;</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableGridAppr"></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td class="col-md-4">
+                                                    <h3>Choose Approver</h3>
+                                                    @Html.DropDownListFor(m => m.ApproverID, Model.AprovalOrderApproverList, "Select Approver Name", new { @id = "ddlApprover", @class = "form-control fname" })
+                                                    <label style="color:red;font-family:'Times New Roman', Times, serif;font-weight:normal;" id="errorMsg"></label>
+                                                </td>
+                                                <td class="col-md-4">
+                                                    <h3>Approval Order</h3>
+                                                    <input class="form-control" type="text" id="approverOrder" />
+                                                </td>
+                                                <td class="col-md-4">
+                                                    <input class="btn btn-default" type="button" value="Add" onclick="AddApproverDetails()" />
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
+                        }
+                    </div>
+                    <div class="tab-pane" id="cutransactions">
+                        @Html.Partial("~/Views/CorporateUsers/_Settings.cshtml", Model)
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="SaveData()">Save changes</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+@{
+    string ids, names, orders;
+    ids = "";
+    names = "";
+    orders = "";
+
+    foreach (CLayer.ApprovalOrder approvalOrder in Model.ApprovalOrder)
+    {
+        if (ids != "") { ids = ids + ","; }
+        ids = ids + approvalOrder.approver_id.ToString();
+        if (names != "") { names = names + ","; }
+        names = names + "'" + approvalOrder.ApproverName + "'";
+        if (orders != "") { orders = orders + ","; }
+        orders = orders + approvalOrder.approver_order.ToString();
+    }
+}
+
+<script type="text/javascript">
+    $(function () {
+
+        /*     $('#CityId [value=7]').attr('selected', 'true');*/
+
+        var CitySelected = $("#CityId").val();
+        //     alert(CitySelected);
+        $('#CityId [value="' + CitySelected + '"]').attr('selected', 'true');
+
+        if ($('#CityId').val() == -1) {
+            $("#CityId").hide();
+            $("#other_city").show();
+            if ($("select#CityId option").length > 1) {
+                $("#close_other_city").show();
+            }
+        }
+        $('#CountryId').change(function () {
+
+            $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                if (data != "") {
+                    $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                    $('#ddlStateID').html(data).append('<option selected="selected" value="0">Select</option>');
+                }
+                else {
+                    $('#State').empty().append('<option selected="selected" value="0">not available...</option>');
+                    $('#ddlStateID').html(data).append('<option selected="selected" value="0">Select</option>');
+                }
+
+                loadcity();
+            });
+        });
+        $('#State').change(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                if (data != "") {
+                    $('#CityId').empty().append(data);
+                    if ($("select#CityId option").length == 1) {
+                        $("#CityId").hide();
+                        $("#City").val("");
+                        $("#other_city").show();
+
+                    }
+                    //$('#ddlApproverCityID').empty().append(data);
+                    //if ($("select#ddlApproverCityID option").length == 1) {
+                    //    $("#ddlApproverCityID").hide();
+                    //    $("#City").val("");
+                    //    $("#other_city").show();
+
+                    //}
+
+                }
+                else {
+                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                    //  $('#ddlApproverCityID').empty().append('<option selected="selected" value="0">not available...</option>');
+                }
+
+            });
+        });
+        $('#CityId').change(function () {
+            if ($(this).val() == -1) {
+                $(this).hide();
+                $("#City").val($("#hdnCity").val());
+                $("#other_city").show();
+                $("#close_other_city").show();
+            }
+        });
+        $('#close_other_city').click(function () {
+            $("#CityId").show();
+            $("#City").val("");
+            $("#other_city").hide();
+            $("#close_other_city").hide();
+        });
+    });
+
+    function loadcity() {
+        $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+            if (data != "") {
+                $('#CityId').empty().append(data);
+                if ($("select#CityId option").length == 1) {
+                    $("#CityId").hide();
+                    $("#City").val("");
+                    $("#other_city").show();
+                }
+                //$('#ddlApproverCityID').empty().append(data);
+                //if ($("select#ddlApproverCityID option").length == 1) {
+                //    $("#ddlApproverCityID").hide();
+                //    $("#City").val("");
+                //    $("#other_city").show();
+
+                //}
+            }
+            else {
+                $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                //     $('#ddlApproverCityID').empty().append('<option selected="selected" value="0">not available...</option>');
+            }
+        });
+    }
+</script>
+
+<script type="text/javascript">
+    //global variables
+    var approverIds = new Array();
+    var approverOrder = new Array();
+    var approverName = new Array();
+ //   var HotelCities = new Array();
+
+    approverIds = [@(ids) ];
+    approverOrder = [@(orders)];
+    approverName = [@Html.Raw(names)];
+
+    function SaveData() {
+
+        var Hotels = HotelIds.toString() + '-' + HotelOrder.toString();
+
+                    if ($('#cuserform').validate().form() == false) return;
+                    $.post('@Url.Action("SaveDetails","CorporateUsers")?DdlApproverID=' + approverIds.toString() + '&ApproverOrdersList=' + approverOrder.toString() + '&pB2BHotels=' + Hotels, $("#cuserform").serialize(), function (data) {
+
+                            //hide the messages
+                            if ($('#Email').val() == "")
+                                return;
+
+                            if ($.trim(data) == "-2") {
+                                alert("The Email Id is already taken");
+                                return;
+                            }
+
+                            var Emailids = $("#Email").val();
+                            var emailfrmt = /\w+([-+.']\w+)*@@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+
+                            if (emailfrmt.test(Emailids)) { }
+                            else {
+                                alert("Enter Valid Email");
+                                return;
+                            }
+
+                            $("#myModal").modal('hide');
+                            $("#userlist").html(data);
+                    });
+
+                }
+</script>
+
+
+
+<script type="text/javascript">
+
+    function AddApproverDetails() {
+
+        var ddlApprover = $("#ddlApprover");
+
+        if (ddlApprover.val() > 0) {
+
+            var ddlApproverID = $("#ddlApprover :selected").val();
+            var ddlApproverText = $("#ddlApprover :selected").text();
+
+            if (hasDuplicate(ddlApproverID)) { alert("Already added"); return; } //dont add - it is a duplicate
+            rowCount = approverIds.length;
+            orderNo = $("#approverOrder").val();
+            if (isNaN(orderNo)) { alert("Please enter valid number"); return; }
+            ono = parseInt(orderNo);
+            if (ono < 1) { orderNo = 1; }
+            if (ono > rowCount) { orderNo = rowCount + 1; }
+            approverIds.push(ddlApproverID);
+            approverName.push(ddlApproverText);
+            addOrder(orderNo);
+
+            refreshGrid();
+
+        }
+        else {
+            alert("Please Select Approver Name");
+        }
+    }
+
+    function addOrder(orderNo) {
+        l = approverOrder.length;
+        for (i = 0; i < l; i++) {
+            if (approverOrder[i] >= orderNo) { approverOrder[i] = approverOrder[i] + 1; }
+        }
+        approverOrder.push(orderNo);
+    }
+
+    function hasDuplicate(id) {
+        l = approverIds.length;
+        for (i = 0; i < l; i++) {
+            if (approverIds[i] == id) { return true; }
+        }
+        return false;
+    }
+
+    function refreshGrid() {
+
+        fixOrder();
+
+        rowCount = approverIds.length;
+
+        trv = '';
+        for (i = 0; i < rowCount; i++) {
+            trv = trv + ' <tr class="form-group"><td>' + approverName[i] + '</td><td align="center">' + approverOrder[i] + '</td><td> <input type="button" class="btn btn-danger btnRemove" onclick="remove(this)" value="Remove" data-val="' + approverIds[i] + '" /></td></tr>';
+        }
+        $("#tableGridAppr").html(trv);
+        if (rowCount > 0) {
+            $("#thApprovalOrder").show();
+        } else {
+            $("#thApprovalOrder").hide();
+        }
+    }
+    function remove(btn) {
+        deletedId = $(btn).attr("data-val");
+        //To chnage `user` - `IsApprover` to false
+        $.post('@(Url.Action("SetIsApproverStatus", "CorporateUsers"))?isApproverStatus=' + deletedId, function (data) {
+        idx = -1;
+        rowCount = approverIds.length;
+        for (i = 0; i < rowCount; i++) {
+            if (approverIds[i] == deletedId) { idx = i; break; }
+        }
+
+        if (idx == -1) {
+            return; //do nothing- could not find the element to delete
+        }
+        approverIds.splice(idx, 1);
+        approverOrder.splice(idx, 1);
+        approverName.splice(idx, 1);
+
+        refreshGrid();
+        });
+    }
+    function fixOrder() {
+        var lastVal = '';
+        len = approverIds.length;
+        for (i = 0; i < len; i++) {
+            for (j = i + 1; j < len; j++) {
+                if (approverOrder[i] > approverOrder[j]) {
+                    //swap order nos
+                    lastVal = approverOrder[i];
+                    approverOrder[i] = approverOrder[j];
+                    approverOrder[j] = lastVal;
+                    //swap ids
+                    lastVal = approverIds[i];
+                    approverIds[i] = approverIds[j];
+                    approverIds[j] = lastVal;
+                    //name
+                    lastVal = approverName[i];
+                    approverName[i] = approverName[j];
+                    approverName[j] = lastVal;
+                }
+            }
+        }
+        //fixing orders
+        for (i = 0; i < len; i++) {
+            approverOrder[i] = i + 1;
+        }
+    }
+
+    $(document).ready(function () {
+        var hiddenUserID = $('#hiddenUserID').val();
+
+        //Hide & show .tblDiv
+        if (hiddenUserID == 0) {
+            $("#list_AddHotels").hide();
+            $('.tblDiv').hide();
+        }
+        else {
+            $("#list_AddHotels").show();
+            $('.tblDiv').show();
+        }
+
+        refreshGrid();
+    });
+    $("#txtMaximumDailyEntitlement").keypress(function (e) {
+        //if the letter is not digit then display error and don't type anything
+        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+            //display error message
+            $("#errmsg").html("Digits Only").show().fadeOut("slow");
+            return false;
+        }
+    });
+
+</script>
+

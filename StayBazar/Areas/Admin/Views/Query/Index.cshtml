@@ -1,0 +1,62 @@
+﻿@model StayBazar.Areas.Admin.Models.QueryModel
+@using CaptchaMvc.HtmlHelpers
+@try
+{
+    ViewBag.Title = "Query";
+    using (Html.BeginForm("Save", "Query"))
+    {
+        <h2>Query</h2>
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        <table border="0">
+            <tbody>
+                <tr>
+                    <td>@Html.DisplayNameFor(m => m.Name)</td>
+                    <td>@Html.TextBoxFor(m => m.Name, new { @tabindex = "1", @class = "form-control input-sm" })</td>
+                    <td>@Html.ValidationMessageFor(m => m.Name)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(m => m.Email)</td>
+                    <td>@Html.TextBoxFor(m => m.Email, new { @tabindex = "2", @class = "form-control input-sm" })</td>
+                    <td>@Html.ValidationMessageFor(m => m.Email)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(m => m.Phone)</td>
+                    <td>@Html.TextBoxFor(m => m.Phone, new { @tabindex = "3", @class = "form-control input-sm" })</td>
+                    <td>@Html.ValidationMessageFor(m => m.Phone)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(m => m.Subject)</td>
+                    <td>@Html.TextBoxFor(m => m.Subject, new { @tabindex = "4", @class = "form-control input-sm" })</td>
+                    <td>@Html.ValidationMessageFor(m => m.Subject)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(m => m.Body)</td>
+                    <td>@Html.TextAreaFor(m => m.Body, new { @tabindex = "5", @class = "form-control input-sm" })</td>
+                    <td>@Html.ValidationMessageFor(m => m.Body)<input type="hidden" name="MsgType" id="MsgType" value="1" /></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        @Html.Captcha("try another", "enter the text you see above:", 5, "is required field", true)
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="divMessage">
+            @ViewBag.Message
+        </div>
+        <input type="submit" id="btnSave" value="Send" class="btn btn-primary" tabindex="7" />
+        <a href="~/Query" id="btnReset" class="btn btn-primary" tabindex="8">Cancel</a>
+        <script type="text/javascript">
+            $(function () {
+                $("#Name").focus();
+                $("#CaptchaInputText").attr("tabindex", "6");
+            });
+        </script>
+    }
+}
+catch (Exception ex)
+{
+    StayBazar.Common.LogHandler.HandleError(ex);
+    Response.Redirect("~/ErrorPage");
+}

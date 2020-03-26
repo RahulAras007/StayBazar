@@ -1,0 +1,99 @@
+﻿
+@{
+    Layout = null;
+   
+
+}
+@using Microsoft.AspNet.Identity
+<div class="row top-margin-10px">
+    @*<div class="col-md-8">
+        <input class="form-control" type="text" id="myInput" placeholder="Search for names .." title="Type in a name">
+    </div>*@
+    <div class="col-md-4">
+   
+     <input type="button" value="Create a new City Class" class="btn btn-primary" onclick="editData(0)" />
+         
+    </div>
+
+</div>
+<br />
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>City Class Name</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @*@foreach (CLayer.User usr in Model.Users)
+        {
+            <tr>
+                <td>@(idx++)</td>
+                <td><span id="name@(usr.UserId)">@usr.Name</span></td>
+                <td>@usr.Email</td>
+                <td>
+                    @{ if (usr.Status == (int)CLayer.ObjectStatus.StatusType.Active)
+                        { <text>Active</text>}
+                    else
+                    { <text>Disabled</text>}
+                    }
+                </td>
+                <td>@( ((CLayer.Role.CorporateRoles)usr.UserTypeId).ToString())</td>
+                <td><a href="#" class="glyphicon glyphicon-edit" title="Edit" onclick="editData(@usr.UserId)"></a></td>
+                <td><a href="#" class="glyphicon glyphicon-trash" title="Delete" onclick="deleteData(@usr.UserId,'@usr.Name')"></a></td>
+            </tr>
+        }*@
+    </tbody>
+</table>
+
+@*@if (perPagerCount < count)
+{
+    <ul class="pagination" id="myPager"></ul>
+}*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        //preparePager();
+    });
+</script>
+<script type="text/javascript">
+
+    @* TO - Filter / Search Table./ Strarts *@
+    $("#myInput").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+
+        if (value != '') {
+            $("#myTable tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                $('#myPager').hide();
+            });
+        } else {
+            location.reload();
+        }
+    });
+    @*./ End *@
+
+    @*function preparePager()
+    {
+        $('#myTable').pageMe({ pagerSelector: '#myPager', showPrevNext: true, hidePageNumbers: false, perPage: @(perPagerCount) });
+    }*@
+
+    function editData(id) {
+        $.get('@(Url.Action("GetDetails", "CorporateCityClass"))?id=' + id, function (data) {
+            $("#userdetails").html(data);
+            $("#myModal").modal('show');
+        });
+    }
+
+    @*function deleteData(id){
+        pname = $("#name"+id).html();
+        if(confirm("Are you sure to delete - '" + pname + "'"))
+        {
+            $.get('@Url.Action("Remove","CorporateUsers")?id='+id, function (data) {
+                $("#userlist").html(data);
+            });
+        }
+    }*@
+
+</script>

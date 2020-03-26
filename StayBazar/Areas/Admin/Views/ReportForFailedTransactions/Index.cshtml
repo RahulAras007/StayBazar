@@ -1,0 +1,46 @@
+﻿@model StayBazar.Areas.Admin.Models.ReportForFailedTransactionsModel
+@{
+    ViewBag.Title = "Failed Transaction Report";
+    //Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+}
+@*<h2>@ViewBag.Title</h2>*@
+
+<div class="page-title-container style3">
+    <div class="container">
+        <form>
+            <div class="row" id="FilterFailedTransaction">
+                <div class="col-md-3" id="DetailsBooking">
+                    <h2 style="color:white">@ViewBag.Title</h2>
+                </div>
+                <div class="col-md-3">
+                    @Html.Partial("_Filter", Model)
+                    <br />
+                </div>
+            </div>
+            
+        </form>
+    </div>
+</div>
+<div class="row" id="FailedTransactionList">
+    <div class="col-md-12" id="TransactionList">
+        @Html.Partial("_Report", Model.ReportList)
+    </div>
+</div>
+@*<div id="content">
+    <div class="row" id="FilterFailedTransaction">
+        <div class="col-md-12">
+            <div class="row margin10px" id="DetailsBooking">
+                @Html.Partial("_Filter", Model)
+            </div>
+        </div>
+    </div>
+    <div class="row" id="FailedTransactionList">
+    <div class="col-md-12" id="TransactionList">
+        @Html.Partial("_Report", Model.ReportList)
+    </div>
+    </div>
+</div>*@
+@*<script type="text/javascript">
+    $(".container").removeClass("container").addClass("container-fluid");
+
+</script>*@

@@ -1,0 +1,71 @@
+﻿@model StayBazar.Areas.Admin.Models.SubscriptionsModel
+@{
+    ViewBag.Title = "Subscriptions ";
+    int countofSubscribed = 0;
+    int countofUnSubscribed = 0;
+    int sum = 0;
+}
+<div id="content">
+    @*<h2>@ViewBag.Title</h2>*@
+    <div class="page-title-container style3">
+        <div class="row">
+            <div class="col-md-6">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="col-md-10 col-md-offset-1 ">
+        @*<div class="col-md-12">*@
+        <div class="row" id="SubscriptionsListDisplay">
+            <div class="col-md-12">
+
+                <div class="panel panel-body panel-default">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <dl>
+                                <div class="row">
+
+                                    <div class="col-md-6">
+
+                                        <dt>Subscription count  	&#x00009;	&#9; &#x00009;	&#9;<span class="active">@{ countofSubscribed = BLayer.Mail.CountOfSubscribed();}@countofSubscribed</span></dt>
+                                        <dt>Unsubscription count	&#x00009;	&#9;@{countofUnSubscribed = BLayer.Mail.CountOfUnSubscribed();}@countofUnSubscribed</dt>
+                                        <dt>Total 	&#x00009;	&#9;@{sum = countofSubscribed + countofUnSubscribed;}@sum</dt>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <dt>
+                                            <div class="col-md-4">
+                                                @using (Html.BeginForm("Download", "Subscriptions", new { area = "Admin" }))
+                                                {
+                                                    <span class="input-group-btn">
+                                                        &#x00009;	&#9;<button class="btn btn-default redbg whitetext" title="Download Subscribed" onclick="DownLoad()" id="btnsavemail" type="submit">DownLoad Subscribed</button>
+                                                    </span>
+                                                }
+                                            </div>
+                                            <div class="col-md-4">
+                                                @using (Html.BeginForm("DownloadUnSubscribed", "Subscriptions", new { area = "Admin" }))
+                                                {
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default redbg whitetext" onclick="DownLoad()" title="Download UnSubscribed" id="btnsavemail" type="submit">Download UnSubscribed</button>
+                                                    </span>
+                                                }
+                                            </div>
+                                        </dt>
+                                    </div>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <hr />
+            <div class="col-md-12 ">
+                <div class="row margin10px" id="SubscriptionsList">
+                    @Html.Partial("_List", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

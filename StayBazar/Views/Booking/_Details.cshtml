@@ -1,0 +1,169 @@
+﻿@model StayBazar.Models.BookingModel
+@{
+    Layout = null;
+    long propertyId = BLayer.Bookings.GetPropertyId(Model.BookingId);
+    ViewBag.PId = propertyId;
+
+}
+
+<!-- Send Query popup -->
+@Html.Partial("~/Views/Property/SendQuery.cshtml")
+<!-- Send Query popup -->
+<!-- feedback popup -->
+@Html.Partial("~/Views/Feedback/Feedback.cshtml")
+<!-- feedback popup -->
+<!--New Design Added By Rahul-->
+<link rel="stylesheet" href="~/RahulSample/css/bootstrap.min.css">
+<link rel="stylesheet" href="~/RahulSample/css/font-awesome.min.css">
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="~/RahulSample/css/animate.min.css">
+
+<!-- Current Page Styles -->
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/revolution_slider/css/settings.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/revolution_slider/css/style.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/jquery.bxslider/jquery.bxslider.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/flexslider/flexslider.css" media="screen" />
+
+<!-- Main Style -->
+<link id="main-style" rel="stylesheet" href="~/RahulSample/css/style.css">
+
+<!-- Updated Styles -->
+<link rel="stylesheet" href="~/RahulSample/css/updates.css">
+
+<!-- Custom Styles -->
+<link rel="stylesheet" href="~/RahulSample/css/custom.css">
+
+<!-- Responsive Styles -->
+<link rel="stylesheet" href="~/RahulSample/css/responsive.css">
+
+<div class="person-information">
+    <h2>Guest Information</h2>
+    <div class="form-group row">
+        <div class="col-sm-6 col-md-5">
+            <label>Guest name</label>
+            <input id="Name" readonly type="text" name="email" class="input-text full-width" value="@Model.OrderedBy.Firstname @Model.OrderedBy.Lastname" />
+        </div>
+        <div class="col-sm-6 col-md-5">
+            <label>Email address</label>
+            <input type="text" readonly id="Email" name="email" class="input-text full-width" value="@Model.OrderedBy.ForUserEmail" placeholder="" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-6 col-md-5">
+            <label>Phone number</label>
+            <input type="text" readonly id="Mob" name="Mob" class="input-text full-width" value="@Model.OrderedBy.ForUserMobile" placeholder="" />
+        </div>
+        <div class="col-sm-6 col-md-5">
+            <label>Address</label>
+            <textarea readonly name="message" rows="3" class="input-text full-width" placeholder="@Model.OrderedBy.AddressText,@Model.OrderedBy.City,@Model.OrderedBy.StateName,@Model.OrderedBy.Country,@Model.OrderedBy.ZipCode"></textarea>
+        </div>
+    </div>
+    <hr />
+    @if (Model.OrderedBy.PropertyId > 0)
+    {
+        List<CLayer.Address> addrssprList = BLayer.Bookings.GetpropertyAddress(Model.OrderedBy.PropertyId);
+        if (addrssprList.Count > 0)
+        {
+            <h2>Stay Details</h2>
+            <div class="form-group row">
+                <div class="col-sm-6 col-md-5">
+                    <label>Hotel Name</label>
+                    <input id="Name" readonly type="text" name="email" class="input-text full-width" value="@Model.OrderedBy.PropertyTitle" />
+                </div>
+                <div class="col-sm-6 col-md-5">
+                    <label>Address</label>
+                    <textarea readonly name="message" rows="1" class="input-text full-width" placeholder=" @Model.OrderedBy.PropertyAddress @addrssprList[0].City,@addrssprList[0].StateName,@addrssprList[0].Country,@addrssprList[0].ZipCode"></textarea>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+
+
+@*<div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                        <h4 class="h4" style="margin-left:18px;">Customer Details</h4>
+                    </div>
+                    <div class="panel panel-body panel-default">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <dl>
+                                    <dt>Guest Name</dt>
+                                    <dd><span id="Name"> @Model.OrderedBy.Firstname @Model.OrderedBy.Lastname</span></dd>
+                                    <dt>Address</dt>
+                                    <dd><span class="splittxt" id="Address">@Model.OrderedBy.AddressText</span></dd>
+                                    <dd><span id="City">@Model.OrderedBy.City</span>,<span id="StateName">@Model.OrderedBy.StateName</span></dd>
+
+                                    <dd><span id="Country">@Model.OrderedBy.Country</span>,Pin:<span id="ZipCode"> @Model.OrderedBy.ZipCode</span> </dd>
+                                    <dd></dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-4">
+                                <dl>
+                                    <dt>Email</dt>
+                                    <dd><span class="splittxt" id="Email">@Model.OrderedBy.ForUserEmail</span></dd>
+                                    <dt>Mobile No.</dt>
+                                    <dd><span id="Mob">@Model.OrderedBy.ForUserMobile </span></dd>
+                                    <dt style="margin-top:25px;"><input type="button" value="Change Guest Information" onclick="PopupForUser(@Model.OrderedBy.ForBookingUserId,@Model.OrderedBy.BookingItemId)" class="btn btn-primary" /></dt>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <h4 class="h4">Stay Details</h4>
+                        </div>
+                        <div class="col-md-4 padding10px">
+                            <span id="cancBox"><a id="policytooltip" href="#" data-toggle="popover" data-placement="left" data-html="true" data-content="@Html.Partial("~/Views/Cancellation/_PolicyText.cshtml", propertyId)">Cancellation Policy</a></span>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="button" class="btn btn-danger" onclick="SendQuery()" value="Enquire Now" />
+                        </div>
+
+                    </div>
+                    <div class="panel panel-body panel-default height195px">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <dl>
+                                    @if (Model.OrderedBy.PropertyId > 0)
+                                    {
+                                        List<CLayer.Address> addrssprList = BLayer.Bookings.GetpropertyAddress(Model.OrderedBy.PropertyId);
+                                        if (addrssprList.Count > 0)
+                                        {
+
+                                            <dt class="bold">Name</dt>
+                                            <dd>@Model.OrderedBy.PropertyTitle</dd>
+                                            <dt class="bold">Address</dt>
+                                            <dd>@Model.OrderedBy.PropertyAddress</dd>
+                                            <dd>@addrssprList[0].City,@addrssprList[0].StateName</dd>
+                                            <dd>@addrssprList[0].Country,Pin:@addrssprList[0].ZipCode</dd>
+                                        }
+                                    }
+
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+<script type="text/javascript">
+
+
+
+
+    function viewFeedback() {
+        $('#Feedbackpop').modal('show');
+    }
+
+    function SendQuery() {
+        $('#Sendquerypop').modal('show');
+    }
+</script>

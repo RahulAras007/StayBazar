@@ -1,0 +1,140 @@
+﻿@using StayBazar.Models
+@model StayBazar.Models.LoginViewModel
+
+@{
+    var currentAction = "";
+    HtmlHelper htmlHelper = this.Html;
+    var routeData = htmlHelper.ViewContext.RouteData;
+    currentAction = routeData.GetRequiredString("Action").ToLower();
+    if (currentAction == "loginforbookingapproval")
+    {
+        ViewBag.Title = "Log in";
+    }
+    else
+    {
+        if (ViewBag.type == 1)
+        {
+            ViewBag.Title = "Business Corporate Login";
+        }
+        else if (ViewBag.type == 2)
+        {
+            ViewBag.Title = "Business Supplier Login";
+        }
+        else if (ViewBag.type == 3)
+        {
+            ViewBag.Title = "Business Travel Agent Login";
+        }
+        
+       
+    }
+   // ViewBag.ReturnUrl1 = " ";
+}
+
+<div class="container bdy_min_height">
+    <div class="row">
+        <div class="col-md-12">
+            @if (currentAction != "loginforbookingapproval")
+            {
+                <h3>Business User Login</h3>
+            }
+            else
+            {
+                <h3>User Login</h3>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 col-md-offset-1 lgnbx1">
+            <div>
+                @if (currentAction != "loginforbookingapproval")
+                {
+                    <span>Corporate users, Suppliers and Travel Agents can login here.</span>
+                }
+                else
+                { <span>Please login with your email.</span>}
+            </div>
+            <div>
+                @using (Html.BeginForm("LoginForBookingApproval", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true)
+                    <div class="incontainer margin-top-10">
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label" })
+                            <div class="col-md-10">
+                                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.UserName)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
+                            <div class="col-md-10">
+                                @Html.PasswordFor(m => m.Password, new { @class = "form-control", @autocomplete = "off" })
+                                @Html.ValidationMessageFor(m => m.Password)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-9">
+                            <div class="checkbox lgn_chk">
+                                @Html.CheckBoxFor(m => m.RememberMe)
+                                @Html.LabelFor(m => m.RememberMe)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><div class="col-md-10 col-md-offset-2"><a href="@Url.Action("Forgot", "Account")">Forgot Password?</a></div></div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Log in" class="btn btn-default" />
+                        </div>
+                    </div>
+
+                }
+            </div>
+
+        </div>
+        <div class="col-md-5 lgnbx2">
+            @if (currentAction != "loginforbookingapproval")
+            {
+                <h4>Don't have an Account?</h4>
+                <p>Please register for an account, we will contact you back!</p>
+                <p><a href="@Url.Action("Supplier","Join")">Register as Supplier</a></p>
+                <p><a href="@Url.Action("Corporate", "Join")">Register as Corporate</a></p>
+                <p><a href="@Url.Action("TravelAgent", "Join")">Register as Travel Agent</a></p>
+                @*<p>&nbsp;</p>
+                    <p><a href="@Url.Action("Forgot", "Account")">Forgot Password?</a></p>*@
+            }
+            else
+            {
+                <h4>New User?</h4>
+                <p>Please create your free account</p>
+                <p><a href="@Url.Action("Register")">Register</a></p>
+                @*<p>&nbsp;</p>
+                    <p><a href="@Url.Action("Forgot", "Account")">Forgot Password?</a></p>*@
+            }
+        </div>
+        @if (currentAction == "loginforbookingapprovalin")
+        {
+            <div class="col-md-4 margin-top-30">
+                <section id="socialLoginForm">
+                    @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl})
+                </section>
+            </div>
+        }
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+    @if (currentAction != "loginforbookingapproval")
+    {
+        <script type="text/javascript">
+            $(function () {
+                $('#myTab').tab();
+            });
+        </script>
+    }
+</div>
+@*<script>
+        $(function () { $("#UserName").focus(); });
+    </script>*@

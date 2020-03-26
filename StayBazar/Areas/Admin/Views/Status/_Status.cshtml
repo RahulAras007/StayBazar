@@ -1,0 +1,42 @@
+﻿@model StayBazar.Areas.Admin.Models.StatusModel
+<div id="stauschanger">
+    @using (Html.BeginForm("Update", "Status", FormMethod.Post, new { role = "form", id = "statusForm" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(m => m.UserId)
+        @Html.HiddenFor(m => m.Status, new { id= "changedStatus" })
+        <div class="h3 panel panel-body">
+            Status
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown">
+                    @((CLayer.ObjectStatus.StatusType)Model.Status)
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li @if (Model.Status == (int)CLayer.ObjectStatus.StatusType.Active) { <text> class="active" </text>         }>
+                        <a href="#" id="@((int)CLayer.ObjectStatus.StatusType.Active)" class="change">Active</a>
+                    </li>
+                    <li @if (Model.Status == (int)CLayer.ObjectStatus.StatusType.Blocked) { <text> class="active" </text>          }>
+                        <a href="#" id="@((int)CLayer.ObjectStatus.StatusType.Blocked)" class="change">Blocked</a>
+                    </li>
+                </ul>
+            </div>
+            <span id="success" class="success h5 hided padding5px">Status changed</span>
+        </div>
+    }
+</div>
+<script type="text/javascript">
+    $(function () {
+        $(".change").click(function () {
+            $("#changedStatus").val($(this).attr("id"));
+            var url = '@Url.Action("Update", "Status")';
+            $.post(url, $("#statusForm").serialize(),
+                    function (data) {
+                        $("#stauschanger").html(data);
+                        $("#success").show().fadeOut(2000);
+                    });
+
+        });
+    });
+</script>

@@ -1,0 +1,89 @@
+﻿@model List<CLayer.StaticPage>
+@{
+    ViewBag.Title = "SEO Static Page Configs";
+}
+<div id="form1">
+    @*<div class="row">
+            <div class="col-md-10">
+                <h2>SEO Static Page Configs</h2>
+            </div>
+        </div>*@
+    <div class="page-title-container style3">
+        <div class="row">
+            <div class="col-md-3">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+
+            @*</div>*@
+
+            @*<div class="row">*@
+            <div class="col-md-12 col-md-offset-8">
+                <a href="#" onclick="GenerateFile()" title="Generate File" class="btn btn-success">Generate File</a>
+                <a href="#" onclick="ClearFile()" title="Clear File" class="btn btn-danger">Clear File</a>
+                <a href="@Url.Action("NewPage","StaticPage")" title="Create New" class="btn btn-info">Create New</a>
+                @*<div class="col-md-2 col-md-offset-10"><a  href="@Url.Action("NewPage","StaticPage")" class="btn btn-info">Create New</a> </div>*@
+            </div>
+        </div>
+            </div>
+            <br />
+            <br />
+    <div class="container-fluid">
+            <div class="hidden">
+                <form action="@Url.Action("GenerateFile", "StaticPage", new { Area = "Admin" })" method="post" id="frmgen">
+                    <input type="hidden" id="genIds" name="GenPIds">
+                </form>
+            </div>
+            <div class="hidden">
+                <form action="@Url.Action("ClearFile", "StaticPage", new { Area = "Admin" })" method="post" id="frmclr">
+                    <input type="hidden" id="clrIds" name="ClrPIds">
+                </form>
+            </div>
+            <div class="row topmargin10">
+                <div class="col-md-12" id="seolists">
+                    @Html.Partial("_StaticList", Model)
+                </div>
+            </div>
+    </div>
+        </div>
+        <script type="text/javascript">
+            function GenerateFile() {
+                var s = "";
+                $(".staticchk").each(function () {
+                    if ($(this).prop("checked") == true) {
+                        if (s != "") {
+                            s = s + ",";
+                        }
+
+                        s = s + $(this).val();
+                    }
+                });
+                $("#genIds").val(s);
+                if (s == '') {
+                    alert('Please choose pages to generate.');
+                    return;
+                }
+                $("#frmgen").submit();
+            }
+
+            function ClearFile() {
+                var s = "";
+                $(".staticchk").each(function () {
+                    if ($(this).prop("checked") == true) {
+                        if (s != "") {
+                            s = s + ",";
+                        }
+
+                        s = s + $(this).val();
+                    }
+                });
+                $("#clrIds").val(s);
+                if (s == '') {
+                    alert('Please choose pages to generate.');
+                    return;
+                }
+                $("#frmclr").submit();
+
+            }
+        </script>
+
+

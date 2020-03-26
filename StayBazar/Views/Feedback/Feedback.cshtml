@@ -1,0 +1,101 @@
+﻿@{
+    Layout = null;
+}
+<div class="modal" id="Feedbackpop" tabindex="-1" role="dialog" aria-labelledby="Feedback" aria-hidden="true">
+    <div class="modal-dialog feedbackbox">
+        <div class="modal-content">
+            <div class="modal-header border-radius btn-danger padd5">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-4">
+                        <button type="button" class="close enqireclosebtn" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove-circle"></span></button>
+                        <h4 class="modal-title bold" id="myModalLabel">We'd love your feedback</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body" id="viewtable">
+                <div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            Help us make this
+                            product better.
+                            <br />
+                            Put
+                            your thoughts here
+                        </div>
+                        <div class="col-md-8 margin0">
+                            <div class="row margin0">
+                                <div class="col-md-4">
+                                    <span style="color:red">*</span><label>Email</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" onchange="chkemail()" id="txtfeedbackemail" style="width:200px;" @*class="form-control"*@ />
+                                </div>
+                            </div>
+                            <div class="row bxmtop">
+                                <div class="col-md-4">
+                                    <span style="color:red">*</span><label>Feedback</label>
+                                </div>
+                                <div class="col-md-8">
+                                    <textarea id="txtfeedback" style="width:200px;"></textarea>
+                                    @*<input type="text" id="txtfeedback" class="form-control" />*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer padd5">
+                    <input type="submit" id="btnSave" onclick="Savenow()" value="Ok" class="btn btn-success whitetext topmargin10 equiresendbtn" tabindex="7" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*<div class="row">
+    <input type="submit" id="btnSave" onclick="Savenow()" value="Ok" class="btn bluebg marginleft100px" style="color:white;" tabindex="7" />
+</div>*@
+
+<script  type="text/javascript">
+    //$(function () {
+    //    setTimeout(function () { viewFeedback(); }, 8000);
+    //});
+    //function viewFeedback() {
+    //    $('#basicModal').modal('show');
+    //}
+  
+
+    function Savenow() {
+        var feedbackemail = $("#txtfeedbackemail").val();
+        var feedback = $("#txtfeedback").val();
+        if (feedbackemail == "")
+        {
+            alert("Please provide your Email ID");
+            $("#txtfeedbackemail").focus();
+            return;
+        }
+
+        var emailfrmt = /\w+([-+.']\w+)*@@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+        if (emailfrmt.test(feedbackemail)) {
+           
+        }
+        else {
+            alert("Enter valid email");
+            return;
+        }
+
+        if (feedback == "")
+        {
+            alert("Please provide your comment");
+            $("#txtfeedback").focus();
+            return;
+        }     
+
+        var url = "@Url.Action("FeedbackSave", "Feedback")";
+        var url = url + "?email=" + feedbackemail + '&' + "feedback=" + feedback;
+
+        $.post(url, function (data) {
+        });
+        $('#basicModal').modal('hide');
+        alert("Thank you for the feedback");
+    }
+
+</script>

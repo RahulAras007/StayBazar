@@ -1,0 +1,30 @@
+﻿@using StayBazar.Areas.Admin.Models
+@model List<costcentre>
+@{
+    ViewBag.Title = "DisplayCostCentre";
+}
+
+<h2>DisplayCostCentre</h2>
+<div class="row">
+    <div><br /></div>
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <table class="table table-hover">
+            <tr>
+                <th>ID</th>
+                <th>Code</th>
+                <th>Percentage</th>
+            </tr>
+            @foreach (var Costcentre in Model)
+            {
+                <tr>
+                    <td>@Costcentre.costcentreID</td>
+                    <td>@Costcentre.CostCentrecode</td>
+                    <td>@Costcentre.percentage</td>
+                </tr>
+            }
+        </table>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+

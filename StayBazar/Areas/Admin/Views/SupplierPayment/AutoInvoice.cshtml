@@ -1,0 +1,140 @@
+﻿@model CLayer.OfflineBooking
+@{
+    Layout = null;
+    CLayer.OfflineBooking customer = BLayer.OfflineBooking.GetAllCustomerDetails(Model.OfflineBookingId);
+    CLayer.OfflineBooking propertyDetails = BLayer.OfflineBooking.GetAllpropertyDetails(Model.OfflineBookingId);
+    
+}
+    @if (Model != null) { 
+
+    @Html.Partial("_InvoiceHeader")
+    <!--#FIRSTROW_START-->
+    <table id="firstrow" style="width:100%">
+        <tr>
+            <td style="width:70%;">Invoice Number: @*@Model.ConfirmationNumber*@<br/>
+            To : <br />
+            @*@customer.CustomerName*@<br />
+@*@customer.CustomerAddress*@,<br/>
+            @*@customer.CustomerCity*@, @*@customer.CustomerState*@,<br/>
+            @*@customer.CustomerCountryname*@
+            </td>
+            <td width="30%">
+                Date: @DateTime.Today.ToShortDateString()<br/>
+                Due By: @*@Model.CheckIn.ToShortDateString()*@<br/>
+                Customer Ref No: 
+            </td>
+        </tr>
+    </table>
+        <!--#FIRSTROW_END-->
+        <!--#SECONDROW_START-->
+    <table border="1" id="secondrow" cellpadding="5" cellspacing="0" style="width:100%;">
+        <tr>
+            <td>
+                Sl No.
+            </td>
+            <td>
+                Description
+            </td>
+            <td>
+                Rate (Rs.)
+            </td>
+            <td>Quantity</td>
+            <td>Value (Rs.)</td>
+        </tr>
+        <tr>
+            <td>
+                1.
+            </td>
+            <td>
+                 @*@(propertyDetails.PropertyName ) @(propertyDetails.PropertyCityname)*@<br />
+                @*@Model.AccommodatoinTypename*@<br />
+                Adult:  @*@Model.NoOfPaxAdult*@ Children : @*@Model.NoOfPaxChild*@
+                
+            </td>
+            <td>
+                @*@(Model.AvgDailyRateBefreStaxForSalePrice)*@
+            </td>
+            <td style="text-align:right;">@*@(Model.NoOfNight)*@</td>
+            <td>@*@(Model.TotalAmtForSalePrice)*@</td>
+        </tr>
+        
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align:right;"><span style="font-weight:bold;">Sub-Total</span></td>
+            <td>&nbsp;</td>
+            <td>@*@(Model.TotalAmtForSalePrice)*@</td>
+        </tr>
+        
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td style="text-align:right;"><span style="font-weight:bold;">Total</span></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;@*@(Model.TotalSalePrice)*@</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Reimbursements (+)</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Discount (-)</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Others (+)</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center;"><span style="font-weight:bold;">Total Invoice Value</span></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+        <!--#SECONDROW_END-->
+        <!--#THIRDROW_START-->
+    <div id="thirdrow">
+        <div>Rupees : @*@(StayBazar.Common.Utils.NumberToWords((int)Model.TotalSalePrice))*@ Only</div>
+        <div>Guest name: @*@Model.CustomerName*@</div>
+        <div>No of rooms: @*@Model.NoOfRooms*@ &nbsp;&nbsp; No of nights: @*@Model.NoOfNight*@ &nbsp;&nbsp; Total room nights: @*@(Model.NoOfRooms * Model.NoOfNight)*@</div>
+        <br />
+    </div>
+        <!--#THIRDROW_END-->
+   @Html.Partial("_InvoiceFooter")
+    }
+    else
+    {
+        <div>Booking not found</div>
+    }
+    

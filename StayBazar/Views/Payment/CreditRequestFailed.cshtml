@@ -1,0 +1,47 @@
+﻿@model long
+@{
+
+    string error = "";
+    if (ViewBag.Errorcomes != null)
+    {
+        error = ViewBag.Errorcomes;
+    }
+    
+    var ReturnUrl = Convert.ToString(Session["ReturnUrl"]);
+  
+        Layout = null;
+   
+}
+@if (error == "RequestFailed")
+{
+   
+<div class="container bdy_min_height">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 topmargin10">
+            <h4 class="alert alert-danger">Sorry selected accommodation not available at this moment.Please change your booking</h4>
+            <br />
+            <div>
+                @*<a href="/property/index/@Model">Back to property</a>*@
+                <a href="@ReturnUrl">Back to property</a>
+            </div>
+        </div>
+    </div>
+</div>
+}
+else
+{
+    <div class="container bdy_min_height">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 topmargin10">
+                <h4 class="alert alert-danger">There has  an issue in processing your request. We will look into the issue.</h4>
+                <br />
+                <div>
+                    @*<a href="/property/index/@Model">Back to property</a>*@
+                    <a href="@ReturnUrl">Back to property</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+

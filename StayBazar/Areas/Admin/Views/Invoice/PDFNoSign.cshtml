@@ -1,0 +1,47 @@
+﻿@model  StayBazar.Areas.Admin.Models.Invoice
+@{
+    Layout = null;
+    int OfflineBookingType = BLayer.OfflineBooking.GetBookingType(Model.OfflineBookingId);
+    long IsGST = BLayer.OfflineBooking.GetOfflinebookingIsGST(Model.OfflineBookingId);
+
+}
+<style>
+    td {
+        padding: 2px !important;
+    }
+</style>
+@if (IsGST == 1)
+{
+    @Html.Partial("_InvoiceHeader")
+    @Html.Raw(Model.HtmlSection1)
+    @Html.Raw(Model.HtmlSection2)
+    @Html.Raw(Model.HtmlSection3)
+    //karthikms added on 30-10-2019 20-21
+    @*@Html.Partial("_InvoicePDFFooter")*@
+    @Html.Partial("_InvoiceFooterGSTNoSign")
+
+    if (OfflineBookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+    {
+        < p style = "page-break-after: always;" ></ p >
+        @Html.Raw(Model.HtmlSection4)
+        @Html.Partial("_InvoiceDirectNoSignFooter")
+    }
+}
+@if (IsGST == 2)
+{
+    //  CLayer.OfflineBooking offb = BLayer.OfflineBooking.GetAllDetailsById(Model.OfflineBookingId);
+    @Html.Partial("_InvoiceHeaderGst", Model.OfflineBookingId);
+    @Html.Raw(Model.HtmlSection1)
+    @Html.Raw(Model.HtmlSection2)
+    @Html.Raw(Model.HtmlSection3)
+    //karthikms added on 30-10-2019 37-38
+    @*@Html.Partial("_InvoicePDFFooter")*@
+    @Html.Partial("_InvoiceFooterGSTNoSign")
+
+    if (OfflineBookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+    {
+        <p style="page-break-after: always;"></p>
+        @Html.Raw(Model.HtmlSection4)
+        @Html.Partial("_InvoiceDirectNoSignFooter")
+    }
+}

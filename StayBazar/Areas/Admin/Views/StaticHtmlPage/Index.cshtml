@@ -1,0 +1,560 @@
+﻿@model StayBazar.Areas.Admin.Models.StaticHtmlPageModel
+@{
+    ViewBag.IsForStaticPage = true;
+    ViewBag.Title = Model.PageTitle;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //  double km;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+    int startD = 0;
+    int endD = 0;
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarStartDate"), out startD);
+    int.TryParse(System.Configuration.ConfigurationManager.AppSettings.Get("CalendarEndDate"), out endD);
+    int diff = endD - startD;
+    if (Model.City != "")
+    {
+        ViewBag.MetaDescription = "Staybazar is an online booking portal for all kinds of alternate stay options in " + Model.City + " like Serviced Apartments, Homestays, Themestays, etc.";
+    }
+    if (Model.City != "")
+    {
+        ViewBag.CurrentCity = Model.City;
+    }
+}
+
+<div id="fb-root"></div>
+<script>
+    (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+<script>
+    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+</script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+
+@section scripts{
+    <script>
+        dataLayer = [{
+            'cityName': '@Model.City',
+            'locationName': '@Model.Location',
+        }];
+    </script>
+}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 form-header">
+            <div class="col-md-7">
+                <h1 class="fsz30">
+                    @if (Model.PageTitle != "")
+                    {
+                        <text>@Model.PageTitle</text>
+                    }
+                    else
+                    {
+                        bool showSlash = true;
+                        if (Model.City == "" || Model.Location == "") { showSlash = false; }
+                        <text>@Model.City</text>
+                        if (showSlash)
+                        { <text>\</text>}
+                        <text>@Model.Location </text>
+                    }
+                </h1>
+            </div>
+            <div class="col-md-5 margin-top-30 left-100">
+                <div class="col-md-3 padd5">
+                    <div class="fb-share-button" data-href="https://www.staybazar.com/serviced-apartments/@Model.City" data-layout="button_count"></div>
+                </div>
+                <div class="col-md-3 padd5">
+                    <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://www.staybazar.com/serviced-apartments/@Model.City">Tweet</a>
+                </div>
+                <div class="col-md-3 padd5">
+                    <div class="g-plusone" data-size="medium" data-href="https://www.staybazar.com/serviced-apartments/@Model.City"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="img-thumbnail">
+                @if (Model.Image == "Empty")
+                {<img src="~/@no_image" class="img img-responsive" alt="noimage" /> }
+                else
+                {<img src="~/Files/SEO/@Model.Image" class="img img-responsive" />}
+            </div>
+        </div>
+        <div class="col-md-8">
+            @Html.Raw(Model.Description)
+        </div>
+    </div>
+    <div class="height10"></div>
+    <div class="row ">
+        @using (Html.BeginForm("Index", "Search", FormMethod.Post, new { id = "searchform", onsubmit = "submitSForm()", area = "" }))
+        {
+            <div class="col-md-12 StcSearch">
+                <div class="row">
+                    <div class="col-xs-12 col-md-2">
+                        <h3>Where</h3>
+                        <div class="smtext">City, location or property</div>
+                        <div class="margin10px"></div>
+                        <div>
+                            <input type="text" id="Destination" class="destination" name="Destination" value="@Model.City" placeholder="Enter your destination" onkeypress="return isINLetters(event)" />
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-3">
+                        <h3>When</h3>
+                        <div class="smtext"><div class="col-md-6 pad0">Check In</div><div class="col-md-6 pad0">Check Out</div></div>
+                        <div class="col-xs-6 col-md-6 checkin">
+                            <div>
+                                <input type="text" id="CheckIn" name="CheckIn" placeholder="Check In">
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-6 checkout">
+                            <div>
+                                <input type="text" id="CheckOut" name="CheckOut" placeholder="Check Out">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-2 persons">
+                        <h3>Who</h3>
+                        <div class="row smtext srch_spn"><div class="col-md-6 ">Adult (10+ yrs)</div><div class="col-md-6 pad0">Children</div></div>
+                        <div class="col-md-6 pad0"><div id="spnrAd"></div></div>
+                        <div class="col-md-6 pad0"><div id="spnrCd"></div></div>
+                        <input type="hidden" id="Adults" name="Adults" value="1" />
+                        <input type="hidden" id="Children" name="Children" value="0" />
+                    </div>
+                    <div class="col-xs-12 col-md-3">
+                        <h3>What</h3>
+                        <div class="smtext row"><div class="col-md-6">Stay options</div><div class="col-md-6 pad0">Bedrooms</div></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <select class="styleselect" style="width:100%;" name="StayType" id="StayType">
+                                    @{
+            List<CLayer.StayCategory> staytypes = BLayer.StayCategory.GetActiveList();
+
+            <option value="0" selected>Any</option>
+                                    }
+                                    @foreach (CLayer.StayCategory sc in staytypes)
+                                    {
+                                        <option value="@sc.CategoryId">@sc.Title</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6 pad0 topmargin12"><div id="spnrBed"></div></div>
+                        </div>
+                        <input type="hidden" name="BedRooms" id="BedRooms" value="0" />
+                    </div>
+                    <div class="col-xs-12 col-md-2 searchbtnctr">
+                        <br />
+                        <br />
+                        <div class="height10"></div>
+                        <button class="redbg whitetext" id="searchbutton" type="button" onclick="submitSForm()">Search</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <span id="DestinationAlert" style="color:red;margin-left:15px;" />
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="height10"></div>
+    <div class="row">
+        <div class="col-md-8 ">
+            <div>
+                <h3>Selected Properties</h3>
+            </div>
+            <div class="">
+                @Html.Partial("~/Areas/Admin/Views/StaticHtmlPage/_List.cshtml", Model)
+            </div>
+            <div>
+                <button class="redbg whitetext col-md-12 staticbtn" id="searchbutton" type="button" onclick="submitSForm()">
+                    @if (Model.City != "")
+                    {
+                        <text>View all properties in @Model.City</text>
+                    }
+                    else
+                    {
+                        if (Model.Location != "")
+                        {
+                            <text>View all properties in @Model.Location</text>
+                        }
+                        else
+                        {
+                            <text>View all properties</text>
+                        }
+                    }
+
+                </button>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div>
+                <button class="col-md-12 staticbtn" id="searchbutton" type="button" onclick="submitSForm()">
+                    @if (Model.City != "")
+                    {
+                        <text>View all properties in @Model.City</text>
+                    }
+                    else
+                    {
+                        if (Model.Location != "")
+                        {
+                            <text>View all properties in @Model.Location</text>
+                        }
+                        else
+                        {
+                            <text>View all properties</text>
+                        }
+                    }
+
+                </button>
+            </div>
+            <div>
+                <div>
+                    @Html.Partial("~/Views/Widget/_PopularPlaces.cshtml")
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type='text/javascript'>
+    $().ready(function () {
+        $('.trunc').jTruncate({
+            length: 120,
+            minTrail: 0,
+            moreText: "",
+            lessText: "",
+            moreAni: "fast",
+            lessAni: 1000,
+            ellipsisText: "",
+        });
+    });
+</script>
+<script type='text/javascript'>
+    $(window).resize(function () {
+        imgadj();
+    });
+    $(function () { imgadj(); });
+    function imgadj() {
+        $(".img-thumb").each(function () {
+            var refH = $(this).height();
+            var refW = $(this).width();
+            var refRatio = refW / refH;
+            var imgH = $(this).children("img").height();
+            var imgW = $(this).children("img").width();
+
+            if ((imgW / imgH) < refRatio) {
+                $(this).addClass("portrait");
+            } else {
+                $(this).addClass("landscape");
+            }
+        })
+    }
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        // $('#most-popular1').show();
+        $('#most-popular12').show();
+        $('#most-popular123').show();
+
+        // for Start Date
+        var now = new Date();
+        now.setDate(now.getDate() + @startD );
+
+        var mnth = pad(now.getMonth() + 1, 2);
+        var sdate = pad(now.getDate(), 2) + "/" + mnth + "/" + now.getFullYear();
+        $("#CheckIn").val(sdate);
+
+        //    var now = nowTemp; // new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDay(), 0, 0, 0, 0);
+        var checkin = $('#CheckIn').datepicker(
+            {
+                minDate: 1,
+                defaultDate: now,
+                numberOfMonths: 2,
+                dateFormat: "dd/mm/yy"
+            });
+        $(".checkin div").click(function () { $("#CheckIn").datepicker('show'); });
+        $(".checkout div").click(function () { $("#CheckOut").datepicker('show'); });
+
+        // for end date
+        now.setDate(now.getDate() + @diff);
+
+        var mnth1 = pad(now.getMonth() + 1, 2);
+        var edate = pad(now.getDate(), 2) + "/" + mnth1 + "/" + now.getFullYear();
+        $("#CheckOut").val(edate);
+
+        var checkout = $('#CheckOut').datepicker(
+             {
+                 minDate: 2,
+                 numberOfMonths: 2,
+                 defaultDate: now,
+                 dateFormat: "dd/mm/yy"
+             });
+
+        $("#CheckIn").change(function () {
+            var v = $(this).val().trim();
+
+            var curDate = new Date();
+            curDate.setDate(curDate.getDate() + 1);
+            var idat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+            curDate.setDate(curDate.getDate() + 2);
+            var odat = pad(curDate.getDate(), 2) + "/" + pad(parseInt(curDate.getMonth()) + 1, 2) + "/" + curDate.getFullYear();
+
+            if (checkDate(v)) {
+                re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+                if (regs = v.match(re)) {
+                    var day, mnt, yr;
+                    yr = parseInt(regs[3]);
+                    mnt = parseInt(regs[2]);
+                    dy = parseInt(regs[1]);
+                    if (mnt > 0) mnt = mnt - 1;
+                    var cd = new Date(Date.UTC(yr, mnt, dy));
+                    cd.setDate(cd.getDate() + 2);
+                    var mn = cd.getMonth() + 1; //parseInt(cd.getMonth()) + 1;
+                    var chgDt = pad(cd.getDate(), 2) + "/" + pad(mn, 2) + "/" + cd.getFullYear();
+                    // alert(chgDt);
+                    var cs = new Date(Date.UTC(yr, mnt, dy));
+                    var mind = new Date(Date.UTC(yr, mnt, dy));
+                    mind.setDate(mind.getDate() + 1);
+                    var mindx = pad(mind.getDate(), 2) + "/" + pad(parseInt(mind.getMonth()) + 1, 2) + "/" + mind.getFullYear();
+                    var xo = $("#CheckOut").val();
+                    //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                    if (checkDate(xo)) {
+                        if (regss = xo.match(re)) {
+                            yr = parseInt(regss[3]);
+                            mnt = parseInt(regss[2]);
+                            dy = parseInt(regss[1]);
+                            if (mnt > 0) mnt = mnt - 1;
+                            var co = new Date(Date.UTC(yr, mnt, dy));
+                            if (co <= cs) {
+                                $("#CheckOut").val(chgDt);
+                                // $("#CheckOut").datepicker("option", "setDate", cd);
+                            }
+                        }
+                        else {
+                            // $("#CheckOut").datepicker("option", "setDate", cd);
+                            $("#CheckOut").val(chgDt);
+                        }
+                    }
+                    else {
+                        // $("#CheckOut").datepicker("option", "setDate", cd);
+                        $("#CheckOut").val(chgDt);
+                    }
+                    //checkout.minDate = n;
+                    $("#CheckOut").datepicker("option", "minDate", mindx);
+                    //$("#CheckOut").datepicker("show");
+                }
+                else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+            }
+            else { $("#CheckIn").val(idat); $("#CheckOut").val(odat); }
+        });
+
+
+        $("#spnrAd").dpNumberPicker({
+            value: 1,
+            min: 1,
+            max: 8,
+            step: 1,
+            afterChange: function () { $("#Adults").val(this.options.value); }
+        });
+        $("#spnrCd").dpNumberPicker({
+            value: 0,
+            min: 0,
+            max: 8,
+            step: 1,
+            afterChange: function () { $("#Children").val(this.options.value); }
+        });
+
+        $("#spnrBed").dpNumberPicker({
+            value: 0,
+            min: 0,
+            max: 6,
+            step: 1,
+            afterChange: function () { $("#BedRooms").val(this.options.value); }
+        });
+    });
+
+    function valdInOutDates() {
+        var v = $.trim($("#CheckIn").val());
+        if (checkDate(v)) {
+            re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            if (regs = v.match(re)) {
+                var cs = new Date(regs[3], regs[2], regs[1]);
+                var xo = $("#CheckOut").val();
+                //                    $("#CheckOut").datepicker("option", "minDate", mind);
+
+                if (checkDate(xo)) {
+                    if (regss = xo.match(re)) {
+                        var co = new Date(regss[3], regss[2], regss[1]);
+                        if (co <= cs) {
+                            $("#DestinationAlert").html('Please enter a checkout date which falls after checkin date');
+                            $("#CheckOut").focus();
+                            return false;
+                        }
+                    }
+                    else {
+                        $("#DestinationAlert").html('Invalid Check Out date');
+                        $("#CheckOut").focus();
+                        return false;
+                    }
+                }
+                else {
+                    $("#DestinationAlert").html('Invalid Check Out date');
+                    $("#CheckOut").focus();
+                    return false;
+                }
+            }
+            else {
+                $("#DestinationAlert").html('Invalid Check In date');
+                $("#CheckIn").focus();
+                return false;
+            }
+        } else {
+            $("#DestinationAlert").html('Invalid Check In date');
+            $("#CheckIn").focus();
+            return false;
+        }
+        return true;
+    }
+    function pad(num, size) {
+        var s = num + "";
+        while (s.length < size) s = "0" + s;
+        return s;
+    }
+    function checkDate(field) {
+        var allowBlank = true; var minYear = 2014; var maxYear = (new Date()).getFullYear() + 1;
+        // regular expression to match required date format
+        re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+        if (field != '') {
+            if (regs = field.match(re)) {
+                if (regs[1] < 1 || regs[1] > 31)
+                { return false; }
+                else if (regs[2] < 1 || regs[2] > 12)
+                { return false; }
+                else if (regs[3] < minYear || regs[3] > maxYear)
+                { return false; }
+            } else { return false; }
+        } else { return false; }
+        return true;
+    }
+    function daydiff(first, second) {
+        return (second - first) / (1000 * 60 * 60 * 24);
+    }
+
+    $(function () {
+
+        $("#Destination").autocomplete({
+            minLength: 0,
+            source: "/Common/GetDestination",
+            focus: function (event, ui) {
+                $("#Destination").val(ui.item.value);
+                return false;
+            }
+        })
+        .autocomplete("instance")._renderItem = function (ul, item) {
+            ul.addClass("custom");
+            return $("<li>") //.addClass("custom")
+            .append("<a>" + item.label + "<br>" + item.desc + "</a>")
+            .appendTo(ul);
+        };
+    });
+
+    function SearchAllCity() {
+        var city = "";
+        @if(Model.City!= "")
+       {<text> city="@Model.City";</text> }
+        else
+        {
+            if(Model.Location !="")
+            {<text> city="@Model.Location";</text> }
+        else
+        {<text> city="";</text> }
+        }
+
+        $("#Destination").val(city);
+        frm = document.getElementById("searchform");
+        //   form.target = '_blank';
+        frm.action = '/Search';
+        frm.submit();
+        return true;
+    }
+
+    function submitSForm() {
+
+        if ($.trim($("#Destination").val()) == '') {
+            $("#DestinationAlert").html("Please enter a valid city, location or property name to search");
+            $("#Destination").val('').focus();
+            return false;
+        }
+        else {
+            if (!valdInOutDates()) return false;
+        }
+        @*frm = document.getElementById("searchform");
+        //   form.target = '_blank';
+        var param = "Destination=" + $("#Destination").val() + "&CheckIn=" + $("#CheckIn").val() + "&CheckOut=" + $("#CheckOut").val() + "&Adults=" + $("#Adults").val() + "&Children=" + $("#Children").val() + "&BedRooms=" + $("#BedRooms").val() + "&StayType=" + $("#StayType").val();
+        frm.action = '@Url.Action("Index", "Search", new { area=""})?' + param;
+        frm.submit();*@
+
+        var url = "/Search/Index" + "?Destination=" + $("#Destination").val() + "&CheckIn=" + $("#CheckIn").val() + "&CheckOut=" + $("#CheckOut").val() + "&Adults=" + $("#Adults").val() + "&Children=" + $("#Children").val() + "&BedRooms=" + $("#BedRooms").val() + "&StayType=" + $("#StayType").val();
+        window.location.href = url;
+
+        return true;
+    }
+</script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $("#owl-demo").owlCarousel({
+            navigation: true,
+            responsiveClass: true,
+            responsive: {
+                0: {
+                    items: 2
+                },
+                450: {
+                    items: 3
+                },
+                767: {
+                    items: 4
+                },
+                991: {
+                    items: 4
+                },
+                1199: {
+                    items: 4
+                }
+            }
+        });
+
+        $("#owl-demo2").owlCarousel({
+            navigation: true,
+            responsiveClass: true,
+            responsive: {
+                0: {
+                    items: 2
+                },
+                450: {
+                    items: 3
+                },
+                767: {
+                    items: 4
+                },
+                991: {
+                    items: 5
+                },
+                1199: {
+                    items: 5
+                }
+            }
+        });
+
+    });
+
+
+
+</script>

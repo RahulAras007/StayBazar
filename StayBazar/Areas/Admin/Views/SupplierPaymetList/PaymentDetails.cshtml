@@ -1,0 +1,256 @@
+﻿@model StayBazar.Areas.Admin.Models.SupplierPaymentModel
+@{
+    ViewBag.Title = "Manage Supplier Payment";
+}
+
+
+<style>
+    .row {
+        margin-bottom: 8px;
+    }
+</style>
+
+
+@using (Html.BeginForm("SaveSupplierPayment", "SupplierPayment", FormMethod.Post, new { @id = "frmSubmit" }))
+{
+    @Html.HiddenFor(m => m.supplierPaymentId)
+    <input type="hidden" value="@Model.supplierPaymentId" id="supPaymentId" />
+    <h4>Supplier Payment</h4><br />
+    <hr />
+    <div class="col-md-12" style="padding:0;">
+        <div class="col-md-6" style="padding:0;">
+         
+            <div class="row">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.GrossAmount)
+                </div>
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.GrossAmount, null, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.NetAmount)
+                </div>
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.NetAmount, null, new { @class = "form-control", @id = "txtNetAmount" })
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.TdsAmount)
+                </div>
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.TdsAmount, null, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" style="padding:0;">
+            <div class="row">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.ModeofPayment)
+                </div>
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.ModeofPayment, null, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.Bank)
+                </div>
+                <div class="col-md-6">
+                    <input type="hidden" value="@Model.Status" id="status">
+                    @Html.TextBoxFor(m => m.Bank, null, new { @class = "form-control" })
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12 text-right" style="padding-right: 115px;">
+            <button class="btn btn-success" type="button" id="btnSubmit" onclick="Paymentsbt()">Submit</button>
+            <button class="btn btn-danger" type="button" onclick="cancel()">Cancel</button>
+        </div>
+    </div>
+
+
+    <hr />
+
+    if (Model.bookinreferno != null)
+    {
+        var i = 1;
+        <h2 colspan="6" style="text-align: center;font-size: 22px;">
+            Booking Selected
+        </h2>
+        foreach (var bookinreferno in Model.bookinreferno)
+        {
+            Model.Supplier = BLayer.SupplierPayment.GetPaymentdetails(bookinreferno);
+<table class="table" >
+   
+    <thead>
+        <tr>
+          
+        </tr>
+        <tr>
+            <th align="center">Property Name</th>
+            <th align="center">Property City</th>
+            <th align="center">Customer Name</th>
+            <th align="center">Confirmation No</th>
+            <th align="center">Supplier Name</th>
+            <th align="center">Date</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><p id="Buyprice_@bookinreferno">@Model.Supplier.propertyname</p></td>
+            <td>@Model.Supplier.propertycity</td>
+            <td>@Model.Supplier.CustomerName</td>
+            <td>@Model.Supplier.OrderId</td>
+            <td>@Model.Supplier.SupplierName</td>
+            <td>Check IN:@Model.Supplier.CheckIn_date.ToShortDateString()<br />
+                Check Out:@Model.Supplier.CheckOut_date.ToShortDateString()</td>
+           
+        </tr>
+        <tr>
+            <td colspan="3"></td>
+            <td>Buy Rate: @Model.Supplier.Buyprice<br />
+                Amount Paid :@Model.Supplier.AmountPaid</td>
+            <td> 
+                Amount  : <input type="hidden" value="@Model.Supplier.supplierId" id="supplierId_@bookinreferno">
+          
+<input type="hidden" value="@Model.Supplier.SupplierEmail" id="SupplierEmail_@bookinreferno">
+<input type="text" value="@Model.Supplier.AmountPaid"  class="amtpaid" id="AmountPaid_@bookinreferno" onchange="compareAmt('@bookinreferno')" />
+              </td>
+            <td colspan="2"><input type="checkbox"  @if(@Model.Supplier.supplierPayment){<text> checked </text>} id="supplierPayment_@bookinreferno" /> Mark as Payment Done</td>
+        </tr>
+    </tbody>
+</table>
+           
+
+            i = i + 1;
+            <hr />
+            //     BLayer.Supplier.DeleteSupplierbyclientidsupid(Supplierid, ClientId);
+        }
+    }
+
+}
+<script>
+
+
+       
+    function compareAmt(BookRef)
+    {
+      
+        var Amtpaid = $("#AmountPaid_" +  BookRef).val();
+        var Buyprice = $("#supplierId_" +  BookRef).val();
+        var sumamt=Number(Amtpaid)+Number(Buyprice);
+       
+        if(Number(Buyprice)<Number(sumamt)){
+            alert('Please Type Amount Paid Should be Less than  Supplier Amount Confirmation number is '+BookRef);
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    function cancel()
+    {
+        var url = '@Url.Action("Index", "SupplierPayment")';
+        window.location.href = url;
+    }
+    function Paymentsbt()
+    {
+
+        if($("#frmSubmit").valid()){
+
+            var inputs = $(".amtpaid");
+            var amtpaid=0;
+            for (var i = 0; i < inputs.length; i++) {
+             
+                var BookR = inputs[i];
+                
+                var AmountPaid = $(inputs[i]).val();
+              
+                amtpaid=Number(amtpaid)+Number(AmountPaid);
+            }
+            var txtNetAmount = $("#txtNetAmount").val() ;
+            
+            if(amtpaid>txtNetAmount){
+                alert("Please Sum of amount paid greater than Net amount");
+            }
+            else{
+                $("#btnSubmit").attr("disabled", true);
+
+                var url = '@Url.Action("SaveSupplierPayment", "SupplierPayment")?'+$("#frmSubmit").serialize();
+                $.post(url, function (data) {
+
+                    if(data>0 &&data!=""){
+
+                        $('#supplierPaymentId').val(data);
+                        var SupPaymentId =data;
+
+
+
+                        var BookRefNo = @Html.Raw(Json.Encode(Model.bookinreferno));
+                        for (var i = 0; i < BookRefNo.length; i++) {
+
+                            var BookRef = BookRefNo[i];
+                            var Buypriceid = "#Buyprice_" +  BookRef;
+                            var Buyprice = $(Buypriceid).val();
+                            var BookRefNo1=false;
+                            var AmountPaidid = "#AmountPaid_" +  BookRef;
+                            var AmountPaid = $(AmountPaidid).val();
+
+                            var supplierId = "#supplierId_" +  BookRef;
+                            var supplier = $(supplierId).val();
+                            var SupplierEmail = "#SupplierEmail_" +  BookRef;
+                            var SupplierEmailid = $(SupplierEmail).val();
+
+                            var supplierPaymentid = "#supplierPayment_" +  BookRef;
+
+                            if($(supplierPaymentid).prop("checked") == true){
+                                var   supplierPayment=true;
+                            }
+                            else if($(supplierPaymentid).prop("checked") == false){
+                                var  supplierPayment=false;
+                            }
+                            var SupplierPaymentId1= $( "#supPaymentId").val();
+                            var j=i+1;
+
+                            if(j==BookRefNo.length){
+
+                                BookRefNo1=true;
+                            }
+
+                            var url = '@Url.Action("SaveSupplierPaymentDetails", "SupplierPayment")?SupplierPaymentId='+SupPaymentId+"&SupplierId="+supplier+"&SupplierEmail="+SupplierEmailid+"&bookingreference="+BookRef+"&amount="+AmountPaid+"&supplierPayment="+supplierPayment+"&BookRefNo1="+BookRefNo1+"&status="+0;
+                            $.post(url, function (data) {
+
+
+
+
+                            });
+                            if(BookRefNo1==true){
+                                var url = '@Url.Action("ReportPdf", "SupplierPayment")?SupplierPaymentId='+SupPaymentId;
+                                window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");}
+
+                        }
+                    }
+
+
+                });
+
+            }
+        }
+
+    }
+
+
+</script>

@@ -1,0 +1,189 @@
+﻿@using StayBazar.Models
+@*<link rel="stylesheet" href="~/Content/main.css">*@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<style>
+    .form-control {
+        display: block;
+        width: 100%;
+        height: calc(3.25rem + 4px);
+        padding-top: 0.375rem;
+        padding-right: 0.75rem;
+        padding-bottom: 0.375rem;
+        padding-left: 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #496057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+    }
+
+    /*input, optgroup, select, textarea {
+        margin: 0;
+        font-family: inherit;
+        font-size: inherit;
+        line-height: 2.5;
+        width: 122px;
+    }*/
+</style>
+<div class="parent-div">
+    <!--Landing Starts Here -->
+    <div class="landing-img">
+        <div class="landing-heading">
+            @*<div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2> Where Experience is </h2>
+                            <h3 class="landing-caption"> as good as Experience</h3>
+                        </div>
+                    </div>
+                </div>*@
+        </div>
+    </div>
+    <!-- ABout us heading section-->
+    <section class="about-section text-left">
+        <div class="title-heading">
+            <h3>USER LOGIN</h3>
+        </div>
+        <style>
+            .form-control {
+                font-size: 14px;
+            }
+        </style>
+
+
+
+        @model StayBazar.Models.LoginViewModel
+
+        @{
+            var currentAction = "login";
+            //HtmlHelper htmlHelper = this.Html;
+            //var routeData = htmlHelper.ViewContext.RouteData;
+            //currentAction = routeData.GetRequiredString("Action").ToLower();
+            //if (currentAction == "login")
+            //{
+            //    ViewBag.Title = "Log in";
+            //}
+            //else
+            //{
+            //    if (ViewBag.type == 1)
+            //    {
+            //        ViewBag.Title = "Business Corporate Login";
+            //    }
+            //    else if (ViewBag.type == 2)
+            //    {
+            //        ViewBag.Title = "Business Supplier Login";
+            //    }
+            //    else if (ViewBag.type == 3)
+            //    {
+            //        ViewBag.Title = "Business Travel Agent Login";
+            //    }
+
+
+            //}
+            // ViewBag.ReturnUrl1 = " ";
+        }
+
+
+        @*<div class="row">
+                <div class="col-md-12">
+                    @if (currentAction != "login")
+                    {
+                        <h3>Business User Login</h3>
+                    }
+                    else
+                    {
+                        <h3>User Login</h3>
+                    }
+                </div>
+            </div>*@
+        <div class="row">
+            <div class="col-md-5 col-md-offset-1 lgnbx1">
+                @*<div>
+                        @if (currentAction != "login")
+                        {
+                            <span>Corporate users, Suppliers and Travel Agents can login here.</span>
+                        }
+                        else
+                        { <span>Please login with your email.</span>}
+                    </div>*@
+                <div>
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true)
+                        <div class="incontainer margin-top-10">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.UserName, new { @class = "col-md-2 control-label", style = "padding-left:0px;font-size:16px;" })
+                                <div class="col-md-10">
+                                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.UserName)
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" , style = "padding-left:0px;font-size:16px;" })
+                                <div class="col-md-10">
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @autocomplete = "off" })
+                                    @Html.ValidationMessageFor(m => m.Password)
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-9">
+                                <div class="checkbox lgn_chk">
+                                    @Html.CheckBoxFor(m => m.RememberMe)
+                                    @Html.LabelFor(m => m.RememberMe)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group"><div class="col-md-10 col-md-offset-2"><a href="@Url.Action("Forgot", "Account")" style="font-size:14px;">Forgot Password?</a></div></div>
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <input type="submit" value="Log in" class="btn btn-danger" style="width:280px;height:50px;font:20px FreigSanProBook_0;border-radius: 10px;"/>
+                            </div>
+                        </div>
+
+                    }
+                </div>
+
+            </div>
+            @*<div class="col-md-5 lgnbx2">
+                    @if (currentAction != "login")
+                    {
+                        <h4>Don't have an Account?</h4>
+                        <p>Please register for an account, we will contact you back!</p>
+                        <p><a href="@Url.Action("Supplier","Join")">Register as Supplier</a></p>
+                        <p><a href="@Url.Action("Corporate", "Join")">Register as Corporate</a></p>
+                        <p><a href="@Url.Action("TravelAgent", "Join")">Register as Travel Agent</a></p>
+
+                    }
+                    else
+                    {
+                        <h4>New User?</h4>
+                        <p class="text-left">Please create your free account</p>
+                        <p class="text-left" ><a href="@Url.Action("Register")" style="color:blue">Register</a></p>
+                        <div class="col-md-12">
+
+                                @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+
+                        </div>
+                    }
+                </div>*@
+            @*@if (currentAction == "login")
+                {
+                    <div class="col-md-4 margin-top-30">
+                        <section id="socialLoginForm">
+                            @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+                        </section>
+                    </div>
+                }*@
+        </div>
+
+
+
+    </section>
+</div>

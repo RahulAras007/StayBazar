@@ -1,0 +1,63 @@
+﻿@model List<CLayer.StaticPage>
+           @{ int srno = 1;
+              string editUrl = Url.Action("EditPage","StaticPage");
+              string delUrl = Url.Action("Delete", "StaticPage");
+              string editPropertyUrl = Url.Action("Index", "PropertyAdd");
+              }
+    <table class="table table-custom table-bordered table-striped">
+        <thead>
+            <tr>
+                <th><input type="checkbox" name="chk" id="chk" onclick="check()" /> <a @*onclick="selectAll()"*@ href="#">Select All</a></th>
+                <th>Sr No</th>
+                <th>City</th>
+                <th>Location</th>
+                <th>Page Title</th>
+                <th>Property</th>
+                <th>Edit</th>
+                <th>Delete</th>
+                <th>Last Update</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (CLayer.StaticPage data in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" class="staticchk" id="Propertyselected" name="Propertyselected" value="@data.PageId" /></td>
+                    <td>@srno</td>
+                    <td>@data.City</td>
+                    <td>@data.Location</td>
+                    <td>@data.PageTitle</td>
+                    <td align="center"><a href="@editPropertyUrl?PageId=@data.PageId"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></td>
+                    <td align="center"><a href="@editUrl?id=@data.PageId"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></td>
+                    <td align="center"><a href="@delUrl?PageId=@data.PageId" onclick="return confirm('Are you sure you want to delete this static page?')"><span class="glyphicon glyphicon-remove red-color fa-2x"></span></a></td>
+                    <td>@data.LastUpdate</td>
+                </tr>
+                srno++;
+            }
+        </tbody>
+    </table>
+<script type="text/javascript">
+
+    function check() {
+        if ($('#chk').prop('checked') == true) {
+            selectAll();
+        }
+        else {
+            deselectAll();
+        }
+    }
+  
+
+    function deselectAll() {
+        $(".staticchk").each(function () {
+            $(this).prop("checked", false);
+        });
+    }
+    function selectAll()
+    {
+        $(".staticchk").each(function () {
+            $(this).prop("checked", true);           
+        });    
+    }
+    
+</script> 

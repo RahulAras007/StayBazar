@@ -1,0 +1,1092 @@
+﻿@model StayBazar.Models.BookingModel
+@using Microsoft.AspNet.Identity
+@{
+    string userid = User.Identity.GetUserId();
+    string email = User.Identity.GetUserName();
+    int roleId = BLayer.User.GetRole(email);
+    ViewBag.Title = "Booking Details Review";
+    bool showPanels = (Model.Items.Count > 0);
+    long propertyId = BLayer.Bookings.GetPropertyId(Model.BookingId);
+    int status = (int)BLayer.Bookings.GetStatus(Model.BookingId);
+
+    CLayer.Property data = BLayer.Property.Get(propertyId);
+    if (data != null)
+    {
+        if (data.PropertyInventoryType != null)
+        {
+            if (data.PropertyInventoryType == (int)CLayer.ObjectStatus.PropertyInventoryType.Offline)
+            {
+                BLayer.Bookings.UpdatePropertyInventoryType(Model.BookingId, (int)CLayer.ObjectStatus.PropertyInventoryType.Offline);
+            }
+            else if (data.PropertyInventoryType == (int)CLayer.ObjectStatus.PropertyInventoryType.Online)
+            {
+                BLayer.Bookings.UpdatePropertyInventoryType(Model.BookingId, (int)CLayer.ObjectStatus.PropertyInventoryType.Online);
+            }
+        }
+    }
+
+
+
+    string ordrno = BLayer.Bookings.GetRefNoById(Model.BookingId);
+    bool showExtensionText = false;
+    if (ordrno != null && ordrno != "")
+    {
+        List<long> ids = BLayer.Bookings.GetBookingsByOrder(ordrno);
+        showExtensionText = (ids.Count > 1);
+    }
+    bool auth = false;
+    CLayer.Role.Roles roleType = CLayer.Role.Roles.Customer;
+    string titleName = "";
+    auth = User.Identity.IsAuthenticated;
+    if (auth)
+    {
+        string userId = User.Identity.GetUserId();
+        long id = 0;
+        if (long.TryParse(userId, out id))
+        {
+            if (id > 0)
+            {
+                roleType = BLayer.User.GetRole(id);
+                if (roleType == CLayer.Role.Roles.Agent || roleType == CLayer.Role.Roles.Corporate)
+                {
+                    titleName = BLayer.B2B.GetBusinessName(id);
+                }
+                else
+                {
+                    if (roleType == CLayer.Role.Roles.CorporateUser)
+                    {
+                        long cid = BLayer.B2B.GetCorporateIdOfUser(id);
+                        titleName = BLayer.B2B.GetBusinessName(cid);
+                    }
+                }
+            }
+        }
+    }
+    string UserIds = User.Identity.GetUserId();
+    CLayer.Role.Roles UsertypeId = BLayer.User.GetRole(Convert.ToInt32(UserIds));
+
+    long MinDays = Convert.ToInt32(BLayer.Settings.GetValue("PartialPaymentSecondReminder"));
+
+
+    CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+
+
+    string pCorpAdmin = BLayer.Settings.GetValue(CLayer.Settings.GDSCORPORATE);
+    string pCorpUser = BLayer.Settings.GetValue(CLayer.Settings.GDSCORPORATEUSER);
+    string pCorpApprover1 = BLayer.Settings.GetValue(CLayer.Settings.GDSCORPORATEAPPROVER1);
+    string pCorpApprover2 = BLayer.Settings.GetValue(CLayer.Settings.GDSCORPORATEAPPROVER2);
+    string pCorporateTestMail = BLayer.Settings.GetValue(CLayer.Settings.CORPORATETESTEMAIL);
+
+    string CorpAdmin = "test";// BLayer.Settings.GetValue(CLayer.Settings.GDSCORPORATE);
+    string CorpUser = "test";//BLayer.Settings.GetValue(CLayer.Settings.GDSCORPORATEUSER);
+    string CorpApprover1 = "test";// BLayer.Settings.GetValue(CLayer.Settings.GDSCORPORATEAPPROVER1);
+    string CorpApprover2 = "test";//BLayer.Settings.GetValue(CLayer.Settings.GDSCORPORATEAPPROVER2);
+    var CorporateTestMail = "test";//BLayer.Settings.GetValue(CLayer.Settings.CORPORATETESTEMAIL);
+}
+
+
+<!--*************************-->
+<!--fsdfsdfsdfsfsdfsdfsdfsdf-->
+@{
+    List<CLayer.Currency> currencies = BLayer.Currency.GetForListing();
+    System.Text.StringBuilder curcodes = new System.Text.StringBuilder();
+    System.Text.StringBuilder curarray = new System.Text.StringBuilder();
+    foreach (CLayer.Currency item in currencies)
+    {
+        curcodes.Append(",");
+        curcodes.Append(item.Title);
+
+        curarray.Append("['");
+        curarray.Append(item.Title);
+        curarray.Append("','");
+        curarray.Append(item.Symbol);
+        curarray.Append("','");
+        curarray.Append(item.ConversionRate);
+        curarray.Append("'],");
+    }
+    if (curarray.Length > 0)
+    {
+        curarray.Remove(curarray.Length - 1, 1);
+    }
+    string defaultCurCode = "";
+    if (Request.Cookies.Get("CurCode") != null)
+    { defaultCurCode = Request.Cookies.Get("CurCode").Value; }
+    string fname = "";
+    bool IsForStaticPage = false;
+    if (ViewBag.IsForStaticPage != null)
+    { IsForStaticPage = (bool)ViewBag.IsForStaticPage; }
+
+}
+
+@{
+    string extensions = System.Configuration.ConfigurationManager.AppSettings.Get("NonImageDocumentFileTypes");
+    string[] allowedFileExtensions = extensions.Split(',');
+}
+
+
+<link href="~/Content/jquery.dpNumberPicker-holoLight-1.0.1.css" rel="stylesheet" />
+<script src="~/Scripts/jquery.dpNumberPicker-1.0.1.js" type="text/javascript"></script>
+<script src="~/Scripts/bootstrap-formhelpers.js" type="text/javascript"></script>
+<script src="~/Scripts/default.js" type="text/javascript"></script>
+<script src="~/Scripts/placeholder.js" type="text/javascript"></script>
+
+
+
+<!--fsdfsdfsdfsfsdfsdfsdfsdf-->
+
+
+
+
+
+@if (roleId == 6 || roleId == 1 || roleId == 5)
+{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<!--*************************-->
+
+
+
+
+
+@using Microsoft.AspNet.Identity
+<script type="text/javascript">
+    $(function () { validateRq(); });
+</script>
+<!--New Design Added By Rahul-->
+<link rel="stylesheet" href="~/RahulSample/css/bootstrap.min.css">
+<link rel="stylesheet" href="~/RahulSample/css/font-awesome.min.css">
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="~/RahulSample/css/animate.min.css">
+
+<!-- Current Page Styles -->
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/revolution_slider/css/settings.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/revolution_slider/css/style.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/jquery.bxslider/jquery.bxslider.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="~/RahulSample/components/flexslider/flexslider.css" media="screen" />
+
+<!-- Main Style -->
+<link id="main-style" rel="stylesheet" href="~/RahulSample/css/style.css">
+
+<!-- Updated Styles -->
+<link rel="stylesheet" href="~/RahulSample/css/updates.css">
+
+<!-- Custom Styles -->
+<link rel="stylesheet" href="~/RahulSample/css/custom.css">
+
+<!-- Responsive Styles -->
+<link rel="stylesheet" href="~/RahulSample/css/responsive.css">
+
+<div id="page-wrapper">
+    <div class="page-title-container">
+        <div class="container">
+            <div class="page-title pull-left">
+                <h2 class="entry-title">Hotel Booking</h2>
+            </div>
+            <ul class="breadcrumbs pull-right">
+                <li class="active">Hotel Booking</li>
+            </ul>
+        </div>
+    </div>
+    <section id="content" class="gray-area">
+        <div class="container">
+            <div class="row">
+                <div id="main" class="col-sms-6 col-sm-8 col-md-9">
+                    <div class="booking-section travelo-box">
+                        <div class="alert small-box" style="display: none;"></div>
+                        <div class="person-information">
+                            @Html.Partial("_Details", Model)
+                        </div>
+                        <hr />
+
+                        @*<div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="term"> By continuing, you agree to the <a href="#"><span class="skin-color">Terms and Conditions</span></a>.
+                                </label>
+                            </div>
+                        </div>*@
+                        <div class="form-group row">
+                            @*<div class="col-md-6">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label>Booking For : </label>
+                                        </td>
+                                        <td style="padding-left:20px;">
+                                            @Html.RadioButtonFor(m => m.BookingForSelf, "S", new { id = "R1", @checked = true, @onchange = "SetVisible(0);" })<span>Self</span>
+                                        </td>
+                                        <td style="padding-left:20px;">
+                                            @Html.RadioButtonFor(m => m.BookingForSelf, "A", new { id = "R2", onchange = "SetVisible(1);" })<span>Others (Asissted)</span>
+                                        </td>
+                                        <td>
+                                            <div id="dddv" style="display:none">
+                                            </div>
+                                        </td>
+                                        <td style="padding-left:60px;">
+                                            <div id="D2" style="display:none">
+                                                @Html.DropDownListFor(m => m.CorporateID, Model.CorporateName, "--Select--", new { @class = "form-control" })
+                                                @Html.DropDownListFor(m => m.CorporateUserID, Model.CorporateUserName, new { @class = "form-control" })
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label>Billing For : </label>
+                                        </td>
+                                        <td style="padding-left:20px;">
+                                            @Html.RadioButtonFor(m => m.NewBillingFor, "P", new { id = "R3" })<span>Personal</span>
+                                        </td>
+                                        <td style="padding-left:20px;">
+                                            @Html.RadioButtonFor(m => m.NewBillingFor, "B", new { id = "R4" })<span>Company/Buisness</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <script language="javascript">
+                                function SetVisible(obj) {
+                                    var value = obj;
+                                    document.getElementById("dddv").style.display = "none"
+                                    document.getElementById("D2").style.display = "none"
+                                    if (value == 0) {
+                                        document.getElementById("dddv").style.display = "none";
+                                        document.getElementById("R4").checked = false;
+                                    }
+                                    if (value == 1) {
+                                        document.getElementById("D2").style.display = "block";
+                                        document.getElementById("R4").checked = true;
+                                    }
+
+                                }
+                            </script>*@
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm-12 col-md-12">
+
+                                <div class="constant-column-2">
+
+                                    @{
+                                        bool IsApproverNeeded = ViewBag.IsApproverNeeded;
+                                        bool IsCreditBookingNeeded = ViewBag.IsCreditBookingNeeded == null ? false : true;
+                                    }
+                                    @if (showPanels)
+                                    {
+                                        if (!IsApproverNeeded)
+                                        {
+                                            if (UsertypeId == CLayer.Role.Roles.Corporate)
+                                            {
+                                                CLayer.B2B Creditbookingdata = BLayer.B2B.GetbookingcreditforCorte(Convert.ToInt32(UserIds));
+
+                                                decimal amt = BLayer.Bookings.GetTotalcreditbookamount(Convert.ToInt32(UserIds));
+                                                decimal creditbalceAmt = Creditbookingdata.TotalCreditAmount - amt;
+
+                                                decimal BTotalAmt = BLayer.Bookings.GetTotal(Model.BookingId);
+
+
+
+
+
+                                                if (Creditbookingdata != null)
+                                                {
+                                                    if (Creditbookingdata.IsCreditBooking == 1)
+                                                    {
+                                                        if (BTotalAmt != null)
+                                                        {
+                                                            if (creditbalceAmt > BTotalAmt)
+                                                            {
+                                                                if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                                {
+                                                                    <span></span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <button id="booking_proceed3" onclick="proceedbcc()" type="button" class="btn-large">Bill to Company</button>
+                                                                    //<a id="booking_proceed3" onclick="proceedbcc()" href="#" class="btn btn-success ">Bill to Company</a>
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else if (UsertypeId == CLayer.Role.Roles.CorporateUser)
+                                            {
+
+
+
+                                                CLayer.B2B Creditbookingdata = BLayer.B2B.GetbookingcreditforCorporateUser(Convert.ToInt32(UserIds));
+
+                                                decimal amt = BLayer.Bookings.GetTotalcreditbookamount(Convert.ToInt32(UserIds));
+                                                decimal creditbalceAmt = Creditbookingdata.TotalCreditAmount - amt;
+
+                                                decimal BTotalAmt = BLayer.Bookings.GetTotal(Model.BookingId);
+
+
+
+
+
+                                                if (Creditbookingdata != null)
+                                                {
+                                                    if (Creditbookingdata.IsCreditBooking == 1)
+                                                    {
+                                                        if (BTotalAmt != null)
+                                                        {
+                                                            if (creditbalceAmt > BTotalAmt)
+                                                            {
+                                                                if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                                {
+                                                                    <span></span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <button id="booking_proceed3" onclick="proceedbcc()" type="button" class="btn-large">Bill to Company</button>
+                                                                    //<a id="booking_proceed3" onclick="proceedbcc()" href="#" class="btn btn-success ">Bill to Company</a>
+                                                                }
+
+
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+
+
+
+                                        if (data.PropertyInventoryType == (int)CLayer.ObjectStatus.PropertyInventoryType.Offline && (status == (int)CLayer.ObjectStatus.BookingStatus.CheckOut || status == (int)CLayer.ObjectStatus.BookingStatus.Cart))
+                                        {
+                                            using (Html.BeginForm("offlineproceed", "Booking", FormMethod.Post, new { style = "display:inline; padding-left: 15px;" }))
+                                            {
+                                                @Html.HiddenFor(m => m.BookingId)
+                                                <button id="booking_proceedoffline" type="submit" class="btn-large">Proceed</button>
+                                                //<input type="submit" value="Proceed" id="booking_proceedoffline" class="btn btn-success " />
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            long UserId = BLayer.Bookings.GetBookedByUserId(Model.BookingId);
+                                            CLayer.User dat = BLayer.User.GetCountrUser(UserId);
+                                            string ct = dat.Country;
+                                            if (ct.ToUpper() == "INDIA")
+                                            {
+
+                                                if (IsApproverNeeded)
+                                                {
+                                                    <button id="bookingapproval_proceed" type="button" class="btn-large" onclick="proceedtoapproval(@Model.BookingId)">Book Now</button>
+                                                    //<a id="bookingapproval_proceed" onclick="proceedtoapproval(@Model.BookingId)" href="#" class="btn btn-success "> Book Now</a>
+                                                }
+
+                                                else
+                                                {
+                                                    if (data.PropertyInventoryType == (int)CLayer.ObjectStatus.PropertyInventoryType.Offline && (status == (int)CLayer.ObjectStatus.BookingStatus.offlineconfirm))
+                                                    {
+                                                        if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button id="booking_proceed" type="button" class="btn-large" onclick="proceedfpOffline(@Model.BookingId)">Make Full Payment</button>
+                                                            //<a id="booking_proceed" onclick="proceedfpOffline(@Model.BookingId)" href="#" class="btn btn-success ">  Make Full Payment</a>
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button id="booking_proceed" type="button" class="btn-large" onclick="proceedfp(@Model.BookingId)">Make Full Payment</button>
+                                                            //<a id="booking_proceed" onclick="proceedfp(@Model.BookingId)" href="#" class="btn btn-success ">  Make Full Payment</a>
+                                                        }
+
+
+                                                    }
+                                                }
+
+
+                                                @*if (Model.Items[0].CheckIn > DateTime.Today.AddDays(MinDays + 1))
+                                                    {
+                                                        if (UsertypeId != CLayer.Role.Roles.Agent)
+                                                        {
+                                                            decimal Partialamountperc = 0;
+                                                            IsApproverNeeded = ViewBag.IsApproverNeeded;
+
+                                                            if (UsertypeId == CLayer.Role.Roles.Customer || UsertypeId == CLayer.Role.Roles.Administrator)
+                                                            {
+                                                                Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2CpartialamountPerc(propertyId));
+                                                            }
+                                                            if (UsertypeId == CLayer.Role.Roles.Corporate || UsertypeId == CLayer.Role.Roles.Affiliate || UsertypeId == CLayer.Role.Roles.Supplier || UsertypeId == CLayer.Role.Roles.CorporateUser)
+                                                            {
+                                                                Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2BpartialamountPerc(propertyId));
+                                                            }
+                                                            if (Partialamountperc != 0)
+                                                            {
+                                                                if (!IsApproverNeeded)
+
+                                                                {
+                                                                    if (data.PropertyInventoryType == (int)CLayer.ObjectStatus.PropertyInventoryType.Offline && (status == (int)CLayer.ObjectStatus.BookingStatus.offlineconfirm))
+                                                                    {
+                                                                        if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                                        {
+                                                                            <span></span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <button id="booking_parproceed" type="button" class=" btn-large" onclick="proceedppOffline(@Model.BookingId)">Make  @Partialamountperc % Payment</button>
+                                                                            //<a id="booking_parproceed" onclick="proceedppOffline(@Model.BookingId)" href="#" class="btn btn-success ">Make  @Partialamountperc % Payment</a>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                        if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                                        {
+                                                                            <span></span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <button id="booking_parproceed" type="button" class=" btn-large" onclick="proceedpp()" data-toggle="popover" data-placement="left" data-html="true" data-content="@Html.Partial("~/Views/Booking/_PartialPayDetails.cshtml", propertyId + "," + Model.BookingId)">Make  @Partialamountperc % Payment</button>
+                                                                            //<a id="booking_parproceed" onclick="proceedpp()" href="#" class="full-width btn-large" data-toggle="popover" data-placement="left" data-html="true" data-content="@Html.Partial("~/Views/Booking/_PartialPayDetails.cshtml", propertyId + "," + Model.BookingId)">Make  @Partialamountperc % Payment</a>
+
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                <a id="policytooltip1" style="display:none" href="#" data-toggle="popover" data-placement="left" data-html="true" data-content="@Html.Partial("~/Views/Booking/_PartialPayDetails.cshtml", propertyId + "," + Model.BookingId)">
+                                                                    <span class="fa fa-info-circle" style="color:#2f5df5;"></span>
+                                                                </a>
+
+                                                            }
+
+                                                        }
+                                                    }*@
+
+
+                                            }
+
+
+
+                                            else
+                                            {
+                                                <form name="psub" id="psub" style="display:inline" action="@Url.Action("ByPaypal","Payment")">
+                                                    <input type="radio" checked name="IsPartial" value="0" /><span style="font-weight:bold;"> Make Full Payment </span>
+                                                    @{
+
+                                                        if (Model.Items[0].CheckIn > DateTime.Today.AddDays(MinDays + 1))
+                                                        {
+
+                                                            if (UsertypeId != CLayer.Role.Roles.Agent)
+                                                            {
+                                                                decimal Partialamountperc = 0;
+                                                                if (UsertypeId == CLayer.Role.Roles.Customer || UsertypeId == CLayer.Role.Roles.Administrator)
+                                                                {
+                                                                    Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2CpartialamountPerc(propertyId));
+                                                                }
+                                                                if (UsertypeId == CLayer.Role.Roles.Corporate || UsertypeId == CLayer.Role.Roles.Affiliate || UsertypeId == CLayer.Role.Roles.Supplier || UsertypeId == CLayer.Role.Roles.CorporateUser)
+                                                                {
+                                                                    Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2BpartialamountPerc(propertyId));
+                                                                }
+                                                                if (Partialamountperc != 0)
+                                                                {
+                                                                    <input type="radio" name="IsPartial" value="1" /><span style="font-weight:bold;"> Make @Partialamountperc % Payment</span>
+                                                                    <a id="policytooltip1" href="#" data-toggle="popover" data-placement="left" data-html="true" data-content="@Html.Partial("~/Views/Booking/_PartialPayDetails.cshtml", propertyId + "," + Model.BookingId)">
+                                                                        <span class="fa fa-info-circle" style="color:#2f5df5;"></span>
+                                                                    </a>
+
+                                                                }
+
+                                                            }
+                                                        }
+                                                    }
+
+                                                    <a href="#" id="paypalsub" class="btn"><img src="https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif" align="left" style="margin-right:7px;" /></a>
+                                                    <input type="hidden" value="@Model.BookingDetails.OrderNo" name="refId" id="refId" />
+                                                </form>
+
+
+
+                                            }
+
+                                        }
+
+
+
+                                        using (Html.BeginForm("Cancel", "Booking", FormMethod.Post, new { style = "display:inline; padding-left: 15px;" }))
+                                        {
+                                            @Html.ValidationSummary(true)
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="full-width btn-large">Cancel</button>
+                                            //<input type="submit" class="btn btn-danger" value="Cancel" />
+                                        }
+
+
+
+
+
+                                    }
+                                    <br />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="sidebar col-sms-6 col-sm-4 col-md-3">
+                    <div class="booking-details travelo-box">
+                        <h4>Booking Details</h4>
+                        <article class="image-box hotel listing-style1">
+                            <figure class="clearfix">
+                                <a href="hotel-detailed.html" class="hover-effect middle-block"><img class="middle-item" width="270" height="160" alt="" src="http://placehold.it/270x160"></a>
+                                <div class="travel-title">
+                                    @if (Model.OrderedBy.PropertyId > 0)
+                                    {
+                                        List<CLayer.Address> addrssprList = BLayer.Bookings.GetpropertyAddress(Model.OrderedBy.PropertyId);
+
+                                        <h5 class="box-title">@Model.OrderedBy.PropertyTitle<small> @addrssprList[0].City</small></h5>
+                                    }
+                                </div>
+                            </figure>
+                            <div class="details">
+                                <div class="feedback">
+                                    <div data-placement="bottom" data-toggle="tooltip" class="five-stars-container" title="4 stars"><span style="width: 80%;" class="five-stars"></span></div>
+                                    <span class="review">270 reviews</span>
+                                </div>
+                            </div>
+                        </article>
+                        <div>
+                            @Html.Partial("_List", Model.Items)
+                        </div>
+                    </div>
+
+                    <div class="travelo-box contact-box">
+                        <h4>Need Travelo Help?</h4>
+                        <p>We would be more than happy to help you. Our team advisor are 24/7 at your service to help you.</p>
+                        <address class="contact-details">
+                            <span class="contact-phone"><i class="soap-icon-phone"></i>080 40916686</span>
+                            <br>
+                            <a class="contact-email" href="#">info@staybazar.com</a>
+                        </address>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+<!--Ends Here-->
+@*<div class="container bdy_min_height">
+        <div class="row margin10px ">
+            <div class="col-md-12 over_div" id="BookingDetails">
+
+                <div class="row margin-top-10">
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        @if (auth && (roleType == CLayer.Role.Roles.Agent || roleType == CLayer.Role.Roles.CorporateUser || roleType == CLayer.Role.Roles.Corporate))
+                        {
+                            if (roleType == CLayer.Role.Roles.Agent)
+                            {
+                                <text><h3>Travel Agent Booking - @titleName</h3></text>
+                            }
+                            else
+                            { <text><h3>Corporate Booking  - @titleName</h3></text> }
+                    }
+                    else
+                    {
+                        <text><h3>@ViewBag.Title</h3></text>
+                    }
+                    </div>
+                    <div class="col-md-8 margin-top-10 rightalign">
+                        @{
+                            bool IsApproverNeeded = ViewBag.IsApproverNeeded;
+                            bool IsCreditBookingNeeded = ViewBag.IsCreditBookingNeeded == null ? false : true;
+                        }
+                        @if (showPanels)
+                        {
+                            if (!IsApproverNeeded)
+                            {
+                                if (UsertypeId == CLayer.Role.Roles.Corporate)
+                                {
+                                    CLayer.B2B Creditbookingdata = BLayer.B2B.GetbookingcreditforCorte(Convert.ToInt32(UserIds));
+
+                                    decimal amt = BLayer.Bookings.GetTotalcreditbookamount(Convert.ToInt32(UserIds));
+                                    decimal creditbalceAmt = Creditbookingdata.TotalCreditAmount - amt;
+
+                                    decimal BTotalAmt = BLayer.Bookings.GetTotal(Model.BookingId);
+
+
+
+
+
+                                    if (Creditbookingdata != null)
+                                    {
+                                        if (Creditbookingdata.IsCreditBooking == 1)
+                                        {
+                                            if (BTotalAmt != null)
+                                            {
+                                                if (creditbalceAmt > BTotalAmt)
+                                                {
+                                                    if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                    {
+                                                        <span></span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a id="booking_proceed3" onclick="proceedbcc()" href="#" class="btn btn-success ">Bill to Company</a>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (UsertypeId == CLayer.Role.Roles.CorporateUser)
+                                {
+
+
+
+                                    CLayer.B2B Creditbookingdata = BLayer.B2B.GetbookingcreditforCorporateUser(Convert.ToInt32(UserIds));
+
+                                    decimal amt = BLayer.Bookings.GetTotalcreditbookamount(Convert.ToInt32(UserIds));
+                                    decimal creditbalceAmt = Creditbookingdata.TotalCreditAmount - amt;
+
+                                    decimal BTotalAmt = BLayer.Bookings.GetTotal(Model.BookingId);
+
+
+
+
+
+                                    if (Creditbookingdata != null)
+                                    {
+                                        if (Creditbookingdata.IsCreditBooking == 1)
+                                        {
+                                            if (BTotalAmt != null)
+                                            {
+                                                if (creditbalceAmt > BTotalAmt)
+                                                {
+                                                    if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                    {
+                                                        <span></span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a id="booking_proceed3" onclick="proceedbcc()" href="#" class="btn btn-success ">Bill to Company</a>
+                                                    }
+
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+
+
+                            if (data.PropertyInventoryType == (int)CLayer.ObjectStatus.PropertyInventoryType.Offline && (status == (int)CLayer.ObjectStatus.BookingStatus.CheckOut || status == (int)CLayer.ObjectStatus.BookingStatus.Cart))
+                            {
+                                using (Html.BeginForm("offlineproceed", "Booking", FormMethod.Post, new { style = "display:inline; padding-left: 15px;" }))
+                                {
+                                    @Html.HiddenFor(m => m.BookingId)
+                                    <input type="submit" value="Proceed" id="booking_proceedoffline" class="btn btn-success " />
+                                }
+                            }
+                            else
+                            {
+
+                                long UserId = BLayer.Bookings.GetBookedByUserId(Model.BookingId);
+                                CLayer.User dat = BLayer.User.GetCountrUser(UserId);
+                                string ct = dat.Country;
+                                if (ct.ToUpper() == "INDIA")
+                                {
+
+                                    if (IsApproverNeeded)
+                                    {
+                                        <a id="bookingapproval_proceed" onclick="proceedtoapproval(@Model.BookingId)" href="#" class="btn btn-success "> Book Now</a>
+                                    }
+
+                                    else
+                                    {
+                                        if (data.PropertyInventoryType == (int)CLayer.ObjectStatus.PropertyInventoryType.Offline && (status == (int)CLayer.ObjectStatus.BookingStatus.offlineconfirm))
+                                        {
+                                            if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                            {
+                                                <span></span>
+                                            }
+                                            else
+                                            {
+                                                <a id="booking_proceed" onclick="proceedfpOffline(@Model.BookingId)" href="#" class="btn btn-success ">  Make Full Payment</a>
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                            {
+                                                <span></span>
+                                            }
+                                            else
+                                            {
+                                                <a id="booking_proceed" onclick="proceedfp(@Model.BookingId)" href="#" class="btn btn-success ">  Make Full Payment</a>
+                                            }
+
+
+                                        }
+                                    }
+
+
+                                    if (Model.Items[0].CheckIn > DateTime.Today.AddDays(MinDays + 1))
+                                    {
+                                        if (UsertypeId != CLayer.Role.Roles.Agent)
+                                        {
+                                            decimal Partialamountperc = 0;
+                                            IsApproverNeeded = ViewBag.IsApproverNeeded;
+
+                                            if (UsertypeId == CLayer.Role.Roles.Customer || UsertypeId == CLayer.Role.Roles.Administrator)
+                                            {
+                                                Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2CpartialamountPerc(propertyId));
+                                            }
+                                            if (UsertypeId == CLayer.Role.Roles.Corporate || UsertypeId == CLayer.Role.Roles.Affiliate || UsertypeId == CLayer.Role.Roles.Supplier || UsertypeId == CLayer.Role.Roles.CorporateUser)
+                                            {
+                                                Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2BpartialamountPerc(propertyId));
+                                            }
+                                            if (Partialamountperc != 0)
+                                            {
+                                                if (!IsApproverNeeded)
+
+                                                {
+                                                    if (data.PropertyInventoryType == (int)CLayer.ObjectStatus.PropertyInventoryType.Offline && (status == (int)CLayer.ObjectStatus.BookingStatus.offlineconfirm))
+                                                    {
+                                                        if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a id="booking_parproceed" onclick="proceedppOffline(@Model.BookingId)" href="#" class="btn btn-success ">Make  @Partialamountperc % Payment</a>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+
+                                                        if ((email == CorporateTestMail) || (CorpAdmin == email) || (CorpUser == email) || (CorpApprover1 == email) || (CorpApprover2 == email))
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a id="booking_parproceed" onclick="proceedpp()" href="#" class="btn btn-success " data-toggle="popover" data-placement="left" data-html="true" data-content="@Html.Partial("~/Views/Booking/_PartialPayDetails.cshtml", propertyId + "," + Model.BookingId)">Make  @Partialamountperc % Payment</a>
+
+                                                        }
+                                                    }
+                                                }
+
+                                                <a id="policytooltip1" style="display:none" href="#" data-toggle="popover" data-placement="left" data-html="true" data-content="@Html.Partial("~/Views/Booking/_PartialPayDetails.cshtml", propertyId + "," + Model.BookingId)">
+                                                    <span class="fa fa-info-circle" style="color:#2f5df5;"></span>
+                                                </a>
+
+                                            }
+
+                                        }
+                                    }
+
+
+                                }
+
+
+
+                                else
+                                {
+                                    <form name="psub" id="psub" style="display:inline" action="@Url.Action("ByPaypal","Payment")">
+                                        <input type="radio" checked name="IsPartial" value="0" /><span style="font-weight:bold;"> Make Full Payment </span>
+                                        @{
+
+                                            if (Model.Items[0].CheckIn > DateTime.Today.AddDays(MinDays + 1))
+                                            {
+
+                                                if (UsertypeId != CLayer.Role.Roles.Agent)
+                                                {
+                                                    decimal Partialamountperc = 0;
+                                                    if (UsertypeId == CLayer.Role.Roles.Customer || UsertypeId == CLayer.Role.Roles.Administrator)
+                                                    {
+                                                        Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2CpartialamountPerc(propertyId));
+                                                    }
+                                                    if (UsertypeId == CLayer.Role.Roles.Corporate || UsertypeId == CLayer.Role.Roles.Affiliate || UsertypeId == CLayer.Role.Roles.Supplier || UsertypeId == CLayer.Role.Roles.CorporateUser)
+                                                    {
+                                                        Partialamountperc = Math.Round(BLayer.Property.GetPropertyB2BpartialamountPerc(propertyId));
+                                                    }
+                                                    if (Partialamountperc != 0)
+                                                    {
+                                                        <input type="radio" name="IsPartial" value="1" /><span style="font-weight:bold;"> Make @Partialamountperc % Payment</span>
+                                                        <a id="policytooltip1" href="#" data-toggle="popover" data-placement="left" data-html="true" data-content="@Html.Partial("~/Views/Booking/_PartialPayDetails.cshtml", propertyId + "," + Model.BookingId)">
+                                                            <span class="fa fa-info-circle" style="color:#2f5df5;"></span>
+                                                        </a>
+
+                                                    }
+
+                                                }
+                                            }
+                                        }
+
+                                        <a href="#" id="paypalsub" class="btn"><img src="https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif" align="left" style="margin-right:7px;" /></a>
+                                        <input type="hidden" value="@Model.BookingDetails.OrderNo" name="refId" id="refId" />
+                                    </form>
+
+
+
+                                }
+
+                            }
+
+
+
+                            using (Html.BeginForm("Cancel", "Booking", FormMethod.Post, new { style = "display:inline; padding-left: 15px;" }))
+                            {
+                                @Html.ValidationSummary(true)
+                                @Html.AntiForgeryToken()
+
+                                <input type="submit" class="btn btn-danger" value="Cancel" />
+                            }
+
+
+
+
+
+                        }
+                        <br />
+
+                    </div>
+                </div>
+                <div class="row" style="float:left;padding:10px">
+                    <a href="@TempData["DetailUrl"]" id="backtodetail" class="btn btn-danger">Back</a>
+                </div>
+                <div class="row">
+                    @Html.Partial("_List", Model.Items)
+                </div>
+
+
+
+                <div class="row">
+                    @if (showPanels)
+                    {
+                        @Html.Partial("_Details", Model)
+                    }
+                </div>
+            </div>
+
+        </div>
+        @if (showExtensionText)
+        {<text><div class="row"><div class="col-md-4" style="color:#a50c0c">Stay extension preview</div> </div></text>}
+        <div class="modal fade" id="chooseForBooking" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h3 class="modal-title" id="myModalLabel">Choose Address</h3>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12" id="ForBookingDataView">
+                                @Html.Partial("_ForBookingList", Model.Forbookings)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="~/BookingUser/Index/" id="btnReset" class="btn btn-default" tabindex="6">Add Guest</a>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+@Html.Partial("~/Views/Cancellation/_Policy.cshtml")
+<script type="text/javascript">
+
+    var cancelpopup = false;
+    function proceedoffline() {
+
+        window.location = "/Payment/Index?IsPartialPay=" + IsPartialPay;
+    }
+    function proceedfp(Bid) {
+        //document.getElementById('loading').style.display = 'block';
+        var IsPartialPay = false;
+        cancelpopup = true;
+        // window.location = "Url.Action("Index","Payment")";
+        debugger;
+        var email='@email';
+        var pCorpAdmin='@pCorpAdmin';
+        var pCorpUser ='@pCorpUser';
+        var pCorpApprover1 ='@pCorpApprover1';
+        var pCorpApprover2 ='@pCorpApprover2';
+        var pCorporateTestMail ='@pCorporateTestMail';
+        var Bid=@Model.BookingId;
+  //      alert(Bid);
+
+        if ((email == pCorporateTestMail) || (pCorpAdmin == email) || (pCorpUser == email) || (pCorpApprover1 == email) || (pCorpApprover2 == email))
+        {
+           // alert('test emails');
+            window.location = "/Payment/SuccessResult?Status="+Bid;
+        }
+        else{
+            if (Bid > 0)
+            {
+                window.location = "/Payment/Index?IsPartialPay=" + IsPartialPay + "&BookId=" + Bid;
+            }
+            else {
+                window.location = "/Payment/Index?IsPartialPay=" + IsPartialPay;
+            }
+        }
+
+
+
+    }
+
+    function proceedfpOffline(BId) {
+        //document.getElementById('loading').style.display = 'block';
+        var IsPartialPay = false;
+        cancelpopup = true;
+        // window.location = "Url.Action("Index","Payment")";
+        window.location = "/Payment/Index?IsPartialPay=" + IsPartialPay + "&BookId=" + BId;
+    }
+    function proceedpp() {
+        //document.getElementById('loading').style.display = 'block';
+        var IsPartialPay = true;
+        cancelpopup = true;
+        // window.location = "Url.Action("Index","Payment")";
+        debugger;
+        var email='@email';
+        var pCorpAdmin='@pCorpAdmin';
+        var pCorpUser ='@pCorpUser';
+        var pCorpApprover1 ='@pCorpApprover1';
+        var pCorpApprover2 ='@pCorpApprover2';
+        var pCorporateTestMail ='@pCorporateTestMail';
+        var Bid=@Model.BookingId;
+
+
+        if ((email == pCorporateTestMail) || (pCorpAdmin == email) || (pCorpUser == email) || (pCorpApprover1 == email) || (pCorpApprover2 == email))
+        {
+          //  alert('test emails');
+            window.location = "/Payment/SuccessResult/"+Bid;
+        }
+        else{
+            window.location = "/Payment/Index?IsPartialPay=" + IsPartialPay;
+        }
+    }
+    function proceedppOffline(BId) {
+        //document.getElementById('loading').style.display = 'block';
+        var IsPartialPay = true;
+        cancelpopup = true;
+        // window.location = "Url.Action("Index","Payment")";
+        window.location = "/Payment/Index?IsPartialPay=" + IsPartialPay + "&BookId=" + BId;
+    }
+    function proceedtoapproval(BId)
+    {
+        var IsPartialPay = false;
+        cancelpopup = true;
+        // window.location = "Url.Action("Index","Payment")";
+        window.location = "/Payment/Index?IsPartialPay=" + IsPartialPay + "&BookId=" + BId;
+
+    }
+
+    $(function () {
+        $('#BookingDetails').show();
+        $('#booking_parproceed').popover({ trigger: "hover" });
+        $('#policytooltip').popover({ trigger: "hover" });
+        $('#policytooltip1').popover({ trigger: "hover" });
+
+    });
+
+    //Corporate booking with credits
+    function proceedbcc() {
+        //document.getElementById('loading').style.display = 'block';
+        var url = '@Url.Action("CorporateBookingbycredits", "Booking")';
+        $.post(url,{ BookingId : @Model.BookingId }, function (data) {
+            $("#BookingDetails").html(data);
+        })
+    }
+    //Popup display
+    function PopupForUser(ForBookingUserId, BookingItemId) {
+        //alert("ForBookingUserId=" + ForBookingUserId + "BookingItemId=" + BookingItemId)
+        $("#chooseForBooking").modal('show');
+        var url = '@Url.Action("ForBookingDisplay", "Booking")';
+        $.post(url, { ForBookingUserId: ForBookingUserId, BookingItemId: BookingItemId }, function (data) {
+            $("#ForBookingDataView").html(data);
+        })
+    }
+    function FinishChooseforUser(UserId) {
+        //alert("id=" + ForBookingUserId);
+        var id = UserId;
+        $('#Name').html($("#name_" + id).html());
+        $('#Address').html($("#Address_" + id).html());
+        $('#Email').html($("#Email_" + id).html());
+        $('#Mob').html($("#Mob_" + id).html());
+        $('#StateName').html($("#State_" + id).html());
+        $('#City').html($("#City_" + id).html());
+        $('#Country').html($("#Country_" + id).html());
+        $('#ZipCode').html($("#ZipCode_" + id).html());
+        var url = '@Url.Action("UpdateBookingforUser", "Booking")';
+        $.post(url, { UserId: UserId });
+    }
+
+
+    function FinishChoose(ForBookingUserId) {
+        //alert("id=" + ForBookingUserId);
+        var id = ForBookingUserId;
+        $('#Name').html($("#name_" + id).html());
+        $('#Address').html($("#Address_" + id).html());
+        $('#Email').html($("#Email_" + id).html());
+        $('#Mob').html($("#Mob_" + id).html());
+        $('#StateName').html($("#State_" + id).html());
+        $('#City').html($("#City_" + id).html());
+        $('#Country').html($("#Country_" + id).html());
+        $('#ZipCode').html($("#ZipCode_" + id).html());
+        var url = '@Url.Action("UpdateBooking", "Booking")';
+        $.post(url, { ForBookingUserId: ForBookingUserId });
+    }
+
+    $(function(){
+        $("#paypalsub").click(function()
+        {
+            //document.getElementById('loading').style.display = 'block';
+            $("#psub").submit();
+        });
+    });
+
+</script>
+<script type="text/javascript">
+
+    //Done By Rahul
+    $(function () {
+
+
+
+        $('#CorporateID').change(function () {
+
+            $.get("/Common/GetCorporateUserName?id=" + $('#CorporateID').val(), function (data) {
+                if (data != "") {
+                    $('#CorporateUserID').html(data).append('<option selected="selected" value="0">Select</option>');
+                    $('#ddlCorporateUserID').html(data).append('<option selected="selected" value="0">Select</option>');
+                }
+                else {
+                    $('#CorporateUserID').empty().append('<option selected="selected" value="0">not available...</option>');
+                    $('#ddlCorporateUserID').html(data).append('<option selected="selected" value="0">Select</option>');
+                }
+
+                loadcity();
+            });
+        });
+
+    });
+
+</script>

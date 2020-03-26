@@ -1,0 +1,445 @@
+@model DataTable
+@using System.Data;
+@using StayBazar.Common;
+@{
+    /**/
+
+    long i = 0;
+    double total = 0;
+    int totalnights = 0;
+    double avgbuy, avgobuy, avgsale, avgosale;
+    double tamount;
+    double sgst, cgst, igst;
+    double tsgst, tcgst, tigst;
+    DataRow dr;
+    int ix = 0;
+    int rowCount = Model.Rows.Count;
+    //Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+    int bookingType = 0;
+    bool TACGstTaxIncluded = false;
+    ViewBag.Title = "GST Report";
+}
+
+@*<div class="row">
+    <div class="col-md-6">
+        <h2 class="bold">
+            
+        </h2>
+    </div>
+</div>*@
+<input type="hidden" id="HiddenFromDate" value="@ViewBag.FromDate" />
+<input type="hidden" id="HiddenToDate" value="@ViewBag.ToDate" />
+<input type="hidden" id="HiddenSearchString" value="@ViewBag.SearchString" />
+
+
+<div class="page-title-container style3">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-3">
+                <h2 style="color:white">@ViewBag.Title</h2>
+            </div>
+
+            @*<div class="row" id="FilterFailedTransaction">
+                <div class="col-md-3" id="DetailsBooking">
+                    <h2 style="color:white">@ViewBag.Title</h2>
+                </div>*@
+            @*<div class="col-md-4">*@
+            @using (Html.BeginForm("Filter", "GSTInvoiceReport", FormMethod.Post, new { @id = "CustomerInvoiceReportFilter" }))
+            {
+                @*<div class="row">*@
+                <div class="col-md-3">
+                    <label>From Date</label><input type="text" id="FromDate" name="FromDate" class="form-control input-sm DateChecker" />
+                </div>
+
+
+                <div class="col-md-3">
+                    <label>To Date</label><input type="text" id="ToDate" name="ToDate" class="form-control input-sm DateChecker" />
+                </div>
+
+                <div class="hide form-group">
+                    <!-- col-md-4-->
+                    <label>Customer Name/Email</label>
+                    <input type="text" id="SearchString" name="SearchString" class="form-control input-sm" />
+                </div>
+                <div class="col-md-2" style="padding-top :20px">
+
+                    <button id="btnSearch" class="btn btn-default margin-top-10" type="submit" tabindex="3">Search</button>
+                    @*<button id="btnSearch" type="submit" class="btn btn-primary" tabindex="3"><span class="glyphicon glyphicon-search"></span></button>*@
+                    @*<a title="Export" onclick="Filter()" id="btnSearch" class="btn btn-primary" tabindex="3"></a>*@
+
+                </div>
+               
+
+                <div class="col-md-1">
+                    <br />
+                    @*<div class="col-md-3 exporticons" style="TOP: -6PX;">
+                            <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6"></a>
+                        </div>*@
+                    <div class="exporticons" style1="TOP: -6PX;">
+                        <a title="Export" onclick="Export()" id="btnNextClick" class="soap-icon-arrow-bottom green-color fa-4x" tabindex="6"></a>
+                    </div>
+                </div>
+                @*</div>*@
+            }
+            <br />
+        </div>
+        @*</div>*@
+
+
+    </div>
+</div>
+
+
+        <br />
+        <br />
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <table border="0" class="table table-custom table-bordered table-hover table-striped" cellpadding="1">
+                        <thead>
+                            <tr>
+                                <th>Sl No</th>
+                                <th>BookingCategory</th>
+                                <th>SB Billing Entity</th>
+                                <th>Invoice Date</th>
+                                <th>Invoice No</th>
+                                <th>Booking ID</th>
+
+                                <th>Customer Name</th>
+                                <th>Customer City</th>
+                                <th>Customer State</th>
+                                <th>Customer GST No</th>
+
+                                <th>Property Name</th>
+                                <th>Property City</th>
+                                <th>Property State</th>
+                                <th>Property GST No</th>
+                                <th>Check In Date</th>
+                                <th>Check Out Date</th>
+                                <th>Total Room Nights</th>
+
+                                <th>Room Value Before GST</th>
+                                <th>SGST Rate</th>
+                                <th>SGST Value</th>
+                                <th>CGST Rate</th>
+                                <th>CGST Value</th>
+                                <th>IGST Rate</th>
+                                <th>IGST Value</th>
+                                <th>Total GST Value</th>
+
+                                <th>Other Services Before GST</th>
+                                <th>SGST Rate</th>
+                                <th>SGST Value</th>
+                                <th>CGST Rate</th>
+                                <th>CGST Value</th>
+                                <th>IGST Rate</th>
+                                <th>IGST Value</th>
+                                <th>Total GST Value</th>
+
+                                <th>Invoice Total Before GST</th>
+                                <th>Total SGST</th>
+                                <th>Total CGST</th>
+                                <th>Total IGST</th>
+                                <th>Customer Invoice Total</th>
+
+                                <th>Supplier room value before GST</th>
+                                <th>Input SGST</th>
+                                <th>Input CGST</th>
+                                <th>Input IGST</th>
+                                <th>Total supplier room value</th>
+                                <th>Supplier other service value before GST</th>
+                                <th>Input SGST</th>
+                                <th>Input CGST</th>
+                                <th>Input IGST</th>
+
+                                <th>Total supplier other service value</th>
+                                <th>Supplier total value before GST</th>
+                                <th>Total supplier GST value</th>
+                                <th>Supplier total including GST</th>
+                                <th>SAC Code</th>
+                                <th>Place Of Supply</th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @for (ix = 0; ix < rowCount; ix++)
+                            {
+                                dr = Model.Rows[ix];
+                                i = i + 1;
+
+
+                                totalnights = Converter.ToInteger(dr["totalnights"]);
+                                avgbuy = Math.Round(Converter.ToDouble(dr["AvgDailyRateBefreStaxForBuyPrice"]) * totalnights, 2);
+                                avgobuy = Math.Round(Converter.ToDouble(dr["BuyPriceforotherservicesForBuyprice"]), 2);
+                                avgsale = Math.Round(Converter.ToDouble(dr["AvgDailyRateBefreStaxForSalePrice"]) * totalnights, 2);
+                                avgosale = Math.Round(Converter.ToDouble(dr["BuyPriceforotherservicesForSalePrice"]), 2);
+                                TACGstTaxIncluded = Converter.ToBoolean(dr["TACGSTIncluded"]);
+                                bookingType = Converter.ToInteger(dr["BookingType"]);
+                                <tr>
+                                    <td align="center">@i</td>
+                                    <td align="center">@Converter.ToString(dr["Booking_Category"])</td>
+                                    <td align="center">@Converter.ToString(dr["BillingEntity"])</td>
+
+                                    <td align="center">@Converter.ToDate(dr["InvoiceDate"]).ToShortDateString()</td>
+                                    <td align="center">@Converter.ToString(dr["InvoiceNumber"])</td>
+                                    <td align="center">@Converter.ToString(dr["orderno"])</td>
+                                    <td align="left">@Converter.ToString(dr["Name"])</td>
+                                    <td align="left">@Converter.ToString(dr["Customer_City"])</td>
+                                    <td align="left">@Converter.ToString(dr["Customer_State"])</td>
+                                    <td align="left">@Converter.ToString(dr["Customer_GST_No"])</td>
+                                    <td align="left">@Converter.ToString(dr["PropertyName"])</td>
+                                    <td align="left">@Converter.ToString(dr["cityname"])</td>
+                                    <td align="left">@Converter.ToString(dr["PropertyState"])</td>
+                                    <td align="left">@Converter.ToString(dr["PropertyGstRegNo"])</td>
+
+
+                                    <td align="center">@Converter.ToDate(dr["CheckIn_date"]).ToShortDateString()</td>
+                                    <td align="center">@Converter.ToDate(dr["CheckOut_date"]).ToShortDateString()</td>
+                                    <td align="center">@(totalnights)</td>
+
+
+
+                                    @{
+                                        if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                                        {
+                                            tsgst = 0; tcgst = 0; tigst = 0; avgsale = 0; total = 0; tamount = 0;
+                                            sgst = 0; cgst = 0; igst = 0;
+                                        }
+                                        else
+                                        {
+                                            sgst = Convert.ToDouble(dr["SGST"]);
+                                            cgst = Convert.ToDouble(dr["CGST"]);
+                                            igst = Convert.ToDouble(dr["IGST"]);
+                                            tsgst = (avgsale * sgst * 0.01);
+                                            tcgst = (avgsale * cgst * 0.01);
+                                            tigst = (avgsale * igst * 0.01);
+                                            tamount = tsgst + tcgst + tigst;
+                                        }
+                                    }
+                                    <td align="right">@Math.Round(avgsale, 2)</td>
+                                    <td align="right">@sgst.ToString("G") %</td>
+                                    <td align="right">@Math.Round(tsgst, 2)</td>
+                                    <td align="right">@cgst.ToString("G") %</td>
+                                    <td align="right">@Math.Round(tcgst, 2)</td>
+                                    <td align="right">@igst.ToString("G") %</td>
+                                    <td align="right">@Math.Round(tigst, 2)</td>
+                                    <td align="right">@Math.Round(tamount, 2)</td>
+
+                                    @{
+                                        if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                                        {
+                                            sgst = Convert.ToDouble(dr["btSGST"]);
+                                            cgst = Convert.ToDouble(dr["btCGST"]);
+                                            igst = Convert.ToDouble(dr["btIGST"]);
+                                            avgosale = Math.Round(Converter.ToDouble(dr["DirectAmount"]), 2);
+
+                                            if (TACGstTaxIncluded)
+                                            { avgosale = @Math.Round(avgosale, 2) / (1 + ((sgst + cgst + igst) / 100)); }
+
+                                            tsgst = 0;
+                                            tcgst = 0;
+                                            tigst = 0;
+                                            avgsale = 0;
+                                        }
+                                        else
+                                        {
+                                            sgst = Convert.ToDouble(dr["oSGST"]);
+                                            cgst = Convert.ToDouble(dr["oCGST"]);
+                                            igst = Convert.ToDouble(dr["oIGST"]);
+                                        }
+
+                                        tsgst = tsgst + (avgosale * sgst * 0.01);
+                                        tcgst = tcgst + (avgosale * cgst * 0.01);
+                                        tigst = tigst + (avgosale * igst * 0.01);
+                                        tamount = (avgosale * sgst * 0.01) + (avgosale * cgst * 0.01) + (avgosale * igst * 0.01); }
+                                    <td align="right">@Math.Round(avgosale, 2)</td>
+                                    <td align="right">@sgst.ToString("G") %</td>
+                                    <td align="right">@Math.Round((avgosale * sgst * 0.01), 2)</td>
+                                    <td align="right">@cgst.ToString("G") %</td>
+                                    <td align="right">@Math.Round((avgosale * cgst * 0.01), 2)</td>
+                                    <td align="right">@igst.ToString("G") %</td>
+                                    <td align="right">@Math.Round((avgosale * igst * 0.01), 2)</td>
+                                    <td align="right">@Math.Round(tamount, 2)</td>
+
+                                    <td align="right">@Math.Round(avgsale + avgosale, 2)</td>
+                                    <td align="right">@Math.Round(tsgst, 2)</td>
+                                    <td align="right">@Math.Round(tcgst, 2)</td>
+                                    <td align="right">@Math.Round(tigst, 2)</td>
+                                    <td align="right">@Math.Round(avgsale + avgosale + tigst + tcgst + tsgst, 0)</td>
+
+                                    @{
+                                        if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                                        {
+                                            tsgst = 0; tcgst = 0; tigst = 0; avgbuy = 0; total = 0; tamount = 0;
+                                        }
+                                        else
+                                        {
+                                            sgst = Convert.ToDouble(dr["bSGST"]);
+                                            cgst = Convert.ToDouble(dr["bCGST"]);
+                                            igst = Convert.ToDouble(dr["bIGST"]);
+                                            tsgst = (avgbuy * sgst * 0.01);
+                                            tcgst = (avgbuy * cgst * 0.01);
+                                            tigst = (avgbuy * igst * 0.01);
+                                            tamount = tsgst + tcgst + tigst;
+                                            total = tamount;
+                                        }
+                                    }
+                                    <td align="right">@Math.Round(avgbuy, 0)</td>
+                                    @*<td align="right">@sgst.ToString("G") %</td>*@
+                                    <td align="right">@Math.Round(tsgst, 2)</td>
+                                    @*<td align="right">@cgst.ToString("G") %</td>*@
+                                    <td align="right">@Math.Round(tcgst, 2)</td>
+                                    @*<td align="right">@igst.ToString("G") %</td>*@
+                                    <td align="right">@Math.Round(tigst, 2)</td>
+                                    <td align="right">@Math.Round(avgbuy + tamount, 0)</td>
+                                    @{
+                                        if (bookingType != (int)CLayer.ObjectStatus.OfflineBookingType.Regular)
+                                        {
+                                            tsgst = 0; tcgst = 0; tigst = 0; avgobuy = 0; total = 0;
+                                        }
+                                        else
+                                        {
+
+                                            sgst = Convert.ToDouble(dr["obSGST"]);
+                                            cgst = Convert.ToDouble(dr["obCGST"]);
+                                            igst = Convert.ToDouble(dr["obIGST"]);
+
+                                            /* tsgst = (avgobuy * sgst * 0.01);
+                                             tcgst = (avgobuy * cgst * 0.01);
+                                             tigst = (avgobuy * igst * 0.01);*/
+
+
+                                            double totalBuyPriceOtherTax = Math.Round(Converter.ToDouble(dr["BuyPriceforotherservicesTotalTax"]), 2);
+                                            tsgst = (totalBuyPriceOtherTax / 2);
+                                            tcgst = tsgst;
+                                            tigst = (igst > 0) ? totalBuyPriceOtherTax : 0;
+
+
+                                            tamount = tsgst + tcgst + tigst;
+
+                                            total = total + tamount;
+                                        }
+                                    }
+                                    <td align="right">@Math.Round(avgobuy, 2)</td>
+                                    @*<td align="right">@sgst.ToString("G") %</td>*@
+                                    <td align="right">@Math.Round(tsgst, 2)</td>
+                                    @*<td align="right">@cgst.ToString("G") %</td>*@
+                                    <td align="right">@Math.Round(tcgst, 2)</td>
+                                    @*<td align="right">@igst.ToString("G") %</td>*@
+                                    <td align="right">@Math.Round(tigst, 2)</td>
+                                    <td align="right">@Math.Round(tamount + avgobuy, 0)</td>
+                                    <td align="right">@Math.Round(avgbuy + avgobuy, 2)</td>
+                                    <td align="right">@Math.Round(total, 2)</td>
+                                    <td align="right">@Math.Round(total + avgbuy + avgobuy, 0)</td>
+                                    <td>@Converter.ToString(dr["HSNCode"])</td>
+
+                                    <td align="center">@Converter.ToString(dr["Place_Of_Supply"])</td>
+
+                                    <td>&nbsp;</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <script>
+    function parseDate(str) {
+        var d = str.split("/")
+        return d[1] + '/' + d[0] + '/' + d[2];
+    }
+  var  from=   $('#HiddenFromDate').val();
+  var to = $('#HiddenToDate').val();
+  var SearchString = $('#HiddenSearchString').val();
+
+  //var f = new Date(from);
+  //var t = new Date(to);
+
+  //var from1 = f.ToShortDateString();
+  //var to1 = t.ToShortDateString();
+
+  $('#FromDate').val(from);
+  $('#ToDate').val(to);
+  $('#SearchString').val(SearchString);
+
+  function dateparts(str)
+  {
+      var dt = new Date(str);
+      return dt.getDate() + '/' + (dt.getMonth() + 1) + '/' + dt.getYear();
+  }
+  function getFormattedDate(date) {
+      var year = date.getFullYear();
+
+      var month = (1 + date.getMonth()).toString();
+      month = month.length > 1 ? month : '0' + month;
+
+      var day = date.getDate().toString();
+      day = day.length > 1 ? day : '0' + day;
+
+      return day + '/' + month + '/' + year;
+  }
+  $(".DateChecker").change(function () {
+      var DefualtDate = new Date(parseDate('01/07/2017'));
+      var frmdt = new Date(parseDate($('#FromDate').val()));
+      var Todt = new Date(parseDate($('#ToDate').val()));
+
+
+      if (frmdt < DefualtDate) {
+          $('#FromDate').val('01/07/2017');
+      }
+
+      if (Todt < DefualtDate) {
+          frmdt = new Date(parseDate($('#FromDate').val()));
+          Todt = new Date(frmdt);
+          Todt.setDate(frmdt.getDate() + 1)
+          $('#ToDate').val(getFormattedDate(Todt));
+      }
+      else {
+          frmdt = new Date(parseDate($('#FromDate').val()));
+          if (Todt < frmdt) {
+              Todt = new Date(frmdt);
+              Todt.setDate(frmdt.getDate() + 1)
+              $('#ToDate').val(getFormattedDate(Todt));
+          }
+      }
+
+  });
+
+    $(function () {
+        $('#FromDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                minDate: new Date('07/01/2017')
+            });
+
+        $('#ToDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+                minDate: new Date('07/01/2017'),
+                beforeShow: function () {
+                    //$(this).datepicker('option', 'minDate', $('#FromDate').val());
+                    //if ($('#FromDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+    });
+    function Filter() {
+         window.location = '@Url.Action("Filter", "GSTInvoiceReport")?' +$('#CustomerInvoiceReportFilter').serialize();
+    }
+
+    function PDF() {
+        var url = '@Url.Action("PDFView", "GSTInvoiceReport")?' + $('#CustomerInvoiceReportFilter').serialize();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function Export() {
+        window.location = '@Url.Action("ExcelReport", "GSTInvoiceReport")?' +$('#CustomerInvoiceReportFilter').serialize();
+        //window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+
+        </script>

@@ -1,0 +1,138 @@
+﻿@model IEnumerable<CLayer.ReportForSuppliersRegistration>
+@using System.Linq
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long i = 0;
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" / >
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="Report1">
+        @{
+            List<CLayer.ReportForSuppliersRegistration> activeReg = new List<CLayer.ReportForSuppliersRegistration>();
+            if (Model != null)
+            {
+                activeReg = Model.Where(x => x.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Active).ToList();
+            }
+        }
+        @if (activeReg.Count > 0)
+        {
+            <ss:Table>
+
+                @foreach (CLayer.ReportForSuppliersRegistration reportList in activeReg)
+                {
+
+
+                    if (i != reportList.B2BId)
+                    {
+                        i = reportList.B2BId;
+                        <ss:Row ss:StyleID="1">
+                            <ss:Cell ss:MergeAcross="8">
+                                <ss:Data ss:Type="String">
+                                    Supplier @reportList.SupplierName
+
+                                    @if (@reportList.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Active)
+                                    {
+                                        <text>Active </text>
+                                    }
+                                    else if (@reportList.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.Blocked)
+                                    {
+                                        <text>Blocked </text>
+                                    }
+
+                                </ss:Data>
+                            </ss:Cell>
+                        </ss:Row>
+                        <ss:Row ss:StyleID="1">
+                            <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">Registration Start Date</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">Approval Date</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">City</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">State</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">Country</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">No of properties</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">Total ACC Inventory</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">Allocation for StayBazar</ss:Data></ss:Cell>
+                        </ss:Row>
+                        <ss:Row>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierName</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.RegistrationStartDate.ToShortDateString()</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.ApprovalDate.ToShortDateString()</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.City</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.State</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.Country</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.Noofproperties</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.TotalAccomodationInventory</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.AllocationforStayBazar</ss:Data></ss:Cell>
+                        </ss:Row>
+                        <ss:Row ss:StyleID="1">
+                            <ss:Cell ss:MergeAcross="8"><ss:Data ss:Type="String">Property Details</ss:Data></ss:Cell>
+                        </ss:Row>
+                    }
+                    else
+                    {
+                        <text> </text>
+                    }
+                    <ss:Row>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyState</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyCountry</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyCity</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyLocation</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.TotalAccomodationInventory</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                    </ss:Row>
+                }
+            </ss:Table>
+        }
+        </ss:Worksheet>
+    <ss:Worksheet ss:Name="Report2">
+        @{
+            List<CLayer.ReportForSuppliersRegistration> pendingReg = new List<CLayer.ReportForSuppliersRegistration>();
+            if (Model != null)
+            {
+                pendingReg = Model.Where(x => x.CurrentStatus == (int)CLayer.ObjectStatus.StatusType.NotVerified).ToList();
+            }
+        }
+        @if (pendingReg.Count > 0)
+        {   
+            <ss:Table>
+                <ss:Row ss:StyleID="1">
+                    <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Registration Start Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Approval Date</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">City</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">State</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Country</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">No of properties</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Total ACC Inventory</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">Allocation for StayBazar</ss:Data></ss:Cell>
+                </ss:Row>
+                @foreach (CLayer.ReportForSuppliersRegistration reportList in pendingReg)
+                {
+                    <ss:Row>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierName</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.RegistrationStartDate.ToShortDateString()</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.ApprovalDate.ToShortDateString()</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.City</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.State</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.Country</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.Noofproperties</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                    </ss:Row>
+
+                }
+            </ss:Table>
+        }
+    </ss:Worksheet>
+</ss:Workbook>

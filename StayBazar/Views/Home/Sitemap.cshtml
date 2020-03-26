@@ -1,0 +1,70 @@
+﻿@{
+    ViewBag.BreadCrumb = " <p style='margin-top: -29px; margin-left: 38px;'> > </p> <div id='breads' style='margin-top: -30px; margin-left: 50px;'> <div itemscope itemtype='http://data-vocabulary.org/Breadcrumb'> <a href=''  itemprop='url'  class=' whitetext breadhvr' > <span class=' whitetext breadhvr'  itemprop='title'>Sitemap</span></a>  </div> </div>";
+
+}
+<div class="parent-div">
+    <!--Landing Starts Here -->
+    <div class="landing-img">
+        <div class="landing-heading" style="padding-bottom:0px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <h2> Keep  </h2>
+                        <h3 class="landing-caption"> moving</h3>
+                    </div>
+                    <!-- <div class="col-6">
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ABout us heading section-->
+    <section class="about-section text-left">
+        <div class="title-heading">
+            <h3> SITEMAP</h3>
+        </div>
+        
+
+
+        <div class="row">
+            <div class="col-md-11 col-md-offset-1">
+                <ul>
+                    <li><a href="@Url.Action("Index","Home")">Home</a></li>
+                    <li><a href="@Url.Action("BusinessLogin","Account")">Business Home</a></li>
+                    <li><a href="@Url.Action("Index","Search")">Search</a></li>
+                    <li><a href="@Url.Action("Careers", "Home")">Careers</a></li>
+                    <li>
+                        Registration
+                        <ul>
+                            <li><a href="@Url.Action("Register", "Account")">Customer Registration</a></li>
+                            <li><a href="@Url.Action("Corporate","Join")">Business Registration</a></li>
+                            <li><a href="@Url.Action("Supplier", "Join")">Supplier Registration</a></li>
+                            <li><a href="@Url.Action("TravelAgent", "Join")">Travel Agent Registration</a></li>
+                            <li><a href="@Url.Action("Affiliates", "Join")">Affiliate Registration</a></li>
+                            @*@Url.Action("Affiliates", "Join")*@
+                        </ul>
+                    </li>
+                    <li><a href="@Url.Action("About","Home")">About Us</a></li>
+                    <li><a href="~/Query/Index/@((int)CLayer.ObjectStatus.MsgType.Complaint)">Complaints</a></li>
+                    <li><a href="~/Query/Index/@((int)CLayer.ObjectStatus.MsgType.Query)">Send Query</a></li>
+                    <li><a href="~/Query/Index/@((int)CLayer.ObjectStatus.MsgType.Feedback)">Feedback</a></li>
+                    <li>@Html.ActionLink("Contact Us", "ContactUs", "Home")</li>
+                    <li><a href="@Url.Action("Index", "FAQ")">FAQ</a></li>
+                    <li>@Html.ActionLink("Service Apartment Owner - FAQ", "ServiceApartment", "FAQ")</li>
+
+                    <li>@Html.ActionLink("Special Requirements", "SpecialRequirements", "Home")</li>
+
+                    <li><a href="@Url.Action("HowStaybazarworks", "Home")">How Staybazar Works</a></li>
+                    <li><a href="@Url.Action("PurposeandStandards", "Home")">Purpose and Standards</a></li>
+                    <li><a href="@Url.Action("TermsOfUse", "Home")">Terms of Use</a></li>
+                    <li><a href="@Url.Action("Privacy", "Home")">Privacy Policy</a></li>
+                    <li><a href="@Url.Action("PaymentGuidelines", "Home")">Payments Guidelines</a></li>
+                </ul>
+
+            </div>
+        </div>
+
+
+
+    </section>
+</div>

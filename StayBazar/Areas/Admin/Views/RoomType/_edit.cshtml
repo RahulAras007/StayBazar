@@ -1,0 +1,73 @@
+﻿@model StayBazar.Areas.Admin.Models.RoomTypeModels
+@{
+    Layout = null;
+    List<CLayer.PropertyRoomType> types = BLayer.RoomType.GetAllPropertyType(Model.RoomTypeId);
+
+}
+@using (Html.BeginForm("Edit", "RoomType"))
+{
+    <h2>Room Type</h2>
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="form-group">
+        @Html.DisplayNameFor(m => m.Title)
+        @Html.TextBoxFor(m => m.Title, new { @tabindex = "1", @class = "form-control input-sm" })
+        @Html.ValidationMessageFor(m => m.Title)
+    </div>
+    <div class="container">
+        <div class="row">Choose Property Types</div>
+        <div class="row">
+            @{
+    string idname = "";
+    string chosen = "";
+
+    foreach (CLayer.PropertyRoomType item in types)
+    {
+        idname = "p" + item.PropertyTypeId.ToString();
+        <div class="col-md-3">
+            <input type="checkbox" id="@idname" class="propertychk"
+                   @{  if (item.IsUsed) {  <text> checked="checked" disabled="disabled" </text>      } else { if (item.Selected) { if (chosen != "") { chosen = chosen + ","; } chosen = chosen + item.PropertyTypeId; <text> checked="checked" </text>         } } } />
+
+
+            @(item.Title + "  ")
+        </div>
+
+    }
+    Model.PropertyTypesAssigned = chosen;
+            }
+        </div>
+    </div>
+    <div class="btn-toolbar">
+        <div class="btn-group">
+            <input type="submit" id="btnSave" value="Save" class="btn btn-default" tabindex="3" />
+            <a href="~/Admin/RoomType" id="btnReset" class="btn btn-danger" tabindex="4">Cancel</a>
+        </div>
+    </div>
+    @Html.HiddenFor(m => m.RoomTypeId)
+    @Html.HiddenFor(m => m.PropertyTypesAssigned)
+    <script type="text/javascript">
+        $(function () {
+            $("#Title").focus();
+            $(".propertychk").click(function () {
+                var nm = $(this).prop("id");
+                var addp = $(this).prop("checked");
+
+                var id = nm.substring(1);
+                var ids = $("#PropertyTypesAssigned").val();
+                var spl = ids.split(",");
+                var targ = "";
+                for (i = 0; i < spl.length; i++) {
+                    if (spl[i] == id) continue;
+                    if (targ != "") targ = targ + ",";
+                    targ = targ + spl[i];
+                }
+                if (addp) {
+                    if (targ != "") targ = targ + ",";
+                    targ = targ + id;
+                }
+                $("#PropertyTypesAssigned").val(targ);
+            });
+        });
+
+    </script>
+}

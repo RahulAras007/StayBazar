@@ -1,0 +1,149 @@
+﻿@model List<CLayer.BookingItem>
+@{
+    Layout = null;
+    string ratesText;
+    int noOfDays;
+}
+@if (Model.Count > 0)
+{
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Stay Category</th>
+                <th>Accommodation Type</th>
+                <th>&nbsp;</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+                <th>Quantity</th>
+                <th>No. of nights</th>
+                <td align="right"><span class="bold">Avg. daily rate</span></td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (CLayer.BookingItem item in Model)
+            {
+                @*<tr>
+                        <td colspan="6">@item.AccommodationTitle</td>
+                        <td>&nbsp;</td>
+                        <td  align="right">
+                        <div class="rightside " ><span class="cxcurele">@(Math.Round(item.Amount))</span>.00</div>
+                        @{
+                    List<CLayer.BookingItemTax> taxes = BLayer.Tax.GetAllByBookingItem(item.BookingItemId);
+                    foreach(CLayer.BookingItemTax t in taxes)
+                    {
+                        <div class="rightalign" >@t.Title : <span class="cxcurele">@(Math.Round(t.Amount))</span>.00</div>
+                    }
+                        }
+                        </td>
+                    </tr>*@
+                noOfDays = (item.CheckOut - item.CheckIn).Days;
+                <tr>
+                    <td>@item.StayCategoryT</td>
+                    <td colspan="2">@item.AccommodationTypeT</td>
+                    <td>@item.CheckIn.ToShortDateString()</td>
+                    <td>@item.CheckOut.ToShortDateString()</td>
+                    <td>@item.NoOfAccommodations</td>
+                    <td>@(noOfDays)</td>
+                    <td align="right">
+                        <div class="rightalign"><span class="cxcurele">@(Math.Round(item.Amount / noOfDays))</span>.00</div>
+                        @{ @* //show taxes
+                                List<CLayer.BookingItemTax> taxes = BLayer.Tax.GetAllByBookingItem(item.BookingItemId);
+                                foreach (CLayer.BookingItemTax t in taxes)
+                                {
+                                    <div class="rightalign">@t.Title : <span class="cxcurele">@(Math.Round(t.Amount))</span>.00</div>
+                                } *@
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="7">
+                        Adults: @if (item.NoOfAdults > 0)
+                        { @item.NoOfAdults }
+                        else
+                        {<text>None</text>},
+                        Children: @if (item.NoOfChildren > 0)
+                        { @item.NoOfChildren }
+                        else
+                        {<text>None</text>},
+                        Additional Guests: @if (item.NoOfGuests > 0)
+                        { @item.NoOfGuests }
+                        else
+                        {<text>None</text>}
+                    </td>
+                    <td align="right"><b>Total: <span class="cxcurele">@(Math.Round(item.TotalAmount))</span>.00</b></td>
+                </tr>
+                        ratesText = "";
+                        ratesText = BLayer.BookingItem.GetRatesAppliedHtmlFormatted(item.BookingItemId, true);
+                        if (ratesText != "")
+                        {
+                            <tr><td colspan="8">Rates Applied: @Html.Raw(ratesText)</td></tr>
+                        }
+                        ratesText = BLayer.BookingItem.GetOfferAppliedAsString(item.BookingItemId);
+                        if (ratesText != "")
+                        {
+                            <tr><td colspan="8">Offers Applied: @ratesText</td></tr>
+                        }
+
+            }
+            <tr>
+                <td colspan="6">Rates and Amounts are all Inclusive</td>
+                <td>&nbsp;</td>
+                <td align="right">
+                    Grand Total: <span class="fa cxprice fa-rupee">
+                        <span id="grandTotal" class="cxcurele">
+                            @if (Model.Count > 0)
+                            { @(Math.Round(BLayer.Bookings.GetTotal(Model[0].BookingId))) }
+                            else
+                            {@("0")}
+                        </span>.00
+                    </span>
+                </td>
+            </tr>
+            <tr id="lastRowBooking" class="hidden">
+                <td colspan="7" align="right">
+                    &nbsp;<span id="inrGrandTotal">
+                        Grand Total in INR <span>
+                            @if (Model.Count > 0)
+                            { @(Math.Round(BLayer.Bookings.GetTotal(Model[0].BookingId)))
+                            }
+                            else
+                            {@("0")}
+                        </span>.00
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+
+    <script type="text/javascript">
+        function showGrandTotal() {
+            if ($("#curPick").val() == "INR") {
+                $("#lastRowBooking").addClass("hidden");
+                $("#inrGrandTotal").addClass("hidden");
+            }
+            else {
+                $("#lastRowBooking").removeClass("hidden");
+                $("#inrGrandTotal").removeClass("hidden");
+            }
+        }
+    </script>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="alert alert-info">
+                You haven't selected any stays!
+            </div>
+        </div>
+    </div> @* leave empty function to avoid javascript error - this gets called while currency changed *@
+    <script type="text/javascript">
+        function showGrandTotal() {
+
+        }
+    </script>
+}
+

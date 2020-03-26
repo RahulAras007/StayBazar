@@ -1,0 +1,147 @@
+﻿@model StayBazar.Areas.Admin.Models.OfferModel
+@{   
+   
+}
+<div id="content">
+           <div class="row" id="OfferDetails">
+            <div class="col-md-12">
+                <div class="row margin10px" id="Details">
+                    @Html.Partial("_Details",Model)                    
+                </div>
+            </div>
+        </div>  
+           <div class="row" id="AccommodationListDisplay">        
+            <div class="col-md-12">
+                <div class="row margin10px" id="AccommodationList">
+                    @Html.Partial("_Accommodation",Model)
+                </div>
+            </div>         
+        </div>
+           <div class="row" id="PropertyListDisplay">
+            <div class="col-md-12">
+                <div class="row margin10px" id="PropertyList">
+                @Html.Partial("_Property")
+                </div>
+            </div>
+        </div>  
+
+           <div class="container-fluid">
+               <div class="row" id="finishbutton">
+                   <div class="col-md-12">
+                       @using (Html.BeginForm("SaveAccommodationProperty", "Offer", FormMethod.Post, new { area = "Admin", @id = "frmFiltersAccommodationsave1" }))
+                       {
+                           <input type="hidden" value="@Model.SPropertyId" id="SPropertyId" name="SPropertyId" />
+                           <input type="hidden" value="@Model.SOfferId" id="SOfferId" name="SOfferId" />
+                           <input type="hidden" value="@Model.SAccommodationId" id="SAccommodationId" name="SAccommodationId" />
+                           <input type="hidden" value="@Model.SOfferType" id="SOfferType" name="SOfferType" />
+                           <input type="hidden" value="@Model.SOfferTitle" id="SOfferTitle" name="SOfferTitle" />
+                           <input type="hidden" value="@Model.SStartDate" id="SStartDate" name="SStartDate" />
+                           <input type="hidden" value="@Model.SEndDate" id="SEndDate" name="SEndDate" />
+                           <input type="hidden" value="@Model.SAmount" id="SAmount" name="SAmount" />
+                           <input type="hidden" value="@Model.SNoOfDays" id="SNoOfDays" name="SNoOfDays" />
+                           <input type="hidden" value="@Model.SOfferFor" id="SOfferFor" name="SOfferFor" />
+                           <input type="hidden" value="@Model.SRateType" id="SRateType" name="SRateType" />
+                           <input type="hidden" value="@Model.SSBCommission" id="SSBCommission" name="SSBCommission" />
+                           <input type="hidden" value="@Model.SFreeDays" id="SFreeDays" name="SFreeDays" />
+                           <input type="hidden" value="@Model.Ids" id="Ids" name="Ids" />
+                           <input type="hidden" value="@Model.SearchValue" id="SearchValue" name="SearchValue" />
+                           <div id="BackFinishgrop" class="col-md-12 col-md-offset-8">
+                               <div class="btn-toolbar ">
+                                   <div>
+                                       <a href="~/Admin/OfferList/Index/?OfferId=@Model.OfferId" id="btnReset2" class="btn btn-danger" tabindex="6">Cancel</a>
+                                       <a href="#" onclick="NextClick()" id="btnNextClick" class="btn btn-success" tabindex="6">Next</a>
+                                       @*<a href="#" onclick="BackClick()" id="btnBacknow" class="glyphicon glyphicon-arrow-left" tabindex="6"></a>*@
+                                       <input type="submit" id="btnSaveFinish" value="Finish" class="btn btn-success" tabindex="5" />
+                                   </div>
+                               </div>
+                           </div>
+                           <hr />
+                           <br />
+                           <div id="last" class="col-lg-12 col-lg-offset-2 ">
+
+                           </div>
+                       }
+                   </div>
+                   <div class="row" id="ExistingList">
+                       @if (Model.currentPage > 0)
+                       {
+                           <div class="col-md-12">
+                               <div class="row margin10px" id="List">
+                                   @Html.Partial("_List")
+                               </div>
+                           </div>
+                       }
+                   </div>
+               </div>
+           </div>
+<script type="text/javascript">
+    function Finish() {
+        var url = '@Url.Action("SaveAccommodationProperty", "Offer")';
+        $.post(url, $("#frmFiltersAccommodationsave1").serialize());
+    }
+    function BackClick(id) {
+        $("#btnSaveFinish").hide();
+        $("#btnNextClick").show();
+        $("#AccommodationListDisplay").hide();
+        $("#PropertyListDisplay").hide();
+        $("#ExistingList").hide();
+        $("#OfferAccommodationList").hide();
+        $("#OfferPropertyList").hide();     
+        $("#ammoutDetails").hide();
+        $("#FreeDaysDetails").hide();        
+        $("#OfferDetails").show();
+        //$("#finishbutton").show();
+        //$("#BackFinishgrop").show(); 
+       
+        var val = $("input[type=radio].redioofferRatetype:checked").val();
+      
+        // alert(val);      
+        if (val == 3) {
+            $("#ammoutDetails").hide();
+            $("#FreeDaysDetails").show();
+        }
+        else {
+            $("#ammoutDetails").show();
+            $("#FreeDaysDetails").hide();
+        }
+    }
+</script>
+<script type="text/javascript">
+    function selectacccheck() {
+        $('.chkacc').each(function () { $(this).click(); });
+    }
+    function selectpropertyCheck()
+    {
+        $('.chkproperty').each(function () { $(this).click(); });
+    }
+    $(function () {       
+        $('.chkclass').click(function () {       
+            var accid = "";
+            $('input.chkclass:checked').each(function (){
+                if (accid != '') accid = accid + ",";
+                accid = accid + $(this).val();
+            });
+            $("#Ids").val(accid);
+        });
+    });
+    function getAccids()
+    {
+        var accid = "";
+        $('input.chkacc:checked').each(function () {
+            if (accid != '') accid = accid + ",";
+            accid = accid + $(this).val();
+        });
+        $("#Ids").val(accid);
+
+    }
+
+    function getpropeIds()
+    {
+        var accid = "";
+        $('input.chkproperty:checked').each(function () {
+            if (accid != '') accid = accid + ",";
+            accid = accid + $(this).val();
+        });
+        $("#Ids").val(accid);
+    }
+</script>

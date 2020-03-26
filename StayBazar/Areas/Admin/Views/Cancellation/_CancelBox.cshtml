@@ -1,0 +1,80 @@
+﻿@{
+    Layout = null;
+}
+<div class="modal fade" id="boxId" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Cancel Booking</h4>
+            </div>
+            <div class="modal-body">
+                <div id="cprogress"><p><img src="/content/ajax11-loader.gif" /> Loading...</p></div>
+                <div id="cancelBox"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelbdis" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="hidden">
+    <a id="cancellink" href="~/@Url.Action("CancelDetails","Cancellation")"></a></div>
+<script type="text/javascript">
+
+
+
+    function callDeclinedt(bookId) {
+        $("#cprogress").show();
+        $("#cancelBox").hide();
+        $('#boxId').modal('show');
+        $("#myModalLabel").text("Decline Booking");
+        var url = '@Url.Action("DeclineDetails", "Cancellation")?bookingId=' + bookId;
+        $.get(url, function (data) {
+            $("#cprogress").hide();
+            $("#cancelBox").html(data);
+            $("#cancelBox").show();
+        });
+    }
+
+
+
+
+    function callCancel(bookId) {
+        $("#cprogress").show();
+        $("#cancelBox").hide();
+        $('#boxId').modal('show');
+       
+        var url = $("#cancellink").attr("href") + '?bookingId=' + bookId;
+          $.get(url, function (data) {
+              $("#cprogress").hide();
+             $("#cancelBox").html(data);
+             $("#cancelBox").show();
+           });
+    }
+    function cancelBooking()
+    {
+        $("#cprogress").show();
+        $("#cancelBox").hide();
+        var id = $("#cancFormValueId").val();
+        var CancAmt = $("#cancRefundAmount").val();
+        var url = '@Url.Action("CancelBooking", "Cancellation")';
+        $.post(url, { bookingId: id, CancAmt: CancAmt }, function (data) {
+            $("#cprogress").hide();
+            $("#cancelBox").html(data);
+            $("#cancelBox").show();
+        });
+    }
+    function cancelAcc() {
+        $("#cprogress").show();
+        $("#cancelBox").hide();
+        var id = $("#cancFormValueId").val();
+        var url = '@Url.Action("CancelAccommodation", "Cancellation")';
+        $.post(url, { bookingId: id }, function (data) {
+            $("#cprogress").hide();
+            $("#cancelBox").html(data);
+            $("#cancelBox").show();
+        });
+    }
+   $("#cancelbdis").click(function () { location.reload(); })
+</script>

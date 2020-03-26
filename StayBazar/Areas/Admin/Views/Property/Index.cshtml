@@ -1,0 +1,104 @@
+﻿@model StayBazar.Areas.Admin.Models.PropertyModel
+@{
+    if (Model.PropertyId > 0)
+    {
+        ViewBag.Title = "Properties / " + Model.Title;
+    }
+    else
+    {
+        ViewBag.Title = "Properties / New";
+    }
+    CLayer.User usr = BLayer.User.Get(Model.OwnerId);
+    string bname = BLayer.B2B.GetBusinessName(Model.OwnerId);
+}
+<script src="@Url.Content("~/Scripts/tinymce/tiny_mce.js")" type="text/javascript"></script>
+
+@section scripts{
+    <script type="text/javascript">
+        dataLayer = [{
+            'cityName': '@Model.City',
+            'locationName': '@Model.Location',
+        }];
+
+
+    </script>
+}
+
+    <div class="page-title-container style3">
+       <div class="row">
+           <div class="col-md-12 greyborderbottom">
+               <h3 style="color:white">
+                   @if (ViewBag.manageproperties == null)
+                   {
+                       <a href="/Admin/Supplier/Details/@Model.OwnerId">Properties of @bname </a>if (Model.PropertyId > 0)
+                       { <text>/</text> @Model.Title }
+                   else
+                   { <text>/ New</text> }
+
+
+               if (Model.Status == (int)CLayer.ObjectStatus.StatusType.Deleted)
+               {
+
+                   <text> [ deleted ] </text>
+               }
+
+           }
+           else
+           {
+               <a href="/Admin/PropertyStatus/Index">Manage Property</a>if (Model.PropertyId > 0)
+               { <text>/</text> @Model.Title }
+           else
+           { <text>/ New</text> }
+
+
+       if (Model.Status == (int)CLayer.ObjectStatus.StatusType.Deleted)
+       {
+
+           <text> [ deleted ] </text>
+       }
+   }
+               </h3>
+           </div>
+           </div>
+        </div>
+                <p class="greytext" style="text-align:center">We use this info to put you in a group with people close to your attributes (weird choice of world)</p>
+            
+            <div class1="container whitebg">
+                @*<div class="container-fluid">*@
+                <div class="col-md-12">
+                    <ul class="nav nav-tabs">
+                        @if (Model.PropertyId > 0)
+                        {
+                            <li class="details @if (Model.ActiveTab == "home") { <text> active </text>            }"><a href="#home" data-toggle="tab">Details</a></li>
+                            <li class="gallery @if (Model.ActiveTab == "gallery") { <text> active </text>              }"><a href="#gallery" data-toggle="tab">Gallery</a></li>
+                            <li class="features"><a href="#features" data-toggle="tab">Features</a></li>
+                            <li class="accomodation  @if (Model.ActiveTab == "accommodation") { <text> active </text>             }"><a href="#accommodation" data-toggle="tab">Accommodation</a></li>
+                            <li class="rates  @if (Model.ActiveTab == "rates") { <text> active </text>             }"><a href="#rates" data-toggle="tab">Markups</a></li>
+                        }
+                    </ul><br /><br />
+                    <div class="col-xs-12 col-md-12 tab-content property-detail">
+                        <div class="tab-pane fade @if (Model.ActiveTab == "home"){ <text> in active </text>}" id="home">
+                            @Html.Partial("~/Areas/Admin/Views/Property/_Details.cshtml", Model)
+                        </div>
+                        @if (Model.PropertyId > 0)
+                        {
+                            <div class="tab-pane fade @if (Model.ActiveTab == "gallery") { <text> in active </text>}" id="gallery">
+                                @Html.Partial("~/Areas/Admin/Views/Property/_Gallery.cshtml", Model.Pictures)
+                            </div>
+                            <div class="tab-pane fade" id="features">
+                                @Html.Partial("~/Areas/Admin/Views/Property/_Features.cshtml", Model.Features)
+                            </div>
+                            <div class="tab-pane fade @if (Model.ActiveTab == "accommodation") { <text> in active </text>}" id="accommodation">
+                                @Html.Partial("~/Areas/Admin/Views/Property/_Rooms.cshtml", Model.Accommodations)
+                            </div>
+                            <div class="tab-pane fade" id="rates">
+                                @Html.Partial("_RateIndex", Model)
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+
+
+

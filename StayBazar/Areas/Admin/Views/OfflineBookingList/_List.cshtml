@@ -1,0 +1,906 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "OfflineshowPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+
+    string apikey = BLayer.Settings.GetValue(CLayer.Settings.PUBLIC_PAGE_LOCK);
+}
+<style>
+    .margin-bot-10Imp {
+        margin-bottom: 5px !important;
+    }
+
+    .padding0 {
+        padding: 0px 17px !important;
+    }
+
+    .panelheadbackimagenone {
+        background-image: none !important;
+        background-color: #ffffff !important;
+    }
+
+    .textalgncenter {
+        text-align: center !important;
+    }
+</style>
+<div class="body-content">
+    @if (Model.Count() == 0)
+    {
+        <div class="alert alert-info">Data not found</div>
+    }
+    <div class="panel-group" id="accordion">
+        @{
+            StayBazar.Areas.Admin.Models.OfflineBookingModel filterform = (StayBazar.Areas.Admin.Models.OfflineBookingModel)ViewBag.Filter;
+            using (Html.BeginForm("Pager", "OfflineBookingList", FormMethod.Post, new { @id = "frmPagers" }))
+            {
+                <input type="hidden" id="SearchString" name="SearchString" value="@filterform.SearchString" />
+                <input type="hidden" id="SearchValue" name="SearchValue" value="@filterform.SearchValue" />
+                <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+                <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+            }
+            gp.RowsInAPage = filterform.Limit;
+        }
+        @if (Model != null && Model.Count() > 0)
+        {
+            @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+        }
+        @foreach (CLayer.OfflineBooking usr in Model)
+        {
+
+            string AccommodationTypeTitle = "";
+            if (@usr.Accommodationtypeid != -1)
+            {
+                CLayer.OfflineBooking getacctitle = BLayer.OfflineBooking.GetAllDetailsById(@usr.OfflineBookingId);
+                AccommodationTypeTitle = @getacctitle.AccommodatoinTypename;
+            }
+            else
+            {
+
+                AccommodationTypeTitle = @usr.AccommodatoinTypename;
+            }
+            long IsGST = BLayer.OfflineBooking.GetOfflinebookingIsGST(@usr.OfflineBookingId);
+            if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.GST)
+            {
+                <div class="panel panel-default">
+
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#i_@usr.OfflineBookingId">
+                            <div class="row">
+                                <div class="col-md-2"><span></span>Date: @usr.CreatedTime.ToShortDateString()</div>
+                                <div class="col-md-3">  Property: @usr.PropertyName </div>
+                                <div class="col-md-2">  Location: @usr.PropertyCityname </div>
+                                <div class="col-md-3">  Confirmation No: @usr.ConfirmationNumber </div>
+                                <div class="col-md-2">
+                                    status:
+                                    @if (usr.SaveStatus == 1)
+                                    {
+                                        <text> Saved </text>
+                                    }
+                                    else if (usr.SaveStatus == 2)
+                                    {
+                                        <text> Submitted </text>
+                                    }
+                                    else if (usr.SaveStatus == 3)
+                                    {
+                                        <text> Cancelled </text>
+                                    }
+                                    else if (usr.SaveStatus == 5)
+                                    {
+                                        <text> Approved </text>
+                                    }
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div id="i_@usr.OfflineBookingId" class="panel-collapse collapse ">
+                        <div class="panel-body over_div">
+
+                            <div class="row">
+                                <div class="col-md-3" id="databuyer_@usr.CustomerId">
+                                    <b>Property Details</b><br />
+                                    Title:@usr.PropertyName<br />
+                                    @if (usr.SupplierName != "" && usr.SupplierName != null)
+                                    {
+                                        <text> Supplier Name : @usr.SupplierName <br /> </text>
+                                    }
+                                    Address: @usr.PropertyAddress<br />
+                                    City: @usr.PropertyCityname<br />
+                                    State: @usr.PropertyStatename<br />
+                                    Country: @usr.PropertyCountryname<br />
+                                    Phone: @usr.PropertyContactNo<br />
+                                    Email: @usr.PropertyEmail<br />
+                                    @*GST Registration No:@usr.GSTRegistrationNo<br />
+                    State of registration:@usr.StateOfRegistration<br />*@
+                                    State of Code:030
+                                </div>
+
+                                <div class="col-md-3">
+                                    <b>Booking Details</b>
+                                    <br />
+                                    Booking Date:  @usr.CreatedTime.ToShortDateString()<br />
+                                    Property Address: @usr.PropertyAddress<br />
+                                    Total  Amount: @usr.TotalSalePrice<br />
+                                    Hotel Confirmation Number: @usr.HotelConfirmationNo<br />
+
+                                </div>
+
+                                <div class="col-md-3" id="databuyer_@usr.CustomerId">
+                                    <b>Customer Details</b><br />
+                                    Name:  @usr.CustomerName <br />
+                                    Address: @usr.CustomerAddress<br />
+                                    City: @usr.CustomerCityname<br />
+                                    State: @usr.CustomerStatename<br />
+                                    Country: @usr.CustomerCountryname<br />
+                                    Phone: @usr.CustomerMobile<br />
+                                    Email: @usr.CustomerEmail<br />
+                                    @*GST Registration No:@usr.GSTRegistrationNo<br />
+                    State of registration:@usr.StateOfRegistration<br />*@
+                                    State of Code:032
+                                </div>
+
+                                @if (usr.CreatedTime.AddDays(10) > DateTime.Now)
+                                {
+                                    <div class="col-md-1">
+                                        <a class="btn btn-success handpointer" onclick="OpenGST(@usr.OfflineBookingId)"> Edit </a>
+                                    </div>
+                                }
+                                @if (usr.SaveStatus != 5)
+                                {
+                                    <div class="col-md-1">
+                                        <a class="btn btn-success handpointer" onclick="OpenGST(@usr.OfflineBookingId)">Open</a>
+                                    </div>
+                                }
+                                <div id="loading_@usr.OfflineBookingId" class="loader" style="display:none;">
+                                    <div class="center_load">
+                                        <img src="~/images/loading.gif" width="20" height="20" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-1">
+                                    <a class="btn btn-success handpointer" onclick="DeleteGST(@usr.OfflineBookingId)">Delete</a>
+                                </div>
+                            </div>
+
+
+                            @* Need multiple booking details *@
+
+                            @{
+                List<CLayer.OfflineBooking> BListGST = BLayer.OfflineBooking.GetMultipleBookingDetailsGST(@usr.OfflineBookingId);
+                            }
+                            @if (BListGST.Count > 0)
+                            {
+                                <div class="panel-group" id="accordion1">
+                                    <div class="col-md-12" style="padding: 0;">
+                                        <table class="table table-hover table-condensed table-responsive table-striped table-custom margin-bot-10Imp">
+                                            <thead>
+                                                <tr>
+                                                    <th width="25">&nbsp; </th>
+                                                    <th width="174">&nbsp;Accommodation</th>
+                                                    <th width="160">&nbsp;Date</th>
+                                                    <th width="80" class="textalgncenter"> No Of Night</th>
+                                                    <th width="90" class="textalgncenter"> No Of rooms</th>
+                                                    <th width="50" class="textalgncenter"> Adults</th>
+                                                    <th width="50" class="textalgncenter"> Children</th>
+                                                    <th width="150">Guest Name</th>
+                                                    <th width="200">Guest Email</th>
+                                                    <th width="80" class="textalgncenter"> Amount</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                    <div class="panel panel-default">
+                                        @foreach (CLayer.OfflineBooking dt in BListGST)
+                                        {
+                                            CLayer.HSNCode HSNdata = new CLayer.HSNCode();
+                                            if (dt.BookingDetailsId > 0)
+                                            {
+                                                long HSNCodeid = BLayer.OfflineBooking.GetBookingDetailHSN(dt.BookingDetailsId);
+                                                if (HSNCodeid > 0)
+                                                {
+                                                    HSNdata = BLayer.HSNCode.Get(HSNCodeid);
+                                                }
+                                            }
+
+                                            <div class="panel-heading padding0 panelheadbackimagenone">
+                                                <a id="Id_@dt.BookingDetailsId" data-toggle="collapse" class="blacktext " data-parent="#accordion1" onclick="changetoggle(@dt.BookingDetailsId)" href="#iAcc_@dt.BookingDetailsId">
+                                                    <div class="row">
+                                                        <table class="table table-hover table-condensed table-responsive table-striped table-custom margin-bot-10Imp">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td width="25">
+                                                                        <span id="minus_@dt.BookingDetailsId" class="glyphicon glyphicon-minus" style=" font-size: small; display:none;"></span>
+                                                                        <span id="plus_@dt.BookingDetailsId" class="glyphicon glyphicon-plus" style=" font-size: small;"></span>
+                                                                    </td>
+                                                                    <td width="174">@dt.AccommodatoinTypename</td>
+                                                                    <td width="160">
+                                                                        @if (HSNdata.NatureOfService == "Event Management Service")
+                                                                        {
+                                                                            if (dt.CheckIn == dt.CheckOut)
+                                                                            {
+                                                                            <text> <b>Event Date</b>:@dt.CheckIn.ToShortDateString() </text>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <text> <b>Event Date</b>:@dt.CheckIn.ToShortDateString() To  @dt.CheckOut.ToShortDateString()</text>
+    }
+}
+else
+{
+                                                                            <text> <b>Check In</b>:@dt.CheckIn.ToShortDateString() <br />
+                                                                            <b>Check out</b>: @dt.CheckOut.ToShortDateString() </text>
+                                                                        }
+                                                                    </td>
+                                                                    <td width="80" class="textalgncenter">@dt.NoOfNight</td>
+                                                                    <td width="90" class="textalgncenter">@dt.NoOfRooms</td>
+                                                                    <td width="50" class="textalgncenter">@dt.NoOfPaxAdult</td>
+                                                                    <td width="50" class="textalgncenter">@dt.NoOfPaxChild</td>
+                                                                    <td width="150">&nbsp;@dt.GuestName</td>
+                                                                    <td width="200">@dt.GuestEmail</td>
+                                                                    <td width="80" class="textalgncenter">@dt.TotalSalePrice</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <div id="iAcc_@dt.BookingDetailsId" class="panel-collapse collapse">
+                                                <div class="panel-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <b>Buy Price</b><br />
+                                                            <div class="col-md-6">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Average Daily Rate Before GST :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.AvgDailyRateBefreStaxForBuyPrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            GST <span>( % )</span> :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.StaxForBuyPrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Total Amount - Accommodation :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.TotalAmtForBuyPrice
+
+                                                                        </td>
+                                                                    </tr>
+
+
+                                                                </table>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>
+                                                                            GST - other services <span>( % )</span> :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.StaxForotherBuyPrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Total Amount - other services :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.TotalAmtotherForBuyPrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Buy Price for other services :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.BuyPriceforotherservicesForBuyprice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="font-weight:bold;">
+                                                                            Total Buy Price :
+                                                                        </td>
+                                                                        <td align="right" style="font-weight:bold;">
+                                                                            @dt.TotalBuyPrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <b>Sale Price</b><br />
+                                                            <div class="col-md-6">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Average Daily Rate Before GST:
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.AvgDailyRateBefreStaxForSalePrice
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            GST <span>( % )</span> :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.StaxForSalePrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Total Amount - Accommodation :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.TotalAmtForSalePrice
+
+                                                                        </td>
+                                                                    </tr>
+
+
+                                                                </table>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>
+                                                                            GST - other services <span>( % )</span> :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.StaxForotherForSalePrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Total Amount - other services:
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.TotalAmtotherForSalePrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Sale Price for other services :
+                                                                        </td>
+                                                                        <td align="right">
+                                                                            @dt.BuyPriceforotherservicesForSalePrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="font-weight:bold;">
+                                                                            Total Sale Price :
+                                                                        </td>
+                                                                        <td align="right" style="font-weight:bold;">
+                                                                            @dt.TotalSalePrice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <br />
+                                                    <div class="row" style="float:right">
+                                                        <a href="#" title="Resendemail" class="btn btn-success" onclick="ResendemailCGST(@usr.OfflineBookingId,@dt.BookingDetailsId)">
+                                                            Resend email to customer
+                                                        </a>
+                                                        <a href="#" title="Resendemail" class="btn btn-success marginleft10" onclick="ResendemailSGST(@usr.OfflineBookingId,@dt.BookingDetailsId)">
+                                                            Resend email to supplier
+                                                        </a>
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="row" style="float:right">
+                                    <a class="btn btn-success" onclick="ViewGST(@usr.OfflineBookingId)"> View </a>
+                                </div>
+
+                            }
+
+
+
+                        </div>
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                 <div class="panel panel-default">
+        <div class="panel-heading">
+            <a data-toggle="collapse" class="blacktext " data-parent="#accordion" href="#i_@usr.OfflineBookingId">
+                <div class="row">
+                    <div class="col-md-2"><span></span>Date: @usr.CreatedTime.ToShortDateString()</div>
+                    <div class="col-md-3">  Property: @usr.PropertyName </div>
+                    <div class="col-md-2">  Location: @usr.PropertyCityname </div>
+                    <div class="col-md-3">  Confirmation No: @usr.ConfirmationNumber </div>
+                    <div class="col-md-2">
+                        status:
+                        @if (usr.SaveStatus == 1)
+                        {
+                            <text> Saved </text>
+                        }
+                        else if (usr.SaveStatus == 2)
+                        {
+                            <text> Submitted </text>
+                        }
+                        else if (usr.SaveStatus == 3)
+                        {
+                            <text> Cancelled </text>
+                        }
+                        else if (usr.SaveStatus == 5)
+                        {
+                            <text> Approved </text>
+                        }
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div id="i_@usr.OfflineBookingId" class="panel-collapse collapse ">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-3" id="databuyer_@usr.CustomerId">
+                        <b>Property Details</b><br />
+                        Title:@usr.PropertyName<br />
+                        @if (usr.SupplierName != "" && usr.SupplierName != null)
+                        {
+                            <text> Supplier Name : @usr.SupplierName <br /> </text>
+                        }
+                        Address: @usr.PropertyAddress<br />
+                        City: @usr.PropertyCityname<br />
+                        State: @usr.PropertyStatename<br />
+                        Country: @usr.PropertyCountryname<br />
+                        Phone: @usr.PropertyContactNo<br />
+                        Email: @usr.PropertyEmail<br />
+                    </div>
+
+                    <div class="col-md-3">
+                        <b>Booking Details</b>
+                        <br />
+                        Booking Date:  @usr.CreatedTime.ToShortDateString()<br />
+                        Property Address: @usr.PropertyAddress<br />
+                        Total  Amount: @usr.TotalSalePrice<br />
+                        Hotel Confirmation Number: @usr.HotelConfirmationNo<br />
+
+                    </div>
+
+                    <div class="col-md-3" id="databuyer_@usr.CustomerId">
+                        <b>Customer Details</b><br />
+                        Name:  @usr.CustomerName <br />
+                        Address: @usr.CustomerAddress<br />
+                        City: @usr.CustomerCityname<br />
+                        State: @usr.CustomerStatename<br />
+                        Country: @usr.CustomerCountryname<br />
+                        Phone: @usr.CustomerMobile<br />
+                        Email: @usr.CustomerEmail<br />
+                    </div>
+
+                    @if (usr.CreatedTime.AddDays(10) > DateTime.Now)
+                    {
+                        <div class="col-md-1">
+                            <a class="btn btn-success handpointer" onclick="Open(@usr.OfflineBookingId)"> Edit </a>
+                        </div>
+                    }
+                    @if (usr.SaveStatus != 5)
+                    {
+                        <div class="col-md-1">
+                            <a class="btn btn-success handpointer" onclick="Open(@usr.OfflineBookingId)">Open</a>
+                        </div>
+                        <div class="col-md-1">
+                            <a class="btn btn-success handpointer" onclick="Delete(@usr.OfflineBookingId)">Delete</a>
+                        </div>
+                    }
+                </div>
+
+                <div class="row">
+                    <div class="col-md-5">
+                        <b>Buy Price</b><br />
+                        <table>
+                            <tr>
+                                <td>
+                                    Average Daily Rate Before Service tax:
+                                </td>
+                                <td align="right">
+                                    @usr.AvgDailyRateBefreStaxForBuyPrice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Service tax <span>( % )</span> :
+                                </td>
+                                <td align="right">
+                                    @usr.StaxForBuyPrice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Total Amount - Accommodation
+                                </td>
+                                <td align="right">
+                                    @usr.TotalAmtForBuyPrice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Buy Price for other services
+                                </td>
+                                <td align="right">
+                                    @usr.BuyPriceforotherservicesForBuyprice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Service tax - other services <span>( % )</span> :
+                                </td>
+                                <td align="right">
+                                    @usr.StaxForotherBuyPrice
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Total Amount - other services
+                                </td>
+                                <td align="right">
+                                    @usr.TotalAmtotherForBuyPrice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="font-weight:bold;">
+                                    Total Buy Price
+                                </td>
+                                <td align="right" style="font-weight:bold;">
+                                    @usr.TotalBuyPrice
+
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-5">
+                        <b>Sale Price</b><br />
+                        <table>
+                            <tr>
+                                <td>
+                                    Average Daily Rate Before Service tax:
+                                </td>
+                                <td align="right">
+                                    @usr.AvgDailyRateBefreStaxForSalePrice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Service tax <span>( % )</span> :
+                                </td>
+                                <td align="right">
+                                    @usr.StaxForSalePrice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Total Amount - Accommodation
+                                </td>
+                                <td align="right">
+                                    @usr.TotalAmtForSalePrice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Sale Price for other services
+                                </td>
+                                <td align="right">
+                                    @usr.BuyPriceforotherservicesForSalePrice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Service tax - other services <span>( % )</span> :
+                                </td>
+                                <td align="right">
+                                    @usr.StaxForotherForSalePrice
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Total Amount - other services:
+                                </td>
+                                <td align="right">
+                                    @usr.TotalAmtotherForSalePrice
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="font-weight:bold;">
+                                    Total Sale Price :
+                                </td>
+                                <td align="right" style="font-weight:bold;">
+                                    @usr.TotalSalePrice
+
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                        <thead>
+                            <tr>
+                                <th>Accommodation</th>
+                                <th>CheckIn</th>
+                                <th>Check out</th>
+                                <th>No Of Night</th>
+                                <th>No Of rooms</th>
+                                <th>Adults</th>
+                                <th>Children</th>
+                                <th>Guests Name</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@usr.AccommodatoinTypename</td>
+                                <td>@usr.CheckIn.ToShortDateString()</td>
+                                <td>@usr.CheckOut.ToShortDateString()</td>
+                                <td>@usr.NoOfNight</td>
+                                <td>@usr.NoOfRooms</td>
+                                <td>@usr.NoOfPaxAdult</td>
+                                <td>@usr.NoOfPaxChild</td>
+                                <td>@usr.GuestName</td>
+                                <td>@usr.TotalSalePrice</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row">
+                    <a href="#" title="Resendemail" class="btn btn-success" onclick="ResendemailC(@usr.OfflineBookingId)">
+                        Resend email to customer
+                    </a>
+                    <a href="#" title="Resendemail" class="btn btn-success marginleft10" onclick="ResendemailS(@usr.OfflineBookingId)">
+                        Resend email to supplier
+                    </a>
+                    <a class="btn btn-success" onclick="View(@usr.OfflineBookingId)"> View </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+            }
+
+        }
+    </div>
+</div>
+<script type="text/javascript">
+    var apiKEY = '@(apikey)';
+
+    $(function () {
+
+
+    });
+    function changetoggle(str) {
+        var Plus = '#plus_' + str
+        var Minus = '#minus_' + str
+        var Sub = '#iAcc_' + str
+        var Id = '#Id_' + str
+        if ($(Sub).hasClass('in')) {
+            $('#plus_' + str).css("display", "block");
+            $('#minus_' + str).css("display", "none");
+
+        }
+        else {
+            $('#plus_' + str).css("display", "none");
+            $('#minus_' + str).css("display", "block");
+        }
+    }
+    function changeextentsign(d) {
+
+
+    }
+    function OfflineshowPager(num) {
+        $("#currentPage").val(num);
+        var url = '@Url.Action("Pager", "OfflineBookingList", new { area = "Admin" })';
+        $.post(url, $("#frmPagers").serialize(), function (data) {
+            $("#List").html(data);
+        });
+    }
+    function View(OffId) {
+        window.location.href = '/Admin/OfflineBooking/ViewBookingData?OfflineBookingId=' + OffId + '&Dir=' + 1;
+
+    }
+    function Open(OffId) {
+        window.location.href = '/Admin/OfflineBooking/OfflineEdit?OfflineBookId=' + OffId;
+    }
+    function Delete(OffId) {
+        var answer = confirm("Are you sure you want to delete this Saved booking ?");
+
+        if (answer == true) {
+            var url = '@Url.Action("DeleteOfflineSavedData", "OfflineBookingList", new { area = "Admin" })?OfflineBookingId=' + OffId;
+            $.post(url, $("#frmPagers").serialize(), function (data) {
+                if (data == 'True' || data == 'true') {
+                    $.get('@Url.Action("LoadList", "OfflineBookingList")', function (result) {
+                        $("#List").html(result);
+                    });
+                }
+                else {
+                    alert("Booking cannot be deleted");
+                }
+            });
+        }
+    }
+
+    function OfflineBookEdit(OffId) {
+        var url = '@Url.Action("OfflineEdit", "OfflineBooking", new { area = "Admin" })';
+        $.post(url, { OfflineBookId: OffId }, function (data) {
+            alert(data);
+            window.location(data);
+        });
+    }
+
+    function ResendemailC(id) {
+        var r = confirm("Are you sure you want to resend confirmation mail? ")
+        if (r == true) {
+            var url = '@Url.Action("ResendemailC", "OfflineBookingList")?OfflineBookingId=' + id;
+            $.post(url, function (data) {
+
+                alert("Resend email was sent successfully");
+            });
+        }
+        else {
+            return false
+        }
+    }
+    function ResendemailS(id) {
+        var r = confirm("Are you sure you want to resend confirmation mail? ")
+        if (r == true) {
+            var url = '@Url.Action("ResendemailS", "OfflineBookingList")?OfflineBookingId=' + id;
+            $.post(url, function (data) {
+
+                alert("Resend email was sent successfully");
+            });
+        }
+        else {
+            return false
+        }
+    }
+
+
+
+    function ResendemailCGST(id,Bid) {
+        var r = confirm("Are you sure you want to resend confirmation mail? ")
+        if (r == true) {
+            var url = '@Url.Action("ResendemailCGST", "OfflineBookingList")?OfflineBookingId=' + id + '&BookingDetailsId=' + Bid + '&key=' + apiKEY;
+            $.post(url, function (data) {
+
+                alert("Resend email was sent successfully");
+            });
+        }
+        else {
+            return false
+        }
+    }
+    function ResendemailSGST(id, Bid) {
+        var r = confirm("Are you sure you want to resend confirmation mail? ")
+        if (r == true) {
+            var url = '@Url.Action("ResendemailSGST", "OfflineBookingList")?OfflineBookingId=' + id + '&BookingDetailsId=' + Bid + '&key=' + apiKEY;
+            $.post(url, function (data) {
+
+                alert("Resend email was sent successfully");
+            });
+        }
+        else {
+            return false
+        }
+    }
+
+    function Cancelbtn(Id) {
+        var r = confirm("Are you sure you want to Cancel? ")
+        // alert(Id);
+        if (r == true) {
+            $.post('@Url.Action("StatusCancel", "CorporateCreditBookings", new { area = "Admin" })', { BookingId: Id }, function (data) {
+
+            });
+        }
+        else {
+            return false
+        }
+    }
+
+    function PDF(OffId) {
+        var url = '@Url.Action("ReportPdf", "OfflineBookingList")?OfflineBookingId=' + OffId;
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+
+
+
+
+    function ViewGST(OffId) {
+        window.location.href = '/Admin/OfflineBookingGST/BookingDetailsPreview?OfflineBookId=' + OffId + '&Dir=' + 1;
+
+    }
+    function OpenGST(OffId) {
+        window.location.href = '/Admin/OfflineBookingGST/OfflineEdit?OfflineBookId=' + OffId;
+    }
+    function DeleteGST(OffId) {
+
+        var answer = confirm("Are you sure you want to delete this booking ?");
+        if (answer == true) {
+            var load = 'loading_' + OffId;
+            document.getElementById(load).style.display = 'block';
+            var url = '@Url.Action("DeleteOfflineSavedData", "OfflineBookingList", new { area = "Admin" })?OfflineBookingId=' + OffId;
+            $.post(url, $("#frmPagers").serialize(), function (data) {
+                document.getElementById(load).style.display = 'none';
+                if (data == 'True' || data == 'true') {
+                    $.get('@Url.Action("LoadList", "OfflineBookingList")', function (result) {
+                        $("#List").html(result);
+                    });
+                }
+                else {
+                    alert("Booking cannot be deleted");
+                }
+            });
+        }
+        @*var answer = confirm("Are you sure you want to delete this Saved booking ?");
+        if (answer == true) {
+            var url = '@Url.Action("DeleteOfflineSavedData", "OfflineBookingList", new { area = "Admin" })?OfflineBookingId=' + OffId;
+            $.post(url, $("#frmPagers").serialize(), function (data) {
+                $("#List").html(data);
+            });
+        }*@
+
+
+    }
+</script>
+
+
+

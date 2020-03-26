@@ -1,0 +1,181 @@
+﻿@model IEnumerable<CLayer.OfflineBooking>
+@{
+    long i = 0;
+    //decimal tt = 0;
+    //decimal m = 0;
+
+
+    //long totalnights = 0;
+
+    //double sgst, cgst, igst;
+    //double tsgst, tcgst, tigst;
+    //double tbgst, togst;
+    //int bookingType = 0;
+
+    //double osgst, ocgst, oigst;
+    //double otsgst, otcgst, otigst;
+
+    //double AmountBeforeServiceTax = 0;
+    //double totalAmountBeforeTax = 0;
+    //double totalAmountAfterTax = 0;
+    ViewBag.Title = "Bank Upload Report";
+    //Layout = "~/Areas/Admin/Views/Shared/_reportLayout.cshtml";
+}
+
+@*<div class="col-md-12">
+        <h2 class="bold">
+
+        </h2>
+    </div>*@
+<input type="hidden" id="HiddenFromDate" value="@ViewBag.FromDate" />
+<input type="hidden" id="HiddenToDate" value="@ViewBag.ToDate" />
+<input type="hidden" id="HiddenSearchString" value="@ViewBag.SearchString" />
+
+<div class="page-title-container style3">
+    <div class="row">
+
+        <div class="col-md-4">
+            <h2 style="color:white">@ViewBag.Title</h2>
+        </div>
+
+        @*<div class="col-md-10">*@
+            @using (Html.BeginForm("Filter", "BankUploadReport", FormMethod.Post, new { @id = "BankUploadReportFilter" }))
+            {
+                @*<div class="row">*@
+                    <div class="col-md-2 form-group">
+                        <label>Date</label><input type="text" id="FromDate" name="FromDate" class="form-control input-sm" />
+                    </div>
+
+
+                    <div class="col-md-2 form-group">
+                        <label>To Date</label><input type="text" id="ToDate" name="ToDate" class="form-control input-sm" />
+                    </div>
+                    <br />
+                    <div class="col-md-1 form-group margin-top-10">
+
+                        <button id="btnSearch" class="btn btn-default margin-top-10" type="submit" tabindex="3">Search</button>
+                    </div>
+                    <div class="col-md-2 form-group hidden">
+                        <label>Customer Name/Email</label>
+                        <input type="text" id="SearchString" name="SearchString" class="form-control input-sm" />
+                    </div>
+
+
+                    <div class="col-md-1">
+                        <br />
+                        @*<div class="col-md-3 exporticons" style="TOP: -6PX;">
+                                <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6"></a>
+                            </div>*@
+                        <div class="exporticons" style="TOP: -6PX;">
+                            @*<a title="Print" href="#" onclick="printDoc()" id="btnNextClick" class="fa fa-print"> </a>*@
+                            <a title="Pdf" href="#" onclick="PDF()" id="btnNextClick" class="fa fa-file-pdf-o"></a>
+                            <a title="Export" onclick="Export()" id="btnNextClick" class="fa fa-file-excel-o" tabindex="6"></a>
+                        </div>
+                    </div>
+                @*</div>*@
+            }
+
+        @*</div>*@
+        </div>
+    </div>
+<br />
+<br />
+        <div class="container-fluid">
+            <div style="padding-left: 30px;">
+                <div class="row">
+                    <table border="0" class="table table-custom table-bordered table-hover table-striped" cellpadding="1">
+                        <thead>
+                            <tr>
+                                <th>Property Bank</th>
+                                <th>Amount Payable</th>
+                                <th>Date</th>
+                                <th>Beneficiary</th>
+                                <th>Account No</th>
+                                <th>Property E-mail</th>
+                                <th>@string.Empty</th>
+                                <th>@string.Empty</th>
+                                <th>@string.Empty</th>
+                                <th>IFSC Code</th>
+                                <th>Account Type Code</th>
+                                <th>@string.Empty</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (CLayer.OfflineBooking pr in Model)
+                            {
+                                var amountPayable = string.Format("{0:n0}", pr.TotalSalePrice);
+
+                                <tr>
+                                    <td align="center">@pr.PropertyBank</td><!--Propertry Bank-->
+                                    <td align="right">@pr.AmountPayableValue</td><!--Amount Payable-->
+                                    <td align="left" style="width:100px">@pr.BankUploadReportDate</td> <!--Request Id-->
+                                    <td align="left">@pr.BeneficiaryName</td><!--Customer Name-->
+                                    <td align="left">@pr.AccountNumber</td> <!--Customer City-->
+                                    <td align="left">@pr.PropertyEmail</td> <!--Customer Email-->
+                                    <td align="left">@pr.BankUploadText1 </td> <!--Guest Name-->
+                                    <td align="left">@pr.BankUploadText2</td> <!--check in-->
+                                    <td align="center">@string.Empty</td> <!--check out-->
+                                    <td align="left">@pr.IFSCCode</td> <!--Total no of pax-->
+                                    <td align="center">@(pr.AccountTypeCode == "0" ? "" : pr.AccountTypeCode)</td><!--Total room night-->
+                                    <td align="right">@pr.StayBazarWebsite</td><!--total customer payable including gst-->
+
+
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+
+
+  var  from=   $('#HiddenFromDate').val();
+  var to = $('#HiddenToDate').val();
+  var SearchString = $('#HiddenSearchString').val();
+
+  //var f = new Date(from);
+  //var t = new Date(to);
+
+  //var from1 = f.ToShortDateString();
+  //var to1 = t.ToShortDateString();
+
+  $('#FromDate').val(from);
+  $('#ToDate').val(to);
+  $('#SearchString').val(SearchString);
+
+
+
+    $(function () {
+        $('#FromDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+            });
+        $('#ToDate').datepicker(
+            {
+                dateFormat: "dd/mm/yy",
+                defaultDate: "+1w",
+                beforeShow: function () {
+                    //$(this).datepicker('option', 'minDate', $('#FromDate').val());
+                    //if ($('#FromDate').val() === '') $(this).datepicker('option', 'minDate', 0);
+                }
+            });
+    });
+
+    function PDF() {
+        var url = '@Url.Action("PDFView", "BankUploadReport")?' + $('#BankUploadReportFilter').serialize();
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+    function Export() {
+        window.location = '@Url.Action("ExcelDownload", "BankUploadReport")?' +$('#BankUploadReportFilter').serialize();
+        //window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+
+        </script>

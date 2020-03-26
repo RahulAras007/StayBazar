@@ -1,0 +1,94 @@
+﻿@model StayBazar.Areas.Admin.Models.ModifyModel
+@{
+    Layout = null;
+}
+@if (Model.Postback)
+{
+    <span>Booking modification information</span>
+    <table class="table">
+        <tr>
+            <td colspan="2">New dates : Check In - @Model.CheckIn.ToShortDateString()  Check Out - @Model.CheckOut.ToShortDateString()</td>
+        </tr>
+        <tr>
+            <td width="300">Old total amount</td>
+            <td align="right">@String.Format("{0:N}", Math.Round(Model.CurrentTotalAmount))</td>
+        </tr>
+        <tr>
+            <td>Cancellation charge</td>
+            <td align="right">@String.Format("{0:N}", Math.Round(Model.CancellationCharge))</td>
+        </tr>
+        <tr>
+            <td>Service charge for cancellation</td>
+            <td align="right">@String.Format("{0:N}", Math.Round(Model.ServiceCharge))</td>
+        </tr>
+        @if (Model.NewBookingAmount > 0)
+        {
+            <tr>
+                <td>New booking charge</td>
+                <td align="right">@String.Format("{0:N}", Math.Round(Model.NewBookingAmount))</td>
+            </tr>
+        }
+        <tr>
+            <td>&nbsp;</td>
+            <td align="right">
+                @using (Html.BeginForm("ChangeBooking", "Cancellation"))
+                {
+                    @Html.HiddenFor(m => m.CheckIn)
+                    @Html.HiddenFor(m => m.CheckOut)
+                    @Html.HiddenFor(m => m.BookingId)
+                    @Html.HiddenFor(m => m.Refundable)
+                    <input type="submit" value="Submit" class="btn btn-success" />
+                }
+            </td>
+        </tr>
+    </table>
+    <span class="smalltext">The request will be forwarded to booking page, where you can see all new booking details. </span>
+}
+else
+{
+    if (Model.Msg != "")
+    {
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div @if (Model.Failed) { <text> class="alert alert-danger" </text> } else { <text> class="alert alert-success" </text> }>@Model.Msg</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-12">
+                @using (Html.BeginForm("Change", "Cancellation", FormMethod.Post, new { id = "frmModify", onsubmit = "return false;" }))
+                {
+                    @Html.ValidationSummary(true)@Html.HiddenFor(m => m.CheckIn) @Html.HiddenFor(m => m.CheckOut)
+                    <dl>
+                        <dt>@Html.AntiForgeryToken()Check In</dt>
+                        <dd><input type="text" value="@Model.CheckIn.ToShortDateString()" id="dcheckin" />@Html.ValidationMessageFor(m => m.CheckIn)</dd>
+                        <dt>Check Out</dt>
+                        <dd><input type="text" value="@Model.CheckOut.ToShortDateString()" id="dcheckout" /> @Html.ValidationMessageFor(m => m.CheckOut)</dd>
+                        <dd><input type="button" class="btn btn-info" value="Modify" onclick="modifyBooking(@Model.BookingId,document.getElementById('dcheckin').value,document.getElementById('dcheckout').value)"  />@Html.HiddenFor(m => m.BookingId)</dd>
+                    </dl>
+                }
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $("#dcheckin").datepicker({
+                    minDate: 1,
+                    defaultDate: '@Model.CheckIn.ToShortDateString()',
+                    numberOfMonths: 2,
+                    dateFormat: "dd/mm/yy"
+                });
+                $("#dcheckout").datepicker({
+                    minDate: 2,
+                    defaultDate: '@Model.CheckOut.ToShortDateString()',
+                    numberOfMonths: 2,
+                    dateFormat: "dd/mm/yy"
+                });
+                $("#dcheckin").change(function () { $("#CheckIn").val($(this).val()); });
+                $("#dcheckout").change(function () { $("#CheckOut").val($(this).val()); });
+            });
+
+        </script>
+    }
+}

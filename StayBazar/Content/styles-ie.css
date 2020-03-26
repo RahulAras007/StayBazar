@@ -1,0 +1,43 @@
+
+.iefix-mp{ max-width: 60%;  }
+.iefix-testi{ max-width: 33%; position: relative; top:-369px; left: 860px}
+.iefix-wbg{max-width: 100%;clear: both; }
+.iefix-ws{max-width: 60%;  clear: both; }
+.iefix-ad1{max-width: 30%; position: relative; top:-369px; left: 860px}
+.ie-clear-fix{clear:both; height: 2px; width: 100% !important; }
+.map {  width: 30%}
+
+.footerie {
+    background: url("../images/footer.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding-top: 10%;
+    padding-bottom: 2%;
+}
+.footerie .btn-default {
+    text-shadow: none;
+}
+.footerie p,
+.footerie a {
+    color: #FFF;
+}
+.footerie p {
+    padding-bottom: 10px; 
+}
+.footerie dt {
+    font-weight: 400;
+    margin-bottom: 10px;
+}
+.footerie a {
+    display: block;
+    padding-top: 1%;
+    padding-bottom: 1%;
+}
+.footerie .input-group {
+    margin-bottom: 5%;
+}
+
+.persons{ font-size: 12px; }
+.srch_spn{ margin-bottom: 10px !important;}
+.advsearch .col-xs-12{ width:100% !important; }

@@ -1,0 +1,374 @@
+@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    Layout = null;
+
+}
+
+<div class="col-md-12">
+    <div class="col-md-6">
+        @Html.CheckBoxFor(m => m.SupplierCancellationDone, new { @class = "" })
+        @Html.LabelFor(m => m.SupplierCancellationDone)
+    </div>
+    @*<div class="col-md-6">
+            <label>Nature Of Sales Service</label>
+            <select class="styleselect" style="width:100%;" name="SelectHSNSalesCode" id="SelectHSNSalesCode" onchange="changehsnsalescode()">
+                @{
+                    List<CLayer.HSNCode> HSNCode = BLayer.HSNCode.GetAll();
+
+                }
+                @foreach (CLayer.HSNCode sc in HSNCode)
+                {
+                    <option value="@sc.CodeId" @if (sc.CodeId == Model.HSNCodeForSalesService) { <text> selected </text> }>@sc.NatureOfService</option>
+                }
+            </select>
+        </div>*@
+</div>
+<br />
+<br />
+<div class="col-md-12 margin-bot-10">
+
+    <div class="col-md-6" id="DivBuyPrice">
+
+        <h4>
+            Buy Price :
+        </h4>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.Label("Average Daily Rate Before GST")<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.AvgDailyRateBefreStaxForBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangestaxbuyprice()" })
+                @Html.ValidationMessageFor(m => m.AvgDailyRateBefreStaxForBuyPrice)
+
+                <a style="cursor:pointer;" onclick="ReloadAvgdailyrateBuyPrice()">Find Avg. Amount</a>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.Label("GST ")<span class="bold"> ( % )</span> <span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.StaxForBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangestaxbuyprice()" })
+                            @Html.ValidationMessageFor(m => m.StaxForBuyPrice)
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>GST Value</label>
+                            <input type="text" id="StaxForBuyPriceamount" readonly="readonly" class="form-control input-sm" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.TotalAmtForBuyPrice)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.TotalAmtForBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangetotalbuyprice()" })
+                @Html.ValidationMessageFor(m => m.TotalAmtForBuyPrice)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.TotalBuyPrice)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.TotalBuyPrice, new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.TotalBuyPrice)
+            </div>
+
+        </div>
+        <div class="col-md-6">
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.BuyPriceforotherservicesForBuyprice)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.BuyPriceforotherservicesForBuyprice, new { @class = "form-control input-sm", @onchange = "onchangestaxbuyprice()" })
+                @Html.ValidationMessageFor(m => m.BuyPriceforotherservicesForBuyprice)
+            </div>
+            <div class="form-group">
+                @Html.Label("GST - other services")<span class="bold"> ( % )</span> <span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.StaxForotherBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangestaxbuyprice()" })
+                @Html.ValidationMessageFor(m => m.StaxForotherBuyPrice)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.TotalAmtotherForBuyPrice)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.TotalAmtotherForBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangetotalbuyprice()" })
+                @Html.ValidationMessageFor(m => m.TotalAmtotherForBuyPrice)
+            </div>
+
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                @Html.LabelFor(m => m.OtherServiceNature)
+                @Html.TextAreaFor(m => m.OtherServiceNature, new { @class = "form-control input-sm" })
+
+            </div>
+        </div>
+
+
+
+    </div>
+    <div class="col-md-6">
+        <h4>
+            Sale Price  :
+        </h4>
+
+        @*<div><label></label></div>*@
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.Label("Average Daily Rate Before GST")<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.AvgDailyRateBefreStaxForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangestaxsaleprice()" })
+                @Html.ValidationMessageFor(m => m.AvgDailyRateBefreStaxForSalePrice)
+                <a style="cursor:pointer;" onclick="ReloadAvgdailyrateSalePrice()">Find Avg. Amount</a>
+            </div>
+
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.Label("GST ") <span class="bold"> ( % )</span> <span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.StaxForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangestaxsaleprice()" })
+                            @Html.ValidationMessageFor(m => m.StaxForSalePrice)
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>GST Value</label>
+                            <input type="text" id="StaxForSalePriceamount" readonly="readonly" class="form-control input-sm" />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.TotalAmtForSalePrice)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.TotalAmtForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangetotalsaleprice()" })
+                @Html.ValidationMessageFor(m => m.TotalAmtForSalePrice)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.TotalSalePrice)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.TotalSalePrice, new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.TotalSalePrice)
+            </div>
+
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Nature Of Other Service</label>
+                <select class="styleselect" style="width:100%;" name="SelectHSNSalesCode" id="SelectHSNSalesCode" onchange="changehsnsalescode()">
+                    @{
+                        List<CLayer.HSNCode> HSNCode = BLayer.HSNCode.GetAll();
+
+                    }
+                    @foreach (CLayer.HSNCode sc in HSNCode)
+                    {
+                        <option value="@sc.CodeId" @if (sc.CodeId == Model.HSNCodeForSalesService) { <text> selected </text> }>@sc.NatureOfService</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.BuyPriceforotherservicesForSalePrice)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.BuyPriceforotherservicesForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangestaxsaleprice()" })
+                @Html.ValidationMessageFor(m => m.BuyPriceforotherservicesForSalePrice)
+            </div>
+            <div class="form-group">
+                @Html.Label("GST - other services") <span class="bold"> ( % )</span> <span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.StaxForotherForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangestaxsaleprice()" })
+                @Html.ValidationMessageFor(m => m.StaxForotherForSalePrice)
+            </div>G483
+            <div class="form-group">
+                @Html.LabelFor(m => m.TotalAmtotherForSalePrice)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.TotalAmtotherForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangetotalsaleprice()" })
+                @Html.ValidationMessageFor(m => m.TotalAmtotherForSalePrice)
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+</div>
+<script>
+    function ReloadAvgdailyrateBuyPrice()
+    {
+        var totalroomnight = 0;
+        var AvgdailyrateBuyPrice = 0;
+
+        var totalroomnight = parseFloat($("#NoOfNight").val() * $("#NoOfRooms").val());
+        if (isNaN(parseFloat(totalroomnight))) { totalroomnight = 0; }
+
+
+        if (totalroomnight > 0) {
+            var AvgdailyrateBuyPrice = parseFloat(($("#AvgDailyRateBefreStaxForBuyPrice").val()) / totalroomnight);
+            if (isNaN(parseFloat(AvgdailyrateBuyPrice))) { AvgdailyrateBuyPrice = 0; }
+        }
+
+
+        $("#AvgDailyRateBefreStaxForBuyPrice").val(AvgdailyrateBuyPrice);
+        onchangestaxbuyprice();
+
+
+
+    }
+
+    function ReloadAvgdailyrateSalePrice() {
+        var totalroomnight = 0;
+        var AvgdailyrateSalePrice = 0;
+
+        var totalroomnight = parseFloat($("#NoOfNight").val() * $("#NoOfRooms").val());
+        if (isNaN(parseFloat(totalroomnight))) { totalroomnight = 0; }
+
+
+        if (totalroomnight > 0) {
+            var AvgdailyrateSalePrice = parseFloat(($("#AvgDailyRateBefreStaxForSalePrice").val()) / totalroomnight);
+            if (isNaN(parseFloat(AvgdailyrateSalePrice))) { AvgdailyrateSalePrice = 0; }
+        }
+
+
+        $("#AvgDailyRateBefreStaxForSalePrice").val(AvgdailyrateSalePrice);
+        onchangestaxsaleprice();
+
+    }
+    $(window).load(function () {
+        @*var GSTTaxPercent = '@ViewBag.StaxForBuyPrice';
+        var GSTTaxAmount = '@ViewBag.StaxForBuyPriceamount';
+        $("#StaxForBuyPrice").val(GSTTaxPercent);
+        $("#StaxForBuyPriceamount").val(GSTTaxAmount);*@
+
+    });
+</script>
+@*<div class="col-md-12 margin-bot-10">
+        <div class="col-md-6">
+            <h4>
+                Buy Price :
+            </h4>
+
+
+
+            <div class="row margin-bot-10" style="margin-bottom:15px;">
+
+                <div class="col-xs-12 col-md-12">
+
+                    <div class=""><div class="col-md-6 pad0 bold">@Html.Label("Average Daily Rate Before GST")<span style="color:red">*</span></div><div class="col-md-6 pad0 bold">@Html.Label("GST ")<span class="bold"> ( % )</span> <span style="color:red">*</span></div></div>
+                    <div class="col-xs-6 col-md-6">
+                        <div>
+                            @Html.TextBoxFor(m => m.AvgDailyRateBefreStaxForBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangestaxbuyprice()" })
+                            @Html.ValidationMessageFor(m => m.AvgDailyRateBefreStaxForBuyPrice)
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-md-6">
+                        <div>
+                            @Html.TextBoxFor(m => m.StaxForBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangestaxbuyprice()" })
+                            @Html.ValidationMessageFor(m => m.StaxForBuyPrice)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-md-12">
+
+                    <div class=""><div class="col-md-6 pad0 bold">@Html.LabelFor(m => m.TotalAmtForBuyPrice)<span style="color:red">*</span></div><div class="col-md-6 pad0 bold">@Html.LabelFor(m => m.BuyPriceforotherservicesForBuyprice)<span style="color:red">*</span></div></div>
+                    <div class="col-xs-6 col-md-6 ">
+                        <div>
+                            @Html.TextBoxFor(m => m.TotalAmtForBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangetotalbuyprice()" })
+                            @Html.ValidationMessageFor(m => m.TotalAmtForBuyPrice)
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-md-6">
+                        <div>
+                            @Html.TextBoxFor(m => m.BuyPriceforotherservicesForBuyprice, new { @class = "form-control input-sm", @onchange = "onchangestaxbuyprice()" })
+                            @Html.ValidationMessageFor(m => m.BuyPriceforotherservicesForBuyprice)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-md-12">
+
+                    <div class=""><div class="col-md-6 pad0 bold">@Html.Label("GST - other services")<span class="bold"> ( % )</span> <span style="color:red">*</span></div><div class="col-md-6 pad0 bold">@Html.LabelFor(m => m.TotalAmtotherForBuyPrice)<span style="color:red">*</span></div></div>
+                    <div class="col-xs-6 col-md-6 ">
+                        <div>
+                            @Html.TextBoxFor(m => m.StaxForotherBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangestaxbuyprice()" })
+                            @Html.ValidationMessageFor(m => m.StaxForotherBuyPrice)
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-md-6">
+                        <div>
+                            @Html.TextBoxFor(m => m.TotalAmtotherForBuyPrice, new { @class = "form-control input-sm", @onchange = "onchangetotalbuyprice()" })
+                            @Html.ValidationMessageFor(m => m.TotalAmtotherForBuyPrice)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(m => m.TotalBuyPrice)<span style="color:red">*</span>
+                    @Html.TextBoxFor(m => m.TotalBuyPrice, new { @class = "form-control input-sm" })
+                    @Html.ValidationMessageFor(m => m.TotalBuyPrice)
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-6">
+            <h4>
+                Sale Price  :
+            </h4>
+            <div class="col-xs-12 col-md-12">
+
+                <div class=""><div class="col-md-6 pad0 bold">@Html.Label("Average Daily Rate Before GST")<span style="color:red">*</span></div><div class="col-md-6 pad0 bold">@Html.Label("GST ")<span class="bold"> ( % )</span> <span style="color:red">*</span></div></div>
+                <div class="col-xs-6 col-md-6">
+                    <div>
+                        @Html.TextBoxFor(m => m.AvgDailyRateBefreStaxForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangestaxsaleprice()" })
+                        @Html.ValidationMessageFor(m => m.AvgDailyRateBefreStaxForSalePrice)
+                    </div>
+                </div>
+                <div class="col-xs-6 col-md-6">
+                    <div>
+                        @Html.TextBoxFor(m => m.StaxForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangestaxsaleprice()" })
+                        @Html.ValidationMessageFor(m => m.StaxForSalePrice)
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-xs-12 col-md-12">
+
+                <div class=""><div class="col-md-6 pad0 bold">@Html.LabelFor(m => m.TotalAmtForSalePrice)<span style="color:red">*</span></div><div class="col-md-6 pad0 bold">@Html.LabelFor(m => m.BuyPriceforotherservicesForSalePrice)<span style="color:red">*</span></div></div>
+                <div class="col-xs-6 col-md-6">
+                    <div>
+                        @Html.TextBoxFor(m => m.TotalAmtForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangetotalsaleprice()" })
+                        @Html.ValidationMessageFor(m => m.TotalAmtForSalePrice)
+                    </div>
+                </div>
+                <div class="col-xs-6 col-md-6">
+                    <div>
+                        @Html.TextBoxFor(m => m.BuyPriceforotherservicesForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangestaxsaleprice()" })
+                        @Html.ValidationMessageFor(m => m.BuyPriceforotherservicesForSalePrice)
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-md-12">
+
+                <div class=""><div class="col-md-6 pad0 bold">@Html.Label("GST - other services") <span class="bold"> ( % )</span> <span style="color:red">*</span></div><div class="col-md-6 pad0 bold">@Html.LabelFor(m => m.TotalAmtotherForSalePrice)<span style="color:red">*</span></div></div>
+                <div class="col-xs-6 col-md-6">
+                    <div>
+                        @Html.TextBoxFor(m => m.StaxForotherForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangestaxsaleprice()" })
+                        @Html.ValidationMessageFor(m => m.StaxForotherForSalePrice)
+                    </div>
+                </div>
+                <div class="col-xs-6 col-md-6">
+                    <div>
+                        @Html.TextBoxFor(m => m.TotalAmtotherForSalePrice, new { @class = "form-control input-sm", @onchange = "onchangetotalsaleprice()" })
+                        @Html.ValidationMessageFor(m => m.TotalAmtotherForSalePrice)
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group col-md-6">
+                @Html.LabelFor(m => m.TotalSalePrice)<span style="color:red">*</span>
+                @Html.TextBoxFor(m => m.TotalSalePrice, new { @class = "form-control input-sm" })
+                @Html.ValidationMessageFor(m => m.TotalSalePrice)
+            </div>
+
+        </div>
+    </div>*@

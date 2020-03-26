@@ -1,0 +1,97 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+                /**/
+
+                Layout = null;
+
+                List<CLayer.OfflineBooking> result = new List<CLayer.OfflineBooking>();
+                result = BLayer.OfflineBooking.BookedList(Model.OfflineBookingId);
+}
+
+@*<script src="~/Scripts/jquery-1.10.1.min.js"></script>*@
+@Styles.Render("~/Content/css")
+<div class="col-md-5">
+    <div style="width:595px">
+        <div>
+            <table border="0" class="table table-condensed table-responsive table-custom">
+                <thead>
+                    <tr>
+                        <th>Hotel Conf. No.</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        @if (Model.InventoryAPIType != (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+                        {
+                            <th>Action</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (CLayer.OfflineBooking item in result)
+                    {
+                        if (item.CheckIn != default(DateTime))
+                        {
+
+
+                            <tr>
+                                <td style="word-break:break-all;">@item.HotelConfirmationNo</td>
+                                <td>@item.CheckIn.ToShortDateString()</td>
+                                <td>@item.CheckOut.ToShortDateString()</td>
+                                <td>
+                                    <a href="/Admin/OfflineBookingGST/EditBookedDetails?BookingId=@item.BookingId"><span class="glyphicon glyphicon-edit"></span></a>
+                                    @if (Model.InventoryAPIType != (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+                                    {
+                                        <span style="padding-left:5px; cursor:pointer;" class="glyphicon glyphicon-trash" onclick="DeleteBookedDetails(@item.BookingId,@Model.OfflineBookingId)"></span>
+                                    }
+                                    @*<span style="padding-left:5px; cursor:pointer;" class="glyphicon glyphicon-trash" onclick="DeleteBookedDetails(@item.BookingId,@Model.OfflineBookingId)"></span>*@
+                                    @*<span class="glyphicon glyphicon-edit" onclick="EditBookedDetails(@item.BookingId)" ></span>*@
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+
+    function EditBookedDetails(num) {
+        var url = '@Url.Action("EditBookedDetails", "OfflineBookingGST")' + "?BookingId=" + num;
+        $.post(url, function (data) {
+
+        });
+
+
+    }
+
+    function DeleteBookedDetails(Bid,OffId) {
+        if (confirm("Are you sure you want to delete?")) {
+            var url = '@Url.Action("DeleteBookingDetails", "OfflineBookingGST")' + "?BookedID=" + Bid + "&OfflineBookingId=" + OffId;
+            $.post(url, function (data) {
+                if (data == 'True' || data == 'true') {
+                    $.get('@Url.Action("LoadList", "OfflineBookingGST")?OfflineBookingId=' + OffId, function (result) {
+                        $("#BookingList").html(result);
+                    });
+                }
+                else {
+                    var url = '@Url.Action("GetMessageAlertForBookingDelete", "OfflineBookingGST", new { area = "Admin" })?OfflineBookingId=' + OffId + "&BookedID=" + Bid;
+                    $.get(url, function (data) {
+                        if (data != null && data != "") {
+                            alert(data);
+                        }
+                        else {
+                            alert("Booking cannot be deleted");
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+
+</script>

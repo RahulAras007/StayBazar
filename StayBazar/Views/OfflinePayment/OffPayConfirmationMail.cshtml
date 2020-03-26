@@ -1,0 +1,271 @@
+﻿@model IEnumerable<CLayer.OfflinePayment>
+@*@model  CLayer.OfflinePayment*@
+@{
+    Layout = null;
+
+}
+<!--START-->
+@if (@Model.First().PaymentLinkID == null || @Model.First().PaymentLinkID == "")
+{
+    <table>
+        <thead>
+            <tr>
+                <th style="padding-top: 2%; " align="left" colspan="3">
+                    <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                </th>
+                <th width="400" align="right" style="font-size:12px;">
+                    Phone: @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                    Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="4" align="center">
+                    <h5 style="border-bottom: 1px solid #000; font-size: 14px; padding: 10px 0; display: inline-block;">Staybazar Payment Confirmation</h5>
+                </td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <td colspan="4">
+                    @*<p style="line-height: 35px; font-size: 12px; color: #666;">*@
+                    Dear @Model.First().Name,<br />
+                    We recieved your payment.
+                    @*</p>*@
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2"><b style="font-size: 13px; margin: 10px 0px; display: inline-block;">Payment Details</b></td>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr>&nbsp;</tr>
+            <tr>
+                <td> Customer Name: </td>
+                <td>@Model.First().Name </td>
+            </tr>
+            <tr>
+                <td>Customer Mobile No: </td>
+                <td>@Model.First().Mobile </td>
+            </tr>
+            <tr>
+                <td>Customer Email Id: </td>
+                <td>@Model.First().Email </td>
+            </tr>
+            <tr>
+                <td> Amount Paid: INR </td>
+                <td> @Model.First().Amount </td>
+            </tr>
+            <tr>
+                <td> Date of Payment: </td>
+                <td>@Model.First().CreatedDate </td>
+            </tr>
+            <tr>
+                <td>Booking Reference No: </td>
+                <td>@Model.First().ReferenceNumber </td>
+            </tr>
+            <tr>
+                <td>Comments: </td>
+                <td>@Model.First().Message </td>
+            </tr>
+            <tr></tr>
+            <tr></tr>
+            <tr>
+                <td align="center" colspan="4">
+                    <p style="margin-top: 20px; margin-bottom: 10px;font-size:12px;">
+                        Thank you for choosing Staybazar!<br />
+                        <a href="https://www.staybazar.com/Home/TermsOfUse">Terms & Conditions</a>
+                        | <a href="https://www.staybazar.com/Home/Privacy">Privacy Policy</a>
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td align="center" colspan="4">
+                    <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px;">
+                        View your online itinerary for additional information
+                    </p>
+                    <p style="font-size:14px;">
+                        Need help with your reservation? – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                    </p>
+                    <p style="font-size:14px;">
+                        Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                    </p>
+                    <p style="font-size:14px;">
+                        www.staybazar.com
+                    </p>
+                    <p style="font-size:14px;">
+                        <span style="font-weight:bold;">Address: </span># 572, 1st Floor, 20th Main, 1st Cross,8th Block,Koramangala, Bangalore – 560095,India<br />
+                        <span style="font-weight:bold;">Phone: </span>080-2570-2898 / 4091 - 6686
+                    </p>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+}
+else
+{
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <tr>
+            <td align="center">
+                <table width="700">
+                    <thead>
+                        <tr>
+                            <th style="padding-top: 2%;" colspan="3">
+                                <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                            </th>
+                            <th width="400" align="right" style="font-size:12px;">
+                                Phone: @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                                Email: @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)<br />
+                                Toll Free Number: 1800-425- 2393
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" align="center">
+                                <h5 style="border-bottom: 1px solid #000; font-size: 12px; padding: 10px 0; display: inline-block;">Staybazar Payment Confirmation</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+
+                                <p style="line-height: 35px; font-size: 12px; color: #666;">
+
+                                    Dear @Model.First().CustomerName,<br />
+
+                                    @Model.First().PropertyCityname<br />
+
+                                    We confirm receipt of below payment from you:
+
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table width="800" cellpadding="5" border="1" cellspacing="0" title="Confirmation and Payment Details">
+                                    <thead>
+                                        <tr style="background-color: #a51e22;color:white; height:30px; font-size:12px;">
+                                            <th>Booking Id</th>
+                                            <th>Property Name</th>
+                                            <th>Property City</th>
+                                            <th>Check In</th>
+                                            <th>Check Out</th>
+                                            <th>Guest Name</th>
+                                            <th>No of Rooms</th>
+                                            <th align="right" style="padding-right: 5px;"><span class="bold">Total Amount</span></th>
+                                            <th align="right" style="padding-right: 5px;"><span class="bold">Advance Received</span></th>
+                                            <th align="right" style="padding-right: 5px;"><span class="bold">Balance Payable</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model != null && Model.Count() > 0)
+                                        {
+                                            foreach (CLayer.OfflinePayment usr in Model)
+                                            {
+                                                <tr>
+
+                                                    <td>
+                                                        @usr.ConfirmationNumber
+                                                    </td>
+                                                    <td>
+                                                        @usr.PropertyName
+                                                    </td>
+                                                    <td>
+                                                        @usr.PropertyCityname
+                                                    </td>
+                                                    <td>
+                                                        @usr.CheckIn.ToShortDateString()
+                                                    </td>
+                                                    <td>
+                                                        @usr.CheckOut.ToShortDateString()
+                                                    </td>
+                                                    <td>
+                                                        @usr.GuestName
+                                                    </td>
+                                                    <td align="right">
+                                                        @usr.NoOfRooms
+                                                    </td>
+                                                    <td align="right">
+                                                        @*@usr.TotalSalePrice*@
+                                                        @String.Format("{0:f0}", usr.TotalSalePrice)
+                                                    </td>
+                                                    <td align="right">
+                                                        @*@usr.AdvanceReceived*@
+                                                        @String.Format("{0:f0}", usr.AdvanceReceived)
+                                                    </td>
+                                                    <td align="right">
+                                                        @String.Format("{0:f0}", usr.PayableSalePrice)
+                                                    </td>
+                                                    @*PayableSalePrice = Connection.ToDecimal(dr["TotalSalePrice"]) - Connection.ToDecimal(dr["AdvanceReceived"])*@
+                                                </tr>
+                                            }
+                                        }
+
+                                        <tr style="border-top: 1px solid #a51e22;  ">
+                                            <td colspan="8">&nbsp;</td>
+                                            <td align="right" style="padding-right: 5px;">
+                                                <b>
+                                                    Total:
+
+                                                </b>
+                                            </td>
+                                            <td align="right" style="padding-right: 5px;">
+                                                <b>
+                                                    @(Math.Round(Model.First().SumTotalSalePrice))
+
+                                                </b>
+                                            </td>
+                                        </tr>
+
+
+                                    </tbody>
+                                    
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center" colspan="4">
+                                <p style="margin-top: 20px; margin-bottom: 10px;font-size:12px;">
+                                    Thank you for choosing Staybazar!This booking is subject to terms and conditions listed in below links.<br />
+                                    <a href="https://www.staybazar.com/Home/TermsOfUse">Terms & Conditions</a>
+                                    | <a href="https://www.staybazar.com/Home/Privacy">Privacy Policy</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                                        <tr>
+                                            <td align="center" colspan="4">
+                                                <p style="border-top: 1px solid #CCC; padding:1% 0;font-weight:bold;font-size:15px;">
+                                                    View your online itinerary for additional information
+                                                </p>
+                                                <p style="font-size:14px;">
+                                                    Need help with your reservation? – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)
+                                                </p>
+                                                <p style="font-size:14px;">
+                                                    Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                                                </p>
+                                                <p style="font-size:14px;">
+                                                    www.staybazar.com
+                                                </p>
+                                                <p style="font-size:14px;">
+                                                    <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                                                    <span style="font-weight:bold;">Phone: </span>080-2572-2898  / 4091 - 6686
+                                                </p>
+                                            </td>
+                                        </tr>
+
+                                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+}
+
+
+
+
+
+

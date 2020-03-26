@@ -1,0 +1,94 @@
+﻿@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+}
+@*@{
+    StayBazar.Areas.Admin.Models.OfferModel filterform = (StayBazar.Areas.Admin.Models.OfferModel)ViewBag.Filter;
+    using (Html.BeginForm("Pager", "Offer", FormMethod.Post, new { area = "Admin", @id = "frmPagersacclist" }))
+    {
+        <input type="hidden" id="currentPage" name="currentPage" value="@filterform.currentPage" />
+        <input type="hidden" id="Limit" name="Limit" value="@filterform.Limit" />
+    }
+    gp.RowsInAPage = filterform.Limit;
+}
+@if (Model != null && Model.offerlist.Count() > 0)
+{
+    @Html.Raw(gp.GetPager((int)filterform.TotalRows, filterform.currentPage))
+}*@
+@try
+{
+ 
+    <div>             
+            <table class="table table-hover table-condensed table-responsive table-striped table-custom">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Title</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                        <th>Stay</th> 
+                        <th>State</th>
+                        <th>City</th>
+                        <th>Owner name</th>  
+                        <th></th>                      
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Accommodations.Count > 0)
+            {
+                foreach (CLayer.Accommodation usr in Model.Accommodations)
+                {                 
+                    <tr>
+                        <td><input type="checkbox" id="chk_@usr.AccommodationId" class="chkacc" value="@usr.AccommodationId" /></td>
+                        <td>@usr.PropertyTitle</td>
+                        <td>@usr.Location</td>
+                        <td>@usr.AccommodationType</td>
+                        <td>@usr.StayCategory</td> 
+                        <td>@usr.Statename</td>
+                        <td>@usr.City</td>
+                        <td>@usr.Ownername</td> 
+                        <td><a href="~/Admin/Offer/DeleteAccommodation/?AccommodationId=@usr.AccommodationId" onclick="return confirm('Are you sure you want to delete this Accommodation?')"><span class="glyphicon glyphicon-remove"></span></a></td>                                          
+                            </tr>
+                        
+                                           @*<script type="text/javascript">
+
+                                $('#chk@(usr.AccommodationId)').attr("checked", true);
+
+        </script>*@
+                }
+            }
+            else
+            {
+                         <div id="loading2_Acc"></div>
+                        <tr>
+                            <td>No data found</td>
+                        </tr>
+            }
+                </tbody>
+            </table>
+             
+        
+        </div>
+}
+catch (Exception ex)
+{
+    Response.Redirect("~/Admin/Offer/Index");
+}
+           
+<script type="text/javascript"> 
+    $(document).ready(function () {
+        $('.chkacc').click(function () {
+           // alert();
+            getAccids();
+        });
+    });
+   
+</script>  
+
+
+
+
+

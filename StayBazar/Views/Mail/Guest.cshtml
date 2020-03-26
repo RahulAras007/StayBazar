@@ -1,0 +1,97 @@
+﻿@model long
+@{
+    Layout = null;
+    string emailid = BLayer.User.GetEmail(Model);
+    
+    string token = BLayer.User.GetToken(Model);
+    string url = Request.Url.ToString().Replace("Mail", "Account").Replace("Guest", "Verify");
+    int idx = url.IndexOf("?");
+    if (idx > 0)
+    {
+        url = url.Substring(0, idx);
+    }
+    url = url + "?token=" + token;
+    //.Replace("Register", "Verify").ToString() + "?token=" + token; ;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>B2CRegistration</title>
+</head>
+<body>
+    <table style="font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <thead>
+            <tr>
+                <th style="padding-top: 2%;" align="left">
+                    <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+                </th>
+                <th width="70" align="left" style="font-weight:normal; font-size:12px;">
+                    Phone<br />
+                    Email
+                </th>
+                <th align="left" style="font-weight: normal; font-size: 12px;">
+                    @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                    @BLayer.Settings.GetValue(CLayer.Settings.QUERY_MAILID)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td align="center" colspan="3">
+                    <h3 style="border-bottom: 1px solid #000; padding: 10px 0; display:inline-block;">Welcome to Staybazar.com</h3>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;">Dear Customer,</p>
+                    <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;">
+                        @*karthikms changed on 27-11-2019*@
+                        @*Welcome to Staybazar.com. Staybazar is online marketplace for alternate stay options and will provide you wide range of accommodation options across India.  As part of registration process, we request you to click link below to complete the process and activate your Staybazar account.*@
+                        Welcome to Staybazar.com ! Staybazar.com is an online accommodation discovery and booking platform, with focus on business travel. As part of registration process, we request you to click the link below to complete the registration process and activate your Staybazar account.
+                    </p>
+                    <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;">
+                        You have signed in as a Guest. Please verfiy your email by clicking on the Verify link. After that please use the given credentials to login and see your booking details.
+                    </p>
+                    <p style="padding: 1% 5%; line-height: 35px; font-size: 16px; color: #666;">
+                        Email: @emailid<br/>
+                        Password: @(ViewBag.Password)</p>
+</td>
+            </tr>
+            <tr>
+                <td align="center" colspan="3">
+                    <a href="@url" title="" target="_blank" style="background: #a51e22; color: #FFF; border-radius: 5px; border: 0; padding: 12px; text-decoration: none; display: inline-block;">Verify your account</a>
+                </td>
+            </tr>
+            <tr>
+                <td align="center" colspan="3">
+                    <p style="margin-top: 20px; margin-bottom: 10px;">
+                        Or verify using this link
+                    </p>
+                    <a href="@url" title="" target="_blank" style="color:#a51e22; text-decoration: none;">@url</a>
+                    <br />
+                    <p style="font-size:14px;font-weight:bold;">Thank you for choosing Staybazar!</p>
+                </td>
+            </tr>
+        <tfoot>
+            <tr>
+                <td align="center" colspan="3">
+                    <p style="border-top: 1px solid #CCC; padding:1% 0;">
+
+                        <a href="https://www.staybazar.com/Home/TermsOfUse" style="color:#a51e22; text-decoration: none;">Terms & Conditions</a> | <a style="color:#a51e22; text-decoration: none;" href="https://www.staybazar.com/Home/Privacy">Cancellation Policies</a><br />
+                        <span style="font-weight:bold;">Need any help or clarifications?</span> – Please call us at @BLayer.Settings.GetValue(CLayer.Settings.STAYB_CONTACTNO)<br />
+                        <span style="font-weight:bold;">
+                            Staybazar, Division of Southern Ecommerce  Solutions Pvt Ltd
+                        </span><br />
+                        <a href="https://www.staybazar.com">www.staybazar.com</a><br />
+                        @*<span style="font-weight:bold;">Address</span> No. 38-A, 2nd avenue,Shubh Enclave, Haralur road, Bangalore 560102, Karnataka*@
+                        <span style="font-weight:bold;">Address: </span>No. 993, 2nd Floor,9th Main, Sector – 7, HSR Layout,Bangalore – 560 102,India<br />
+                        <span style="font-weight:bold;">Phone: </span>080-2570-2898 / 4091 - 6686
+                    </p>
+                </td>
+            </tr>
+        </tfoot>
+        </tbody>
+    </table>
+</body>
+</html>

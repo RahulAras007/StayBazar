@@ -1,0 +1,153 @@
+﻿@model object
+@{
+    //List<Clayer.property> PropertypopularList = new List<Clayer.property>();
+    long id = 0;
+    List<CLayer.Property> PropertypopularList = new List<CLayer.Property>();
+    if (Model == null)
+    {
+        //load mostpopular
+        int j = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_MOST_POPULAR_NO)));
+        StayBazar.Models.PropertyMostpopularModel b = new StayBazar.Models.PropertyMostpopularModel();
+        //  b.PropertypopularList = BLayer.PropertyMostpopular.MostpopularGet((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+        b.PropertypopularList = BLayer.PropertyMostpopular.MostpopularGetWithGDS((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+        PropertypopularList = b.PropertypopularList;
+    }
+    else
+    {
+        string s = Model.ToString();
+        long.TryParse(s, out id);
+        if (id > 0)
+        {
+            //load data with id = propertyid
+            int j = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_MOST_POPULAR_NO)));
+            StayBazar.Models.PropertyMostpopularModel b = new StayBazar.Models.PropertyMostpopularModel();
+            //          b.PropertypopularList = BLayer.PropertyMostpopular.InterestedPropertiesGet(id, (int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+            b.PropertypopularList = BLayer.PropertyMostpopular.InterestedPropertiesGetWithGDS(id, (int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+
+            PropertypopularList = b.PropertypopularList;
+            if (PropertypopularList.Count == 0) { id = 0; }
+        }
+        if (id == 0)
+        {
+            //load most popular
+            int j = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_MOST_POPULAR_NO)));
+            StayBazar.Models.PropertyMostpopularModel b = new StayBazar.Models.PropertyMostpopularModel();
+            //      b.PropertypopularList = BLayer.PropertyMostpopular.MostpopularGet((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+            b.PropertypopularList = BLayer.PropertyMostpopular.MostpopularGetWithGDS((int)CLayer.ObjectStatus.StatusType.Active, (int)CLayer.ObjectStatus.StatusType.Active, j);
+            PropertypopularList = b.PropertypopularList;
+        }
+    }
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+}
+<div class="col-sm-12 col-md-8">
+    <div class="line">
+        <div class="pull-left leftside whitebg">You might be interested in</div>
+        <div class="pull-right rightside whitebg">
+            <a href="javascript:void(0)" class="pplr prev">
+                <img src="~/images/arrow-left.png" alt="Left">
+            </a>
+            <a href="javascript:void(0)" class="pplr next">
+                <img src="~/images/arrow-right.png" alt="Right">
+            </a>
+        </div>
+    </div>
+    <div id="most-popular" class="owl-carousel">
+        @if (PropertypopularList.Count > 0)
+        {
+            foreach (CLayer.Property most in PropertypopularList)
+            {
+                <Text>
+                <div class="prop">
+                    <div class="prop-image">
+                        <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                            @if (most.FileName == "")
+                            {
+                                <img src="~/@no_image" height="153" alt="noimage" />
+                            }
+                            else
+                            { 
+                                @*<img src="~/Files/Property/@most.PropertyId/@most.FileName" height="153" alt="@most.Title serviced apartment in  @most.Location @most.City" />*@
+                                 if (most.InventoryAPIType == (int)CLayer.ObjectStatus.InventoryAPIType.Amadeus)
+                                {
+                                    <img src="@most.FileName" height="153" alt="@most.Title serviced apartment in  @most.Location @most.City" />
+                                }
+                                else
+                                {
+                                    <img src="@most.FileName" height="153" alt="@most.Title serviced apartment in  @most.Location @most.City" />
+                                }
+                            }
+
+                            <div class="price">
+                                <i class="fa cxprice fa-rupee"></i><span class="cxcurele">
+                                    @Math.Round(most.bookingitemsTotalAmount)
+                                </span>
+                                <p class="onwards whitetext">onwards</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="tile_desc">
+                        <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                            <span class="name">
+                                @{
+                string title = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 20);
+                @String.Format(title);
+                                }
+                                <br>
+                                <b>@most.Location @most.City</b>
+                            </span>
+                        </a>
+                        <div class="starbox">
+                            @*<div class="starr"  data-score="@most.Rating"></div>
+                                <div id="result"></div>*@
+                            @*@(Html.Raw(StayBazar.Common.Utils.GetStarRating(most.Rating)))*@
+                        </div>
+                        <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId" class="redtext">
+                            <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                        </a>
+                        <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId" class="pull-right redtext">
+                            <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                        </a>
+                    </div>
+                    <a href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.Location.ToLower().Replace(" ", "-")/@most.PropertyId">
+                        <div class="text-center redbg whitetext book">Book now</div>
+                    </a>
+                </div>
+                @*<div class="prop">
+                        <div class="prop-image">
+                            <img src="/images/properties/prop-image.jpg" />
+                            <span class="price">
+                                <i class="fa fa-rupee"></i>2500
+                                <p class="onwards whitetext">onwards</p>
+                            </span>
+                        </div>
+                        <div class="tile_desc">
+                            <span class="name">
+                                The Green Gradens
+                                <br>
+                                <b>Koramangala, Banglore</b>
+                            </span>
+                            <div>
+                                <span class="star">
+                                    <i class="glyphicon glyphicon-star st-active"></i>
+                                    <i class="glyphicon glyphicon-star st-active"></i>
+                                    <i class="glyphicon glyphicon-star st-active"></i>
+                                    <i class="glyphicon glyphicon-star"></i>
+                                    <i class="glyphicon glyphicon-star"></i>
+                                </span>
+                            </div>
+                            <a href="#" class="redtext">
+                                <i class="glyphicon glyphicon-map-marker blacktext"></i>Show on map
+                            </a>
+                            <a href="#" class="pull-right redtext">
+                                <i class="glyphicon glyphicon-user blacktext"></i>Read reviews
+                            </a>
+                        </div>
+                        <a href="#">
+                            <div class="text-center redbg whitetext book">Book now</div>
+                        </a>
+                    </div>*@
+                </text>
+            }
+        }
+    </div>
+</div>

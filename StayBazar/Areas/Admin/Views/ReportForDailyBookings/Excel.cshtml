@@ -1,0 +1,301 @@
+﻿@model IEnumerable<CLayer.ReportForDailyBooking>
+@using System.Linq
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 25;
+    long q = 0;
+    long t = 0;
+    double totalamount = 0;
+    double totalcomm = 0;
+}<?xml version="1.0" ?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Styles>
+        <ss:Style ss:ID="1">
+            <ss:Font ss:Bold="1" />
+        </ss:Style>
+    </ss:Styles>
+    <ss:Worksheet ss:Name="Report1">
+        @{
+            IEnumerable<CLayer.ReportForDailyBooking> newBooking = Model.Where(x => x.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Success);
+            q = 0;
+        }
+        <ss:Table>
+
+            <ss:Row ss:StyleID="1">
+                <ss:Cell ss:MergeAcross="1"><ss:Data ss:Type="String">New Bookings</ss:Data></ss:Cell>
+            </ss:Row>
+
+            <ss:Row ss:StyleID="1">
+                <ss:Cell><ss:Data ss:Type="String">New Bookings</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Destination</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String"> Accomodation Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking Category</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Rate Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Checkin date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Checkout Date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No of Nights</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No of accomodations</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No of Adults</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No of Children</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Additional Guests</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Total booking Amount</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Stay Bazar Commission</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Travel Agent Commission Payable</ss:Data></ss:Cell>
+            </ss:Row>
+
+            @foreach (CLayer.ReportForDailyBooking reportList in newBooking)
+            {
+
+                if (reportList.NewBookingAmount == 0 && reportList.TotalbookingAmountcancelled == 0 && reportList.TotalRefund == 0)
+                {
+                    q++;
+            <ss:Row>
+                <ss:Cell><ss:Data ss:Type="String">@q</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierName</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.Destination</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.AccomodationType</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.BookingCategory</ss:Data></ss:Cell>
+                <ss:Cell>
+                    <ss:Data ss:Type="String">
+                        @reportList.RateType @{
+
+                    DateTime checkin = reportList.Checkindate;
+                    DateTime checkout = reportList.CheckoutDate;
+                    TimeSpan ts = checkout - checkin;
+                    int differenceInDays = ts.Days;
+                    string nights = differenceInDays.ToString();
+                        }
+                    </ss:Data>
+                </ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.Checkindate.ToShortDateString()</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.CheckoutDate.ToShortDateString()</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@nights</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.Noofaccomodations</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.NoofAdults</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.NoofChildren</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.NoOfGuests</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.TotalbookingAmount</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.StayBazarCommission</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">@reportList.TravelAgentCommission</ss:Data></ss:Cell>
+            </ss:Row>
+                    totalamount = totalamount + reportList.TotalbookingAmount;
+                    totalcomm = totalcomm + reportList.StayBazarCommission;
+                    t = t + reportList.Noofaccomodations;
+                    q++;
+                }
+            }
+            <ss:Row ss:StyleID="1">
+                <ss:Cell><ss:Data ss:Type="String">Summary</ss:Data></ss:Cell>
+                <ss:Cell ss:MergeAcross="15"><ss:Data ss:Type="String">Total Accommodations : @t, Total Amount: @Math.Round(totalamount), Total Commission: @Math.Round(totalcomm)</ss:Data></ss:Cell>
+            </ss:Row>
+
+        </ss:Table>
+            </ss:Worksheet>
+        @{
+            q = 1;
+            double charges = 0;
+            totalcomm = 0;
+            totalamount = 0;
+        }
+        <ss:Worksheet ss:Name="Report2">
+        <ss:Table>
+            <ss:Row ss:StyleID="1">
+                <ss:Cell ss:MergeAcross="17"><ss:Data ss:Type="String">Changes to booking</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row ss:StyleID="1">
+                <ss:Cell><ss:Data ss:Type="String">Ser No</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Destination</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Accomodation Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking Category</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Rate Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Checkin date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Checkout Date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No of Nights</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">New Checkin Date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">New Checkout Date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Summary of changes</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Original Booking Amout</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">New Booking Amount</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Original Commission</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">New Commission</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Charges for change</ss:Data></ss:Cell>
+            </ss:Row>
+            @foreach (CLayer.ReportForDailyBooking reportList in newBooking)
+            {
+                if (reportList.NewBookingAmount != 0 || reportList.TotalbookingAmountcancelled != 0 || reportList.TotalRefund != 0)
+                {
+
+                    <ss:Row>
+                        <ss:Cell><ss:Data ss:Type="String">@q</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierName</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.Destination</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.AccomodationType</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.BookingCategory</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.RateType</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.Checkindate.ToShortDateString()</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.CheckoutDate.ToShortDateString()</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">
+                                  @{
+                                  DateTime checkin = reportList.Checkindate;
+                                  DateTime checkout = reportList.CheckoutDate;
+                                  TimeSpan ts = checkout - checkin;
+                                  int differenceInDays = ts.Days;
+                                   string nights = differenceInDays.ToString();}@nights</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.TotalbookingAmount</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.NewBookingAmount</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.StayBazarCommission</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.NewCommission</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">@reportList.Chargesforchange</ss:Data></ss:Cell>
+                   </ss:Row>
+                    totalamount += reportList.TotalbookingAmount;
+                    totalcomm += reportList.StayBazarCommission;
+                    charges += reportList.Chargesforchange;
+                    q++;
+                }
+            }
+            <ss:Row ss:StyleID="1">
+                <ss:Cell><ss:Data ss:Type="String">Summary</ss:Data></ss:Cell>
+                <ss:Cell ss:MergeAcross="15"><ss:Data ss:Type="String">
+                        Original Booking Amount: @Math.Round(totalamount) , Net Booking Amount: @Math.Round(totalcomm), Net Charges: @Math.Round(charges)
+                </ss:Data></ss:Cell>
+            </ss:Row>
+        </ss:Table>
+            </ss:Worksheet>
+        <ss:Worksheet ss:Name="Report3">
+        <ss:Table>
+            <ss:Row ss:StyleID="1">
+                <ss:Cell ss:MergeAcross="17"><ss:Data ss:Type="String">Cancellations</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row ss:StyleID="1">
+                <ss:Cell><ss:Data ss:Type="String">Ser No</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Destination</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String"> Accomodation Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking Category</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Rate Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Checkin date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Checkout Date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">No of Nights</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Rate type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Total booking Amount cancelled</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Stay Bazar Commission cancelled</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Charges for change</ss:Data></ss:Cell>
+            </ss:Row>
+            @{
+                IEnumerable<CLayer.ReportForDailyBooking> canrecords = Model.Where(x => x.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.Cancelled);
+                q = 0;
+                long amnt;
+            }
+            @foreach (CLayer.ReportForDailyBooking reportList in canrecords)
+            {
+                q++;
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">@q</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.Destination</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.AccomodationType</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingCategory</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.RateType</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.Checkindate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CheckoutDate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell>
+                        <ss:Data ss:Type="String">
+                            @{ DateTime checkin = reportList.Checkindate;
+                             DateTime checkout = reportList.CheckoutDate;
+                             TimeSpan ts = checkout - checkin;
+                             int differenceInDays = ts.Days;
+                             string nights = differenceInDays.ToString();
+                            }@nights
+                        </ss:Data>
+                    </ss:Cell>
+                    <ss:Cell>
+                        <ss:Data ss:Type="String">
+                            @{
+                             amnt = (long)Math.Round(reportList.TotalbookingAmount - reportList.TotalRefund);
+                             if (amnt < 0) { amnt = 0; }
+                            }                           
+                        </ss:Data>
+                    </ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.TotalbookingAmountcancelled</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.StayBazarCommission</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.Chargesforchange</ss:Data></ss:Cell>
+                </ss:Row>
+            }
+        </ss:Table>
+        </ss:Worksheet>
+        <ss:Worksheet ss:Name="Report4">
+        <ss:Table>
+            <ss:Row ss:StyleID="1">
+                <ss:Cell ss:MergeAcross="17"><ss:Data ss:Type="String">Bookings with Failed Transactions</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row ss:StyleID="1">
+                <ss:Cell><ss:Data ss:Type="String">Ser No</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Supplier Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Destination</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String"> Accomodation Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking Category</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Rate Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Checkin date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Checkout Date</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Rate type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">total booking Amount</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Stay Bazar Commission</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Current Status</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Booking Time</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Issue</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">ResolutionTime</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Resolution</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Resolved BY</ss:Data></ss:Cell>
+            </ss:Row>
+            @{
+                IEnumerable<CLayer.ReportForDailyBooking> failed = Model.Where(x => x.BookingStatus == (int)CLayer.ObjectStatus.BookingStatus.CheckOut);
+                q = 0;
+            }
+            @foreach (CLayer.ReportForDailyBooking reportList in failed)
+            {
+                q++;
+                <ss:Row>
+                    <ss:Cell><ss:Data ss:Type="String">@q</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.SupplierName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.Destination</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.AccomodationType</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingCategory</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.RateType</ss:Data></ss:Cell>
+                    @{ DateTime checkin = reportList.Checkindate;
+                     DateTime checkout = reportList.CheckoutDate;
+                     TimeSpan ts = checkout - checkin;
+                     int differenceInDays = ts.Days;
+                     string nights = differenceInDays.ToString();
+                    }
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.Checkindate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.CheckoutDate.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.TotalbookingAmount</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.StayBazarCommission</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String">@reportList.BookingTime.ToShortDateString()</ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                    <ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>
+                </ss:Row>
+            }
+        </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>

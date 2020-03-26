@@ -1,0 +1,59 @@
+﻿@model  StayBazar.Models.SearchSupplierModel
+@{
+    
+    ViewBag.Title = "Supplier List";
+    int SupplierList = Model.SearchList.Count;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.RowsInAPage = StayBazar.Controllers.SearchSupplierController.PAGELIMIT;
+    gp.JavascriptFuncName = "showPager";
+    TempData["ActiveTab"] = "Suppliers";
+    Layout = null;
+}
+<div class="container bdy_min_height">
+    @*@Html.HiddenFor(m => Request.QueryString["B2bId"], new { @id="AffiliateB2bId" })*@
+    @*<input type="text" value="@Request.QueryString["B2bId"]" id="AffiliateB2bId" />*@
+    @if (SupplierList > 0)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                @Html.Raw(gp.GetPager(Model.TotalRows, Model.CurrentPage))
+                <table border="0" class="table table-condensed table-responsive table-custom">
+                    <thead>
+                        <tr>
+                            <th>Buisiness Name</th>
+                            <th>Email</th>
+                            <th>Details</th>
+                            <th>Add</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (CLayer.B2B pr in Model.SearchList)
+                        {
+                            <tr>
+                                <td>@pr.Name</td>
+                                <td>@pr.Email</td>
+                                <td><a href="/Admin/SearchSupplier/SupplierDetails?id=@pr.B2BId&B2bId=@Model.B2BId" title="Details"><span class="glyphicon glyphicon-edit"></span></a></td>
+                                <th><a href="/Admin/SearchSupplier/AddSupplier?UserId=@pr.B2BId&B2bId=@Model.B2BId"><span class="glyphicon glyphicon-plus-sign"></span></a></th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @Html.Raw(gp.GetPager(Model.TotalRows, Model.CurrentPage))
+            </div>
+        </div>
+        @Html.HiddenFor(m => m.SearchString, new { @id = "SearchString" })
+    }
+    else
+    {
+        <div class="row margin-top-10">
+            <div class="col-md-8 col-md-offset-2 margin-top-10">
+                <div class="alert alert-info">Selected supplier is already linked to another affiliate/Not found in list</div>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+
+

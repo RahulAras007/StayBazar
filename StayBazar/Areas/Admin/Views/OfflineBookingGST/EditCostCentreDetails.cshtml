@@ -1,0 +1,53 @@
+﻿@model StayBazar.Areas.Admin.Models.OfflineBookingModel
+
+@{
+    ViewBag.Title = "NewCostCentre";
+}
+
+@using (Html.BeginForm("SaveEditCostCentreDetails", "OfflineBookingGST", new { OfflineBookingID = Model.OfficeBookingID, CostCentreId = Model.CostCentre_ID }, FormMethod.Post))
+{
+
+   @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="jumbotron">
+        
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <table>
+                    <tr>
+
+                        <td>
+                            @Html.Label("Cost Centre")
+                        </td>
+                        <td style="padding-left:10px">
+                            @{
+                                List<CLayer.CostCentre> CostCentrecode = BLayer.CostCentre.GetAll();
+
+                            }
+
+                            @Html.DropDownListFor(m => m.CostCenter_Codee, Model.ECostCentre, "--Select--", new { @class = "form-control" })
+
+                        </td>
+
+
+                        <td style="padding-left:10px">
+                            <label class="highlight">%</label>
+                        </td>
+                        <td style="padding-left:10px">
+                            @Html.TextBoxFor(m => m.CostCentrePercentage, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.CostCentrePercentage, "", new { @class = "text-danger" })
+                        </td>
+                        <td style="padding-left:10px">
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </td>
+                    </tr>
+
+                    
+
+                </table>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+
+    </div>
+}

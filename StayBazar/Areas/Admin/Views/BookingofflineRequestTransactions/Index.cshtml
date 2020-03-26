@@ -1,0 +1,115 @@
+﻿@model StayBazar.Areas.Admin.Models.TransactionsModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Booking Requests - Offline Properties";
+}
+<div id="content">
+    <h2>@ViewBag.Title</h2>
+    <div class="row">
+
+        <div class="col-md-12">
+            @using (Html.BeginForm("Filter", "BookingofflineRequestTransactions", FormMethod.Post, new { @id = "frmFilters", onsubmit = "return false;" }))
+            {
+                <div class="row">
+                    <div class="col-md-2">
+                        @Html.DropDownListFor(m => m.Status, Model.BookingOfflineStatus, new { @tabindex = "1", @class = "form-control" })
+                    </div>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            @Html.TextBoxFor(m => m.SearchString, new { @tabindex = "2", @class = "form-control" })
+                            <span class="input-group-btn">
+                                <button id="btnSearch" class="btn btn-default" type="button" tabindex="3">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-control">
+                            @foreach (StayBazar.Areas.Admin.Models.TransactionsModel.TransactionsSearchValue ruv in (StayBazar.Areas.Admin.Models.TransactionsModel.TransactionsSearchValue[])Enum.GetValues(typeof(StayBazar.Areas.Admin.Models.TransactionsModel.TransactionsSearchValue)))
+                            {
+                                <input type="radio" name="ruv" class="css-radiobutton" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text>             } />
+                                <label for="@((int)ruv)" class="css-label">@ruv.ToString()</label>
+                                <text>&nbsp;&nbsp;</text>
+                            }
+                        </div>
+                    </div>
+                </div>
+              
+                @Html.HiddenFor(m => m.SearchValue)
+            }
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <div id="List" class="row">
+                @{
+                    Html.RenderPartial("~/Areas/Admin/Views/BookingofflineRequestTransactions/_List.cshtml", Model.Bookinglist);
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@Html.Partial("~/Views/Cancellation/_CancelBox.cshtml")
+<script type="text/javascript">
+            $(function () {
+                $("#SearchValue").val("1");
+        
+                $(".css-radiobutton").change(function () {
+                    $("#SearchValue").val("1");
+                    $(".css-radiobutton").each(function () {
+                        if (this.checked) {
+                            $("#SearchValue").val($(this).attr("id"));
+                        }
+                    });
+                });
+                $("#btnSearch").click(function () {
+                    var url = '@Url.Action("Filter", "BookingofflineRequestTransactions")';
+                    $.post(url, $("#frmFilters").serialize(),
+                            function (data) {
+                                $("#List").html(data);
+                            });
+                });
+            });
+            //Ajax Passing data (BookingId) to the PostBack POSt  for Address List
+            function BuyerBT(BookingId) {
+
+                // add loading image to div
+
+                $('#loading1_'+BookingId).html('<img src="../../Content/ajax11-loader.gif"> loading...');
+
+                var urls = '@Url.Action("FillBookedByAddressSearch", "BookingofflineRequestTransactions")';
+                $.ajax({ url: urls, data: { BookingId: BookingId }, type: "POST", success: showMessageFillBookedBy(BookingId) });
+            }
+            var showMessageFillBookedBy = function (BookingId) {
+                    return function (res) {
+                        $("#databuyer_" + BookingId).html(res);
+                    };
+                }
+            function ForBuyerBT(BookingId) {
+
+                // add loading image to div
+                $('#loading2_'+BookingId).html('<img src="../../Content/ajax11-loader.gif"> loading...');
+
+                var urls = '@Url.Action("Booking_GetBookedFor", "BookingofflineRequestTransactions")';
+                            $.ajax({ url: urls, data: { BookingId: BookingId }, type: "POST", success: showMessageBookedFor(BookingId) });
+            }
+                var showMessageBookedFor = function (BookingId) {
+                    return function (res) {
+                        $("#DataFor_" + BookingId).html(res);
+                    };
+                }
+
+                $(function () {
+                    $("#Status").change(function () {
+                        var url = '@Url.Action("Filter", "BookingofflineRequestTransactions")';
+                        $.post(url, $("#frmFilters").serialize(),
+                                function (data) {
+                                    $("#List").html(data);
+                                });
+                    });
+                });
+
+</script>
+

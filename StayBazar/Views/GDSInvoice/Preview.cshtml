@@ -1,0 +1,97 @@
+﻿
+@model  StayBazar.Areas.Admin.Models.Invoice
+@{
+    Layout = null;
+
+    if (ViewBag.DisableEdit == null) { ViewBag.DisableEdit = ""; }
+
+    int BookingType = BLayer.Bookings.GetBookingType(Model.BookingId);
+
+    Session["LoggedInUser"] = Model.LoggedInUser;
+
+}
+<!DOCTYPE html>
+<style>
+    td {
+        padding: 2px !important;
+    }
+</style>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Preview</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-theme.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/popup.css" />
+</head>
+<body>
+    <div class="row tophd">
+        <div class="col-xs-3"><div class="titlebar">Invoice - Preview</div></div>
+        <div class="col-xs-2">
+            <div class="lnkbtn">
+                @*@if (ViewBag.DisableEdit != "True")
+                {
+                    <text>
+                        <a class="lnkbtn" href="Edit?obid=@Model.BookingId">Edit</a> |
+                        <a class="lnkbtn" href="Preview?obid=@Model.BookingId">Preview</a>
+                    </text>
+                }*@
+            </div>
+        </div>
+    </div>
+    <div style="width: 89%;padding-left: 61px;">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="wraparound">
+                    <div align="right" style="position: absolute;top: 27px;right: 44px;">
+                        <a title="Pdf" href="InvoicePDF?obid=@Model.BookingId" id="btnNextClick" class="fa fa-file-pdf-o" tabindex="6">  <img src="~/Content/themes/icon images/pdf-icon-4.png" width="25" /></a><span style="position: absolute;top: 25px;left: -16px;">Download</span>
+                    </div>
+                    @{
+
+                        long IsGST = 2;// (int)CLayer.OfflineBooking.OfflineBookingsType.GST;// BLayer.OfflineBooking.GetOfflinebookingIsGST(Model.OfflineBookingId);
+                        int IsIGST = BLayer.Bookings.GetGDSbookingIsIGST(Model.BookingId);
+                    }
+                    @if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.GST)
+                    {
+                        if (IsIGST == 1)
+                        {
+                            @Html.Partial("GDSInvoiceHeaderIGST", Model.BookingId)
+                        }
+                        else
+                        {
+                            @Html.Partial("GDSInvoiceHeaderCGSTSGST", Model.BookingId)
+                        }
+
+                    }
+                    else
+                    {
+                        @Html.Partial("_InvoiceHeader")
+                    }
+                    @Html.Raw(Model.HtmlSection1)
+                    @Html.Raw(Model.HtmlSection2)
+                    @Html.Raw(Model.HtmlSection3)
+
+                    @if (IsGST == (int)CLayer.OfflineBooking.OfflineBookingsType.GST)
+                    {
+                        @Html.Partial("_InvoiceFooterGST")
+                    }
+                    else
+                    {
+                        @Html.Partial("_InvoiceFooter")
+                    }
+                    @if (BookingType == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                    {
+                        @Html.Raw(Model.HtmlSection4)
+                        @Html.Partial("_InvoiceDirectFooter")
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

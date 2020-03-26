@@ -1,0 +1,84 @@
+﻿@model long
+@{
+    List<CLayer.Review> review = BLayer.Review.ByProperty(Model, (int)CLayer.ObjectStatus.StatusType.Verified);
+    string url = Request.Url.ToString().ToLower();
+    string eleClass = "whitebg";
+    if (url.IndexOf("/account") > -1) { eleClass = "pattern"; }
+}
+<div class="col-sm-12 col-md-12">
+    <div class="line">
+        <div class="pull-left leftside @eleClass">Reviews</div>
+    </div>
+    <div class="wrap">
+        <div class="tbadge">
+            <img src="~/images/badge.png" alt="Badge">
+        </div>
+        <div id="cusreviews" class="owl-carousel">
+            @foreach (CLayer.Review t in review)
+            {
+                <div class="cusreview">
+                    <h4 class="bold">@(Html.Raw(StayBazar.Common.Utils.GetStarRating(t.Rating)))    @*@Enum.GetName(typeof(StayBazar.Models.ReviewModel.Feedbackratings), t.OverallExp)*@</h4>
+                    <p>@t.Description</p>
+                    <p class="redtext">
+                        @t.FirstName@t.LastName
+                        <br />@t.ReviewDate.ToShortDateString()
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+  
+</div>
+
+@*old slider*@
+
+@*<script type='text/javascript'>
+
+    $(document).ready(function () {
+        var owl7 = $("#cusreviews")
+            owl7.owlCarousel({
+                singleItem: true,
+                pagination: false           
+            });
+    });
+
+</script>*@
+
+
+
+
+ @*New slider*@
+
+<script type='text/javascript'>
+    $(document).ready(function () {
+        var testitems = $('.cusreview');
+        if (testitems.length > 1) {
+            $("#cusreviews").owlCarousel({
+                singleItem: true,
+                loop: true,
+                pagination: true,
+                dots: false,
+                margin: 10,
+                navigation: true,
+                autoplay: false,
+                items: 1
+
+
+            });
+        }
+        else {
+
+            $("#cusreviews").owlCarousel({
+                singleItem: true,
+                pagination: true,
+                dots: false,
+                margin: 10,
+                navigation: true,
+                autoplay: false,
+                items: 1
+
+            });
+
+        }
+    });
+</script>

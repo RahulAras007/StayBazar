@@ -1,0 +1,70 @@
+﻿
+@model long
+@{
+    Layout = null;
+
+    List<CLayer.BookingItem> BookingDt = BLayer.BookingItem.GetAllDetails(Model, true);
+    //Billing entity state id
+    long PropertyID = BLayer.Bookings.GetPropertyId(Model);
+    int BillingEntityStateID = BLayer.State.GetBillingEntityStateID(PropertyID);
+    CLayer.SBEntity data = BLayer.SBEntity.Get(BillingEntityStateID);
+    int CustomerStateID = BLayer.State.GetCustomerStateID(Convert.ToInt32(Session["LoggedInUser"]));
+}
+
+@{
+    string SbEntityName = "";
+    string SbEntityAddress = "";
+    string SbEntityCountry = "";
+    string SbEntityState = "";
+    string SbEntityPhone = "";
+    //Get Entity address
+    if (Model > 0)
+    {
+        CLayer.Booking SbEntityBillingAddress = BLayer.Bookings.GetSBEntityAddressDetailsByBookingId(Model, BillingEntityStateID);
+        if (SbEntityBillingAddress != null)
+        {
+            if (SbEntityBillingAddress.SbEntityName != "" && SbEntityBillingAddress.SbEntityName != null) { SbEntityName = SbEntityBillingAddress.SbEntityName; }
+            if (SbEntityBillingAddress.SbEntityAddress != "" && SbEntityBillingAddress.SbEntityAddress != null) { SbEntityAddress = SbEntityBillingAddress.SbEntityAddress; }
+            if (SbEntityBillingAddress.SbEntityCountry != "" && SbEntityBillingAddress.SbEntityCountry != null) { SbEntityCountry = SbEntityBillingAddress.SbEntityCountry; }
+            if (SbEntityBillingAddress.SbEntityState != "" && SbEntityBillingAddress.SbEntityState != null) { SbEntityState = SbEntityBillingAddress.SbEntityState; }
+            if (SbEntityBillingAddress.SbEntityPhone != "" && SbEntityBillingAddress.SbEntityPhone != null) { SbEntityPhone = SbEntityBillingAddress.SbEntityPhone; }
+        }
+    }
+}
+
+<table style="width:100%">
+    <tr>
+        <th style="padding-top: 2%;" align="left">
+            <img style="width:25%" src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+        </th>
+    </tr>
+    <tr>
+        <td style="text-align:center;">
+            <p style=" text-align:center;margin:0px;padding:0px;">
+                <h1 style="margin:0px;padding:0px;font-size:24px;">Southern E-Commerce Solutions Pvt Ltd</h1>
+                <div style="font-size:14px;padding-top:10px;">
+                    @SbEntityAddress<br />
+                    @if (SbEntityPhone != "")
+                    {
+                        <text>  Phone: @SbEntityPhone, </text>
+                    }
+                    Toll Free: 1800-425-2393 E-Mail: info@staybazar.com<br />
+                    <span style="font-size:14px;font-weight:bold;">
+                        PAN  :	AAUCS1420R <b style="margin-left:60px;">
+                            GSTIN : @if (data != null)
+                            {
+                                if (data.GSTNo != "")
+                                { <text>  @data.GSTNo </text> }
+                            }
+                        </b>
+                    </span>
+                </div>
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:center;"><span style="font-size:18px;font-weight:bold;">Tax Invoice</span></td>
+    </tr>
+</table>
+
+

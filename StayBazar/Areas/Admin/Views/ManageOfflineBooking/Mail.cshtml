@@ -1,0 +1,20 @@
+﻿@model  StayBazar.Areas.Admin.Models.Invoice
+@{
+    Layout = null;
+}
+<div style="width:100%; ">
+    <table style="width:100%; font-family: sans-serif; font-weight: 100; padding: 0 5%;">
+        <tbody>
+            <tr>
+                <td colspan="4">
+                    <br />
+                    @Html.Partial("~/Areas/Admin/Views/Invoice/_InvoiceHeader.cshtml")
+                    @Html.Raw(Model.HtmlSection1)
+                    @Html.Raw(Model.HtmlSection2)
+                    @Html.Raw(Model.HtmlSection3)
+                    @Html.Partial("~/Areas/Admin/Views/Invoice/_InvoiceFooter.cshtml")
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

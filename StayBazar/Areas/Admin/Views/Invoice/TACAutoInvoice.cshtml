@@ -1,0 +1,252 @@
+﻿@model CLayer.OfflineBooking
+@{
+    Layout = null;
+    CLayer.OfflineBooking BillingAddressDetails = new CLayer.OfflineBooking();
+    CLayer.OfflineBooking customer = BLayer.OfflineBooking.GetAllCustomerDetails(Model.OfflineBookingId);
+    CLayer.OfflineBooking propertyDetails = BLayer.OfflineBooking.GetAllpropertyDetails(Model.OfflineBookingId);
+    CLayer.OfflineBooking OfflineBookingDt = BLayer.OfflineBooking.GetAllDetailsById(Model.OfflineBookingId);
+    //CLayer.OfflineBooking bookingTypeData = BLayer.OfflineBooking.GetBookingTypeData(Model.OfflineBookingId);
+    if (customer.CustomerType != 0)
+    {
+        if (customer.CustomerType == 5)
+        {
+            BillingAddressDetails = BLayer.OfflineBooking.GetAllCustomerBillingaddress(Model.OfflineBookingId);
+        }
+    }
+    CLayer.HSNCode HSNdata = BLayer.OfflineBooking.GetBookingTypeHSN(Model.OfflineBookingId);
+    double OtherPriceTotal = 0;
+    //List<CLayer.OfflineBooking> VendorDt_OfflineBooking = BLayer.OfflineBooking.getVendorDetails(Model.OfflineBookingId);
+    //decimal VendorTotal = 0;
+    string coma = ",";
+    long Duedatedays = Convert.ToInt32(BLayer.Settings.GetValue(CLayer.Settings.INVOICE_DUE_DAYS));
+    CLayer.Invoice invoice = BLayer.Invoice.GetInvoiceByOfflineBooking(Model.OfflineBookingId);
+
+    CLayer.B2B b2bdata = new CLayer.B2B();
+    string CusRefNo = "";
+    if (OfflineBookingDt != null)
+    {
+        if (OfflineBookingDt.CustomerId > 0)
+        {
+            b2bdata = BLayer.B2B.Get(OfflineBookingDt.CustomerId);
+            if (b2bdata != null)
+            {
+                CusRefNo = b2bdata.UserCode;
+            }
+        }
+    }
+
+}
+
+
+@Html.Partial("_InvoiceHeaderGst", Model.OfflineBookingId)
+
+<!--#FIRSTROW_START-->
+<table id="firstrow" style="width:100%">
+    <tr>
+        <td style="width:70%;">
+            Invoice Number:<b>
+                @if (invoice != null)
+                {
+                    if (invoice.InvoiceNumber != null && invoice.InvoiceNumber != "")
+                    {
+                        @invoice.InvoiceNumber
+                    }
+                    else
+                    { <text><!--#INVOICENUMBER#--></text>}
+                }
+                else
+                { <text><!--#INVOICENUMBER#--></text>}
+            </b><br />
+            To : <br />
+            @propertyDetails.SupplierName
+            @propertyDetails.PropertyAddress@coma<br />
+            @propertyDetails.PropertyCityname@coma<br />
+            @propertyDetails.PropertyStatename@coma<br />
+            @propertyDetails.PropertyPinCode<br />
+            @propertyDetails.PropertyCountryname
+            @if (OfflineBookingDt != null)
+            {
+                if (OfflineBookingDt.PropertyGstRegNo != "")
+                {
+                    <br />
+                        <b>GSTIN: @OfflineBookingDt.PropertyGstRegNo</b>
+                }
+            }
+
+        </td>
+        <td width="30%">
+            Date: @{ if (invoice.InvoiceDate != DateTime.MinValue)
+                { <text><b>@invoice.InvoiceDate.ToString("dd/MM/yyyy")</b></text>}
+            else
+            { <text><b><!--#INVOICEDATE#--></b></text>}
+            }
+
+            <br /> @* *@
+            Due By: @{ if (invoice.InvoiceDate != DateTime.MinValue)
+                { <text><b>@invoice.InvoiceDate.AddDays(@Duedatedays).ToShortDateString()</b></text>}
+            else
+            { <text><b>@Model.CheckOut.AddDays(@Duedatedays).ToShortDateString()</b></text>} }
+
+            <br />
+            Customer Ref No:
+            @if (Model.NewCustomerReferenceNo != null)
+            {
+                @Model.NewCustomerReferenceNo
+            }<br />
+            @*@if (Model.PlaceOfSupplyName != null)
+            {
+                @Model.PlaceOfSupplyName
+            }*@
+            <br />
+            <br />
+            <br />
+            <br />
+        </td>
+    </tr>
+</table>
+<br />
+<!--#FIRSTROW_END-->
+<!--#SECONDROW_START-->
+<div style="padding-top:10px;padding-bottom:10px;">TAC value towards accommodation booking as per details given below:<br /></div>
+<table border="1" id="secondrow" cellpadding="5" cellspacing="0" style="width:100%;">
+    <tr>
+        <td style="width: 43px;">
+            Sl No.
+        </td>
+        <td>
+            Description
+        </td>
+
+        <td style="width:10%" align="center">Value (Rs.)</td>
+    </tr>
+
+    @{
+        List<CLayer.OfflineBooking> BListGST = BLayer.OfflineBooking.GetMultipleBookingDetailsGST(Model.OfflineBookingId);
+        int BListGSTi = 1;
+    }
+    <CLayer.OfflineBooking>
+        @foreach (CLayer.OfflineBooking bookData in BListGST)
+        {
+            <tr>
+                <td>
+                    @BListGSTi.
+                </td>
+                <td>
+                    Accommodation at: @(propertyDetails.PropertyName) @(propertyDetails.PropertyCityname) <br />
+                    @bookData.AccommodatoinTypename<br />
+                    Booking Id: <b>@OfflineBookingDt.ConfirmationNumber</b><br />
+                    Guest name: @bookData.GuestName<br />
+                    Check-in date:  @bookData.CheckIn.ToShortDateString()    Check-out date: @bookData.CheckOut.ToShortDateString() <br />
+                    No of rooms: @bookData.NoOfRooms &nbsp;&nbsp; No of nights: @bookData.NoOfNight &nbsp;&nbsp; Total room nights: @(bookData.NoOfRooms * bookData.NoOfNight)<br />
+                    Adult:  @bookData.NoOfPaxAdult Children : @bookData.NoOfPaxChild<br />
+                    
+                    @if (HSNdata.Code != "" && HSNdata.NatureOfService != "")
+                    {
+                            <text>
+                                SAC : @HSNdata.Code , Nature Of Service : @HSNdata.NatureOfService <br />
+                            </text>
+                        }
+                    
+                </td>
+                <td style="text-align:right">&nbsp;</td>
+            </tr>
+
+           
+            BListGSTi = BListGSTi + 1;
+        }
+        @{
+            CLayer.OfflineBooking ob = BLayer.OfflineBooking.GetBookingTypeData(Model.OfflineBookingId);
+            List<KeyValuePair<string, double>> BookTypeTax = BLayer.OfflineBooking.GetBookingTypeTaxes(Model.OfflineBookingId);
+            double TotalTaxAmount = 0;
+            int bookType = BLayer.OfflineBooking.GetBookingType(Model.OfflineBookingId);
+            if(bookType == (int) CLayer.ObjectStatus.OfflineBookingType.TAC)
+            {
+                ob.BookingTypeAmount = ob.BookingTypeTAC;
+            }
+
+            double TotalTaxPercentChk = 0;
+            double BookingTypeAmountChk = 0;
+        }
+        
+        @if (ob != null)
+        {
+            if (ob.BookingTypeAmount > 0)
+            {
+                if (ob.BookingTypeGSTIncluded)
+                {
+                    for (int i = 0; i < @BookTypeTax.Count; i++)
+                    {
+                        TotalTaxPercentChk = TotalTaxPercentChk + @BookTypeTax[i].Value;
+                    }
+                    BookingTypeAmountChk = @Math.Round(ob.BookingTypeAmount, 2) / (1 + (TotalTaxPercentChk / 100));
+                    ob.BookingTypeAmount = BookingTypeAmountChk;
+                }
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>TAC Value</td>
+
+
+
+                        <td style="text-align:right">@Math.Round(ob.BookingTypeAmount,2).ToString("0.00")</td>
+                    </tr>
+
+
+                for (int i = 0; i < @BookTypeTax.Count; i++)
+                {
+
+                    double taxamount = (Math.Round((@ob.BookingTypeAmount * @BookTypeTax[i].Value) / 100,2));
+                    TotalTaxAmount = TotalTaxAmount + taxamount;
+
+    <tr>
+        <td>&nbsp;</td>
+        <td>@BookTypeTax[i].Key  @BookTypeTax[i].Value%</td>
+        <td style="text-align:right">@Math.Round(taxamount, 2).ToString("0.00")</td>
+    </tr>
+                }
+            }
+ <tr>
+            <td>&nbsp;</td>
+            <td style="text-align:right;"> <span style="font-weight:bold;">Total</span></td>
+            <td style="text-align:right">@Math.Round((ob.BookingTypeAmount + TotalTaxAmount), 0)</td>
+        </tr>
+
+        }
+
+        <tr>
+            <td>&nbsp;</td>
+            <td>Reimbursements (+)</td>
+            <td style="text-align:right">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Discount (-)</td>
+            <td style="text-align:right">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Others (+)</td>
+            <td style="text-align:right">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center;"><span style="font-weight:bold;">Total Invoice Value</span></td>
+            <td style="text-align:right">&nbsp;<b>@Math.Round((ob.BookingTypeAmount + TotalTaxAmount), 0)</b></td>
+        </tr>
+</table>
+<!--#SECONDROW_END-->
+<!--#THIRDROW_START-->
+<div id="thirdrow">
+    <br />
+    <div>Rupees :<b> @(StayBazar.Common.Utils.NumberToWords((int)(Math.Round((ob.BookingTypeAmount + TotalTaxAmount), 0)))) Only  </b></div>
+    <br />
+</div>
+<!--#THIRDROW_END-->
+@Html.Partial("_InvoiceFooterGst")
+
+
+
+
+
+
+
+
+

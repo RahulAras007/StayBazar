@@ -1,0 +1,28 @@
+﻿@model StayBazar.Models.CorporateModel
+@{
+    ViewBag.Title = "Users";
+}
+@section scripts{
+<script src="~/Scripts/custom_pager.js"></script>
+}
+<script type="text/javascript">
+    $(function () { validateRq(); });
+</script>
+<div class="container ">
+    <div class="row ">
+        <div class=" col-md-12">
+            <h2>Corporate Users</h2>
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class=" col-md-12">
+            <div id="userlist">
+                @Html.Partial("~/Views/CorporateUsers/_List.cshtml", Model)
+            </div>
+            <div id="userdetails">
+                @Html.Partial("~/Views/CorporateUsers/_Details.cshtml", Model.CorpUser)
+            </div>
+        </div>
+    </div>
+</div>

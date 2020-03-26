@@ -1,0 +1,87 @@
+﻿@model IEnumerable<CLayer.Currency>
+
+@{
+    ViewBag.Title = "Currency";
+    try
+    {
+        var grid = new WebGrid(Model, canSort: false, canPage: true, rowsPerPage: 25,
+        selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.NextPrevious);
+        StayBazar.Areas.Admin.Models.CurrencyModel data = (StayBazar.Areas.Admin.Models.CurrencyModel)ViewBag.Currency;
+        <text>
+            <div id="bodycontent">
+                <div id="divedit">
+                    @{
+        Html.RenderPartial("~/Areas/Admin/Views/Currency/_Edit.cshtml", data, ViewData);
+                    }
+                </div>
+
+                <br />
+                
+                    @*<a id="tilt" href="~/Currency/Delete/"></a>*@
+
+                   <div class="col-md-12">
+                    @using (Html.BeginForm("UpdateCurrencyRate", "Currency", new { Area = "Admin" }))
+                    {
+                        <input type="submit" value="Get Exchange Rates" class="btn btn-info" />
+                    }
+                    @*</div>*@
+                @*</div>*@
+
+            <br />
+
+                <div id="gridContent">
+                    
+
+
+                    @grid.GetHtml(
+               tableStyle: "webGrid center table table-striped table-hover table-condensed table-custom table-bordered",
+                headerStyle: "header",
+                alternatingRowStyle: "alt",
+                selectedRowStyle: "select",
+                columns: grid.Columns(grid.Column("Title", "Title"),
+                grid.Column("Symbol", "Symbol"),
+                grid.Column("ConversionRate", "Conversion Rate"),
+                grid.Column("Exchangecode", "Exchange code"),
+                //grid.Column("ConversionPercentage", "Conversion Percentage"),
+               grid.Column("LastUpdate", "Last Updated Date"),
+               //ExchgCode
+                grid.Column("Status", format: @<text>@if (item.Status == 1)
+                {<text>Enabled</text>}
+                else
+                {<text>Hidden</text>}</text>, style: "btnclm"),
+                /*grid.Column("Default", format: @<text>@if (item.IsDefault)
+                {<text>&#10004;</text>}
+                else
+                {<text></text>}</text>, style: "btnclm"),*/
+
+                grid.Column("Edit", format: @<text><a href="#" title="Edit" onclick="EditBT(@item.CurrencyId)"><span class="glyphicon glyphicon-edit green-color fa-2x"></span></a></text>, style: "btnclm")
+))
+                </div>
+            </div>
+
+
+                    
+            </div>
+            <script type="text/javascript">
+                function EditBT(id) {
+                    //alert(id);
+                    @*var url = '@Url.Action("Pager","Corporate")';*@
+                    $.post("/Admin/Currency/GET?id=" + id, function (data) {
+                        $("#divedit").html(data);
+                    });
+                }
+            </script>
+        </text>
+    }
+    catch (Exception ex)
+    {
+        StayBazar.Common.LogHandler.HandleError(ex);
+        Response.Redirect("~/Admin/ErrorPage");
+    }
+}
+
+
+
+
+

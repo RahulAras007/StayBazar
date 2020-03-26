@@ -1,0 +1,110 @@
+﻿@model StayBazar.Models.TestModel
+@{
+    // Layout = null;
+    //bool test = false;
+    //if(Request.QueryString["type"]== "1")
+    //{ test = true;  }
+}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <h2>Please make your payment</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+            @{
+                StayBazar.Models.PaymentModel pm = new StayBazar.Models.PaymentModel();
+                pm.account_id = "15160";
+                pm.amount = "12.34";
+                pm.reference_no = "RB00667";
+                pm.return_url = "https://www.staybazar.com/response?DR={DR}";
+                pm.mode = "TEST";
+                pm.SecurePayment();
+                
+                @*
+                string responsebody = "testing payment";
+                if (test) { 
+                string url = BLayer.Settings.GetValue(CLayer.Settings.PAYMENT_REFUND_LINK);
+                System.Collections.Specialized.NameValueCollection reqparm = new System.Collections.Specialized.NameValueCollection();
+                reqparm.Add("AccountID", BLayer.Settings.GetValue(CLayer.Settings.PAY_ACCOUNT_ID));
+                reqparm.Add("SecretKey", BLayer.Settings.GetValue(CLayer.Settings.PAY_SECRET_KEY));
+                reqparm.Add("Amount", "2");
+                reqparm.Add("PaymentID", "30730235");
+                reqparm.Add("Action", "refund");
+                WebClient client = new WebClient();
+                byte[] responsebytes = client.UploadValues(url, "POST", reqparm);
+                responsebody = System.Text.Encoding.UTF8.GetString(responsebytes);
+                }*@
+            }
+
+           
+                    <form id="paytoaccount" method="post" action="https://secure.ebs.in/pg/ma/sale/pay/">
+                       
+                        <div class="height10px"></div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <span>Account Id</span><br />
+                                <input id="account_id" name="account_id" type="text" value="15160" /><br />
+                                <span>reference_no</span><br />
+                                <input id="reference_no" name="reference_no" type="text" value="RB00667" /><br />
+                                <span>mode</span><br />
+                                <input id="mode" name="mode" type="text" value="LIVE" /><br />
+                                <span>return_url</span><br />
+                                <input id="return_url" name="return_url" type="text" value="https://www.staybazar.com/response?DR={DR}" /><br />
+                                <span>amount</span><br />
+                                <input id="amount" name="amount" type="text" value="12.34" /><br />
+                                <span>description</span><br />
+                                <input id="description" name="description" type="text" value="For&#32;booking&#32;accommodation&#32;from&#32;Staybazar" /><br />
+                                <span>name</span><br />
+
+                                <input id="name" name="name" type="text" value="Admin" /><br />
+                                <span>address</span><br />
+                                <input id="address" name="address" type="text" value="staybazar" /><br />
+                                <span>city</span><br />
+                                <input id="city" name="city" type="text" value="Ernakulam" /><br />
+                                <span>state</span><br />
+                                <input id="state" name="state" type="text" value="Kerala" /><br />
+                                <span>country</span><br />
+                                <input id="country" name="country" type="text" value="IND" /><br />
+                                
+
+                           </div>
+                            <div class="col-md-3">
+                                <span>phone</span><br />
+                                <input id="phone" name="phone" type="text" value="9019066111" /><br />
+                                <span>email</span><br />
+                                <input id="email" name="email" type="text" value="admin@staybazar.com" /><br />
+                                <span>postal_code</span><br />
+                                <input id="postal_code" name="postal_code" type="text" value="682020" /><br />
+                                <span>ship_name</span><br />
+                                <input id="ship_name" name="ship_name" type="text" value="Admin" /><br />
+                                <span>ship_address</span><br />
+                                <input id="ship_address" name="ship_address" type="text" value="staybazar" /><br />
+                                <span>ship_city</span><br />
+                                <input id="ship_city" name="ship_city" type="text" value="Ernakulam" /><br />
+                                <span>ship_state</span><br />
+                                <input id="ship_state" name="ship_state" type="text" value="Kerala" /><br />
+                                <span>ship_country</span><br />
+                                <input id="ship_country" name="ship_country" type="text" value="IND" /><br />
+                                <span>ship_postal_code</span><br />
+                                <input id="ship_postal_code" name="ship_postal_code" type="text" value="682020" /><br />
+                                <span>ship_phone</span><br />
+                                <input id="ship_phone" name="ship_phone" type="text" value="9019066111" /><br />
+                                <span>secure_hash (for security)</span><br />
+                                <input id="secure_hash" name="secure_hash" type="text" value="@pm.secure_hash" />
+                               
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2 col-md-offset-2">
+                                <div class="height10px"></div>
+                                <input type="submit" value=" Submit " class="btn btn-success"  />
+                            </div>
+                        </div>
+                        
+                    </form>
+            
+        </div>
+    </div>
+</div>

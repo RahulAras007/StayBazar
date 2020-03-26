@@ -1,0 +1,594 @@
+﻿@model  StayBazar.Areas.Admin.Models.OfflineBookingModel
+@{
+    CLayer.OfflineBooking offedit = BLayer.OfflineBooking.GetAllDetailsById(Model.OfflineBookingId);
+    CLayer.OfflineBooking customerdetails = BLayer.OfflineBooking.GetAllCustomerDetails(Model.OfflineBookingId);
+    CLayer.OfflineBooking offprodt = BLayer.OfflineBooking.GetAllpropertyDetails(Model.OfflineBookingId);
+
+
+
+    CLayer.AccommodationType AccommodationTypedetails = new CLayer.AccommodationType();
+    string AccommodationTypeTitle = "";
+    CLayer.StayCategory Staycategorydetails = new CLayer.StayCategory();
+    if (offedit != null)
+    { if (offedit.Accommodationtypeid != -1)
+        {
+            AccommodationTypedetails = BLayer.AccommodationType.Get(Convert.ToInt32(offedit.Accommodationtypeid));
+            AccommodationTypeTitle = AccommodationTypedetails.Title;
+        }
+        else
+        {
+
+            AccommodationTypeTitle = offedit.AccommodatoinTypename;
+        }
+       Staycategorydetails = BLayer.StayCategory.Get(Convert.ToInt32(offedit.StayCategoryid));
+    }
+
+
+
+    string viewpage = ViewBag.viewonly;
+}
+@if (viewpage == "yes")
+{
+    <div class="row ">
+        <div class="col-md-1 col-md-offset-10 margin-top-30">
+            <a title="Pdf" href="#" onclick="PDF(@Model.OfflineBookingId)" id="btnNextClick" class="fa fa-file-pdf-o" style="font-size: 22px;"></a>
+        </div>
+    </div>
+}
+
+
+<div class="container" id="SubmitForm">
+
+    <div class="col-md-12">
+        <h4 class="bold">Customer Details</h4>
+        <div class="col-md-5">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            @Html.Label("Name")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @customerdetails.CustomerName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Email")
+                        </td>
+                        <td>
+                            &nbsp;: &nbsp; &nbsp;@customerdetails.CustomerEmail
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Mobile")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @customerdetails.CustomerMobile
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Guest Name")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @offedit.GuestName
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Guest Email")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offedit.GuestEmail
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Address")
+                            </div>
+                        </td>
+                        <td>
+                             <div class="group"><div style="padding-left:27px;">@customerdetails.CustomerAddress </div></div> 
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Zip Code")
+                            </div>
+                        </td>
+                        <td>
+                            <div class="group"><div style="padding-left:27px;">@customerdetails.CustomerpinCode </div></div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Country")
+                                </div>
+                        </td>
+                        <td>
+                            &nbsp; &nbsp; &nbsp;  @customerdetails.CustomerCountryname
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("State")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @customerdetails.CustomerStatename
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("City")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @customerdetails.CustomerCityname
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <h4 class="bold">Property Details</h4>
+
+        <div class="col-md-5">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            @Html.Label("Property Name")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offprodt.PropertyName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Supplier Name")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offprodt.SupplierName
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Property Email")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @offprodt.PropertyEmail
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Mobile")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offprodt.PropertyContactNo
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="col-md-5">
+            <table>
+
+                <tbody>
+
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Address")
+                            </div>
+                        </td>
+                        <td>
+                            <div class="group"><div style="padding-left:27px;">@offprodt.PropertyAddress </div></div>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            <div class="AddressBar">
+                                @Html.Label("Zip Code")
+                            </div>
+                        </td>
+                        <td>
+                            <div class="group"><div style="padding-left:27px;">@offprodt.PropertyPinCode </div></div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @Html.Label("Country")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offprodt.PropertyCountryname
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("State")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @offprodt.PropertyStatename
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("City")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offprodt.PropertyCityname
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+    <div class="col-md-12">
+        <h4 class="bold">Booking Details</h4>
+        <div class="col-md-5">
+            <table>
+                <tbody>
+
+                    <tr>
+                        <td>
+                            @Html.Label("Accomodation Type")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offedit.AccommodatoinTypename
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Staycategory")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @if (Staycategorydetails != null)
+                            { @Staycategorydetails.Title }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @Html.Label("Booking Date")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.CreatedTime
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Check In ")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.CheckIn
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Check Out")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @offedit.CheckOut
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-5">
+            <table>
+                <tbody>
+
+                    <tr>
+                        <td>
+                            @Html.Label("No Of Rooms")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offedit.NoOfRooms
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("No Of Night")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @offedit.NoOfNight
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("No Of Adult")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.NoOfPaxAdult
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("No Of Child")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.NoOfPaxChild
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Hotel Confirmation Number")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.HotelConfirmationNo
+                        </td>
+                    </tr>
+
+                    <br />
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <h4 class="bold">Pricing Details</h4>
+
+        <div class="col-md-5">
+            <table>
+                <tbody>
+                    <tr>
+                        @Html.Label(" Buy Price :- ")
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Average Daily Rate Before Service tax")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.AvgDailyRateBefreStaxForBuyPrice
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Service tax(%)")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;    @offedit.StaxForBuyPrice
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Total Amount - Accommodation")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.TotalAmtForBuyPrice
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Price for other services")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.BuyPriceforotherservicesForBuyprice
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @Html.Label("Service tax - other services(%)")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.StaxForotherBuyPrice
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Total Amount - other services")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.TotalAmtotherForBuyPrice
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Total Buy Price")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.TotalBuyPrice
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-5">
+            <table>
+                <tbody>
+                    <tr>
+                        @Html.Label(" Sale Price :-")
+
+
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @Html.Label("Average Daily Rate Before Service tax")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @offedit.AvgDailyRateBefreStaxForSalePrice
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Service tax(%)")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;  @offedit.StaxForSalePrice
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @Html.Label("Total Amount - Accommodation")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.TotalAmtForSalePrice
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @Html.Label("Price for other services")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.BuyPriceforotherservicesForSalePrice
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Service tax - other services (%)")
+                        </td>
+                        <td>
+                            &nbsp;: &nbsp; &nbsp; @offedit.StaxForotherForSalePrice
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            @Html.Label("Total Amount - other services")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp; @offedit.TotalAmtotherForSalePrice
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            @Html.Label("Total Sale Price")
+                        </td>
+                        <td>
+                            &nbsp;:&nbsp; &nbsp;   @offedit.TotalSalePrice
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+    <div class="col-md-12" id="Vendor">
+        <h4 class="bold">Other Payment Details</h4>
+        @Html.Partial("~/Areas/Admin/Views/OfflineBookingGST/vendorpaymentlistview.cshtml", Model.Vendorlist)
+
+
+    </div>
+
+
+    @if (viewpage == "yes")
+    {
+        <div class="col-md-12 margin-bot-10 margin-top-30">
+            <div class="col-md-4 col-md-offset-4">
+                @if (Model.Direction != null)
+                {
+                    if (Model.Direction == 1)
+                    {
+                        <a href="/Admin/OfflineBookingList" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+                    }
+                    else if (Model.Direction == 2)
+                    {
+                        <a href="/Admin/ManageOfflineBooking" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+                    }
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-md-12 margin-bot-10 margin-top-30">
+            <div class="col-md-4 col-md-offset-4">
+                <input type="button" id="btnSave" value="Submit" onclick="Submit(@Model.OfflineBookingId)" class="btn btn-success marginleft30px" tabindex="23" />
+                <input type="button" id="btngoback" value="Go back" onclick="Goback(@Model.OfflineBookingId)" class="btn btn-success " tabindex="23" />
+                <a onclick="Goback(@Model.OfflineBookingId)" id="btnReset" class="btn btn-danger" tabindex="24">Cancel</a>
+            </div>
+        </div>
+
+
+    }
+
+</div>
+<style>
+    .AddressBar
+    {
+        position:relative;
+        width:100%;
+    }
+    .AddressBar:before
+    {
+        content:":";
+        position:absolute;
+        right:-15px;
+        top:0px;
+    }
+    td
+    {
+        padding:0px 5px 0px 0px;
+    }
+</style>
+
+<script>
+    function Submit(OffId) {
+        window.location.href = '/Admin/OfflineBookingGST/OverollSubmit?OfflineBookingId=' + OffId;
+
+    }
+
+    function Goback(OffId) {
+
+        window.location.href = '/Admin/OfflineBookingGST/BackToVendorDetails?OfflineBookId=' + OffId;
+    }
+
+
+    function PDF(OffId) {
+        var url = '@Url.Action("ReportPdf", "OfflineBookingList")?OfflineBookingId=' + OffId;
+        window.open(url, "_blank", " scrollbars=yes, resizable=yes, width=400, height=400");
+    }
+</script>
+
+
+
+
+

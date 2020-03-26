@@ -1,0 +1,22 @@
+﻿@model  StayBazar.Areas.Admin.Models.Invoice
+@{
+    Layout = null;
+    CLayer.OfflineBooking ob = BLayer.OfflineBooking.GetAllDetailsById(Model.OfflineBookingId);
+    CLayer.OfflineBooking oc = BLayer.OfflineBooking.GetAllCustomerDetails(Model.OfflineBookingId);
+}
+<p style="font-family: sans-serif,Verdana;font-size:13px;">
+    Dear @oc.CustomerName,<br /><br />
+    <br />
+    Thank you for booking your Stay with Staybazar!<br />
+    <br />
+    Attached please find Invoice No. <b>@Model.InvoiceNumber</b> against Booking ID <b>@ob.ConfirmationNumber</b>.   Hope you had a pleasant stay.<br />
+    <br />
+    Any query on this invoice may be brought to our notice within 7 days from the invoice date.<br />
+    <br />
+    Kindly pay this invoice on due date. This is a system generated invoice, no manual invoice will be provided against this booking. You can also download a copy of this invoice by logging on to <a href="https://www.staybazar.com">www.staybazar.com</a> using your login details.<br />
+    <br />
+    Regards<br />
+    <br />
+    Finance Team,<br /><br />
+    <img src="http://www.staybazar.com/Files/Mailer/images/logo.png" title="Staybazar" alt="Staybazar Logo" />
+</p>

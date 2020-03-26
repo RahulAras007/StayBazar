@@ -1,0 +1,113 @@
+﻿@model  IEnumerable<CLayer.MargintrackingReport>
+@{
+    Layout = null;
+    StayBazar.Lib.GridPager gp = new StayBazar.Lib.GridPager();
+    gp.JavascriptFuncName = "showPager";
+    gp.ColumnsInPager = 8;
+    gp.RowsInAPage = 2;
+    long i = 1;
+    StayBazar.Areas.Admin.Models.MargintrackingReportModel filterform = null;
+    if (ViewBag.Filter != null)
+    {
+        filterform = (StayBazar.Areas.Admin.Models.MargintrackingReportModel)ViewBag.Filter;
+    }
+    bool showGSTColumns = false;
+    if(filterform != null)
+    {
+        DateTime frdt = DateTime.Today;
+        if(DateTime.TryParse(filterform.FromDate, out frdt))
+        {
+            if(frdt>= new DateTime(2017, 7, 1)) { showGSTColumns = true; }
+        }
+        
+    }
+}
+<?xml version="1.0"?>
+<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <ss:Styles>
+     <ss:Style ss:ID="1">
+        <ss:Font ss:Bold="1" /> 
+     </ss:Style>
+  </ss:Styles>
+    <ss:Worksheet ss:Name="MargintrackingReport">
+                <ss:Table>
+                    <ss:Row ss:StyleID="1">
+                        <ss:Cell><ss:Data ss:Type="String">Sl No </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking Category</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking Entity</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Booking Ref No</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Invoice Number</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Invoice Date</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Customer Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Customer City</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Property Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Property City</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check In</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Check Out</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Guest Name</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Total room nights</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Customer value before GST</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Supplier value before GST</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Gross Margin</ss:Data></ss:Cell>
+                        @if (showGSTColumns)
+                        {
+                            <ss:Cell><ss:Data ss:Type="String">ORC Amount</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">Net Margin</ss:Data></ss:Cell>
+                        }
+                        <ss:Cell><ss:Data ss:Type="String">Sale Value inc. tax</ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Buy Value inc. tax</ss:Data></ss:Cell>
+                        @*<ss:Cell><ss:Data ss:Type="String">Staybazar margin inc. tax</ss:Data></ss:Cell>*@
+                        <ss:Cell><ss:Data ss:Type="String">Sale Person </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Itilite Booking ID </ss:Data></ss:Cell>
+                        <ss:Cell><ss:Data ss:Type="String">Hotel Confirmation Number </ss:Data></ss:Cell>
+
+                        <ss:Cell><ss:Data ss:Type="String">Status</ss:Data></ss:Cell>
+                    </ss:Row>
+                    @foreach (CLayer.MargintrackingReport reportList in Model)
+                    {
+                        long roomnights = (reportList.TotalNights);
+                        <ss:Row>
+                            <ss:Cell><ss:Data ss:Type="Number">@(i++)</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.BookingDate.ToString("dd/MM/yyyy")</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.BookingType</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.BillingEntity</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.orderno</ss:Data></ss:Cell>
+                            @if(reportList.InvoiceNumber!= ""){
+                            <ss:Cell><ss:Data ss:Type="Number">@reportList.InvoiceNumber</ss:Data></ss:Cell>
+							}else{<ss:Cell><ss:Data ss:Type="String"> </ss:Data></ss:Cell>}
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.InvoiceDate.ToString("dd/MM/yyyy")</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.CustomerName</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.City</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyName</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.PropertyCity</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.CheckIn.ToString("dd/MM/yyyy")</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.CheckOut.ToString("dd/MM/yyyy")</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.GuestName</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="Number">@roomnights</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="Number">@if(@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.Direct){@Math.Round(reportList.ManagementFee)}else if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.TAC){@Math.Round(reportList.TacAmount)}else{@Math.Round(reportList.CustomerValueBeforeGST)}</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="Number">@reportList.SupplierValueBeforeGST</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="Number">@if(@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.Direct){@Math.Round(reportList.DirectOnlyAmount)}else if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.TAC){@Math.Round(reportList.TAConlyAmount)}else{@Math.Round(reportList.CustomerValueBeforeGST - reportList.SupplierValueBeforeGST)}</ss:Data></ss:Cell>
+							 @if (showGSTColumns)
+                            {
+                                <ss:Cell><ss:Data ss:Type="Number">@Math.Round(reportList.ORCAmount,2)</ss:Data></ss:Cell>
+                                <ss:Cell><ss:Data ss:Type="Number">@if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.Direct)
+                                {@Math.Round(reportList.DirectOnlyAmount- reportList.ORCAmount)}
+                                else if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.TAC)
+                                {@Math.Round(reportList.TAConlyAmount- reportList.ORCAmount)}
+                                else
+                                {@Math.Round(reportList.CustomerValueBeforeGST - reportList.SupplierValueBeforeGST- reportList.ORCAmount)}</ss:Data></ss:Cell>
+                            }
+                            <ss:Cell><ss:Data ss:Type="Number">@if(@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.Direct){@Math.Round(reportList.SaleAmountDirect)}else if (@reportList.BookingTypeid == (int)CLayer.ObjectStatus.OfflineBookingType.TAC){@Math.Round(reportList.SaleAmountTac)}else{@reportList.CustomerBillvalue}</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="Number">@reportList.SupplierRate</ss:Data></ss:Cell>
+                            @*<ss:Cell><ss:Data ss:Type="Number">@Math.Round(reportList.CustomerBillvalue - reportList.SupplierRate, 2)</ss:Data></ss:Cell>*@
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.salepersonaname</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.CustomerReferenceNo</ss:Data></ss:Cell>
+                            <ss:Cell><ss:Data ss:Type="String">@reportList.HotelConformationNo</ss:Data></ss:Cell>
+                              <ss:Cell><ss:Data ss:Type="String">@Enum.GetName(typeof(CLayer.OfflineBooking.Statuslist), reportList.offlinestatus)</ss:Data></ss:Cell>
+                        </ss:Row>
+                    }
+                   
+              </ss:Table>
+    </ss:Worksheet>
+</ss:Workbook>
