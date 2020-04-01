@@ -241,9 +241,9 @@ namespace StayBazar.Controllers
                 srch.CheckOut = srch.CheckIn.AddDays(1);
 
                 //karthikms added this code from 256 to 260
-                string result = TamrindMultiSingleAvailability(srch);
+               string result = TamrindMultiSingleAvailability(srch);
                 LogHandler.AddLog("----Ziac---- Time Taken for fetching Tamarind Result" + DateTime.Now.ToString());
-                string TBOresult = TBOHotelSearch(srch);
+               string TBOresult = TBOHotelSearch(srch);
                 LogHandler.AddLog("----Ziac---- Time Taken for fetching TBO Result" + DateTime.Now.ToString());
                 //string TBOresult = "";
                 DataSet lds_auth = new DataSet();
@@ -365,136 +365,147 @@ namespace StayBazar.Controllers
 
 
                 CLayer.SearchResult AmadeusResults;
-                //if (lds_auth.Tables[0].Rows[0][0].ToString() != "FAIL")
-                //{
-                //    //for (int i = 0; i < lds_auth.Tables["hotel"].Rows.Count; i++)
-                //    for (int i = 0; i < 2; i++)
-                //    {
+                if (lds_auth.Tables[0].Rows[0][0].ToString() != "FAIL")
+                {
+                    for (int i = 0; i < lds_auth.Tables["hotel"].Rows.Count; i++)
+                    //for (int i = 0; i < 2; i++)
+                    {
 
-                //        price = Convert.ToDecimal(lds_auth.Tables["hotel"].Rows[i]["TotalPrice"]);
-                //        TamHotelID = Convert.ToInt64(lds_auth.Tables["hotel"].Rows[i]["HotelId"]);
-                //        //for (int j = 0; j < lds_auth.Tables["Images"].Rows.Count; j++)
-                //        //    for (int j = 0; j < 2; j++)
-                //        //{
-                //        //    ImgHotelID = lds_auth.Tables["Images"].Rows[j]["HotelId"].ToString() != "" ? Convert.ToInt64(lds_auth.Tables["Images"].Rows[j]["HotelId"]) : Convert.ToInt64(lds_auth.Tables["Images"].Rows[j]["hotel_Id"]);
-                //        //    if (TamHotelID == ImgHotelID)
-                //        //    {
-                //        //        image = (lds_auth.Tables["Images"].Rows[j]["ImageName"]).ToString();
-                //        //        break;
-                //        //    }
-                //        //}
-                //        ImgHotelID = lds_auth.Tables["Images"].Rows[i]["HotelId"].ToString() != "" ? Convert.ToInt64(lds_auth.Tables["Images"].Rows[i]["HotelId"]) : Convert.ToInt64(lds_auth.Tables["Images"].Rows[i]["hotel_Id"]);
-
-
+                        price = Convert.ToDecimal(lds_auth.Tables["hotel"].Rows[i]["TotalPrice"]);
+                        TamHotelID = Convert.ToInt64(lds_auth.Tables["hotel"].Rows[i]["HotelId"]);
+                        //for (int j = 0; j < lds_auth.Tables["Images"].Rows.Count; j++)
+                        //    for (int j = 0; j < 2; j++)
+                        //{
+                        //    ImgHotelID = lds_auth.Tables["Images"].Rows[j]["HotelId"].ToString() != "" ? Convert.ToInt64(lds_auth.Tables["Images"].Rows[j]["HotelId"]) : Convert.ToInt64(lds_auth.Tables["Images"].Rows[j]["hotel_Id"]);
+                        //    if (TamHotelID == ImgHotelID)
+                        //    {
+                        //        image = (lds_auth.Tables["Images"].Rows[j]["ImageName"]).ToString();
+                        //        break;
+                        //    }
+                        //}
+                        //ImgHotelID = lds_auth.Tables["Images"].Rows[i]["HotelId"].ToString() != "" ? Convert.ToInt64(lds_auth.Tables["Images"].Rows[i]["HotelId"]) : Convert.ToInt64(lds_auth.Tables["Images"].Rows[i]["hotel_Id"]);
 
 
 
-                //        Tamarind_GST = BLayer.APIPriceMarkup.GSTRate(lsz_hsn_code, Convert.ToInt32(price));
 
-                //        if (ldt_sgst_flag == 1)
-                //        {
-                //            lf_SGST = Tamarind_GST / 2;
-                //            lf_CGST = Tamarind_GST / 2;
-                //        }
-                //        else
-                //        {
-                //            lf_IGST = Tamarind_GST;
-                //        }
 
-                //        if (TamrindAPIPercentage == 0)
-                //        {
-                //            //prem sir told set default percentage as 10 on 30-01-2020
-                //            Tax = (10 * price) / 100;
-                //            amount = price + Tax;
-                //        }
-                //        else
-                //        {
-                //            Tax = (TamrindAPIPercentage * price) / 100;
-                //            amount = price + Tax;
-                //        }
+                        Tamarind_GST = BLayer.APIPriceMarkup.GSTRate(lsz_hsn_code, Convert.ToInt32(price));
 
-                //        objData = new Models.PropertyModel();
-                //        file = new CLayer.PropertyFiles();
-                //        acc = new Models.AccommodationModel();
-                //        // for property save
+                        if (ldt_sgst_flag == 1)
+                        {
+                            lf_SGST = Tamarind_GST / 2;
+                            lf_CGST = Tamarind_GST / 2;
+                        }
+                        else
+                        {
+                            lf_IGST = Tamarind_GST;
+                        }
 
-                //        objData.Title = (lds_auth.Tables["hotel"].Rows[i]["HotelName"]).ToString();
-                //        objData.Location = "";
-                //        objData.Description = (lds_auth.Tables["hotel"].Rows[i]["Desc"]).ToString();
-                //        objData.Image = image;
-                //        objData.PositionLat = "";
-                //        objData.PositionLng = "";
-                //        objData.DistanceFromCity = 0;
-                //        objData.Rating = 0;
-                //        objData.City = (lds_auth.Tables["hotel"].Rows[i]["CityID"]).ToString();
-                //        objData.CityId = CityId;
-                //        objData.State = StateID;
-                //        objData.Country = CountryID;
-                //        objData.ZipCode = "";
-                //        objData.HotelId = (lds_auth.Tables["hotel"].Rows[i]["HotelId"]).ToString();
-                //        objData.TamarindHotelId = (lds_auth.Tables["hotel"].Rows[i]["HotelId"]).ToString();
-                //        objData.InventoryAPIType = 4;
-                //        objData.TamarindFlag = "Y";
-                //        objData.RateCardDetailedId = (lds_auth.Tables["hotel"].Rows[i]["RateCardDetailID"]).ToString();
-                //        objData.OwnerId = GetUserId();
-                //        objData.TaxPercentage = Tamarind_GST;
-                //        objData.GSTSlab = ldt_sgst_flag;
-                //        ldt_property = await SaveAmadeus_Property(objData);
-                //        LogHandler.AddLog("----Ziac---- Time Taken for saving Tamarind Property" + DateTime.Now.ToString());
+                        if (TamrindAPIPercentage == 0)
+                        {
+                            //prem sir told set default percentage as 10 on 30-01-2020
+                            Tax = (10 * price) / 100;
+                            amount = price + Tax;
+                        }
+                        else
+                        {
+                            Tax = (TamrindAPIPercentage * price) / 100;
+                            amount = price + Tax;
+                        }
 
-                //        file.PropertyId = ldt_property;
-                //        file.FileName = objData.Image;
+                        objData = new Models.PropertyModel();
+                        file = new CLayer.PropertyFiles();
+                        acc = new Models.AccommodationModel();
+                        // for property save
 
-                //        BLayer.PropertyFiles.Save(file);
-                //        LogHandler.AddLog("----Ziac---- Time Taken for Tamarind Property File Save Result" + DateTime.Now.ToString());
-                //        LogHandler.AddLog("Property Files Saves:-" + DateTime.Now.ToString());
-                //        //accommodation type save
-                //        ldt_catid = BLayer.AccommodationType.AccommodationTypeSave((lds_auth.Tables["hotel"].Rows[i]["RoomCatName"]).ToString(), Convert.ToInt32(lds_auth.Tables["hotel"].Rows[i]["RoomCategoryId"]));
-                //        LogHandler.AddLog("Accommodation Save:-" + DateTime.Now.ToString());
-                //        LogHandler.AddLog("----Ziac---- Time Taken for saving  Tamarind Property Accommodation Result" + DateTime.Now.ToString());
-                //        acc.AccommodationTypeId = ldt_catid;
-                //        acc.StayCategoryId = 39;
-                //        acc.PropertyId = ldt_property;
-                //        acc.Description = (lds_auth.Tables["hotel"].Rows[i]["Desc"]).ToString();
-                //        acc.CheckIn = srch.CheckIn;
-                //        acc.CheckOut = srch.CheckOut;
-                //        acc.Amount = price;
-                //        acc.AmountWithTax = amount;
-                //        AccommodationSaveByAPI(acc);
-                //        LogHandler.AddLog("----Ziac---- Time Taken for saving  Tamarind Property Accommodation API" + DateTime.Now.ToString());
-                //        AmadeusResults = new CLayer.SearchResult();
-                //        AmadeusResults.PropertyId = Convert.ToInt64(lds_auth.Tables["hotel"].Rows[i]["HotelId"]);
-                //        AmadeusResults.Amount = amount;
-                //        AmadeusResults.Title = (lds_auth.Tables["hotel"].Rows[i]["HotelName"]).ToString();
-                //        AmadeusResults.Location = "";
-                //        AmadeusResults.Description = (lds_auth.Tables["hotel"].Rows[i]["Desc"]).ToString();
-                //        AmadeusResults.ImageFile = image;
-                //        AmadeusResults.Lattitude = "";
-                //        AmadeusResults.Longitude = "";
-                //        AmadeusResults.Distance = 0;
-                //        AmadeusResults.StarRate = 0;
-                //        AmadeusResults.City = (lds_auth.Tables["hotel"].Rows[i]["CityID"]).ToString();
-                //        AmadeusResults.IsDistanceFromCity = false;
-                //        AmadeusResults.IsImageExists = true;
-                //        AmadeusResults.State = "";
-                //        AmadeusResults.Country = "";
-                //        AmadeusResults.Pincode = "";
-                //        AmadeusResults.PropertyCount = lds_auth.Tables["hotels"].Rows.Count;
-                //        AmadeusResults.Avail = 0;
-                //        AmadeusResults.HotelID = (lds_auth.Tables["hotel"].Rows[i]["CityID"]).ToString();
-                //        AmadeusResults.InventoryAPIType = 4;
-                //        AmadeusResults.APIType = "";
-                //        AmadeusResults.GDSCurrencyCode = Session["GDSCurrencyCode"].ToString();
-                //        AmadeusResults.GDSRateConversion = 0;
-                //        AmadeusResults.StarRating = (lds_auth.Tables["hotel"].Rows[i]["HotelRating"]).ToString();
-                //        AmadeusResults.LocationName = "";
-                //        AmadeusResults.EntitlementOrder = 1;
-                //        AmadeusResults.MaximumDailyEntitlement = 34;
-                //        AmadeusResultList.Add(AmadeusResults);
-                //        AmadeusResults = null;
-                //        //AmadeusResults = SetAmadeusResult(HotelItem, RoomStaysResultList, CityName, AmadeusPropertyID, lds_auth.Tables["images"].Rows[i]["images"], objData.Description, objData.Rating, objData.Address);
-                //    }
-                //}
+                        objData.Title = (lds_auth.Tables["hotel"].Rows[i]["HotelName"]).ToString();
+                        objData.Location = "";
+                        objData.Description = (lds_auth.Tables["hotel"].Rows[i]["Desc"]).ToString();
+                        objData.Image = image;
+                        objData.PositionLat = "";
+                        objData.PositionLng = "";
+                        objData.DistanceFromCity = 0;
+                        objData.Rating = 0;
+                        objData.City = (lds_auth.Tables["hotel"].Rows[i]["CityID"]).ToString();
+                        objData.CityId = CityId;
+                        objData.State = StateID;
+                        objData.Country = CountryID;
+                        objData.ZipCode = "";
+                        objData.HotelId = (lds_auth.Tables["hotel"].Rows[i]["HotelId"]).ToString();
+                        objData.TamarindHotelId = (lds_auth.Tables["hotel"].Rows[i]["HotelId"]).ToString();
+                        objData.InventoryAPIType = 4;
+                        objData.TamarindFlag = "Y";
+                        objData.RateCardDetailedId = (lds_auth.Tables["hotel"].Rows[i]["RateCardDetailID"]).ToString();
+                        objData.OwnerId = GetUserId();
+                        objData.TaxPercentage = Tamarind_GST;
+                        objData.GSTSlab = ldt_sgst_flag;
+                        //ldt_property = await SaveAmadeus_Property(objData);
+                        LogHandler.AddLog("----Ziac---- Time Taken for saving Tamarind Property" + DateTime.Now.ToString());
+
+                        //file.PropertyId = ldt_property;
+                        file.FileName = objData.Image;
+
+                        //BLayer.PropertyFiles.Save(file);
+                        LogHandler.AddLog("----Ziac---- Time Taken for Tamarind Property File Save Result" + DateTime.Now.ToString());
+                        LogHandler.AddLog("Property Files Saves:-" + DateTime.Now.ToString());
+                        //accommodation type save
+                        ldt_catid = BLayer.AccommodationType.AccommodationTypeSave((lds_auth.Tables["hotel"].Rows[i]["RoomCatName"]).ToString(), Convert.ToInt32(lds_auth.Tables["hotel"].Rows[i]["RoomCategoryId"]));
+                        LogHandler.AddLog("Accommodation Save:-" + DateTime.Now.ToString());
+                        LogHandler.AddLog("----Ziac---- Time Taken for saving  Tamarind Property Accommodation Result" + DateTime.Now.ToString());
+                        acc.AccommodationTypeId = ldt_catid;
+                        acc.StayCategoryId = 39;
+                        //acc.PropertyId = ldt_property;
+                        acc.Description = (lds_auth.Tables["hotel"].Rows[i]["Desc"]).ToString();
+                        acc.CheckIn = srch.CheckIn;
+                        acc.CheckOut = srch.CheckOut;
+                        acc.Amount = price;
+                        acc.AmountWithTax = amount;
+                        //AccommodationSaveByAPI(acc);
+                        LogHandler.AddLog("----Ziac---- Time Taken for saving  Tamarind Property Accommodation API" + DateTime.Now.ToString());
+                        AmadeusResults = new CLayer.SearchResult();
+                        AmadeusResults.PropertyId = Convert.ToInt64(lds_auth.Tables["hotel"].Rows[i]["HotelId"]);
+                        //AmadeusResults.PropertyId = ldt_property;
+                        AmadeusResults.Amount = amount;
+
+                        AmadeusResults.Title = (lds_auth.Tables["hotel"].Rows[i]["HotelName"]).ToString();
+                        AmadeusResults.Location = "";
+                        AmadeusResults.Description = (lds_auth.Tables["hotel"].Rows[i]["Desc"]).ToString();
+                        AmadeusResults.ImageFile = image;
+                        AmadeusResults.Lattitude = "";
+                        AmadeusResults.Longitude = "";
+                        AmadeusResults.Distance = 0;
+                        AmadeusResults.StarRate = 0;
+                        AmadeusResults.City = (lds_auth.Tables["hotel"].Rows[i]["CityID"]).ToString();
+                        AmadeusResults.IsDistanceFromCity = false;
+                        AmadeusResults.IsImageExists = true;
+                        AmadeusResults.State = "";
+                        AmadeusResults.Country = "";
+                        AmadeusResults.Pincode = "";
+                        AmadeusResults.PropertyCount = lds_auth.Tables["hotels"].Rows.Count;
+                        AmadeusResults.Avail = 0;
+                        AmadeusResults.HotelID = (lds_auth.Tables["hotel"].Rows[i]["CityID"]).ToString();
+                        AmadeusResults.InventoryAPIType = 4;
+                        AmadeusResults.APIType = "";
+                        AmadeusResults.GDSCurrencyCode = Session["GDSCurrencyCode"].ToString();
+                        AmadeusResults.GDSRateConversion = 0;
+                        AmadeusResults.StarRating = (lds_auth.Tables["hotel"].Rows[i]["HotelRating"]).ToString();
+                        AmadeusResults.LocationName = "";
+                        AmadeusResults.EntitlementOrder = 1;
+                        AmadeusResults.MaximumDailyEntitlement = 34;
+
+                        AmadeusResults.CityId = objData.CityId;
+                        AmadeusResults.StateId = objData.State;
+                        AmadeusResults.RateCardDetailedId = (lds_auth.Tables["hotel"].Rows[i]["RateCardDetailID"]).ToString();
+                        AmadeusResults.TaxPercentage = Tamarind_GST;
+                        AmadeusResults.GSTSlab = ldt_sgst_flag;
+                        AmadeusResults.AccommodationTpeID = acc.AccommodationTypeId;
+                        AmadeusResults.StayCategoryID = acc.StayCategoryId;
+                        AmadeusResults.price = price;
+                        AmadeusResultList.Add(AmadeusResults);
+                        AmadeusResults = null;
+                        //AmadeusResults = SetAmadeusResult(HotelItem, RoomStaysResultList, CityName, AmadeusPropertyID, lds_auth.Tables["images"].Rows[i]["images"], objData.Description, objData.Rating, objData.Address);
+                    }
+                }
 
                 string lsz_Hotelsearchlist = "";
                 decimal ld_apigst = 0.0M;
@@ -510,13 +521,13 @@ namespace StayBazar.Controllers
 
                 if (lsz_Hotelsearchlist != "")
                 {
-                    
+
                     LogHandler.AddLog("----Ziac---- Time Taken for fetching TBO Room" + DateTime.Now.ToString());
-                    
+
                     lsz_city = BLayer.TBO.GetCityName(Convert.ToInt32(lds_tboauth.Tables[0].Rows[0]["CityId"]));
                     //for (int i = 0; i < lds_tboauth.Tables["HotelResults"].Rows.Count; i++)
                     for (int i = 0; i < lds_tboauth.Tables["HotelResults"].Rows.Count; i++)
-                    //for (int i = 0; i < 3; i++)
+                    //for (int i = 0; i < 1; i++)
                     {
                         //ldt_property = BLayer.TBO.UpdateHotelList((lds_tboauth.Tables[3].Rows[i]["HotelCode"]).ToString(), (lds_tboauth.Tables[3].Rows[i]["HotelName"]).ToString());
 
@@ -576,19 +587,21 @@ namespace StayBazar.Controllers
                         objData.OwnerId = GetUserId();
                         objData.TaxPercentage = Tamarind_GST;
                         objData.GSTSlab = ldt_sgst_flag;
-                        ldt_property = await SaveAmadeus_Property(objData);
+                        //ldt_property = await SaveAmadeus_Property(objData);
                         LogHandler.AddLog("----Ziac---- Time Taken for saving TBO Property" + DateTime.Now.ToString());
 
-                        file.PropertyId = ldt_property;
+                        //file.PropertyId = ldt_property;
                         file.FileName = objData.Image;
 
                         //BLayer.PropertyFiles.Save(file);
 
+                        srch.TraceId = (lds_tboauth.Tables[0].Rows[0]["TraceId"]).ToString();
+                        srch.ResultIndex = Convert.ToInt32(lds_tboauth.Tables[3].Rows[i]["ResultIndex"]);
 
                         //Was Commented to speed Up 21-03-2020
-                        //srch.TraceId = (lds_tboauth.Tables[0].Rows[0]["TraceId"]).ToString();
-                        
 
+
+                        //srch.TraceId = (lds_tboauth.Tables[0].Rows[0]["TraceId"]).ToString();
                         //srch.ResultIndex = Convert.ToInt32(lds_tboauth.Tables[3].Rows[i]["ResultIndex"]);
                         //srch.HotelCode = (lds_tboauth.Tables[3].Rows[i]["HotelCode"]).ToString();
                         //string TBORoomResult = TBOHotelRoomRequest(srch);
@@ -597,11 +610,10 @@ namespace StayBazar.Controllers
 
 
 
-
                         //if (int.Parse(lds_tboroom.Tables["Error"].Rows[0]["ErrorCode"].ToString()) == 0)
                         //{
-                        //    for (int j = 0; j < lds_tboroom.Tables["HotelRoomsDetails"].Rows.Count; j++)
-                        //    //for (int j = 0; j < 3; j++)
+                        //    //for (int j = 0; j < lds_tboroom.Tables["HotelRoomsDetails"].Rows.Count; j++)
+                        //    for (int j = 0; j < 1; j++)
                         //    {
                         //        price = Convert.ToDecimal((lds_tboroom.Tables[4].Rows[j]["OfferedPriceRoundedOff"]).ToString());
                         //        ld_apigst = Convert.ToDecimal((lds_tboroom.Tables[4].Rows[j]["TotalGSTAmount"]).ToString());
@@ -634,12 +646,12 @@ namespace StayBazar.Controllers
                         //        LogHandler.AddLog("----Ziac---- Time Taken for saving TBO Accommodation" + DateTime.Now.ToString());
                         //    }
                         //}
-                        //  Till Here 21-03-2020
+                        ////  Till Here 21-03-2020
 
 
 
 
-                        AmadeusResults.PropertyId = ldt_property;
+                        AmadeusResults.PropertyId = Convert.ToInt64(lds_tboauth.Tables[3].Rows[i]["HotelCode"]);
                         AmadeusResults.Title = (lds_tboauth.Tables[3].Rows[i]["HotelName"]).ToString();
                         AmadeusResults.Location = (lds_tboauth.Tables[3].Rows[i]["HotelLocation"]).ToString();
                         AmadeusResults.Description = (lds_tboauth.Tables[3].Rows[i]["HotelDescription"]).ToString();
@@ -669,8 +681,17 @@ namespace StayBazar.Controllers
                         //AmadeusResults.Amount = Convert.ToDecimal((lds_tboauth.Tables[4].Rows[i]["OfferedPriceRoundedOff"]).ToString());
                         AmadeusResults.GDSCurrencyCode = (lds_tboauth.Tables[4].Rows[i]["CurrencyCode"]).ToString();
 
+                        AmadeusResults.CityId = objData.CityId;
+                        AmadeusResults.StateId = objData.State;
+                        AmadeusResults.TaxPercentage = Tamarind_GST;
+                        AmadeusResults.GSTSlab = ldt_sgst_flag;
+                        AmadeusResults.price = price;
+                        AmadeusResults.TraceID = srch.TraceId;
+                        AmadeusResults.ResultIndex = srch.ResultIndex;
+                        //AmadeusResults.ErrorCode = int.Parse(lds_tboroom.Tables["Error"].Rows[0]["ErrorCode"].ToString());
+
                         AmadeusResultList.Add(AmadeusResults);
-                        LogHandler.AddLog("----Ziac---- Total Results Count is : " + AmadeusResultList);
+                        LogHandler.AddLog("----Ziac---- Total Results Count is : " + AmadeusResultList.Count);
                         AmadeusResults = null;
                     }
                 }
@@ -826,7 +847,7 @@ namespace StayBazar.Controllers
                 //    //    //        {
                 //    //    //            objData.CountryName = Convert.ToString(Session["GDSCountry"]);
                 //    //    //        }
-                //    //    //        PropertyCountryID = CountryID;
+                //    //      //        PropertyCountryID = CountryID;
                 //    //    //        PropertyCountryName = objData.CountryName;
 
                 //    //    //        if ((objData.PositionLat == "0" && objData.PositionLng == "0") || (objData.PositionLat == null && objData.PositionLng == null))
@@ -4346,7 +4367,7 @@ namespace StayBazar.Controllers
         {
             string Result = string.Empty;
             //#256#<br clear='All'/><b>Area information</b><br/><div>Close to Shopping (Linking Road) and Office Complex (KBC) <br/></div><br clear='All'/><b>Features</b><br/><div><table><tr><td style="vertical-align:top"><ul><li> Restautant:
-            //            Tête - à - tête at the Lounge Coffee Shop.
+            //            TÃªte - Ã  - tÃªte at the Lounge Coffee Shop.
             //24 - hour Room Service multi - cuisine array.
             //Complimentary bed tea and Buffet Breakfast .
             //Only the very best product is used by our chefto create a memorable meal displaying originality and finesse.

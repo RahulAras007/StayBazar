@@ -378,7 +378,7 @@ namespace BLayer
         public static void GDSUpdatePropertyStarRatings(long PropertyId, int StarRatings)
         {
             DataLayer.Property bok = new DataLayer.Property();
-            bok.GDSUpdatePropertyStarRatings(PropertyId,  StarRatings);
+            bok.GDSUpdatePropertyStarRatings(PropertyId, StarRatings);
         }
         public static void GDSUpdatePropertyTitle(long PropertyId, string Title)
         {
@@ -442,22 +442,22 @@ namespace BLayer
             DataLayer.Property bok = new DataLayer.Property();
             return bok.GetAllGDSPropertiesRecommended();
         }
-        public static  List<CLayer.Property> PropertyGetOnCity(int CityId)
+        public static List<CLayer.Property> PropertyGetOnCity(int CityId)
         {
             DataLayer.Property bok = new DataLayer.Property();
             return bok.PropertyGetOnCity(CityId);
         }
-        public static  List<CLayer.Property> GetDefaultHotels(long pUserID, string pDestination)
+        public static List<CLayer.Property> GetDefaultHotels(long pUserID, string pDestination)
         {
             DataLayer.Property bok = new DataLayer.Property();
             return bok.GetDefaultHotels(pUserID, pDestination);
         }
-        public static  CLayer.Property GetBookingPropertyDetails(long propertyId)
+        public static CLayer.Property GetBookingPropertyDetails(long propertyId)
         {
             DataLayer.Property bok = new DataLayer.Property();
             return bok.GetBookingPropertyDetails(propertyId);
         }
-        public static string GetPropertyTamarindFlag(long PropertyID,string PropertyName)
+        public static string GetPropertyTamarindFlag(long PropertyID, string PropertyName)
         {
             DataLayer.Property bok = new DataLayer.Property();
             return bok.GetPropertyTamarindFlag(PropertyID, PropertyName);
@@ -466,6 +466,11 @@ namespace BLayer
         {
             DataLayer.Property bok = new DataLayer.Property();
             return bok.GetTamarindInventoryAPITypeId(tamarindhotelid);
+        }
+        public static int GetTBOInventoryAPITypeId(long tamarindhotelid)
+        {
+            DataLayer.Property bok = new DataLayer.Property();
+            return bok.GetTBOInventoryAPITypeId(tamarindhotelid);
         }
     }
 }

@@ -54,6 +54,21 @@ namespace StayBazar.Models
         public string SecurityToken { get; set; }
         public string Moreindicator { get; set; }
         public string title { get; set; }
+        public string RateCardDetailedId { get; set; }
+        public decimal TaxPercentage { get; set; }
+        public int GSTSlab { get; set; }
+        public int StateId { get; set; }
+        public int CityId { get; set; }
+        public int AccommodationTpeID { get; set; }
+        public int StayCategoryID { get; set; }
+        public decimal AmountWithTax { get; set; }
+        public decimal Amount { get; set; }
+        public decimal price { get; set; }
+        public int ResultIndex { get; set; }
+        public string TraceID { get; set; }
+        public int ErrorCode { get; set; }
+        public int InventoryAPIType { get; set; }
+        public string Description { get; set; }
         public SimpleSearchModel()
         {
 
@@ -109,6 +124,22 @@ namespace StayBazar.Models
         public string HotelID { get; set; }
         public string APIType { get; set; }
 
+        //Added by rahul
+        public string RateCardDetailedId { get; set; }
+        public decimal TaxPercentage { get; set; }
+        public int GSTSlab { get; set; }
+        public int StateId { get; set; }
+        public int CityId { get; set; }
+        public int AccommodationTpeID { get; set; }
+        public int StayCategoryID { get; set; }
+        public decimal AmountWithTax { get; set; }
+        public decimal Amount { get; set; }
+        public decimal price { get; set; }
+        public int ResultIndex { get; set; }
+        public string TraceID { get; set; }
+        public int ErrorCode { get; set; }
+        public int InventoryAPIType { get; set; }
+        public string Description { get; set; }
         public SearchParamModel()
         {
             Destination = "";
@@ -156,6 +187,19 @@ namespace StayBazar.Models
             sm.SequenceNumber = SequenceNumber;
             sm.SecurityToken = SecurityToken;
             sm.Moreindicator = Moreindicator;
+            sm.RateCardDetailedId = RateCardDetailedId;
+            sm.TaxPercentage = TaxPercentage;
+            sm.StateId = StateId;
+            sm.CityId = CityId;
+            sm.AccommodationTpeID = AccommodationTpeID;
+            sm.StayCategoryID = StayCategoryID;
+            sm.Amount = Amount;
+            sm.AmountWithTax = AmountWithTax;
+            sm.ResultIndex = ResultIndex;
+            sm.TraceID = TraceID;
+            //sm.ErrorCode = ErrorCode;
+            sm.Description = Description;
+            sm.InventoryAPIType = InventoryAPIType;
             return sm;
         }
     }

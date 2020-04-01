@@ -20,11 +20,11 @@
                     selectedRowStyle: "select",
                     columns: grid.Columns(grid.Column("CostCentreName", "Cost Centre Name"),
                     grid.Column("Edit", format: @<text><a href="#" onclick="EditCorporateCostCentre(@item.CostCentreCode)" title="Edit"><span class="glyphicon glyphicon-edit"></span></a></text>),
-                 grid.Column("Delete", format: (item) =>
-                 {
-                     return Html.Raw("<a title='Delete' class='lnk' href='/CostCentre/Delete?id=" + item.CostCentreCode + "' onclick=\"return confirm('Are you sure you want to delete?')\"><span class='glyphicon glyphicon-remove'></span></a>");
-                 })
-                 ))
+grid.Column("Delete", format: (item) =>
+{
+return Html.Raw("<a title='Delete' class='lnk' href='/CostCentre/Delete?id=" + item.CostCentreCode + "' onclick=\"return confirm('Are you sure you want to delete?')\"><span class='glyphicon glyphicon-remove'></span></a>");
+})
+))
                 </div>
             </div>
             <script type="text/javascript">
@@ -41,4 +41,6 @@
         StayBazar.Common.LogHandler.HandleError(ex);
     }
 }
-
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}

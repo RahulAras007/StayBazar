@@ -39,7 +39,19 @@ namespace CLayer
         public int EntitlementOrder { get; set; }
         public string TraceID { get; set; }
         public long MaximumDailyEntitlement { get; set; }
-
+        //*Added By Rahul
+        public string RateCardDetailedId { get; set; }
+        public decimal TaxPercentage { get; set; }
+        public int GSTSlab { get; set; }
+        public int StateId { get; set; }
+        public int CityId { get; set; }
+        public int AccommodationTpeID { get; set; }
+        public int StayCategoryID { get; set; }
+        
+        public decimal AmountWithTax { get; set; }
+        public decimal price { get; set; }
+        public int ResultIndex { get; set; }
+        public int ErrorCode { get; set; }
         public List<RoomStaysResult> RoomStaysResultList { get; set; }
 
         public SearchResult()

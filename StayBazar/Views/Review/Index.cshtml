@@ -9,6 +9,9 @@
     gp.RowsInAPage = 25;
     gp.ColumnsInPager = 8;
 }
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
 <div class="container bdy_min_height">
     <script type="text/javascript">
         $(function () { validateRq(); });
@@ -56,7 +59,7 @@
             }
             <div class="col-lg-12" id="Tabledata2">
                 @{
-            bool flag = false;
+                    bool flag = false;
                 }
                 @if (Model != null && Model.ReviewList.Count() > 0)
                 {
@@ -74,19 +77,19 @@
                                         @(Html.Raw(StayBazar.Common.Utils.GetStarRating(usr.Rating)))<br />
 
                                         @{
-                            int id = usr.Status;
-                            if (id == (int)CLayer.ObjectStatus.StatusType.Verified)
-                            {
-                                        <text> [Active]</text>
-                            }
-                            else if (id == (int)CLayer.ObjectStatus.StatusType.Rejected)
-                            {
-                                        <text>[Waiting for verification or Rejected]</text>
-                            }
-                            else
-                            {
-                                        <text>Waiting for verification</text>
-                            }
+                                            int id = usr.Status;
+                                            if (id == (int)CLayer.ObjectStatus.StatusType.Verified)
+                                            {
+                                                <text> [Active]</text>
+                                            }
+                                            else if (id == (int)CLayer.ObjectStatus.StatusType.Rejected)
+                                            {
+                                                <text>[Waiting for verification or Rejected]</text>
+                                            }
+                                            else
+                                            {
+                                                <text>Waiting for verification</text>
+                                            }
                                         }
                                         @usr.ReviewDate.ToShortDateString()
                                     </div>
@@ -95,35 +98,35 @@
                                             <tbody>
                                                 <tr>
                                                     <td> Accessibility to property</td>
-                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.Accessibility)</td>
+                                                    <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @usr.Accessibility)</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Easiness in check-in</td>
-                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.Easiness)</td>
+                                                    <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @usr.Easiness)</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Cleanliness - Bedroom</td>
-                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.CleanlinessBed)</td>
+                                                    <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @usr.CleanlinessBed)</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Cleanliness - Bathroom</td>
-                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.CleanlinessBath)</td>
+                                                    <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @usr.CleanlinessBath)</td>
                                                 </tr>
                                                 <tr>
                                                     <td> Sleep Quality</td>
-                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.SleepQuality)</td>
+                                                    <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @usr.SleepQuality)</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Staff behavior</td>
-                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings), @usr.Staffbehave)</td>
+                                                    <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @usr.Staffbehave)</td>
                                                 </tr>
                                                 <tr>
                                                     <td> Overall experience</td>
-                                                    <td> : @Enum.GetName(typeof (CLayer.Review.Feedbackratings),@usr.OverallExp)</td>
+                                                    <td> : @Enum.GetName(typeof(CLayer.Review.Feedbackratings), @usr.OverallExp)</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Will you consider this property during your next travel</td>
-                                                    <td> : @Enum.GetName(typeof (CLayer.Review.considernext), @usr.Considerfornext)</td>
+                                                    <td> : @Enum.GetName(typeof(CLayer.Review.considernext), @usr.Considerfornext)</td>
                                                 </tr>
 
                                             </tbody>
@@ -132,8 +135,8 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-12">
-                                        Remarks : 
-                                       <p style="text-align:justify;">@usr.Description</p>
+                                        Remarks :
+                                        <p style="text-align:justify;">@usr.Description</p>
                                     </div>
                                 </div>
                             </div>
@@ -185,15 +188,15 @@
             // $('#input-id').rating('update',5);
             // alert($(this).attr('data-score'))
             $(this).raty(
-         {
-             path: '../Content/raty27/images/',
-             half: true,
-             readOnly: true,
-             targetKeep: true,
-             score: function () {
-                 return $(this).attr('data-score');
-             }
-         });
+                {
+                    path: '../Content/raty27/images/',
+                    half: true,
+                    readOnly: true,
+                    targetKeep: true,
+                    score: function () {
+                        return $(this).attr('data-score');
+                    }
+                });
         });
     });
 </script>

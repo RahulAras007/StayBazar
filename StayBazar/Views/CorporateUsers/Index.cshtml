@@ -3,7 +3,10 @@
     ViewBag.Title = "Users";
 }
 @section scripts{
-<script src="~/Scripts/custom_pager.js"></script>
+    <script src="~/Scripts/custom_pager.js"></script>
+}
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 <script type="text/javascript">
     $(function () { validateRq(); });

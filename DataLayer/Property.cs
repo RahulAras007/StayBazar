@@ -1706,5 +1706,12 @@ namespace DataLayer
             object obj = Connection.ExecuteQueryScalar("property_GetTamarindInventoryAPITypeId", param);
             return Connection.ToInteger(obj);
         }
+        public int GetTBOInventoryAPITypeId(long tamarindhotelid)
+        {
+            List<DataPlug.Parameter> param = new List<DataPlug.Parameter>();
+            param.Add(Connection.GetParameter("pTamarindHotelId", DataPlug.DataType._BigInt, tamarindhotelid));
+            object obj = Connection.ExecuteQueryScalar("property_GetTBOInventoryAPITypeId", param);
+            return Connection.ToInteger(obj);
+        }
     }
 }

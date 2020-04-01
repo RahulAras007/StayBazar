@@ -3,7 +3,6 @@
     string extensions = System.Configuration.ConfigurationManager.AppSettings.Get("NonImageDocumentFileTypes");
     string[] allowedFileExtensions = extensions.Split(',');
 }
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -40,7 +39,7 @@
     }
 </head>
 <body>
-    <ul class="menu">
+    @*<ul class="menu">
         @if (Request.IsAuthenticated && (!IsForStaticPage))
         {
             string email = User.Identity.GetUserName();
@@ -71,46 +70,149 @@
                     }
                 }
             }
-        <li class="menu-item-has-children">
-            <a href="#">@fname (My Account)</a>
-            <ul>
-                <li><a href="~/account/profile">My Profile</a></li>
-                <li><a href="~/bookinghistory/">My Stays</a></li>
-                @if (role == CLayer.Role.Roles.Corporate)
-                {
-                    <li><a href="~/corporateusers/">Users</a></li>
-                }
-                else if (role == CLayer.Role.Roles.Supplier)
-                {
-                    <li><a href="~/propertylist/">My Properties</a></li>
-                    <li><a href="~/bookingchart/">Bookings</a></li>
-                }
-                else if (role == CLayer.Role.Roles.Affiliate)
-                {
-                    <li><a href="~/supplierlist/">My Supplier</a></li>
-                }
-                <li><a href="~/review/">My Reviews</a></li>
-                @if ((role == CLayer.Role.Roles.Corporate) || (IsApprover))
-                {
-                    <li><a href="~/BookingApproval">Booking Approvals </a></li>
-                }
-                @if (role == CLayer.Role.Roles.Corporate)
-                {
-                    <li><a href="~/CorporateEmployeeGrades">Employee Grade </a></li>
-                    <li><a href="~/CorporateCityClass">City Class </a></li>
-                    <li><a href="~/CorporateCityEntitlement">City Class Entitlement</a></li>
-                    <li><a href="~/CostCentre">Cost Centre</a></li>
-                    <li>@Html.ActionLink("New Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
-                    <li><a href="~/assistedbooking/">Assisted Booking</a></li>
-                }
-                @if (role == CLayer.Role.Roles.CorporateUser)
-                {
-                    <li>@Html.ActionLink("New Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
+            <li class="menu-item-has-children">
+                <a href="#">@fname (My Account)</a>
+                <ul>
+                    <li><a href="~/account/profile">My Profile</a></li>
+                    <li><a href="~/bookinghistory/">My Stays</a></li>
+                    @if (role == CLayer.Role.Roles.Corporate)
+                    {
+                        <li><a href="~/corporateusers/">Users</a></li>
+                    }
+                    else if (role == CLayer.Role.Roles.Supplier)
+                    {
+                        <li><a href="~/propertylist/">My Properties</a></li>
+                        <li><a href="~/bookingchart/">Bookings</a></li>
+                    }
+                    else if (role == CLayer.Role.Roles.Affiliate)
+                    {
+                        <li><a href="~/supplierlist/">My Supplier</a></li>
+                    }
+                    <li><a href="~/review/">My Reviews</a></li>
+                    @if ((role == CLayer.Role.Roles.Corporate) || (IsApprover))
+                    {
+                        <li><a href="~/BookingApproval">Booking Approvals </a></li>
+                    }
+                    @if (role == CLayer.Role.Roles.Corporate)
+                    {
+                        <li><a href="~/CorporateEmployeeGrades">Employee Grade </a></li>
+                        <li><a href="~/CorporateCityClass">City Class </a></li>
+                        <li><a href="~/CorporateCityEntitlement">City Class Entitlement</a></li>
+                        <li><a href="~/CostCentre">Cost Centre</a></li>
+                        <li>@Html.ActionLink("New Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
+                        <li><a href="~/assistedbooking/">Assisted Booking</a></li>
+                    }
+                    @if (role == CLayer.Role.Roles.CorporateUser)
+                    {
+                        <li>@Html.ActionLink("New Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
 
-                }
-            </ul>
-        </li>
+                    }
+                </ul>
+            </li>
         }
-    </ul>
+    </ul>*@
+    <div class="container">
+
+        @if (Request.IsAuthenticated && (!IsForStaticPage))
+        {
+            string email = User.Identity.GetUserName();
+            CLayer.Role.Roles role = (CLayer.Role.Roles)BLayer.User.GetRole(email);
+            bool IsApprover = BLayer.User.GetApproverStatus(email);
+
+            long id = 0;
+            if (role == CLayer.Role.Roles.Corporate || role == CLayer.Role.Roles.CorporateUser || role == CLayer.Role.Roles.Supplier || role == CLayer.Role.Roles.Agent || role == CLayer.Role.Roles.Affiliate)
+            {
+                if (long.TryParse(User.Identity.GetUserId(), out id))
+                {
+                    if (role == CLayer.Role.Roles.CorporateUser)
+                    {
+                        id = BLayer.B2B.GetCorporateIdOfUser(id);
+                    }
+                    fname = BLayer.B2B.GetBusinessName(id);
+                }
+
+            }
+            else
+            {
+                if (long.TryParse(User.Identity.GetUserId(), out id))
+                {
+                    CLayer.User u = BLayer.User.Get(id);
+                    if (u != null)
+                    {
+                        fname = u.FirstName;
+                    }
+                }
+            }
+            <nav id="main-menu" role="navigation">
+                <ul class="menu">
+                    <li class="menu-item-has-children">
+                        <a href="#">Profile</a>
+                        <ul>
+                            <li><a href="~/account/profile">Account</a></li>
+                            <li><a href="~/bookinghistory/">Stays</a></li>
+                            <li><a href="~/review/">Reviews</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item-has-children">
+                        @if (role == CLayer.Role.Roles.Corporate)
+                        {
+                            <a href="~/corporateusers/">Users</a>
+
+                        }
+                        else if (role == CLayer.Role.Roles.Supplier)
+                        {
+                            <a href="~/propertylist/">My Properties</a>
+                            <a href="~/bookingchart/">Bookings</a>
+                        }
+                        else if (role == CLayer.Role.Roles.Affiliate)
+                        {
+                            <a href="~/supplierlist/">My Supplier</a>
+                        }
+
+
+                    </li>
+                    <li class="menu-item-has-children">
+                        @if ((IsApprover))
+                        {
+                            <a href="~/BookingApproval">Booking Approvals </a>
+                        }
+                    </li>
+                    @if (role == CLayer.Role.Roles.Corporate)
+                    {
+                        <li class="menu-item-has-children">
+                            <a href="#">Settings</a>
+                            <ul>
+                                <li><a href="~/assistedbooking/">Assisted Booking</a></li>
+                                <li><a href="~/CostCentre">Cost Centre</a></li>
+                                <li><a href="~/CorporateCityClass">City Class </a></li>
+                                <li><a href="~/CorporateEmployeeGrades">Employee Grade </a></li>
+                                <li><a href="~/CorporateCityEntitlement">Entitlement</a></li>
+                            </ul>
+                        </li>
+                        <li class="menu-item-has-children">
+                            <a href="#">Bookings</a>
+                            <ul>
+                                <li>@Html.ActionLink("Offline Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
+                                <li><a href="~/BookingApproval">Approvals</a></li>
+
+                            </ul>
+                        </li>
+                       
+                       
+                    }
+                    @if (role == CLayer.Role.Roles.CorporateUser)
+                    {
+                        <li class="menu-item-has-children">
+                            <a href="#">Bookings</a>
+                            <ul>
+                                <li>@Html.ActionLink("Offline Booking", "OfflineBooking", "OfflineBookingGst", new { area = "Admin" }, new { })</li>
+                            </ul>
+                        </li>
+                    }
+
+                </ul>
+            </nav>
+        }
+    </div>
 </body>
 </html>

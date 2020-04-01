@@ -797,7 +797,7 @@ namespace DataLayer
                 CreatedName = "All"
             });
 
-            DataTable dt = Connection.GetSQLTable("SELECT DISTINCT u.`UserId` AS CreatedBy,u.FirstName,u.`LastName`   FROM `offline_bookings` of  INNER JOIN `user` u ON  u.`UserId` = of.`CreatedBy`");
+            DataTable dt = Connection.GetSQLTable("SELECT DISTINCT u.`UserId` AS CreatedBy,u.FirstName,u.`LastName`   FROM `offline_bookings` off  INNER JOIN `user` u ON  u.`UserId` = off.`CreatedBy`");
             foreach (DataRow dr in dt.Rows)
             {
                 createdusersList.Add(new CLayer.OfflineBooking()

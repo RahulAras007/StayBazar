@@ -4,362 +4,459 @@
     ViewBag.Title = "Manage Profile";
 
 }
-<div class="container bdy_min_height">
-    <script type="text/javascript">
-        $(function () { validateRq(); });
-    </script>
-    <h2>@ViewBag.Title.</h2>
-    @if (ViewBag.Message != null)
-    {
-        <div class="alert alert-info">
-            @ViewBag.Message
-        </div>
-    }
-    @using (Html.BeginForm("Update", "Account", FormMethod.Post, new { role = "form" }))
-    {
-        @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true)
-        @Html.HiddenFor(m => m.UserId)
-        @Html.HiddenFor(m => m.UserTypeId)
-        @Html.HiddenFor(m => m.Status)
-        @Html.HiddenFor(m => m.Email)
-        @Html.HiddenFor(m => m.AddressId)
-        @Html.HiddenFor(m => m.AddressType)
-        @Html.HiddenFor(m => m.BillingAddressType)
-        @Html.HiddenFor(m => m.BillingAddressId)
-        <div class="row">
-            <div class="col-md-5 ">
-                <p>You're logged in as <strong>@Model.Email</strong>.</p>
-                @if (Model.UserTypeId == (int)CLayer.Role.Roles.CorporateUser)
-                {
-                    <p>Company:  <strong>@Model.Businessname </strong>.</p>
-
-                    <p> @Model.Busineessaddressarray.AddressText,@Model.Busineessaddressarray.City</p>
-                }
+@{ 
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+    <div class="container bdy_min_height">
+        <script type="text/javascript">
+            $(function () { validateRq(); });
+        </script>
+        <h2>@ViewBag.Title.</h2>
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-info">
+                @ViewBag.Message
             </div>
-            <div class="col-md-6 col-md-offset-7">
-                <div class=" row">
-                    <div class="col-md-3">
-                        @Html.ActionLink("Change Password", "Manage", "Account", routeValues: null, htmlAttributes: new { title = "Manage", @class = "btn btn-danger" })
-                    </div>
-                    @if (Model.UserTypeId == (int)CLayer.Role.Roles.Corporate || Model.UserTypeId == (int)CLayer.Role.Roles.Agent || Model.UserTypeId == (int)CLayer.Role.Roles.Supplier || Model.UserTypeId == (int)CLayer.Role.Roles.Affiliate)
+        }
+        @using (Html.BeginForm("Update", "Account", FormMethod.Post, new { role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+            @Html.HiddenFor(m => m.UserId)
+            @Html.HiddenFor(m => m.UserTypeId)
+            @Html.HiddenFor(m => m.Status)
+            @Html.HiddenFor(m => m.Email)
+            @Html.HiddenFor(m => m.AddressId)
+            @Html.HiddenFor(m => m.AddressType)
+            @Html.HiddenFor(m => m.BillingAddressType)
+            @Html.HiddenFor(m => m.BillingAddressId)
+            <div class="row">
+                <div class="col-md-5 ">
+                    <p>You're logged in as <strong>@Model.Email</strong>.</p>
+                    @if (Model.UserTypeId == (int)CLayer.Role.Roles.CorporateUser)
                     {
+                        <p>Company:  <strong>@Model.Businessname </strong>.</p>
+
+                        <p> @Model.Busineessaddressarray.AddressText,@Model.Busineessaddressarray.City</p>
+                    }
+                </div>
+                <div class="col-md-6 col-md-offset-7">
+                    <div class=" row">
                         <div class="col-md-3">
-                            @Html.ActionLink("Manage Documents", "Index", "ManageDocuments", routeValues: null, htmlAttributes: new { title = "Manage", @class = "btn btn-danger" })
+                            @Html.ActionLink("Change Password", "Manage", "Account", routeValues: null, htmlAttributes: new { title = "Manage", @class = "btn btn-danger" })
+                        </div>
+                        @if (Model.UserTypeId == (int)CLayer.Role.Roles.Corporate || Model.UserTypeId == (int)CLayer.Role.Roles.Agent || Model.UserTypeId == (int)CLayer.Role.Roles.Supplier || Model.UserTypeId == (int)CLayer.Role.Roles.Affiliate)
+                        {
+                            <div class="col-md-3">
+                                @Html.ActionLink("Manage Documents", "Index", "ManageDocuments", routeValues: null, htmlAttributes: new { title = "Manage", @class = "btn btn-danger" })
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+            <hr />
+            @*<div class="panel panel-default">*@
+            <div class="row">
+                @*<div class="panel-body">*@
+
+
+                <div class="col-md-5">
+                    @if (Model.UserTypeId == (int)CLayer.Role.Roles.Corporate)
+                    {
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Businessname)
+                            @Html.TextBoxFor(m => m.Businessname, new { @tabindex = "2", @class = "form-control" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ContactName)
+                            @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control" })
                         </div>
                     }
-                </div>
-
-            </div>
-        </div>
-        <hr />
-        @*<div class="panel panel-default">*@
-        <div class="row">
-            @*<div class="panel-body">*@
-
-
-            <div class="col-md-5">
-                @if (Model.UserTypeId == (int)CLayer.Role.Roles.Corporate)
-                {
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.Businessname)
-                        @Html.TextBoxFor(m => m.Businessname, new { @tabindex = "2", @class = "form-control" })
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.ContactName)
-                        @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control" })
-                    </div>
-                }
-                else
-                {
-                    <div class="form-group ">
-                        @Html.LabelFor(m => m.SalutationId)
-                        @Html.DropDownListFor(m => m.SalutationId, Model.Salutations, new { @tabindex = "1", @class = "form-control" })
-                    </div>
-                    <div class="form-group ">
-                        @Html.LabelFor(m => m.FirstName)
-                        @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control" })
-                    </div>
-
-                    <div class="form-group ">
-                        @Html.LabelFor(m => m.LastName)
-                        @Html.TextBoxFor(m => m.LastName, new { @tabindex = "3", @class = "form-control" })
-                    </div>
-
-                    @*<div class="form-group">
-                    @Html.LabelFor(m => m.DateOfBirth)<span style="color:red">*</span>
-                    @Html.TextBoxFor(m => m.DateOfBirth, new { @tabindex = "4", @class = "form-control" })
-                </div>*@
-
-                    <div class="form-group ">
-                        @Html.LabelFor(m => m.SexList)
-                        @Html.DropDownListFor(m => m.Sex, Model.SexList, new { @tabindex = "5", @class = "form-control" })
-                    </div>
-                }
-                @if (Model.UserTypeId == (int)CLayer.Role.Roles.Corporate)
-                {
+                    else
                     {
-                        CLayer.B2B obj11 = BLayer.B2B.Get(Model.UserId);
+                        <div class="form-group ">
+                            @Html.LabelFor(m => m.SalutationId)
+                            @Html.DropDownListFor(m => m.SalutationId, Model.Salutations, new { @tabindex = "1", @class = "form-control" })
+                        </div>
+                        <div class="form-group ">
+                            @Html.LabelFor(m => m.FirstName)
+                            @Html.TextBoxFor(m => m.FirstName, new { @tabindex = "2", @class = "form-control" })
+                        </div>
 
-                        Model.ContactDesignation = obj11.ContactDesignation;
+                        <div class="form-group ">
+                            @Html.LabelFor(m => m.LastName)
+                            @Html.TextBoxFor(m => m.LastName, new { @tabindex = "3", @class = "form-control" })
+                        </div>
+
+                        @*<div class="form-group">
+                            @Html.LabelFor(m => m.DateOfBirth)<span style="color:red">*</span>
+                            @Html.TextBoxFor(m => m.DateOfBirth, new { @tabindex = "4", @class = "form-control" })
+                        </div>*@
+
+                        <div class="form-group ">
+                            @Html.LabelFor(m => m.SexList)
+                            @Html.DropDownListFor(m => m.Sex, Model.SexList, new { @tabindex = "5", @class = "form-control" })
+                        </div>
+                    }
+                    @if (Model.UserTypeId == (int)CLayer.Role.Roles.Corporate)
+                    {
+                        {
+                            CLayer.B2B obj11 = BLayer.B2B.Get(Model.UserId);
+
+                            Model.ContactDesignation = obj11.ContactDesignation;
+                        }
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.ContactDesignation)
+                            @Html.TextBoxFor(m => m.ContactDesignation, new { @tabindex = "21", @class = "form-control input-sm" })
+                        </div>
                     }
                     <div class="form-group">
-                        @Html.LabelFor(m => m.ContactDesignation)
-                        @Html.TextBoxFor(m => m.ContactDesignation, new { @tabindex = "21", @class = "form-control input-sm" })
-                    </div>
-                }
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
-                    @Html.TextAreaFor(m => m.Address, new { @tabindex = "6", @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.Address)
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Email)
-                    @Html.TextBoxFor(m => m.Email, new { @tabindex = "6", @class = "form-control", @readonly = "readonly" })
-                    @Html.ValidationMessageFor(m => m.Email)
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
-                    @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "7", @class = "form-control" })
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.State)<span style="color:red">*</span>
-                    @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "8", @class = "form-control" })
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.City)<span style="color:red">*</span>
-                    <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
-                    @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "9", @class = "form-control" })
-                    <div id="other_city" style="display:none;">
-                        @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
-                        <input type="hidden" value="@Model.City" id="hdnCity" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Mobile)<span style="color:red">*</span>
-                    @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "10", @class = "form-control", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
-                    @Html.ValidationMessageFor(m => m.Mobile)
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Phone)@*<span style="color:red">*</span>*@
-                    @Html.TextBoxFor(m => m.Phone, new { @tabindex = "10", @class = "form-control", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
-
-                    @Html.ValidationMessageFor(m => m.Phone)
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.ZipCode)@*<span style="color:red">*</span>*@
-                    @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "10", @class = "form-control", @MaxLength = "12", @onkeypress = "return isINNumbers(event)" })
-                    @Html.ValidationMessageFor(m => m.ZipCode)
-                </div>
-                @if (Model.UserTypeId == (int)CLayer.Role.Roles.Supplier)
-                {
-                    <div>
-
-                        <input type="submit" class="btn btn-primary prfbtnwidth" tabindex="16" value="Save" />
-
-                    </div>
-                }
-
-                @if (Model.UserTypeId != (int)CLayer.Role.Roles.Supplier)
-                {
-                    <div>
-
-                        <input type="submit" @*onclick="abc()"*@ class="btn btn-primary prfbtnwidth" tabindex="16" value="Save" />
-
-                    </div>
-                }
-            </div>
-            <div class="col-md-5">
-                @if (Model.UserTypeId == (int)CLayer.Role.Roles.Corporate)
-                {
-                    <h3>Billing Address [Optional]</h3>
-                    <div class="form-group">
-                        @Html.CheckBoxFor(m => m.IsClicked, new { onclick = "Addrsame()" })
-                        @*<input type="checkbox" id="IsClicked" checked="checked" onclick="Addrsame()" name="IsClicked" />*@
-                        Same address as the main address
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.BillingAddress)
-                        @Html.TextAreaFor(m => m.BillingAddress, new { @tabindex = "13", @class = "form-control input-sm" })
+                        @Html.LabelFor(m => m.Address)<span style="color:red">*</span>
+                        @Html.TextAreaFor(m => m.Address, new { @tabindex = "6", @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Address)
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(m => m.BillingCountryId)
-                        @Html.DropDownListFor(m => m.BillingCountryId, Model.BillingCountryList, new { @tabindex = "14", @class = "form-control input-sm" })
+                        @Html.LabelFor(m => m.Email)
+                        @Html.TextBoxFor(m => m.Email, new { @tabindex = "6", @class = "form-control", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(m => m.Email)
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(m => m.BillingState)
-                        @Html.DropDownListFor(m => m.BillingState, Model.BillingStateList, new { @tabindex = "15", @class = "form-control input-sm" })
+                        @Html.LabelFor(m => m.CountryId)<span style="color:red">*</span>
+                        @Html.DropDownListFor(m => m.CountryId, Model.CountryList, new { @tabindex = "7", @class = "form-control" })
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(m => m.BillingCityId) &nbsp;
-                        <a href="#" id="close_other_billing_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
-                        @Html.DropDownListFor(m => m.BillingCityId, Model.BillingCityList, new { @tabindex = "16", @class = "form-control input-sm" })
-                        <div id="other_billing_city" style="display:none;">
-                            @Html.TextBoxFor(m => m.BillingCity, new { @class = "form-control input-sm" })
+                        @Html.LabelFor(m => m.State)<span style="color:red">*</span>
+                        @Html.DropDownListFor(m => m.State, Model.StateList, new { @tabindex = "8", @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.City)<span style="color:red">*</span>
+                        <a href="#" id="close_other_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                        @Html.DropDownListFor(m => m.CityId, Model.CityList, new { @tabindex = "9", @class = "form-control" })
+                        <div id="other_city" style="display:none;">
+                            @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                            <input type="hidden" value="@Model.City" id="hdnCity" />
                         </div>
                     </div>
                     <div class="form-group">
-                        @Html.LabelFor(m => m.BillingZipCode)
-                        @Html.TextBoxFor(m => m.BillingZipCode, new { @tabindex = "7", @class = "form-control input-sm", @MaxLength = "12", @onkeypress = "return isINNumbers(event)" })
+                        @Html.LabelFor(m => m.Mobile)<span style="color:red">*</span>
+                        @Html.TextBoxFor(m => m.Mobile, new { @tabindex = "10", @class = "form-control", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
+                        @Html.ValidationMessageFor(m => m.Mobile)
                     </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Phone)@*<span style="color:red">*</span>*@
+                        @Html.TextBoxFor(m => m.Phone, new { @tabindex = "10", @class = "form-control", @MaxLength = "15", @onkeypress = "return isINNumbers(event)" })
 
-                    CLayer.B2B Credirbookingdata = BLayer.B2B.GetbookingcreditforCorte(Model.UserId);
-
-                    if (Credirbookingdata.CreditAmount == null)
+                        @Html.ValidationMessageFor(m => m.Phone)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.ZipCode)@*<span style="color:red">*</span>*@
+                        @Html.TextBoxFor(m => m.ZipCode, new { @tabindex = "10", @class = "form-control", @MaxLength = "12", @onkeypress = "return isINNumbers(event)" })
+                        @Html.ValidationMessageFor(m => m.ZipCode)
+                    </div>
+                    @if (Model.UserTypeId == (int)CLayer.Role.Roles.Supplier)
                     {
-                        Credirbookingdata.CreditAmount = 0;
-                    }
-                    if (Credirbookingdata.CreditDays == null)
-                    {
-                        Credirbookingdata.CreditDays = 0;
-                    }
-                    if (Credirbookingdata.IsCreditBooking == null)
-                    {
-                        Credirbookingdata.IsCreditBooking = 0;
-                    }
-                    decimal CreditAmt = Credirbookingdata.TotalCreditAmount;
-                    long Dayscredit = Credirbookingdata.CreditDays;
-                    int CreditAll = Credirbookingdata.IsCreditBooking;
+                        <div>
 
-                    <h3>Booking Credits</h3>
-                    <div class="panel panel-body panel-default">
-                        <div class="row">
-                            <div class="col-md-5 marginleft15px">
-                                <div class="row margin-top-10">
-                                    <label>
-                                        Credit Booking Allowed :
+                            <input type="submit" class="btn btn-primary prfbtnwidth" tabindex="16" value="Save" />
 
-                                    </label>
-                                    @if (CreditAll == 1)
-                                    {<text> ON </text>}
-                                else
-                                {<text> OFF </text>}
+                        </div>
+                    }
+
+                    @if (Model.UserTypeId != (int)CLayer.Role.Roles.Supplier)
+                    {
+                        <div>
+
+                            <input type="submit" @*onclick="abc()"*@ class="btn btn-primary prfbtnwidth" tabindex="16" value="Save" />
+
+                        </div>
+                    }
+                </div>
+                <div class="col-md-5">
+                    @if (Model.UserTypeId == (int)CLayer.Role.Roles.Corporate)
+                    {
+                        <h3>Billing Address [Optional]</h3>
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsClicked, new { onclick = "Addrsame()" })
+                            @*<input type="checkbox" id="IsClicked" checked="checked" onclick="Addrsame()" name="IsClicked" />*@
+                            Same address as the main address
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BillingAddress)
+                            @Html.TextAreaFor(m => m.BillingAddress, new { @tabindex = "13", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BillingCountryId)
+                            @Html.DropDownListFor(m => m.BillingCountryId, Model.BillingCountryList, new { @tabindex = "14", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BillingState)
+                            @Html.DropDownListFor(m => m.BillingState, Model.BillingStateList, new { @tabindex = "15", @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BillingCityId) &nbsp;
+                            <a href="#" id="close_other_billing_city" class="lnk" style="display:none;"><span class="glyphicon glyphicon-remove"></span>choose from the list</a>
+                            @Html.DropDownListFor(m => m.BillingCityId, Model.BillingCityList, new { @tabindex = "16", @class = "form-control input-sm" })
+                            <div id="other_billing_city" style="display:none;">
+                                @Html.TextBoxFor(m => m.BillingCity, new { @class = "form-control input-sm" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.BillingZipCode)
+                            @Html.TextBoxFor(m => m.BillingZipCode, new { @tabindex = "7", @class = "form-control input-sm", @MaxLength = "12", @onkeypress = "return isINNumbers(event)" })
+                        </div>
+
+                        CLayer.B2B Credirbookingdata = BLayer.B2B.GetbookingcreditforCorte(Model.UserId);
+
+                        if (Credirbookingdata.CreditAmount == null)
+                        {
+                            Credirbookingdata.CreditAmount = 0;
+                        }
+                        if (Credirbookingdata.CreditDays == null)
+                        {
+                            Credirbookingdata.CreditDays = 0;
+                        }
+                        if (Credirbookingdata.IsCreditBooking == null)
+                        {
+                            Credirbookingdata.IsCreditBooking = 0;
+                        }
+                        decimal CreditAmt = Credirbookingdata.TotalCreditAmount;
+                        long Dayscredit = Credirbookingdata.CreditDays;
+                        int CreditAll = Credirbookingdata.IsCreditBooking;
+
+                        <h3>Booking Credits</h3>
+                        <div class="panel panel-body panel-default">
+                            <div class="row">
+                                <div class="col-md-5 marginleft15px">
+                                    <div class="row margin-top-10">
+                                        <label>
+                                            Credit Booking Allowed :
+
+                                        </label>
+                                        @if (CreditAll == 1)
+                                        {<text> ON </text>}
+                                    else
+                                    {<text> OFF </text>}
+                                    </div>
+                                    <div class="row">
+                                        <label for="stdShort">No: Of Days for Credit :  </label> @Dayscredit
+                                    </div>
+                                    <div class="row">
+                                        <label for="stdShort">Credit Limit (INR) : </label> @CreditAmt
+
+                                    </div>
                                 </div>
-                                <div class="row">
-                                    <label for="stdShort">No: Of Days for Credit :  </label> @Dayscredit
-                                </div>
-                                <div class="row">
-                                    <label for="stdShort">Credit Limit (INR) : </label> @CreditAmt
 
+                            </div>
+                        </div>
+                        @*<div class="row">
+                            <div class="col-12">
+                                <h3>My Assisted Booker</h3>
+                                <div>
+                                    @Html.DropDownListFor(m => m.AssistedCorporateID, Model.AssistedCorporateUserName, new { @class = "form-control" })
                                 </div>
                             </div>
 
+                        </div>*@
+
+                    }
+                    @if (Model.UserTypeId != (int)CLayer.Role.Roles.Corporate)
+                    {
+                        <div class="col-md-12">
+                            <h3>My Assisted Booker</h3>
+                            <div>
+                                @Html.DropDownListFor(m => m.AssistedCorporateID, Model.AssistedCorporateUserName, new { @class = "form-control" })
+                            </div>
                         </div>
-                    </div>
-                    @*<div class="row">
-                <div class="col-12">
-                    <h3>My Assisted Booker</h3>
-                    <div>
-                        @Html.DropDownListFor(m => m.AssistedCorporateID, Model.AssistedCorporateUserName, new { @class = "form-control" })
-                    </div>
+                    }
                 </div>
 
-            </div>*@
+                <div class="row">
 
-                }
-                @if (Model.UserTypeId != (int)CLayer.Role.Roles.Corporate)
-                {
-                    <div class="col-md-12">
-                        <h3>My Assisted Booker</h3>
-                        <div>
-                            @Html.DropDownListFor(m => m.AssistedCorporateID, Model.AssistedCorporateUserName, new { @class = "form-control" })
-                        </div>
+                </div>
+
+
+
+
+                <div>
+                    <div class=" row">
+                        <div class=" col-md-12"><br /></div>
                     </div>
-                }
-            </div>
 
-            <div class="row">
-                
-            </div>
-
-           
-
-
-            <div>
-                <div class=" row">
-                    <div class=" col-md-12"><br /></div>
                 </div>
 
             </div>
-
-        </div>
-        @*</div>*@
-    }
-    <script type="text/javascript">
-
-
-        ////function abc() {
-
-        ////    if ($('#IsClicked').prop('checked') == true) {
-        ////        $('#IsClicked').val(true);
-        ////    }
-        ////    else {
-        ////        $('#IsClicked').val(false);
-        ////    }
-        ////}
-        function Addrsame() {
-            var enb = !$('#IsClicked').prop('checked');
-
-            if (enb = "true") {
-                $('#BillingAddress').prop("disabled", false);
-                $("#BillingCountryId").prop("disabled", false);
-                $("#BillingState").prop("disabled", false);
-                $("#BillingCityId").prop("disabled", false);
-                $("#BillingZipCode").prop("disabled", false);
-            }
-            if ($('#IsClicked').prop('checked') == true) {
-                $('#BillingAddress').prop("disabled", true);
-                $("#BillingCountryId").prop("disabled", true);
-                $("#BillingState").prop("disabled", true);
-                $("#BillingCityId").prop("disabled", true);
-                $("#BillingZipCode").prop("disabled", true);
-            }
+            @*</div>*@
         }
-        Addrsame();
-        $(function () {
+        <script type="text/javascript">
 
-            var now = new Date();
-            now.setDate(now.getDate() + 7);
 
-            var checkin = $('#DateOfBirth').datepicker(
-                {
-                    minDate: 1,
-                    defaultDate: now,
-                    numberOfMonths: 1,
-                    dateFormat: "dd/mm/yy"
-                });
-            //$("#DateOfBirth").datepicker({
-            //    changeMonth: true,
-            //    changeYear: true,
-            //    yearRange: "-80:+0"
-            //    dateFormat: "dd/mm/yy"
-            //});
-        });
-    </script>
-    <script type="text/javascript">
-        $(function () {
-            if ($('#CityId').val() == -1) {
-                $("#CityId").hide();
-                $("#other_city").show();
-                if ($("select#CityId option").length > 1) {
-                    $("#close_other_city").show();
+            ////function abc() {
+
+            ////    if ($('#IsClicked').prop('checked') == true) {
+            ////        $('#IsClicked').val(true);
+            ////    }
+            ////    else {
+            ////        $('#IsClicked').val(false);
+            ////    }
+            ////}
+            function Addrsame() {
+                var enb = !$('#IsClicked').prop('checked');
+
+                if (enb = "true") {
+                    $('#BillingAddress').prop("disabled", false);
+                    $("#BillingCountryId").prop("disabled", false);
+                    $("#BillingState").prop("disabled", false);
+                    $("#BillingCityId").prop("disabled", false);
+                    $("#BillingZipCode").prop("disabled", false);
+                }
+                if ($('#IsClicked').prop('checked') == true) {
+                    $('#BillingAddress').prop("disabled", true);
+                    $("#BillingCountryId").prop("disabled", true);
+                    $("#BillingState").prop("disabled", true);
+                    $("#BillingCityId").prop("disabled", true);
+                    $("#BillingZipCode").prop("disabled", true);
                 }
             }
-            $('#CountryId').change(function () {
-                $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
-                    if (data != "")
-                        $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
-                    else
-                        $('#State').empty().append('<option selected="selected" value="0">Not available...</option>');
-                    cityLoad();
+            Addrsame();
+            $(function () {
+
+                var now = new Date();
+                now.setDate(now.getDate() + 7);
+
+                var checkin = $('#DateOfBirth').datepicker(
+                    {
+                        minDate: 1,
+                        defaultDate: now,
+                        numberOfMonths: 1,
+                        dateFormat: "dd/mm/yy"
+                    });
+                //$("#DateOfBirth").datepicker({
+                //    changeMonth: true,
+                //    changeYear: true,
+                //    yearRange: "-80:+0"
+                //    dateFormat: "dd/mm/yy"
+                //});
+            });
+        </script>
+        <script type="text/javascript">
+            $(function () {
+                if ($('#CityId').val() == -1) {
+                    $("#CityId").hide();
+                    $("#other_city").show();
+                    if ($("select#CityId option").length > 1) {
+                        $("#close_other_city").show();
+                    }
+                }
+                $('#CountryId').change(function () {
+                    $.get("/Common/GetState?id=" + $('#CountryId').val(), function (data) {
+                        if (data != "")
+                            $('#State').html(data).append('<option selected="selected" value="0">Select</option>');
+                        else
+                            $('#State').empty().append('<option selected="selected" value="0">Not available...</option>');
+                        cityLoad();
+                    });
+                });
+                $('#State').change(function () {
+                    $("#CityId").show();
+                    $("#City").val("");
+                    $("#other_city").hide();
+                    $("#close_other_city").hide();
+                    $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
+                        if (data != "") {
+                            $('#CityId').empty().append(data);
+                            if ($("select#CityId option").length == 1) {
+                                $("#CityId").hide();
+                                $("#City").val("");
+                                $("#other_city").show();
+                            }
+                        }
+                        else {
+                            $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                        }
+                    });
+                });
+
+                $('#CityId').change(function () {
+                    if ($(this).val() == -1) {
+                        $(this).hide();
+                        $("#City").val($("#hdnCity").val());
+                        $("#other_city").show();
+                        $("#close_other_city").show();
+                    }
+                });
+                $('#close_other_city').click(function () {
+                    $("#CityId").show();
+                    $("#City").val("");
+                    $("#other_city").hide();
+                    $("#close_other_city").hide();
                 });
             });
-            $('#State').change(function () {
-                $("#CityId").show();
-                $("#City").val("");
-                $("#other_city").hide();
-                $("#close_other_city").hide();
+
+            //billing
+
+
+            $('#BillingCountryId').change(function () {
+                $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
+                    if (data != "") {
+                        // $('#BillingState').empty().append('<option selected="selected" value="-1">Other</option>');
+                        $('#BillingState').html(data).append('<option selected="selected" value="-1">Select</option>');
+                    }
+                    else {
+                        $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+                    }
+                    BillingCityLoad();
+                });
+            });
+            $('#BillingState').change(function () {
+                $("#BillingCityId").show();
+                $("#BillingCity").val("");
+                $("#other_billing_city").hide();
+                BillingCityLoad();
+            });
+            $('#BillingCityId').change(function () {
+                if ($(this).val() == -1) {
+                    $(this).hide();
+                    $("#BillingCity").val("");
+                    $("#other_billing_city").show();
+                    $("#close_other_billing_city").show();
+                }
+            });
+            $('#close_other_billing_city').click(function () {
+                $("#BillingCityId").show();
+                $("#BillingCity").val("");
+                $("#other_billing_city").hide();
+                $("#close_other_billing_city").hide();
+            });
+            function BillingstateLoad() {
+                $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
+                    if (data != "") {
+                        $('#BillingState').empty().append(data);
+                    }
+                    else {
+                        $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
+                    }
+                });
+            }
+            //function
+            function BillingCityLoad() {
+                $.get("/Common/GetCity?id=" + $('#BillingState').val(), function (data) {
+                    if (data != "") {
+                        $('#BillingCityId').html(data).append('<option selected="selected" value="0">Select</option>');
+                        if ($("select#BillingCityId option").length == 1) {
+                            $("#BillingCityId").hide();
+                            $("#BillingCity").val("");
+                            $("#other_billing_city").show();
+                        }
+                    }
+                    else {
+                        $('#BillingCityId').empty().append('<option selected="selected" value="0">not available...</option>');
+                    }
+                });
+            }
+            //billing
+            function cityLoad() {
                 $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
                     if (data != "") {
                         $('#CityId').empty().append(data);
@@ -373,101 +470,7 @@
                         $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
                     }
                 });
-            });
-
-            $('#CityId').change(function () {
-                if ($(this).val() == -1) {
-                    $(this).hide();
-                    $("#City").val($("#hdnCity").val());
-                    $("#other_city").show();
-                    $("#close_other_city").show();
-                }
-            });
-            $('#close_other_city').click(function () {
-                $("#CityId").show();
-                $("#City").val("");
-                $("#other_city").hide();
-                $("#close_other_city").hide();
-            });
-        });
-
-        //billing
-
-
-        $('#BillingCountryId').change(function () {
-            $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
-                if (data != "") {
-                    // $('#BillingState').empty().append('<option selected="selected" value="-1">Other</option>');
-                    $('#BillingState').html(data).append('<option selected="selected" value="-1">Select</option>');
-                }
-                else {
-                    $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
-                }
-                BillingCityLoad();
-            });
-        });
-        $('#BillingState').change(function () {
-            $("#BillingCityId").show();
-            $("#BillingCity").val("");
-            $("#other_billing_city").hide();
-            BillingCityLoad();
-        });
-        $('#BillingCityId').change(function () {
-            if ($(this).val() == -1) {
-                $(this).hide();
-                $("#BillingCity").val("");
-                $("#other_billing_city").show();
-                $("#close_other_billing_city").show();
             }
-        });
-        $('#close_other_billing_city').click(function () {
-            $("#BillingCityId").show();
-            $("#BillingCity").val("");
-            $("#other_billing_city").hide();
-            $("#close_other_billing_city").hide();
-        });
-        function BillingstateLoad() {
-            $.get("/Common/GetState?id=" + $('#BillingCountryId').val(), function (data) {
-                if (data != "") {
-                    $('#BillingState').empty().append(data);
-                }
-                else {
-                    $('#BillingState').empty().append('<option selected="selected" value="0">not available...</option>');
-                }
-            });
-        }
-        //function
-        function BillingCityLoad() {
-            $.get("/Common/GetCity?id=" + $('#BillingState').val(), function (data) {
-                if (data != "") {
-                    $('#BillingCityId').html(data).append('<option selected="selected" value="0">Select</option>');
-                    if ($("select#BillingCityId option").length == 1) {
-                        $("#BillingCityId").hide();
-                        $("#BillingCity").val("");
-                        $("#other_billing_city").show();
-                    }
-                }
-                else {
-                    $('#BillingCityId').empty().append('<option selected="selected" value="0">not available...</option>');
-                }
-            });
-        }
-        //billing
-        function cityLoad() {
-            $.get("/Common/GetCity?id=" + $('#State').val(), function (data) {
-                if (data != "") {
-                    $('#CityId').empty().append(data);
-                    if ($("select#CityId option").length == 1) {
-                        $("#CityId").hide();
-                        $("#City").val("");
-                        $("#other_city").show();
-                    }
-                }
-                else {
-                    $('#CityId').empty().append('<option selected="selected" value="0">not available...</option>');
-                }
-            });
-        }
 
-    </script>
-</div>
+        </script>
+    </div>

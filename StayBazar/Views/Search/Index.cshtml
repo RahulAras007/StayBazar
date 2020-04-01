@@ -2466,7 +2466,7 @@
         var testimgsrc = "/Files/Property/testgdsimg.jpg";
 
         for (var i=start;i<=end;i++)
-           // for (var i=0;i<ResultItem.Results.length;i++)
+           //for (var i=0;i<ResultItem.Results.length;i++)
         {
 
 
@@ -2475,9 +2475,24 @@
             var imgExists = ResultItem.Results[i].IsImageExists;
             var InventoryAPIType = ResultItem.Results[i].InventoryAPIType;
             var StarRate = ResultItem.Results[i].StarRate;
-            var Rating = ResultItem.Results[i].StarRating;
+           var Rating = ResultItem.Results[i].StarRating;
             var HotelID = ResultItem.Results[i].HotelID;
             var APIType = ResultItem.Results[i].InventoryAPIType;
+            var RateCardDetailedId = ResultItem.Results[i].RateCardDetailedId;
+            var TaxPercentage = ResultItem.Results[i].TaxPercentage;
+            var GSTSlab = ResultItem.Results[i].GSTSlab;
+            var StateId = ResultItem.Results[i].StateId;
+            var CityId = ResultItem.Results[i].CityId;
+            var AccommodationTpeID = ResultItem.Results[i].AccommodationTpeID;
+            var StayCategoryID = ResultItem.Results[i].StayCategoryID;
+            var Amount = ResultItem.Results[i].Amount;
+            var AmountWithTax = ResultItem.Results[i].AmountWithTax;
+            var price = ResultItem.Results[i].price;
+            var ResultIndex = ResultItem.Results[i].ResultIndex;
+            var TraceID = ResultItem.Results[i].TraceID;
+            //var ErrorCode = ResultItem.Results[i].ErrorCode;
+            var Description = ResultItem.Results[i].Description;
+            var InventoryAPIType = ResultItem.Results[i].InventoryAPIType;
             //var SessionID = ResultItem.Results[i].SessionID;
             //alert(result.Results.SessionID);
 
@@ -2486,10 +2501,12 @@
             }
 
                Title=Title.replace("<","").replace(">","");
-            sparam = sparam + '&title=' + Title + '&HotelID=' + HotelID;
-            sparam = sparam + '&APIType=' + APIType;
-            //alert(sparam);
-            var PropertyIDParam = '/property/property?propertyid=' + ResultItem.Results[i].PropertyId+ sparam ;
+            //sparam = sparam + '&HotelID=' + HotelID + '&AccommodationTpeID=' + AccommodationTpeID + '&StayCategoryID=' + StayCategoryID + '&Amount=' + Amount + '&AmountWithTax=' + AmountWithTax + '&ResultIndex=' + ResultIndex + '&TraceID=' + TraceID + '&Description=' + Description;
+            sparam = sparam + '&APIType=' + APIType ;/*+ APIType + '&RateCardDetailedId=' + RateCardDetailedId + '&TaxPercentage=' + TaxPercentage + '&GSTSlab=' + GSTSlab + '&StateId=' + StateId + '&CityId=' + CityId + '&price=' + price  ;*/
+            ////alert(sparam);
+            var PropertyIDParam = '/property/property?propertyid=' + ResultItem.Results[i].PropertyId + '&title=' + ResultItem.Results[i].Title +
+            '&HotelID=' + ResultItem.Results[i].HotelID + '&AccommodationTpeID=' + ResultItem.Results[i].AccommodationTpeID + '&StayCategoryID=' + ResultItem.Results[i].StayCategoryID + '&Amount=' + ResultItem.Results[i].Amount + '&AmountWithTax=' + ResultItem.Results[i].AmountWithTax + '&ResultIndex=' + ResultItem.Results[i].ResultIndex + '&TraceID=' + ResultItem.Results[i].TraceID + '&Description=' + ResultItem.Results[i].Description
+                + '&RateCardDetailedId=' + ResultItem.Results[i].RateCardDetailedId + '&TaxPercentage=' + ResultItem.Results[i].TaxPercentage + '&GSTSlab=' + ResultItem.Results[i].GSTSlab + '&StateId=' + ResultItem.Results[i].StateId + '&CityId=' + ResultItem.Results[i].CityId + '&price=' + ResultItem.Results[i].price + '&InventoryAPIType=' + ResultItem.Results[i].InventoryAPIType + sparam;
            //ResultString=ResultString+'<div class=\"col-md-12 listingbox\">\n' ;
            //ResultString=ResultString+'    <div class=\"listing\">\n' ;
            //ResultString=ResultString+'        <div class=\"col-md-4 pad0\">\n' ;

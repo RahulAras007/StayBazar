@@ -4,6 +4,9 @@
     ViewBag.Title = "My Stays";
     string firstid = "";
 }
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
 <div class="container bdy_min_height">
     @{
         long cid = 0;
@@ -42,35 +45,44 @@
     </script>
     <ul class="nav nav-tabs" id="myTab">
         <li class="active"><a href="#Recent" data-toggle="tab">Recent</a></li>
-        @if ((a == CLayer.Role.Roles.Corporate)|| (a == CLayer.Role.Roles.CorporateUser))
+        @if ((a == CLayer.Role.Roles.Corporate) || (a == CLayer.Role.Roles.CorporateUser))
         {
             <li><a href="#CreditBook" data-toggle="tab">Credit Bookings</a></li>
         }
-        <li><a href="#History" data-toggle="tab" >My Bookings</a></li>
+        <li><a href="#History" data-toggle="tab">My Bookings</a></li>
         <li><a href="#Other" data-toggle="tab">Booking Queries</a></li>
-     @if(Model.OtherofflineBookinglist.Count>0  && Model.OtherofflineBookinglist!=null){   <li><a href="#offlineOthers" data-toggle="tab">Others</a></li>}
-     
-     @if (Model.ReadyForBookinglist.Count > 0 && Model.ReadyForBookinglist != null)  { <li><a href="#ReadyForBookings" data-toggle="tab" style="display:none">Ready for Booking</a></li>}
-    @if (Model.RejectedBookinglist.Count > 0 && Model.RejectedBookinglist != null)   { <li><a href="#RejectedBookings" data-toggle="tab">Failed/Rejected Bookings</a></li> }
+        @if (Model.OtherofflineBookinglist.Count > 0 && Model.OtherofflineBookinglist != null)
+        {
+            <li><a href="#offlineOthers" data-toggle="tab">Others</a></li>
+}
+
+        @if (Model.ReadyForBookinglist.Count > 0 && Model.ReadyForBookinglist != null)
+        {
+            <li><a href="#ReadyForBookings" data-toggle="tab" style="display:none">Ready for Booking</a></li>
+}
+        @if (Model.RejectedBookinglist.Count > 0 && Model.RejectedBookinglist != null)
+        {
+            <li><a href="#RejectedBookings" data-toggle="tab">Failed/Rejected Bookings</a></li>
+}
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="Recent">
             @if (ViewBag.Message != null)
             {
-            <div class="alert alert-danger">
-                @ViewBag.Message
-            </div>
+                <div class="alert alert-danger">
+                    @ViewBag.Message
+                </div>
             }
             <div class="row" id="ResentList">
                 @Html.Partial("~/Views/BookingHistory/_Recent.cshtml", Model.Bookinglist)
             </div>
         </div>
-        <div class="tab-pane " id="History" >
+        <div class="tab-pane " id="History">
             @if (ViewBag.Message != null)
             {
-            <div class="alert alert-danger">
-                @ViewBag.Message.
-            </div>
+                <div class="alert alert-danger">
+                    @ViewBag.Message.
+                </div>
             }
             <div class="row">
                 <div class="col-md-6">
@@ -78,11 +90,11 @@
                         <div class="row">
                             <div class="col-md-12">
                                 Months :  @foreach (StayBazar.Models.BookingHistoryModel.searchingperiod ruv in (StayBazar.Models.BookingHistoryModel.searchingperiod[])Enum.GetValues(typeof(StayBazar.Models.BookingHistoryModel.searchingperiod)))
-                                          {
-                                           if (firstid == "") { firstid =((int) ruv).ToString(); }
-                                <input type="radio" name="ruv" onclick="FillHistory(@((int)ruv))" class="css-radiobutton12" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text>                   } />
-                                <label for="@((int)ruv)" class="css-label">@ruv.ToString() </label>
-                                <text>&nbsp;&nbsp;</text>
+                                {
+                                    if (firstid == "") { firstid = ((int)ruv).ToString(); }
+                                    <input type="radio" name="ruv" onclick="FillHistory(@((int)ruv))" class="css-radiobutton12" id="@((int)ruv)" @if ((int)ruv == 1) { <text> checked </text> } />
+                                    <label for="@((int)ruv)" class="css-label">@ruv.ToString() </label>
+                                    <text>&nbsp;&nbsp;</text>
                                 }
                                 @Html.HiddenFor(m => m.Searchvalue)
                             </div>
@@ -109,20 +121,20 @@
                     @Html.Partial("~/Views/BookingHistory/CorporateCreditBookings.cshtml", Model.CreditBookinglist)
                 </div>
             </div>
-                }
-                <div class="tab-pane" id="Other">
-                    <div class="row" id="OtherList">
-                        @Html.Partial("~/Views/BookingHistory/_Other.cshtml", Model.OtherBookinglist)
-                    </div>
+        }
+        <div class="tab-pane" id="Other">
+            <div class="row" id="OtherList">
+                @Html.Partial("~/Views/BookingHistory/_Other.cshtml", Model.OtherBookinglist)
+            </div>
+        </div>
+        @if (Model.OtherofflineBookinglist.Count > 0 && Model.OtherofflineBookinglist != null)
+        {
+            <div class="tab-pane" id="offlineOthers">
+                <div class="row" id="offlineOthersList">
+                    @Html.Partial("~/Views/BookingHistory/offlineIndex.cshtml", Model.OtherofflineBookinglist)
                 </div>
-                @if (Model.OtherofflineBookinglist.Count > 0 && Model.OtherofflineBookinglist != null)
-                {
-                    <div class="tab-pane" id="offlineOthers">
-                        <div class="row" id="offlineOthersList">
-                            @Html.Partial("~/Views/BookingHistory/offlineIndex.cshtml", Model.OtherofflineBookinglist)
-                        </div>
-                    </div>
-                }
+            </div>
+        }
 
         <div class="tab-pane" id="ReadyForBookings" style="display:none">
             <div class="row" id="ReadyForBookingsList">
@@ -135,7 +147,7 @@
             </div>
         </div>
 
-            </div>
+    </div>
 </div>
 @Html.Partial("~/Views/Cancellation/_CancelBox.cshtml")
 @Html.Partial("~/Views/Cancellation/_Policy.cshtml")

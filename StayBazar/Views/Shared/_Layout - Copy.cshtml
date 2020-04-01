@@ -807,10 +807,10 @@
 
     @*livserv chat section*@
 
-    @*@{*@
-        @*//format of assign day --- (dayname)_(time1)-(time2)*@
+    @{
+        //format of assign day --- (dayname)_(time1)-(time2)
 
-        @*string assigndayforzopim = System.Configuration.ConfigurationManager.AppSettings.Get("assigndayforzopim");
+        string assigndayforzopim = System.Configuration.ConfigurationManager.AppSettings.Get("assigndayforzopim");
 
         int ChatEnable = 2;
         string ChatScript = "";
@@ -883,7 +883,7 @@
 
 
 
-    @Html.Raw(HttpUtility.HtmlDecode(ChatScript))*@
+    @Html.Raw(HttpUtility.HtmlDecode(ChatScript))
 
 
 
@@ -901,6 +901,7 @@
 
     <script type="text/javascript">
 
+        /* <![CDATA[ */
 
         var google_conversion_id = 962412488;
 
@@ -908,10 +909,11 @@
 
         var google_remarketing_only = true;
 
+/* ]]> */
 
     </script>
 
-    @*<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+    <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
 
     </script>
 
@@ -919,7 +921,7 @@
         <div style="display:inline;">
             <img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/962412488/?value=0&amp;guid=ON&amp;script=0" />
         </div>
-    </noscript>*@
+    </noscript>
 
 
     <script src="https://cwc.livserv.in/chat.js?lid=9737" id="lp_cwc_xqzyihjdskw"></script>

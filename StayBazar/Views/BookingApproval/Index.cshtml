@@ -6,16 +6,12 @@
 @section scripts{
     <script src="~/Scripts/custom_pager.js"></script>
 }
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
 
-<script src="~/Scripts/jquery.bootpag.min.js"></script>
-<link href="~/Content/styles.css" rel="stylesheet" />
-<div class="container bdy_min_height">
-    @*@Styles.Render("~/Content/css")*@
-    @*@Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/jqueryui")
-        @Scripts.Render("~/bundles/jqueryval")*@
-    @Scripts.Render("~/bundles/bootstrap")
-    @Styles.Render("~/Content/bootcss")
+   @* @Scripts.Render("~/bundles/bootstrap")*@
+   @* @Styles.Render("~/Content/bootcss")*@
 
     @{
         long cid = 0;

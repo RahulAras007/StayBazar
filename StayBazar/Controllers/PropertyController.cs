@@ -732,7 +732,7 @@ namespace StayBazar.Controllers
                         if (accIds.Count == 0)
                             rtes = new List<CLayer.Rates>();
                         else
-                            rtes = BLayer.Rate.GetTotalRates(accIds, bookingData.HiddenCheckIn, bookingData.HiddenCheckOut, ((isCorp) ? CLayer.Role.Roles.Corporate : CLayer.Role.Roles.Customer), userId,InventoryAPIType);
+                            rtes = BLayer.Rate.GetTotalRates(accIds, bookingData.HiddenCheckIn, bookingData.HiddenCheckOut, ((isCorp) ? CLayer.Role.Roles.Corporate : CLayer.Role.Roles.Customer), userId, InventoryAPIType);
                         int cnt, idx;
                         cnt = property.Accommodations.Accommodations.Count();
                         //ViewBag.AmedusRoomsList = RoomStaysResultList.Count;
@@ -1108,8 +1108,38 @@ namespace StayBazar.Controllers
                  }
                  return View("Index", property);
              }*/
+        public long GetUserId()
+        {
+            long userId = 0;
+            if (User.Identity.IsAuthenticated)
+            {
+                long.TryParse(User.Identity.GetUserId(), out userId);
+            }
+            else
+                if (Session[CLayer.ObjectStatus.GUEST_ID_SESSION] != null)
+            {
+                userId = (long)Session[CLayer.ObjectStatus.GUEST_ID_SESSION];
+            }
+            return userId;
+        }
+        public static string TBOHotelRoomRequest(CLayer.SearchCriteria room)
+        {
+            string tokenid = BLayer.TBO.TokenID();
+            CLayer.TBOHotelRoom param1 = new CLayer.TBOHotelRoom
+            {
+                EndUserIp = Dns.GetHostEntry(Dns.GetHostName()).AddressList[1].ToString(),
+                TokenId = tokenid,
+                TraceId = room.TraceId,
+                ResultIndex = room.ResultIndex,
+                HotelCode = room.HotelCode
+            };
 
+            string requestdata = Newtonsoft.Json.JsonConvert.SerializeObject(param1);
+            string authurl = "http://api.tektravels.com/BookingEngineService_Hotel/hotelservice.svc/rest/GetHotelRoom";
 
+            string responsedata = BLayer.TBO.GetResponse(requestdata, authurl);
+            return responsedata;
+        }
         public async Task<ActionResult> Property(Models.SearchParamModel data)
         {
             Session["ReturnUrl"] = Request.Url.AbsoluteUri;
@@ -1120,6 +1150,81 @@ namespace StayBazar.Controllers
             {
                 ViewBag.Destination = data.Destination.ToLower();
             }
+            long ldt_property = 0;
+            Models.PropertyModel objData;
+            objData = new Models.PropertyModel();
+            if (data.InventoryAPIType == 4)
+            {
+
+                objData.Title = data.title;
+                objData.CityId = data.CityId;
+                objData.State = data.StateId;
+                objData.HotelId = data.HotelID;
+                objData.InventoryAPIType = Convert.ToInt32(data.InventoryAPIType);
+                objData.TamarindFlag = "Y";
+                objData.RateCardDetailedId = data.RateCardDetailedId;
+                objData.OwnerId = GetUserId();
+                objData.TaxPercentage = data.TaxPercentage;
+                objData.GSTSlab = data.GSTSlab;
+                ldt_property = await SaveAmadeus_Property(objData);
+                Models.AccommodationModel acc;
+                acc = new Models.AccommodationModel();
+                acc.AccommodationTypeId = data.AccommodationTpeID;
+                acc.StayCategoryId = data.StayCategoryID;
+                acc.PropertyId = ldt_property;
+                acc.CheckIn = Convert.ToDateTime(data.CheckIn);
+                acc.CheckOut = Convert.ToDateTime(data.CheckOut);
+                acc.Amount = data.price;
+                acc.AmountWithTax = data.Amount;
+                AccommodationSaveByAPI(acc);
+            }
+            else if (data.InventoryAPIType == 5)
+            {
+                objData.Title = data.title;
+                objData.CityId = data.CityId;
+                objData.State = data.StateId;
+                objData.HotelId = data.HotelID;
+                objData.TBOHotelId = data.HotelID;
+                objData.InventoryAPIType = 5;
+                objData.TBOFlag = "Y";
+                objData.OwnerId = GetUserId();
+                objData.TaxPercentage = data.TaxPercentage;
+                objData.GSTSlab = data.GSTSlab;
+                ldt_property = await SaveAmadeus_Property(objData);
+                CLayer.SearchCriteria srch = new CLayer.SearchCriteria();
+
+                srch.TraceId = data.TraceID;
+                srch.ResultIndex = data.ResultIndex;
+                srch.HotelCode = data.HotelID;
+                string TBORoomResult = TBOHotelRoomRequest(srch);
+                DataSet lds_tboroom = new DataSet();
+                lds_tboroom.ReadXml(GenerateStreamFromString(TBORoomResult));
+                if (int.Parse(lds_tboroom.Tables["Error"].Rows[0]["ErrorCode"].ToString()) == 0)
+                {
+                    for (int j = 0; j < 1; j++)
+                    {
+                       decimal price = Convert.ToDecimal((lds_tboroom.Tables[4].Rows[j]["OfferedPriceRoundedOff"]).ToString());
+                       decimal ld_apigst = Convert.ToDecimal((lds_tboroom.Tables[4].Rows[j]["TotalGSTAmount"]).ToString());
+                       decimal Tax = (10 * (price + ld_apigst)) / 100;
+                       decimal amount = price + ld_apigst + Tax;
+                       int ldt_catid = BLayer.AccommodationType.TBOAccommodationTypeSave(lds_tboroom.Tables[2].Rows[j]["RoomTypeName"].ToString());
+                        Models.AccommodationModel acc;
+                        acc = new Models.AccommodationModel();
+                        acc.AccommodationTypeId = ldt_catid;
+                        acc.StayCategoryId = 39;//default set as hotel 
+                        acc.PropertyId = ldt_property;
+                        acc.Description = data.Description;
+                        acc.CheckIn = Convert.ToDateTime(data.CheckIn);
+                        acc.CheckOut = Convert.ToDateTime(data.CheckOut);
+                        acc.Amount = price;
+                        acc.AmountWithTax = amount;
+                        AccommodationSaveByAPI(acc);
+
+                    }
+                }
+               
+            }
+
 
             ViewBag.Bedrooms = data.Bedrooms;
             ViewBag.CheckIn = data.CheckIn;
@@ -1142,6 +1247,7 @@ namespace StayBazar.Controllers
 
                 int Inventorytype = BLayer.Property.GetPropertyInventoryAPIType(data.PropertyId);
                 int TamarindInventoryType = BLayer.Property.GetTamarindInventoryAPITypeId(data.PropertyId);
+                int TBOInventoryType = BLayer.Property.GetTBOInventoryAPITypeId(data.PropertyId);
 
                 if (Inventorytype == 2)
                 {
@@ -1163,12 +1269,13 @@ namespace StayBazar.Controllers
                     var firstdate = starts.ToString("yyyy-MM-dd");
                     var lastdate = ends.ToString("yyyy-MM-dd");
 
-                    long PropertyId = BLayer.Property.GetPropertyIdFromTamarindId(data.PropertyId);
+                    long PropertyId = ldt_property;
+                    //long PropertyId = BLayer.Property.GetPropertyIdFromTamarindId(data.PropertyId);
                     data.PropertyId = PropertyId;
                     //return (await TamrindPropertyDetails(PropertyId, firstdate, lastdate, data));
 
                 }
-                if (Inventorytype == 5 || TamarindInventoryType == 5)
+                if (Inventorytype == 5 || TBOInventoryType == 5)
                 {
                     DateTime starts = DateTime.Parse(data.CheckIn);
                     DateTime ends = DateTime.Parse(data.CheckOut);
@@ -1176,6 +1283,9 @@ namespace StayBazar.Controllers
                     var firstdate = starts.ToString("yyyy-MM-dd");
                     var lastdate = ends.ToString("yyyy-MM-dd");
 
+                    long PropertyId = ldt_property;
+                    //long PropertyId = BLayer.Property.GetPropertyIdFromTamarindId(data.PropertyId);
+                    data.PropertyId = PropertyId;
                     //return (await TBOPropertyDetails(data.PropertyId, firstdate, lastdate, data));
 
                 }
@@ -1199,6 +1309,152 @@ namespace StayBazar.Controllers
                 Common.LogHandler.HandleError(ex);
             }
             return View("Index", property);
+        }
+        public async Task<long> SaveAmadeus_Property(Models.PropertyModel data)
+        {
+            try
+            {
+
+                CLayer.Property prprty = new CLayer.Property()
+                {
+
+                    PropertyId = data.PropertyId,
+                    Title = data.Title,
+                    Description = data.Description,
+                    Location = data.Location,
+                    Status = (CLayer.ObjectStatus.StatusType)data.Status,
+                    OwnerId = data.OwnerId,
+                    Address = data.Address,
+                    Country = data.Country,
+                    State = data.State,
+                    City = data.City,
+                    CityId = data.CityId,
+                    ZipCode = data.ZipCode,
+                    PropertyInventoryType = data.InventoryAPIType,
+                    HotelID = data.HotelId,
+                    TBOHotelId = data.TBOHotelId,
+                    TBOFlag = data.TBOFlag,
+                    TamarindHotelId = data.TamarindHotelId,
+                    TamarindFlag = data.TamarindFlag,
+                    RateCardDetailedId = data.RateCardDetailedId,
+                    TaxPercentage = data.TaxPercentage,
+                    GSTSlab = data.GSTSlab
+                };
+                string loc = "";
+                try
+                {
+
+                    string statename = data.StateName;
+                    string cityname;
+                    //if (data.Country == 0)
+                    //{
+
+                    //}
+                    if (data.CityId < 1)
+                    {
+                        cityname = data.City;
+                    }
+                    else
+                    {
+                        cityname = BLayer.City.Get(data.CityId).Name;
+                        data.City = cityname;
+                        prprty.City = cityname;
+                    }
+                    string Countryname = data.CountryName;// BLayer.Country.Get(data.Country).Name;
+                    loc = cityname + "," + statename + "," + Countryname + "," + data.ZipCode;
+                    string qAdddress = data.Title + "," + data.Address + "," + loc;
+
+                    //Common.Utils.Location pos;
+
+                    //pos = await Common.Utils.GetLocation(qAdddress);
+                    prprty.PositionLat = null;
+                    prprty.PositionLng = null;
+
+                }
+                catch (Exception ex)
+                {
+                    Common.LogHandler.LogError(ex);
+                }
+
+
+                data.PropertyId = BLayer.Property.SaveAmadeus_Property(prprty);
+                return data.PropertyId;
+
+            }
+            catch (Exception ex)
+            {
+                Common.LogHandler.HandleError(ex);
+                return 0;
+            }
+        }
+        public void AccommodationSaveByAPI(Models.AccommodationModel data)
+        {
+            try
+            {
+
+                string userid = (User == null) ? "0" : User.Identity.GetUserId();
+                long id = 0;
+                long.TryParse(userid, out id);
+                //if (ModelState.IsValid)
+                //{
+                CLayer.Accommodation accmdtn = new CLayer.Accommodation()
+                {
+                    AccommodationId = data.AccommodationId,
+                    PropertyId = data.PropertyId,
+                    AccommodationTypeId = data.AccommodationTypeId,
+                    StayCategoryId = data.StayCategoryId,
+                    AccommodationCount = 1,
+                    Description = data.Description,
+                    //Location = data.Location,
+                    MaxNoOfPeople = 0,
+                    MaxNoOfChildren = 0,
+                    MinNoOfPeople = 0,
+                    BedRooms = 0,
+                    Area = 0,
+                    Status = 1,
+                    TotalAccommodations = 1,
+                    UpdatedById = id
+                };
+                if (accmdtn.MaxNoOfPeople < accmdtn.MinNoOfPeople) accmdtn.MaxNoOfPeople = accmdtn.MinNoOfPeople;
+                if (accmdtn.MaxNoOfPeople < accmdtn.MaxNoOfChildren) accmdtn.MaxNoOfPeople = accmdtn.MaxNoOfChildren;
+                long accId = BLayer.Accommodation.Save_API(accmdtn);
+
+                CLayer.Inventory inv = new CLayer.Inventory()
+                {
+                    AccommodationId = accId,
+                    Quantity = 2,
+                    FromDate = data.CheckIn,
+                    ToDate = data.CheckOut
+                };
+                BLayer.Inventory.APIsave(inv);
+                DateTime enddate = (data.CheckIn).AddDays(20);
+                CLayer.Rates rate = new CLayer.Rates()
+                {
+                    AccommodationId = accId,
+                    RateFor = 7,
+                    DailyRate = data.Amount,
+                    WeeklyRate = 0,
+                    LongTermRate = 0,
+                    MonthlyRate = 0,
+                    GuestRate = 0,
+                    StartDate = data.CheckIn,
+                    EndDate = enddate,
+                    Status = 1,
+                    UpdatedBy = id,
+                    SellRateAfterTax = data.AmountWithTax
+                };
+                BLayer.Rate.APISave(rate);
+
+
+                if (data.RoomId == null) { data.RoomId = ""; }
+
+                //  BLayer.Accommodation.SetRoomId(data.AccommodationId, data.RoomId.Trim());
+            }
+            catch (Exception ex)
+            {
+                Common.LogHandler.HandleError(ex);
+
+            }
         }
 
         //public static string TBOMultiSingleAvailability(string hotelcode, string start, string end)
@@ -4354,7 +4610,7 @@ namespace StayBazar.Controllers
         }
 
         [AllowAnonymous]
-        public ContentResult CheckAccommodationAvailable(long PropertyId, string BookingData, string CheckIn, string CheckOut,string BookingForSelfValue, string NewBillingForValue)
+        public ContentResult CheckAccommodationAvailable(long PropertyId, string BookingData, string CheckIn, string CheckOut, string BookingForSelfValue, string NewBillingForValue)
         {
             int InventoryAPIType = BLayer.Property.GetInventoryAPITypeId(PropertyId);
 
@@ -4363,7 +4619,7 @@ namespace StayBazar.Controllers
             {
                 string HotelId = BLayer.Property.GetHotelId(PropertyId);
                 string RateCardDetailId = BLayer.Property.GetRateCardDetailId(PropertyId);
-                string  cityid = BLayer.Property.GetTamrindCityID(PropertyId);
+                string cityid = BLayer.Property.GetTamrindCityID(PropertyId);
                 int CategoryID = 0;
 
                 if (HotelId != null && HotelId != "")
@@ -4883,12 +5139,12 @@ namespace StayBazar.Controllers
             HotelParm.HotelID = sch.PropertyId.ToString();
             HotelParm.Rating = "";
             string hotel = client.GetHotels(HotelParm);
-            
+
             return hotel;
         }
         public static string TamrindInsertCartItem(CLayer.SearchCriteria sch)
         {
-            BookingServiceRef.BookingServiceClient  client = new BookingServiceRef.BookingServiceClient();
+            BookingServiceRef.BookingServiceClient client = new BookingServiceRef.BookingServiceClient();
 
             client.ClientCredentials.UserName.UserName = "STAYBAZARXMLTEST";
             client.ClientCredentials.UserName.Password = "STAYBAZARXMLTEST";
@@ -4897,19 +5153,19 @@ namespace StayBazar.Controllers
             BookingServiceRef.CartPaxDetails cartPax = new BookingServiceRef.CartPaxDetails
             {
 
-                    CartItemID = 0,
-                    LeadName = true,
-                    PaxFirstName = "test",
-                    PaxID = 0,
-                    PaxLastName = "test",
-                    PaxSalutation = "Ms",
-                    RoomType = "double"
+                CartItemID = 0,
+                LeadName = true,
+                PaxFirstName = "test",
+                PaxID = 0,
+                PaxLastName = "test",
+                PaxSalutation = "Ms",
+                RoomType = "double"
 
             };
 
-            BookingServiceRef.CartPaxDetails[] test = new BookingServiceRef.CartPaxDetails[] { cartPax }; 
+            BookingServiceRef.CartPaxDetails[] test = new BookingServiceRef.CartPaxDetails[] { cartPax };
 
-            BookingServiceRef.CartItem  InsCartItem = new BookingServiceRef.CartItem();
+            BookingServiceRef.CartItem InsCartItem = new BookingServiceRef.CartItem();
             InsCartItem.HotelID = Convert.ToInt32(sch.HotelID);
             InsCartItem.HotelRateCartDetailID = sch.RateCardDetailId;
             InsCartItem.CityID = sch.cityid;

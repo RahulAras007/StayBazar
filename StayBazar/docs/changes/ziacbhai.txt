@@ -1516,3 +1516,65 @@ $$
 ALTER TABLE bookingdetails MODIFY Guestname VARCHAR(2000)
 $$
 ALTER TABLE bookingdetails MODIFY Guestemail VARCHAR(500);
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+27/03/2020
+
+USE `staybazar_data`;
+DROP procedure IF EXISTS `property_GetTBOInventoryAPITypeId`;
+
+DELIMITER $$
+USE `staybazar_data`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `property_GetTBOInventoryAPITypeId`( pTamarindHotelId BIGINT)
+BEGIN
+      select p.`InventoryAPIType` from property p WHERE tbo_hotelid = pTamarindHotelId; 
+END$$
+
+DELIMITER ;
+
+
+--------------------------------------------------------------------
+
+28/03/2020
+
+USE `staybazar_data`;
+DROP procedure IF EXISTS `property_GetTamarindInventoryAPITypeId`;
+
+DELIMITER $$
+USE `staybazar_data`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `property_GetTamarindInventoryAPITypeId`( pTamarindHotelId BIGINT)
+BEGIN
+	select p.`InventoryAPIType` from property p WHERE InventoryAPIType <> 0 and tamarind_hotelid = pTamarindHotelId; 
+	
+    END$$
+
+DELIMITER ;
+
+--------------------------------------------------------------------
+
+31/03/2020
+
+USE `staybazar_data`;
+DROP procedure IF EXISTS `sp_TBO_accommodationtype_Save`;
+
+DELIMITER $$
+USE `staybazar_data`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_TBO_accommodationtype_Save`( 
+						     IN pTitle VARCHAR(500)
+						    )
+BEGIN
+	IF NOT EXISTS (SELECT *  FROM accommodationtype WHERE Title = pTitle) THEN 
+		INSERT INTO accommodationtype(`Title`)
+			VALUES(pTitle);
+			SELECT  LAST_INSERT_ID() AS TypeId;
+	ELSE 
+		SELECT AccommodationTypeId AS TypeId FROM accommodationtype 
+		WHERE Title = pTitle ORDER BY AccommodationTypeId DESC LIMIT 1;
+	END IF;
+END$$
+
+DELIMITER ;
+
