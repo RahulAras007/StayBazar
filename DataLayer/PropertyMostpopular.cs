@@ -256,5 +256,24 @@ namespace DataLayer
             }
             return result;
         }
+        public List<CLayer.Property> PreferedProperties(string Destination,string Userid)
+        {
+            List<DataPlug.Parameter> param = new List<DataPlug.Parameter>();
+            param.Add(Connection.GetParameter("pDestination", DataPlug.DataType._Varchar, Destination));
+            param.Add(Connection.GetParameter("puserId", DataPlug.DataType._Varchar, Userid));
+            DataTable dt = Connection.GetTable("SP_Prefered_properties", param);
+            List<CLayer.Property> result = new List<CLayer.Property>();
+            CLayer.Property temp;
+            foreach (DataRow dr in dt.Rows)
+            {
+                temp = new CLayer.Property();
+                temp.PropertyId = Connection.ToLong(dr["PropertyId"]);
+                temp.Title = Connection.ToString(dr["Title"]);
+                temp.City = Connection.ToString(dr["City"]);
+                temp.InventoryAPIType = Connection.ToInteger(dr["InventoryAPIType"]);
+                result.Add(temp);
+            }
+            return result;
+        }
     }
 }

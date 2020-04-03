@@ -55,8 +55,12 @@ namespace BLayer
             DataLayer.PropertyMostpopular property = new DataLayer.PropertyMostpopular();
             return property.InterestedPropertiesGetWithGDS(PropertyId, PropertyStatus, UserStstus, Limit);
         }
-
-
+        //PreferedProperties
+        public static List<CLayer.Property> PreferedProperties(string Destination, string Userid)
+        {
+            DataLayer.PropertyMostpopular property = new DataLayer.PropertyMostpopular();
+            return property.PreferedProperties(Destination, Userid);
+        }
 
 
 

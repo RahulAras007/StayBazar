@@ -483,7 +483,7 @@ namespace StayBazar.Controllers
                         AmadeusResults.Pincode = "";
                         AmadeusResults.PropertyCount = lds_auth.Tables["hotels"].Rows.Count;
                         AmadeusResults.Avail = 0;
-                        AmadeusResults.HotelID = (lds_auth.Tables["hotel"].Rows[i]["CityID"]).ToString();
+                        AmadeusResults.HotelID = (lds_auth.Tables["hotel"].Rows[i]["HotelID"]).ToString();
                         AmadeusResults.InventoryAPIType = 4;
                         AmadeusResults.APIType = "";
                         AmadeusResults.GDSCurrencyCode = Session["GDSCurrencyCode"].ToString();
@@ -4522,6 +4522,14 @@ namespace StayBazar.Controllers
                 userId = (long)Session[CLayer.ObjectStatus.GUEST_ID_SESSION];
             }
             return userId;
+        }
+        public ActionResult GetPreferdHotels(Models.SearchParamModel param)
+        {
+            CLayer.SearchCriteria srch = new CLayer.SearchCriteria();
+            ViewBag.Destination = param.Destination;
+            ViewBag.CheckIN = param.CheckIn;
+            ViewBag.CheckOUT = param.CheckOut;
+            return View();
         }
     }
 

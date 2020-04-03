@@ -1578,3 +1578,74 @@ END$$
 
 DELIMITER ;
 
+-------------------------------------------------------------------------
+1/4/2020
+
+USE `staybazar_data`;
+DROP procedure IF EXISTS `transaction_PropertyAddress`;
+
+DELIMITER $$
+USE `staybazar_data`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `transaction_PropertyAddress`(pPropertyId BIGINT)
+BEGIN   
+        select  p.`PropertyId`,p.ZipCode,p.Phone,p.Mobile,p.Title AS PropertyTitle,p.Address AS PropertyAddress,cc.Name as city,c.`Name`AS CountryName,s.`Name` AS StateName
+        from  property p 
+        Left join city cc on p.cityid = cc.cityid
+	Left JOIN `state` s ON p.`State`=s.`StateId`
+	Left JOIN `country` c ON p.`Country`=c.`CountryId`
+	where p.`PropertyId`=pPropertyId;
+    END$$
+
+DELIMITER ;
+
+------------------------------------------------------------------------
+
+1/4/2020
+
+USE `staybazar_data`;
+DROP procedure IF EXISTS `Sp_GetTamrindCityId`;
+
+DELIMITER $$
+USE `staybazar_data`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Sp_GetTamrindCityId`( pPropertyId BIGINT)
+BEGIN
+	select cityid from city where name=(select City from property 
+	WHERE PropertyId = pPropertyId);
+END$$
+
+DELIMITER ;
+
+
+-------------------------------------------------------------------------
+
+
+4/3/2020
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SP_Prefered_properties`(pDestination varchar(50),puserId varchar(20))
+BEGIN
+Select p.propertyid,p.title,p.city,p.InventoryAPIType
+from property p
+inner join b2b_hotels h on h.propertyid=p.propertyid
+inner join user u on u.userid=h.userid
+inner join city c on c.cityid=p.cityid
+where p.city=pDestination and h.userid=puserId;
+END
+
+
+--------------------------------------------------
+
+USE `staybazar_data`;
+DROP procedure IF EXISTS `Property_GetOnCity`;
+
+DELIMITER $$
+USE `staybazar_data`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Property_GetOnCity`(pCityId INT)
+BEGIN
+		SELECT propertyid,title,location,description,cityid,STATUS,state,country FROM property WHERE (InventoryAPIType=4 or InventoryAPIType=5) AND cityid=pCityId order by title;
+    END$$
+
+DELIMITER ;
+
+
+----------------------------------------------------------------------------
+

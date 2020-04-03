@@ -534,7 +534,8 @@
                                                                         }
                                                                     </div>
                                                                 </td>
-                                                            </tr>}
+                                                            </tr>
+}
                                                         <tr>
                                                             <td class="room-note lightgreybg padding10px" colspan="5">
                                                                 <div>Prices are per accommodation</div>
@@ -850,43 +851,43 @@
                             <button data-animation-duration="1" data-animation-type="bounce" class="full-width icon-check animated" type="button" onclick="SendQuery()">Enquire Now</button>
                         </div>
                         @*<div class="travelo-box">
-                                <h4>Similar Listings</h4>
-                                <div class="image-box style14">
-                                    <article class="box">
-                                        <figure>
-                                            <a href="#"><img src="http://placehold.it/63x59" alt="" /></a>
-                                        </figure>
-                                        <div class="details">
-                                            <h5 class="box-title"><a href="#">Plaza Tour Eiffel</a></h5>
-                                            <label class="price-wrapper">
-                                                <span class="price-per-unit">$170</span>avg/night
-                                            </label>
-                                        </div>
-                                    </article>
-                                    <article class="box">
-                                        <figure>
-                                            <a href="#"><img src="http://placehold.it/63x59" alt="" /></a>
-                                        </figure>
-                                        <div class="details">
-                                            <h5 class="box-title"><a href="#">Sultan Gardens</a></h5>
-                                            <label class="price-wrapper">
-                                                <span class="price-per-unit">$620</span>avg/night
-                                            </label>
-                                        </div>
-                                    </article>
-                                    <article class="box">
-                                        <figure>
-                                            <a href="#"><img src="http://placehold.it/63x59" alt="" /></a>
-                                        </figure>
-                                        <div class="details">
-                                            <h5 class="box-title"><a href="#">Park Central</a></h5>
-                                            <label class="price-wrapper">
-                                                <span class="price-per-unit">$322</span>avg/night
-                                            </label>
-                                        </div>
-                                    </article>
+                        <h4>Similar Listings</h4>
+                        <div class="image-box style14">
+                            <article class="box">
+                                <figure>
+                                    <a href="#"><img src="http://placehold.it/63x59" alt="" /></a>
+                                </figure>
+                                <div class="details">
+                                    <h5 class="box-title"><a href="#">Plaza Tour Eiffel</a></h5>
+                                    <label class="price-wrapper">
+                                        <span class="price-per-unit">$170</span>avg/night
+                                    </label>
                                 </div>
-                            </div>*@
+                            </article>
+                            <article class="box">
+                                <figure>
+                                    <a href="#"><img src="http://placehold.it/63x59" alt="" /></a>
+                                </figure>
+                                <div class="details">
+                                    <h5 class="box-title"><a href="#">Sultan Gardens</a></h5>
+                                    <label class="price-wrapper">
+                                        <span class="price-per-unit">$620</span>avg/night
+                                    </label>
+                                </div>
+                            </article>
+                            <article class="box">
+                                <figure>
+                                    <a href="#"><img src="http://placehold.it/63x59" alt="" /></a>
+                                </figure>
+                                <div class="details">
+                                    <h5 class="box-title"><a href="#">Park Central</a></h5>
+                                    <label class="price-wrapper">
+                                        <span class="price-per-unit">$322</span>avg/night
+                                    </label>
+                                </div>
+                            </article>
+                        </div>
+                    </div>*@
                         <div class="travelo-box book-with-us-box">
                             <h4>Why Book with us?</h4>
                             <ul>
@@ -926,6 +927,9 @@
                 </div>
             </div>
             @Html.Partial("~/Views/Widget/_SearchMostPopular.cshtml")
+            <div>
+                @Html.Partial("~/Views/Search/GetPreferdHotels.cshtml")
+            </div>
         </section>
     </div>
 
@@ -1445,9 +1449,8 @@
         //alert("hi");
         //bd = testmakeData(20061);
         //$("#BookingData").val(bd);
-                    var BookingForSelfValue = $('input:radio[name=BookingForSelf]:checked').val();
-            var NewBillingForValue = $('input:radio[name=NewBillingFor]:checked').val();
-        alert("myval " + BookingForSelfValue + " " + NewBillingForValue);
+                   
+        //alert("myval " + BookingForSelfValue + " " + NewBillingForValue);
 
         if($("#BookingTotal").html() == "0")
         {
@@ -1460,7 +1463,7 @@
             document.getElementById('loading').style.display='block';
 
             var url = "@Url.Action("CheckAccommodationAvailable", "Property")";
-
+             
 
 
             $.get(url, { PropertyId: @PropertyId, BookingData: $("#BookingData").val(), CheckIn: $("#BookCheckIn").val(), CheckOut: $("#BookCheckOut").val(), BookingForSelfValue: $('input:radio[name=BookingForSelf]:checked').val(), NewBillingForValue: $('input:radio[name=NewBillingFor]:checked').val()}, function (data) {

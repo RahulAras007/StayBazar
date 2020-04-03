@@ -10181,6 +10181,7 @@
     <Content Include="Views\Booking\Index - Copy.cshtml" />
     <Content Include="Views\Shared\_Menu - Copy.cshtml" />
     <Content Include="Views\Shared\_Layout - Copy.cshtml" />
+    <Content Include="Views\Search\GetPreferdHotels.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

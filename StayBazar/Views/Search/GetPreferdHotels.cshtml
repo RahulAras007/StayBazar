@@ -1,0 +1,49 @@
+﻿@model StayBazar.Models.SearchModel
+@using Microsoft.AspNet.Identity
+@{
+    string UserId = User.Identity.GetUserId();
+    string Destination = ViewBag.Destination;
+    int j = Convert.ToInt32(BLayer.Settings.GetValue((CLayer.Settings.WIDGET_MOST_POPULAR_NO)));
+    StayBazar.Models.PropertyMostpopularModel b = new StayBazar.Models.PropertyMostpopularModel();
+    b.PropertypopularList = BLayer.PropertyMostpopular.PreferedProperties(Destination, UserId);
+    List<CLayer.Property> PropertypopularList = b.PropertypopularList;
+    string no_image = System.Configuration.ConfigurationManager.AppSettings.Get("NoImageLnk");
+}
+
+
+
+<div class="container">
+    <h2>Preferred Hotels</h2>
+    <div class="block image-carousel style2 flexslider" data-animation="slide" data-item-width="270" data-item-margin="30">
+        <ul class="slides image-box listing-style2">
+            @if (PropertypopularList.Count > 0)
+            {
+
+                foreach (CLayer.Property most in PropertypopularList)
+                {
+
+                    <li>
+                        <article class="box">
+                            <figure>
+                                <a href="ajax/slideshow-popup.html" class="hover-effect popup-gallery"><img src="~/RahulSample/images/luxurious-hotel-room-wallpaper-preview.jpg" alt="" width="270" height="160" /></a>
+                            </figure>
+                            <div class="details">
+                                @*<a title="View all" href="~/serviced-apartments/@most.City.ToLower().Replace(" ", "-")/@most.PropertyId" class="pull-right button uppercase">select</a>*@
+                               @Html.ActionLink("Select","Property","Property",new {propertyid=most.PropertyId,title=most.Title,checkin=ViewBag.CheckIN,checkout=ViewBag.CheckOUT,InventoryAPIType=most.InventoryAPIType },new {@class="pull-right button uppercase", target = "_blank" })
+                                <h4 class="box-title">
+                                    @{
+                                        string title = StayBazar.Common.Utils.ConvertShortLengthString(@most.Title, 20);
+                                        @String.Format(title);
+                                    }
+                                    <small><i class="soap-icon-departure yellow-color"></i>@most.City</small>
+                                </h4>
+                            </div>
+                        </article>
+                    </li>
+
+                }
+
+            }
+        </ul>
+    </div>
+</div>
